@@ -1,0 +1,11 @@
+.coverage
+.tox
+__pycache__
+*.egg
+*.egg-info
+*.mo
+*.pyc
+build/
+sessions/
+nosetests.xml
+/development.ini
