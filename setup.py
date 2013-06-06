@@ -1,4 +1,5 @@
 import os
+import sys
 
 from setuptools import setup, find_packages
 
@@ -7,9 +8,17 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
+    'pymongo==2.5.1',
     'pyramid==1.4',
     'pyramid_jinja2==1.6',
+    'pyramid_debugtoolbar==1.0.4',
+
 ]
+
+if sys.version_info[0] < 3:
+    # Babel does not work with Python 3
+    requires.append('Babel==0.9.6')
+
 
 test_requires = [
     'WebTest==1.4.3',
@@ -55,5 +64,4 @@ setup(name='eduid-dashboard',
       [paste.app_factory]
       main = eduiddashboard:main
       """,
-      paster_plugins=['pyramid'],
       )

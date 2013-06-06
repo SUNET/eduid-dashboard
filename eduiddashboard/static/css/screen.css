@@ -1,0 +1,81 @@
+/* Main marketing message and sign up button */
+.jumbotron {
+    margin: 60px 0;
+    text-align: center;
+}
+.jumbotron h1 {
+    font-size: 72px;
+    line-height: 1;
+}
+
+.jumbotron .lead {
+    margin: 1em 0 2em 0;
+}
+
+.jumbotron input {
+    height: 30px;
+}
+
+.jumbotron .btn {
+    height: 40px;
+    border-radius: 0 5px 5px 0;
+}
+
+.input-append .help-block {
+    font-size: 14px;
+}
+
+.btn-social {
+    display: inline-block;
+    border-radius: 5px;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-social:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.btn-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 40px;
+    height: 40px;
+}
+
+.btn-text {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 14px 0 10px;
+    margin: 0 0 0 4px;
+    border-left: 1px solid #ccc;
+}
+
+.btn-google .btn-icon {
+    background: url("../img/google_icon_32.png") no-repeat scroll 10px 50% transparent;
+}
+
+.btn-facebook .btn-icon {
+    background: url("../img/facebook_icon_32.png") no-repeat scroll 10px 50% transparent;
+}
+
+.btn-google {
+    background-color: rgb(204, 55, 50);
+}
+
+.btn-google:hover {
+    background-color: rgb(231, 75, 55);
+}
+
+.btn-facebook {
+    background-color: rgb(79, 106, 163);
+}
+
+.btn-facebook:hover {
+    background-color: rgb(114, 136, 181);
+}
+
+.pre-big {
+    font-size: 150%;
+}

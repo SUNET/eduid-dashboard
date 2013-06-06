@@ -9,7 +9,7 @@ class ViewTests(unittest.TestCase):
 
     def setUp(self):
         testing.setUp()
-        
+
     def tearDown(self):
         testing.tearDown()
 
@@ -18,4 +18,3 @@ class ViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = my_view(request)
         self.assertEqual(response['project'], 'eduid-dashboard')
-
