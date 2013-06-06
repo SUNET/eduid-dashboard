@@ -14,7 +14,7 @@ class ViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_my_view(self):
-        from eduiddashboard.views import my_view
+        from eduiddashboard.views import home
         request = testing.DummyRequest()
-        response = my_view(request)
-        self.assertEqual(response['project'], 'eduid-dashboard')
+        response = home({}, request)
+        self.assertEqual(response, {})
