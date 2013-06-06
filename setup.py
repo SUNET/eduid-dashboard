@@ -11,6 +11,22 @@ requires = [
     'pyramid_jinja2==1.6',
 ]
 
+test_requires = [
+    'WebTest==1.4.3',
+]
+
+
+docs_extras = [
+    'Sphinx==1.1.3'
+]
+
+
+testing_extras = test_requires + [
+    'nose==1.2.1',
+    'coverage==3.6',
+]
+
+
 setup(name='eduid-dashboard',
       version='0.0',
       description='eduid-dashboard',
@@ -29,7 +45,11 @@ setup(name='eduid-dashboard',
       include_package_data=True,
       zip_safe=False,
       install_requires=requires,
-      tests_require=requires,
+      tests_require=test_requires,
+      extras_require={
+          'testing': testing_extras,
+          'docs': docs_extras,
+      },
       test_suite="eduiddashboard",
       entry_points="""\
       [paste.app_factory]
