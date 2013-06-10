@@ -32,6 +32,7 @@ def includeme(config):
     # root views
     config.add_route('home', '/')
     config.add_route('help', '/help/')
+    config.add_route('token-login', '/tokenlogin/')
 
 
 def main(global_config, **settings):
@@ -53,6 +54,7 @@ def main(global_config, **settings):
     for item in (
         'mongo_uri',
         'site.name',
+        'auth_shared_secret',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:

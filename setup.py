@@ -8,6 +8,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
+    'eduid_am',
     'pymongo==2.5.1',
     'pyramid==1.4',
     'pyramid_jinja2==1.6',

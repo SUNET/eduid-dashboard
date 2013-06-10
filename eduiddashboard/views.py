@@ -1,11 +1,24 @@
 from pyramid.i18n import get_locale_name
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.renderers import render_to_response
+from pyramid.security import remember
 from pyramid.view import view_config
+
+from eduid_am.tasks import AttributeManager
+
+from eduiddashboard.utils import verify_auth_token
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(context, request):
-    return {}
+    email = request.session.get('email', None)
+    user = request.session.get('user', None)
+    # Get the userdata from eduid_am
+
+    return {
+        'email': email,
+        'user': user
+    }
 
 
 @view_config(route_name='help')
@@ -24,3 +37,25 @@ def help(request):
     template = 'eduiddashboard:templates/help-%s.jinja2' % locale_name
 
     return render_to_response(template, {}, request=request)
+
+
+@view_config(route_name='token-login', request_method='POST')
+def token_login(context, request):
+    email = request.POST.get('email')
+    token = request.POST.get('token')
+    shared_key = request.registry.settings.get('auth_shared_secret')
+
+    next_url = request.POST.get('next_url', '/')
+
+    if verify_auth_token(shared_key, email, token):
+        # Do the auth
+
+        am = AttributeManager()
+        user = am.get_user_by_field('email', email)
+        request.session['email'] = email
+        request.session['user'] = user
+        remember_headers = remember(request, email)
+        return HTTPFound(location=next_url, headers=remember_headers)
+    else:
+        # Show and error, the user can't be logged
+        return HTTPBadRequest()
