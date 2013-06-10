@@ -18,16 +18,13 @@ class ViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = home({}, request)
         self.assertEqual(response, {
-            'email': None,
             'user': None
         })
 
         request = testing.DummyRequest()
         request.session = {
-            'email': 'email@example.com',
             'user': {
-                'email':
-                'email@example.com'
+                'email': 'email@example.com'
             },
         }
 

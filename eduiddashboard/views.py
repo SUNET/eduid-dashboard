@@ -4,17 +4,14 @@ from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
-from eduiddashboard.utils import verify_auth_token
+from eduiddashboard.utils import verify_auth_token, get_am
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(context, request):
-    email = request.session.get('email', None)
     user = request.session.get('user', None)
-    # Get the userdata from eduid_am
 
     return {
-        'email': email,
         'user': user
     }
 
@@ -47,8 +44,8 @@ def token_login(context, request):
 
     if verify_auth_token(shared_key, email, token):
         # Do the auth
-
-        user = request.am.get_user_by_field('email', email)
+        am = get_am(request)
+        user = am.get_user_by_field('email', email)
         request.session['email'] = email
         request.session['user'] = user
         remember_headers = remember(request, email)

@@ -4,8 +4,6 @@ import re
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 
-from eduid_am.tasks import AttributeManager
-
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
 
@@ -30,8 +28,6 @@ def includeme(config):
     config.registry.settings['db_conn'] = mongodb.get_connection
 
     config.set_request_property(get_db, 'db', reify=True)
-
-    config.set_request_property(AttributeManager(), 'am', reify=True)
 
     # root views
     config.add_route('home', '/')

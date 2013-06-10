@@ -9,7 +9,16 @@
   <div class='row'>
     <dl>
       <dt>Email</dt>
-      <dd>{{ user.email }}</dd>
+      <dd>{{ user.email }} <strong>{% if not user.verified %}Not verified{% else %}verified{% endif %}</strong> </dd>
+
+      <dt>First Name</dt>
+      <dd>{{ user.first_name }}</dd>
+
+      <dt>Last Name</dt>
+      <dd>{{ user.last_name }}</dd>
+
+      <dt>Screen Name</dt>
+      <dd>{{ user.screen_name }}</dd>
     </dl>
   </div>
 
