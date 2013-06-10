@@ -4,8 +4,6 @@ from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
-from eduid_am.tasks import AttributeManager
-
 from eduiddashboard.utils import verify_auth_token
 
 
@@ -50,8 +48,7 @@ def token_login(context, request):
     if verify_auth_token(shared_key, email, token):
         # Do the auth
 
-        am = AttributeManager()
-        user = am.get_user_by_field('email', email)
+        user = request.am.get_user_by_field('email', email)
         request.session['email'] = email
         request.session['user'] = user
         remember_headers = remember(request, email)
