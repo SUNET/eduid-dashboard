@@ -15,6 +15,7 @@ requires = [
     'pyramid_debugtoolbar==1.0.4',
     'colander==1.0a5',
     'deform==0.9.7',
+    'deform_bootstrap==0.2.7',
 ]
 
 if sys.version_info[0] < 3:
