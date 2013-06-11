@@ -13,7 +13,8 @@ requires = [
     'pyramid==1.4',
     'pyramid_jinja2==1.6',
     'pyramid_debugtoolbar==1.0.4',
-
+    'colander==1.0a5',
+    'deform==0.9.7',
 ]
 
 if sys.version_info[0] < 3:

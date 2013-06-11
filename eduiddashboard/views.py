@@ -4,15 +4,23 @@ from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
+from deform import Form
+
 from eduiddashboard.utils import verify_auth_token, get_am
+from eduiddashboard.models import Person
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(context, request):
     user = request.session.get('user', None)
+    schema = Person()
+    person = schema.serialize(user)
+
+    form = Form(schema, buttons=('submit',))
 
     return {
-        'user': user
+        'person': person,
+        'form': form,
     }
 
 
