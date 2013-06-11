@@ -16,12 +16,7 @@ class ViewTests(unittest.TestCase):
     def test_my_view(self):
         from eduiddashboard.views import home
         request = testing.DummyRequest()
-        response = home({}, request)
-        self.assertEqual(response, {
-            'user': None
-        })
 
-        request = testing.DummyRequest()
         request.session = {
             'user': {
                 'email': 'email@example.com'
@@ -29,4 +24,4 @@ class ViewTests(unittest.TestCase):
         }
 
         response = home({}, request)
-        self.assertEqual(response, request.session)
+        self.assertEqual(response['person']['email'], 'email@example.com')
