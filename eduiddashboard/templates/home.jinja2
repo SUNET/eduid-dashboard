@@ -2,6 +2,11 @@
 
 {% block nav_class_home %}active{% endblock %}
 
+{% block headjs %}
+<script href="{{'deform:static/scripts/deform.js'|static_url }}"></script>
+<script href="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url }}"></script>
+{% endblock %}
+
 {% block contents %}
 
   <h2>{{ _("eduID dashboard.") }}</h2>

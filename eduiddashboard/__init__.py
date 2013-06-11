@@ -76,6 +76,8 @@ def main(global_config, **settings):
     config.include('deform_bootstrap')
 
     config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_static_view('deform', 'deform:static',
+                           cache_max_age=3600)
     config.add_static_view('deform_bootstrap', 'deform_bootstrap:static',
                            cache_max_age=3600)
 

@@ -14,6 +14,9 @@
     <link href="{{'eduiddashboard:static/css/screen.css'|static_url}}" rel="stylesheet" media="screen">
     {% block extracss %}
     {% endblock %}
+
+    {% block headjs %}
+    {% endblock %}
   </head>
   <body>
     <div class="container">
@@ -23,6 +26,14 @@
           <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
         </ul>
         <h3 class="muted"><a href="{{ request.route_path('home') }}">eduID</a></h3>
+      </div>
+      <div class="messages">
+      {% for message in request.session.pop_flash() %}
+        <div class="alert alert-{{ message|get_flash_message_type }}">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          {{ message|get_flash_message_text }}
+        </div>
+      {% endfor %}
       </div>
       {% block contents %}
 

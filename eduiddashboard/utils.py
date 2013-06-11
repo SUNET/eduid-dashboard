@@ -18,3 +18,7 @@ def get_am(request):
 
     celery.conf.update(settings)
     return get_attribute_manager(celery)
+
+
+def flash(request, message_type, message):
+    request.session.flash("{0}|{1}".format(message_type, message))

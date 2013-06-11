@@ -4,20 +4,34 @@ from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
-from deform import Form
+from deform import Form, ValidationFailure
 
-from eduiddashboard.utils import verify_auth_token, get_am
+from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
+from eduiddashboard.utils import verify_auth_token, get_am, flash
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(context, request):
     user = request.session.get('user', None)
     schema = Person()
-    person = schema.serialize(user)
-
     form = Form(schema, buttons=('submit',))
+    if request.POST:
+        controls = request.POST.items()
+        try:
+            user_modified = form.validate(controls)
+        except ValidationFailure:
+            flash(request, 'error',
+                  _('Please fix the highlighted errors in the form'))
+            person = schema.serialize(user)
+        else:
+            person = schema.serialize(user_modified)
+            # Do the save staff
+            flash(request, 'info',
+                  _('Your changes was saved'))
+            return HTTPFound(request.route_url('home'))
 
+    person = schema.serialize(user)
     return {
         'person': person,
         'form': form,
