@@ -11,15 +11,24 @@
 
   <h2>{{ _("eduID dashboard.") }}</h2>
 
+  <div class='loa-big'>
+    <div>{{ _('Level %(level)s')|format(level=request.session.get('loa', 5)) }}</div>
+  </div>
+
   <h3>{{ _("Summary") }}</h3>
+
+  <div class='clearfix'></div>
 
   <div class='row'>
     <div class='span6'>
       <h4>{{ _("Level of assurance") }}</h4>
-        <div>
-          Loa: {{ request.session.get('loa', 5) }}
-        </div>
 
+        <ul class='circles-widget-labels'>
+          <li>{{ _('Level 5') }}</li>
+          <li>{{ _('Level 4') }}</li>
+          <li>{{ _('Level 3') }}</li>
+          <li>{{ _('Level 2') }}</li>
+        </ul>
         <div class='circles-widget  level-{{ request.session.get('loa', 5) }}' >
           <img src="{{ 'eduiddashboard:static/img/circle-bar.png'|static_url }}" />
           <div class='bar'></div>
@@ -28,9 +37,10 @@
     </div>
 
     <div class='span6'>
-      <h4>{{ _("Profile filled") }}</h4>
-      Total: {{ profile_filled }} %
-
+      <h4>{{ _("Profile filled") }}: {{ profile_filled }}%</h4>
+      <div class="progress progress-striped active">
+        <div class="bar" style="width: {{ profile_filled }}%;"></div>
+      </div>
     </div>
   </div>
 
