@@ -4,6 +4,7 @@ import re
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 
+from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
 
@@ -65,6 +66,12 @@ def main(global_config, **settings):
                                              None)
     if mongo_replicaset is not None:
         settings['mongo_replicaset'] = mongo_replicaset
+
+    # configure Celery broker
+    broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
+    celery.conf.update(BROKER_URL=broker_url)
+    settings['celery'] = celery
+    settings['broker_url'] = broker_url
 
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
 

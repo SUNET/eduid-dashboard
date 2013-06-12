@@ -6,6 +6,8 @@ from pyramid.view import view_config
 
 from deform import Form, ValidationFailure
 
+from eduid_am.tasks import update_attributes
+
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 from eduiddashboard.utils import verify_auth_token, get_am, flash
@@ -26,9 +28,23 @@ def home(context, request):
             person = schema.serialize(user)
         else:
             person = schema.serialize(user_modified)
+            # update the session data
+            request.session['user'].update(person)
+
+            # Remove items from changes queue, if exists
+            request.db.profiles.remove({
+                '_id': user['_id'],
+            })
+
+            # Insert the new user object
+            request.db.profiles.insert(user, safe=True)
+
+            update_attributes.delay('eduid_dashboard', str(user['_id']))
+
             # Do the save staff
             flash(request, 'info',
-                  _('Your changes was saved'))
+                  _('Your changes was saved, please, wait before your changes'
+                    'are distributed through all applications'))
             return HTTPFound(request.route_url('home'))
 
     person = schema.serialize(user)
