@@ -5,6 +5,7 @@ from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
+from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.view import view_config
 from pyramid.security import remember
@@ -75,4 +76,9 @@ def logout_service(request):
 
 @view_config(route_name='saml2-metadata')
 def metadata(request):
-    raise NotImplemented()
+    """Returns an XML with the SAML 2.0 metadata for this
+    SP as configured in the settings.py file.
+    """
+    conf = get_saml2_config(request.registry.settings.get('saml2.settings_module'))
+    metadata = entity_descriptor(conf)
+    return Response(body=str(metadata), content_type="text/xml; charset=utf8")
