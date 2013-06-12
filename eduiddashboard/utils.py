@@ -10,7 +10,7 @@ def verify_auth_token(shared_key, public_word, token, generator=sha256):
 
 def get_am(request):
 
-    settings = {'mongodb': request.registry.settings['mongo_uri_am']}
+    settings = {'MONGO_URI': request.registry.settings['mongo_uri_am']}
 
     mongo_replicaset = request.registry.settings.get('mongo_replicaset', None)
     if mongo_replicaset is not None:
