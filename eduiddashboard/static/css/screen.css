@@ -79,3 +79,40 @@
 .pre-big {
     font-size: 150%;
 }
+
+.circles-widget .bar {
+  height: 32px;
+  background-color: #0088cc;
+  z-index: 0;
+}
+
+
+.circles-widget.level-5 .bar {
+  width: 25px;
+}
+
+.circles-widget.level-4 .bar {
+  width: 100px;
+}
+
+.circles-widget.level-3 .bar {
+  width: 175px;
+}
+
+.circles-widget.level-2 .bar {
+  width: 237px;
+}
+
+.circles-widget.level-1 .bar {
+  width: 300px;
+}
+
+.circles-widget img {
+  position: absolute;
+  z-index: 10;
+}
+
+.circles-widget {
+  height: 32px;
+  width: 237px;
+}

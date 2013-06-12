@@ -32,9 +32,14 @@ def home(context, request):
             return HTTPFound(request.route_url('home'))
 
     person = schema.serialize(user)
+
+    total_fields = len(schema.children)
+    filled_fields = len(person.keys())
+
     return {
         'person': person,
         'form': form,
+        'profile_filled': (filled_fields / total_fields) * 100,
     }
 
 
@@ -70,6 +75,7 @@ def token_login(context, request):
         user = am.get_user_by_field('email', email)
         request.session['email'] = email
         request.session['user'] = user
+        request.session['loa'] = 5
         remember_headers = remember(request, email)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
