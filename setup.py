@@ -16,6 +16,7 @@ requires = [
     'colander==1.0a5',
     'deform==0.9.7',
     'deform_bootstrap==0.2.7',
+    'pysaml2==1.0.2',
 ]
 
 if sys.version_info[0] < 3:
