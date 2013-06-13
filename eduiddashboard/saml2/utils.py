@@ -10,6 +10,11 @@ def get_saml2_config(module_path):
     return conf
 
 
+def get_saml2_config_from_request(request):
+    module_path = request.registry.settings.get('saml2.settings_module')
+    return get_saml2_config(module_path)
+
+
 def get_location(http_info):
     """Extract the redirect URL from a pysaml2 http_info object"""
     assert 'headers' in http_info

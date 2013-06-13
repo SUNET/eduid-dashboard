@@ -2,7 +2,7 @@ import os
 
 from pyramid.exceptions import ConfigurationError
 
-from eduiddashboard.saml2.utils import get_saml2_config
+from eduiddashboard.saml2.utils import get_saml2_config_from_request
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -25,8 +25,8 @@ def includeme(config):
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
 
-    saml2_config = get_saml2_config(settings.get('saml2.settings_module'))
-    config.set_request_property(saml2_config, 'saml2_config', reify=True)
+    config.add_request_method(get_saml2_config_from_request, 'saml2_config',
+                              reify=True)
 
     # saml2 views
     config.add_route('saml2-login', '/saml2/login/')
