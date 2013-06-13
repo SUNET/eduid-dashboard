@@ -1,8 +1,11 @@
 import os
 
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import ConfigurationError
 
 from eduiddashboard.saml2.utils import get_saml2_config_from_request
+from eduiddashboard.saml2.security import groupfinder
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -19,14 +22,46 @@ def includeme(config):
     for item in (
         'saml2.settings_module',
         'saml2.login_redirect_url',
+        'saml2.user_main_attribute',
+        'auth_tk_secret'
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
 
+    attribute_mapping_raw = read_setting_from_env(settings,
+                                                  'saml2.attribute_mapping',
+                                                  "")
+
+    attribute_mapping = {}
+    for raw_line in attribute_mapping_raw.split('\n'):
+        if '=' in raw_line:
+            (from_saml2, to_local) = raw_line.split('=')
+            from_saml2 = from_saml2.strip()
+            to_local = to_local.strip()
+            if from_saml2 not in attribute_mapping:
+                attribute_mapping[from_saml2] = [to_local]
+            else:
+                attribute_mapping[from_saml2].append(to_local)
+
+    if attribute_mapping == {}:
+        raise ConfigurationError(
+            'The saml2.attribute_mapping configuration option is required. '
+            'Remember you mast user one line per attribute with the follow '
+            'format: saml_attribute=local_attribute')
+
+    settings['saml2.attribute_mapping'] = attribute_mapping
+
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
+
+    authn_policy = AuthTktAuthenticationPolicy(
+        settings['auth_tk_secret'], callback=groupfinder, hashalg='sha512')
+    authz_policy = ACLAuthorizationPolicy()
+
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
 
     # saml2 views
     config.add_route('saml2-login', '/saml2/login/')
