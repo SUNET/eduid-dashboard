@@ -35,14 +35,6 @@ def includeme(config):
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
 
-    # saml2 views
-    config.add_route('saml2-login', '/saml2/login/')
-    config.add_route('saml2-acs', '/saml2/acs/')
-    config.add_route('saml2-echo-attributes', '/saml2/echo-attributes/')
-    config.add_route('saml2-logout', '/saml2/logout/')
-    config.add_route('saml2-logout-service', '/saml2/slo/')
-    config.add_route('saml2-metadata', '/saml2/metadata/')
-
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
@@ -64,8 +56,6 @@ def main(global_config, **settings):
         'mongo_uri',
         'site.name',
         'auth_shared_secret',
-        'saml2.settings_module',
-        'saml2.login_redirect_url',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -91,6 +81,8 @@ def main(global_config, **settings):
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
+
+    config.include('eduiddashboard.saml2')
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_static_view('deform', 'deform:static',

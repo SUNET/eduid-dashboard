@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 @view_config(route_name='saml2-login')
 def login(request):
-    login_redirect_url = request.registry.settings.get('saml2.login_redirect_url', '/')
+    login_redirect_url = request.registry.settings.get(
+        'saml2.login_redirect_url', '/')
 
     came_from = request.GET.get('next', login_redirect_url)
 
@@ -26,10 +27,9 @@ def login(request):
         HTTPFound(came_from)
 
     selected_idp = request.GET.get('idp', None)
-    conf = get_saml2_config(request.registry.settings.get('saml2.settings_module'))
 
     # is a embedded wayf needed?
-    idps = conf.getattr('idp', 'sp')
+    idps = request.saml2_config.getattr('idp', 'sp')
     if selected_idp is None and len(idps) > 1:
         logger.debug('A discovery process is needed')
 
@@ -38,7 +38,7 @@ def login(request):
             'came_from': came_from,
         })
 
-    client = Saml2Client(conf)
+    client = Saml2Client(request.saml2_config)
     try:
         (session_id, result) = client.prepare_for_authenticate(
             entityid=selected_idp, relay_state=came_from,
