@@ -79,6 +79,20 @@ def metadata(request):
     """Returns an XML with the SAML 2.0 metadata for this
     SP as configured in the settings.py file.
     """
-    conf = get_saml2_config(request.registry.settings.get('saml2.settings_module'))
+    conf = get_saml2_config(
+        request.registry.settings.get('saml2.settings_module'))
     metadata = entity_descriptor(conf)
     return Response(body=str(metadata), content_type="text/xml; charset=utf8")
+
+
+@view_config(route_name='saml2-wayf-demo',
+             renderer='templates/wayf.jinja2')
+def wayf_demo(request):
+    return {
+        'available_idps': (
+            ('http://idp1.example.com', 'IDP from Organization 1'),
+            ('http://idp2.example.com', 'IDP from Organization 2'),
+        ),
+        'came_from': '/',
+        'login_url': request.route_url('saml2-login'),
+    }

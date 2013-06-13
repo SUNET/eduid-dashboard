@@ -35,3 +35,5 @@ def includeme(config):
     config.add_route('saml2-logout', '/saml2/logout/')
     config.add_route('saml2-logout-service', '/saml2/slo/')
     config.add_route('saml2-metadata', '/saml2/metadata/')
+
+    config.add_route('saml2-wayf-demo', '/saml2/wayf-demo/')
