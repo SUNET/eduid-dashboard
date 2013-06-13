@@ -56,22 +56,22 @@ def login(request):
 
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
-    raise NotImplemented()
+    raise NotImplementedError
 
 
 @view_config(route_name='saml2-echo-attributes')
 def echo_attributes(request):
-    raise NotImplemented()
+    raise NotImplementedError
 
 
 @view_config(route_name='saml2-logout')
 def logout(request):
-    raise NotImplemented()
+    raise NotImplementedError
 
 
 @view_config(route_name='saml2-logout-service')
 def logout_service(request):
-    raise NotImplemented()
+    raise NotImplementedError
 
 
 @view_config(route_name='saml2-metadata')
