@@ -4,10 +4,12 @@ from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized
+from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest,
+                                    HTTPUnauthorized, HTTPForbidden)
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
-from pyramid.view import view_config
+from pyramid.security import authenticated_userid
+from pyramid.view import view_config, forbidden_view_config
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login
@@ -25,6 +27,16 @@ def _get_subject_id(session):
     return session['_saml2_subject_id']
 
 
+@forbidden_view_config()
+def forbidden_view(request):
+    # do not allow a user to login if they are already logged in
+    if authenticated_userid(request):
+        return HTTPForbidden()
+
+    loc = request.route_url('saml2-login',
+                            _query=(('next', request.path),))
+    return HTTPFound(location=loc)
+
 
 @view_config(route_name='saml2-login')
 def login_view(request):
@@ -33,7 +45,7 @@ def login_view(request):
 
     came_from = request.GET.get('next', login_redirect_url)
 
-    if request.session.get('is_logged', False):
+    if authenticated_userid(request):
         HTTPFound(came_from)
 
     selected_idp = request.GET.get('idp', None)
@@ -62,7 +74,7 @@ def login_view(request):
     oq_cache.set(session_id, came_from)
 
     logger.debug('Redirecting the user to the IdP')
-    return HTTPFound(get_location(result))
+    return HTTPFound(location=get_location(result))
 
 
 @view_config(route_name='saml2-acs', request_method='POST')
@@ -109,7 +121,7 @@ def assertion_consumer_service(request):
     # redirect the user to the view where he came from
     relay_state = request.POST.get('RelayState', '/')
     logger.debug('Redirecting to the RelayState: ' + relay_state)
-    return HTTPFound(relay_state, headers=headers)
+    return HTTPFound(location=relay_state, headers=headers)
 
 
 @view_config(route_name='saml2-echo-attributes')

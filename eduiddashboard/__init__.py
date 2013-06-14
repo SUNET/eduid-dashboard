@@ -7,6 +7,8 @@ from pyramid.exceptions import ConfigurationError
 from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
+from eduiddashboard.permissions import RootFactory, PersonFactory
+from eduiddashboard.saml2 import configure_authtk
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -31,7 +33,7 @@ def includeme(config):
     config.set_request_property(get_db, 'db', reify=True)
 
     # root views
-    config.add_route('home', '/')
+    config.add_route('home', '/', factory=PersonFactory)
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
 
@@ -76,7 +78,10 @@ def main(global_config, **settings):
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
 
     config = Configurator(settings=settings,
+                          root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
+
+    config = configure_authtk(config, settings)
 
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')

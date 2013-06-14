@@ -13,7 +13,8 @@ from eduiddashboard.models import Person
 from eduiddashboard.utils import verify_auth_token, get_am, flash
 
 
-@view_config(route_name='home', renderer='templates/home.jinja2')
+@view_config(route_name='home', renderer='templates/home.jinja2',
+             permission='edit')
 def home(context, request):
     user = request.session.get('user', None)
     schema = Person()

@@ -5,7 +5,6 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import ConfigurationError
 
 from eduiddashboard.saml2.utils import get_saml2_config_from_request
-from eduiddashboard.saml2.security import groupfinder
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -14,6 +13,17 @@ def read_setting_from_env(settings, key, default=None):
         return os.environ[env_variable]
     else:
         return settings.get(key, default)
+
+
+def configure_authtk(config, settings):
+    authn_policy = AuthTktAuthenticationPolicy(
+        settings['auth_tk_secret'], hashalg='sha512')
+
+    authz_policy = ACLAuthorizationPolicy()
+
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
+    return config
 
 
 def includeme(config):
@@ -55,13 +65,6 @@ def includeme(config):
 
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
-
-    authn_policy = AuthTktAuthenticationPolicy(
-        settings['auth_tk_secret'], callback=groupfinder, hashalg='sha512')
-    authz_policy = ACLAuthorizationPolicy()
-
-    config.set_authentication_policy(authn_policy)
-    config.set_authorization_policy(authz_policy)
 
     # saml2 views
     config.add_route('saml2-login', '/saml2/login/')
