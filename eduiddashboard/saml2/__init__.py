@@ -58,7 +58,7 @@ def includeme(config):
     if attribute_mapping == {}:
         raise ConfigurationError(
             'The saml2.attribute_mapping configuration option is required. '
-            'Remember you mast user one line per attribute with the follow '
+            'Remember you must use one line per attribute with the follow '
             'format: saml_attribute=local_attribute')
 
     settings['saml2.attribute_mapping'] = attribute_mapping
