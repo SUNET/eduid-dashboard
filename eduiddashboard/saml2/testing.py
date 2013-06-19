@@ -70,6 +70,7 @@ def saml2_main(global_config, **settings):
     config = configure_authtk(config, settings)
 
     config.include('pyramid_beaker')
+    config.include('pyramid_jinja2')
 
     saml2_includeme(config)
 
@@ -92,7 +93,12 @@ class Saml2RequestTests(unittest.TestCase):
             'saml2.attribute_mapping': "email = mail",
             'auth_tk_secret': '123456',
             'testing': True,
-
+            'jinja2.directories': 'eduiddashboard:saml2/templates',
+            'jinja2.undefined': 'strict',
+            'jinja2.filters': """
+                route_url = pyramid_jinja2.filters:route_url_filter
+                static_url = pyramid_jinja2.filters:static_url_filter
+            """,
         }
         app = saml2_main({}, **settings)
         self.testapp = TestApp(app)

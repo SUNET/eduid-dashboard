@@ -9,4 +9,3 @@ class AuthTests(Saml2RequestTests):
         self.assertEqual(get_loa({}), 5)
         self.assertEqual(get_loa(None), 5)
         self.assertEqual(get_loa({'LoA': 3}), 3)
-
