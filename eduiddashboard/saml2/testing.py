@@ -32,10 +32,13 @@ class MockedUserDB(IUserDB):
         },
     }
 
+    def __init__(self):
+        pass
+
     def get_user(self, userid):
-        if userid not in self.test_user:
+        if userid not in self.test_users:
             raise self.UserDoesNotExist
-        return self.test_user.get(userid)
+        return self.test_users.get(userid)
 
 
 class RootFactory(object):
@@ -84,7 +87,7 @@ class Saml2RequestTests(unittest.TestCase):
     def setUp(self):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
-        settings = {
+        self.settings = {
             'auth_tk_secret': '123456',
             'saml2.settings_module': path.join(path.dirname(__file__),
                                                'tests/data/saml2_settings.py'),
@@ -100,7 +103,7 @@ class Saml2RequestTests(unittest.TestCase):
                 static_url = pyramid_jinja2.filters:static_url_filter
             """,
         }
-        app = saml2_main({}, **settings)
+        app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
 
     def tearDown(self):
@@ -123,3 +126,9 @@ class Saml2RequestTests(unittest.TestCase):
             session[key] = value
         session.persist()
         self.testapp.cookies['beaker.session.id'] = session._sess.id
+        return request
+
+    def dummy_request(self):
+        request = DummyRequest()
+        request.userdb = MockedUserDB()
+        return request

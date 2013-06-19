@@ -11,3 +11,6 @@ class IUserDB:
 
     class MultipleUsersReturned(Exception):
         pass
+
+    class UserDoesNotExist(Exception):
+        pass
