@@ -58,3 +58,14 @@ class AuthTests(Saml2RequestTests):
                           {
                               'NOTmail': 'mail',
                           }))
+
+    def test_login(self):
+        session_info = self.get_fake_session_info()
+        request = self.get_request_with_session()
+        attribute_mapping = {
+            'mail': 'email',
+        }
+
+        user = authenticate(request, session_info, attribute_mapping)
+
+        self.assertIsNotNone(login(request, session_info, user))

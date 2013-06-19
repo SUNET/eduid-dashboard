@@ -132,3 +132,14 @@ class Saml2RequestTests(unittest.TestCase):
         request = DummyRequest()
         request.userdb = MockedUserDB()
         return request
+
+    def get_request_with_session(self):
+        queryUtility = self.testapp.app.registry.queryUtility
+        session_factory = queryUtility(ISessionFactory)
+
+        request = self.dummy_request()
+        request.userdb = MockedUserDB()
+        session = session_factory(request)
+        session.persist()
+        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        return request
