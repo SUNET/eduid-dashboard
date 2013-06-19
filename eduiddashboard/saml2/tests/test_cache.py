@@ -84,3 +84,12 @@ class OutstandingQueriesCacheTests(unittest.TestCase):
         oqc.delete('session_id')
 
         self.assertEqual(oqc.outstanding_queries(), {})
+
+
+class IdentityCacheTests(unittest.TestCase):
+
+    def test_init(self):
+        ic = IdentityCache({})
+
+        self.assertIsInstance(ic._db, pyramidSessionCacheAdapter)
+        self.assertTrue(ic._sync, True)
