@@ -49,3 +49,38 @@ class pyramidSessionCacheAdapterTests(unittest.TestCase):
 
         psca.sync()
         self.assertEqual(psca._get_objects(), {'onekey': 'onevalue'})
+
+
+class OutstandingQueriesCacheTests(unittest.TestCase):
+
+    def test_init(self):
+        fake_session_dict = {
+            'user': 'someone@example.com',
+        }
+        oqc = OutstandingQueriesCache(fake_session_dict)
+
+        self.assertIsInstance(oqc._db, pyramidSessionCacheAdapter)
+
+    def test_outstanding_queries(self):
+
+        oqc = OutstandingQueriesCache({})
+        oqc._db['user'] = 'someone@example.com'
+        oqc._db.sync()
+
+        self.assertEqual(oqc.outstanding_queries(), {'user':
+                                                     'someone@example.com'})
+
+    def test_set(self):
+        oqc = OutstandingQueriesCache({})
+        oqc.set('session_id', '/next')
+
+        self.assertEqual(oqc.outstanding_queries(), {'session_id': '/next'})
+
+    def test_delete(self):
+        oqc = OutstandingQueriesCache({})
+        oqc.set('session_id', '/next')
+        self.assertEqual(oqc.outstanding_queries(), {'session_id': '/next'})
+
+        oqc.delete('session_id')
+
+        self.assertEqual(oqc.outstanding_queries(), {})
