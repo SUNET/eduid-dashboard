@@ -9,6 +9,7 @@ from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import RootFactory, PersonFactory
 from eduiddashboard.saml2 import configure_authtk
+from eduiddashboard.userdb import UserDB, get_userdb
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -31,6 +32,10 @@ def includeme(config):
     config.registry.settings['db_conn'] = mongodb.get_connection
 
     config.set_request_property(get_db, 'db', reify=True)
+
+    userdb = UserDB(config.registry.settings)
+    config.registry.settings['userdb'] = userdb
+    config.add_request_method(get_userdb, 'userdb', reify=True)
 
     # root views
     config.add_route('home', '/', factory=PersonFactory)
@@ -58,6 +63,7 @@ def main(global_config, **settings):
         'mongo_uri',
         'site.name',
         'auth_shared_secret',
+        'mongo_uri_am',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:

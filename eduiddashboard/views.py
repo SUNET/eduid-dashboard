@@ -10,7 +10,7 @@ from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
-from eduiddashboard.utils import verify_auth_token, get_am, flash
+from eduiddashboard.utils import verify_auth_token, flash
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2',
@@ -88,8 +88,7 @@ def token_login(context, request):
 
     if verify_auth_token(shared_key, email, token):
         # Do the auth
-        am = get_am(request)
-        user = am.get_user_by_field('email', email)
+        user = request.userdb.get_user(email)
         request.session['email'] = email
         request.session['user'] = user
         request.session['loa'] = 5

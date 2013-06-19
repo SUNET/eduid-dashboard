@@ -21,11 +21,6 @@ import logging
 
 from pyramid.security import remember
 
-from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
-
-# TODO Make authenticate_user a pluggable method
-from eduiddashboard.utils import get_am
-
 
 logger = logging.getLogger(__name__)
 
@@ -67,15 +62,13 @@ def authenticate(request, session_info, attribute_mapping):
 
     user = None
     logger.debug('Retrieving existing user "%s"' % saml_user)
-
-    am = get_am(request)
     try:
-        user = am.get_user_by_field(user_main_attribute, saml_user)
-    except UserDoesNotExist:
+        user = request.userdb.get_user(saml_user)
+    except request.userdb.UserDoesNotExist:
         logger.error('The user "%s" does not exist' % saml_user)
         return None
 
-    except MultipleUsersReturned:
+    except request.userdb.MultipleUsersReturned:
         logger.error("There are more than one user with %s = %s" %
                      (user_main_attribute, saml_user))
         return None
