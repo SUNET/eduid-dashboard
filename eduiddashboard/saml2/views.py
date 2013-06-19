@@ -33,9 +33,9 @@ def forbidden_view(request):
     if authenticated_userid(request):
         return HTTPForbidden()
 
-    loc = request.route_url('saml2-login',
-                            _query=(('next', request.path),))
-    return HTTPFound(location=loc)
+    loginurl = request.route_url('saml2-login',
+                                 _query=(('next', request.path),))
+    return HTTPFound(location=loginurl)
 
 
 @view_config(route_name='saml2-login')
