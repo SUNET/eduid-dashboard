@@ -5,10 +5,12 @@ from os import path
 from webtest import TestApp, TestRequest
 
 from pyramid.config import Configurator
-from pyramid.interfaces import ISessionFactory
+
+from pyramid.interfaces import ISessionFactory, IDebugLogger
 from pyramid.security import (remember, Allow, Authenticated, Everyone,
                               ALL_PERMISSIONS)
-from pyramid.testing import DummyRequest
+from pyramid.testing import DummyRequest, DummyResource
+from pyramid import testing
 
 from eduiddashboard.saml2.userdb import IUserDB
 from eduiddashboard.saml2 import includeme as saml2_includeme
@@ -106,9 +108,23 @@ class Saml2RequestTests(unittest.TestCase):
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
 
+        self.config = testing.setUp()
+        self.config.registry.registerUtility(self, IDebugLogger)
+
     def tearDown(self):
         super(Saml2RequestTests, self).tearDown()
         self.testapp.reset()
+
+    def _makeOne(self, userid=None, callback=None):
+        from pyramid.authentication import CallbackAuthenticationPolicy
+
+        class MyAuthenticationPolicy(CallbackAuthenticationPolicy):
+            def unauthenticated_userid(self, request):
+                return userid
+        policy = MyAuthenticationPolicy()
+        policy.debug = True
+        policy.callback = callback
+        return policy
 
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
@@ -130,7 +146,12 @@ class Saml2RequestTests(unittest.TestCase):
 
     def dummy_request(self):
         request = DummyRequest()
+        request.context = DummyResource()
+        self.pol = self.config.testing_securitypolicy(
+            'user', ('editors', ),
+            permissive=False, remember_result=True)
         request.userdb = MockedUserDB()
+        request.registry.settings = self.settings
         return request
 
     def get_request_with_session(self):
@@ -143,3 +164,27 @@ class Saml2RequestTests(unittest.TestCase):
         session.persist()
         self.testapp.cookies['beaker.session.id'] = session._sess.id
         return request
+
+    def get_fake_session_info(self, user=None):
+        session_info = {
+            'authn_info': [
+                ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', [])
+            ],
+            'name_id': None,
+            'not_on_or_after': 1371671386,
+            'came_from': u'/',
+            'ava': {
+                'cn': ['Usuario1'],
+                'objectclass': ['top', 'inetOrgPerson', 'person', 'eduPerson'],
+                'userpassword': ['1234'],
+                'edupersonaffiliation': ['student'],
+                'sn': ['last name'],
+                'mail': ['user1@example.com']
+            },
+            'issuer': 'https://idp.example.com/saml/saml2/idp/metadata.php'
+        }
+
+        if user is not None:
+            session_info['ava']['mail'] = user
+
+        return session_info

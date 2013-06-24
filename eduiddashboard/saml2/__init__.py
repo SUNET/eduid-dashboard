@@ -75,3 +75,4 @@ def includeme(config):
     config.add_route('saml2-metadata', '/saml2/metadata/')
 
     config.add_route('saml2-wayf-demo', '/saml2/wayf-demo/')
+    config.add_route('saml2-forbidden-view', '/saml2/forbidden/')

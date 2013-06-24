@@ -28,6 +28,7 @@ def _get_subject_id(session):
 
 
 @forbidden_view_config()
+@view_config(route_name='saml2-forbidden-view')
 def forbidden_view(request):
     # do not allow a user to login if they are already logged in
     if authenticated_userid(request):
