@@ -87,7 +87,7 @@ def assertion_consumer_service(request):
     client = Saml2Client(request.saml2_config)
 
     if 'SAMLResponse' not in request.POST:
-        return HTTPBadRequest(
+        raise HTTPBadRequest(
             'Couldn\'t find "SAMLResponse" in POST data.')
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
@@ -101,7 +101,7 @@ def assertion_consumer_service(request):
                                                    outstanding_queries)
     if response is None:
         logger.error('SAML response is None')
-        return HTTPBadRequest(
+        raise HTTPBadRequest(
             "SAML response has errors. Please check the logs")
 
     session_id = response.session_id()
@@ -115,7 +115,7 @@ def assertion_consumer_service(request):
     user = authenticate(request, session_info, attribute_mapping)
     if user is None:
         logger.error('The user is None')
-        return HTTPUnauthorized("Access not authorized")
+        raise HTTPUnauthorized("Access not authorized")
 
     headers = login(request, session_info, user)
 
