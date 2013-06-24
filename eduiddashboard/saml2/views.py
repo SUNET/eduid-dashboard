@@ -34,11 +34,11 @@ def forbidden_view(request):
     if authenticated_userid(request):
         login_redirect_url = request.registry.settings.get(
             'saml2.login_redirect_url', '/')
-        raise HTTPFound(login_redirect_url)
+        return HTTPFound(login_redirect_url)
 
     loginurl = request.route_url('saml2-login',
                                  _query=(('next', request.path),))
-    raise HTTPFound(location=loginurl)
+    return HTTPFound(location=loginurl)
 
 
 @view_config(route_name='saml2-login')
@@ -49,7 +49,7 @@ def login_view(request):
     came_from = request.GET.get('next', login_redirect_url)
 
     if authenticated_userid(request):
-        raise HTTPFound(came_from)
+        return HTTPFound(came_from)
 
     selected_idp = request.GET.get('idp', None)
 
@@ -88,7 +88,7 @@ def assertion_consumer_service(request):
     client = Saml2Client(request.saml2_config)
 
     if 'SAMLResponse' not in request.POST:
-        raise HTTPBadRequest(
+        return HTTPBadRequest(
             'Couldn\'t find "SAMLResponse" in POST data.')
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
@@ -102,7 +102,7 @@ def assertion_consumer_service(request):
                                                    outstanding_queries)
     if response is None:
         logger.error('SAML response is None')
-        raise HTTPBadRequest(
+        return HTTPBadRequest(
             "SAML response has errors. Please check the logs")
 
     session_id = response.session_id()
@@ -116,7 +116,7 @@ def assertion_consumer_service(request):
     user = authenticate(request, session_info, attribute_mapping)
     if user is None:
         logger.error('The user is None')
-        raise HTTPUnauthorized("Access not authorized")
+        return HTTPUnauthorized("Access not authorized")
 
     headers = login(request, session_info, user)
 
