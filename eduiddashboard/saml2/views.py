@@ -32,11 +32,13 @@ def _get_subject_id(session):
 def forbidden_view(request):
     # do not allow a user to login if they are already logged in
     if authenticated_userid(request):
-        return HTTPForbidden()
+        login_redirect_url = request.registry.settings.get(
+            'saml2.login_redirect_url', '/')
+        raise HTTPFound(login_redirect_url)
 
     loginurl = request.route_url('saml2-login',
                                  _query=(('next', request.path),))
-    return HTTPFound(location=loginurl)
+    raise HTTPFound(location=loginurl)
 
 
 @view_config(route_name='saml2-login')
@@ -47,7 +49,7 @@ def login_view(request):
     came_from = request.GET.get('next', login_redirect_url)
 
     if authenticated_userid(request):
-        HTTPFound(came_from)
+        raise HTTPFound(came_from)
 
     selected_idp = request.GET.get('idp', None)
 

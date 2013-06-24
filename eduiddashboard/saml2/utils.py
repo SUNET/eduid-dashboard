@@ -1,9 +1,10 @@
 from saml2.config import SPConfig
+import imp
 
 
 def get_saml2_config(module_path):
 
-    module = __import__(''.join(module_path.split('.')[:-1]))
+    module = imp.load_source('saml2_settings', module_path)
 
     conf = SPConfig()
     conf.load(module.SAML_CONFIG)
