@@ -86,9 +86,10 @@ def saml2_main(global_config, **settings):
 class Saml2RequestTests(unittest.TestCase):
     """Base TestCase for those tests that need a full environment setup"""
 
-    def setUp(self):
+    def setUp(self, settings={}):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
+
         self.settings = {
             'auth_tk_secret': '123456',
             'saml2.settings_module': path.join(path.dirname(__file__),
@@ -105,6 +106,8 @@ class Saml2RequestTests(unittest.TestCase):
                 static_url = pyramid_jinja2.filters:static_url_filter
             """,
         }
+        self.settings.update(settings)
+
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
 
@@ -132,6 +135,7 @@ class Saml2RequestTests(unittest.TestCase):
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
         self.testapp.cookies['auth_tkt'] = cookie_value
+        return request
 
     def add_to_session(self, data):
         queryUtility = self.testapp.app.registry.queryUtility
@@ -147,9 +151,6 @@ class Saml2RequestTests(unittest.TestCase):
     def dummy_request(self):
         request = DummyRequest()
         request.context = DummyResource()
-        self.pol = self.config.testing_securitypolicy(
-            'user', ('editors', ),
-            permissive=False, remember_result=True)
         request.userdb = MockedUserDB()
         request.registry.settings = self.settings
         return request
@@ -163,6 +164,9 @@ class Saml2RequestTests(unittest.TestCase):
         session = session_factory(request)
         session.persist()
         self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.pol = self.config.testing_securitypolicy(
+            'user', ('editors', ),
+            permissive=False, remember_result=True)
         return request
 
     def get_fake_session_info(self, user=None):

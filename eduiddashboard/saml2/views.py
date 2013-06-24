@@ -58,9 +58,10 @@ def login_view(request):
     if selected_idp is None and len(idps) > 1:
         logger.debug('A discovery process is needed')
 
-        return render_to_response('eduiddashboard:templates/wayf.jinja2', {
+        return render_to_response('templates/wayf.jinja2', {
             'available_idps': idps.items(),
             'came_from': came_from,
+            'login_url': request.route_url('saml2-login'),
         })
 
     client = Saml2Client(request.saml2_config)

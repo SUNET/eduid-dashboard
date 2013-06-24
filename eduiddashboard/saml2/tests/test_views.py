@@ -1,3 +1,5 @@
+from os import path
+
 from eduiddashboard.saml2.testing import Saml2RequestTests
 
 
@@ -31,3 +33,16 @@ class Saml2ViewsTests(Saml2RequestTests):
         res = self.testapp.get('/saml2/login/?next=/afterlogin/')
         self.assertEqual(res.status, '302 Found')
         self.assertIn('/afterlogin/', res.location)
+
+
+class Saml2ViewsTestsUsingWayf(Saml2RequestTests):
+
+    def setUp(self):
+        super(Saml2ViewsTestsUsingWayf, self).setUp({
+            'saml2.settings_module': path.join(path.dirname(__file__),
+                                               'data/saml2_settings_wayf.py'),
+        })
+
+    def test_login_nologgedin(self):
+        res = self.testapp.get('/saml2/login/')
+        self.assertEqual(res.status_code, 200)
