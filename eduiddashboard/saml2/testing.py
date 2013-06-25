@@ -96,7 +96,7 @@ class Saml2RequestTests(unittest.TestCase):
                                                'tests/data/saml2_settings.py'),
             'saml2.login_redirect_url': '/',
             'saml2.user_main_attribute': 'email',
-            'saml2.attribute_mapping': "email = mail",
+            'saml2.attribute_mapping': "mail = email",
             'auth_tk_secret': '123456',
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',
@@ -112,6 +112,7 @@ class Saml2RequestTests(unittest.TestCase):
         self.testapp = TestApp(app)
 
         self.config = testing.setUp()
+        self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
 
     def tearDown(self):
@@ -148,6 +149,16 @@ class Saml2RequestTests(unittest.TestCase):
         self.testapp.cookies['beaker.session.id'] = session._sess.id
         return request
 
+    def add_to_session_kv(self, key, value):
+        queryUtility = self.testapp.app.registry.queryUtility
+        session_factory = queryUtility(ISessionFactory)
+        request = DummyRequest()
+        session = session_factory(request)
+        session[key] = value
+        session.persist()
+        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        return request, session
+
     def dummy_request(self):
         request = DummyRequest()
         request.context = DummyResource()
@@ -167,6 +178,17 @@ class Saml2RequestTests(unittest.TestCase):
         self.pol = self.config.testing_securitypolicy(
             'user', ('editors', ),
             permissive=False, remember_result=True)
+        return request
+
+    def get_request_with_session_nologged(self):
+        queryUtility = self.testapp.app.registry.queryUtility
+        session_factory = queryUtility(ISessionFactory)
+
+        request = self.dummy_request()
+        request.userdb = MockedUserDB()
+        session = session_factory(request)
+        session.persist()
+        self.testapp.cookies['beaker.session.id'] = session._sess.id
         return request
 
     def get_fake_session_info(self, user=None):

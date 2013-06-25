@@ -66,6 +66,16 @@ def includeme(config):
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
 
+    if settings.get('testing', False):
+        from eduiddashboard.saml2.testing import MockedUserDB
+        userdb = MockedUserDB()
+
+        def get_userdb(request):
+            return config.registry.settings['userdb']
+
+        config.registry.settings['userdb'] = userdb
+        config.add_request_method(get_userdb, 'userdb', reify=True)
+
     # saml2 views
     config.add_route('saml2-login', '/saml2/login/')
     config.add_route('saml2-acs', '/saml2/acs/')
