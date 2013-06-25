@@ -16,6 +16,7 @@ requires = [
     'colander==1.0a5',
     'deform==0.9.7',
     'deform_bootstrap==0.2.7',
+    'pysaml2==1.0.2',
 ]
 
 if sys.version_info[0] < 3:
@@ -36,6 +37,7 @@ docs_extras = [
 testing_extras = test_requires + [
     'nose==1.2.1',
     'coverage==3.6',
+    'nosexcover==1.0.8',
 ]
 
 

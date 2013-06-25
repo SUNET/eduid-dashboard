@@ -1,0 +1,15 @@
+<html>
+<head>
+</head>
+<body>
+
+<h1>Where are you from?</h1>
+
+<p>Please select your <strong>Identity Provider</strong> from the following list:</p>
+<ul class="unstyled">
+  {% for url, name in available_idps %}
+  <li><a href="{{ login_url }}?idp={{ url }}{% if came_from is defined %}&next={{ came_from }}{% endif %}">{{ name }}</a></li>
+  {% endfor %}
+</ul>
+</body>
+</html>

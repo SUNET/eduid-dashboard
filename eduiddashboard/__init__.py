@@ -7,6 +7,9 @@ from pyramid.exceptions import ConfigurationError
 from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
+from eduiddashboard.permissions import RootFactory, PersonFactory
+from eduiddashboard.saml2 import configure_authtk
+from eduiddashboard.userdb import UserDB, get_userdb
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -30,8 +33,12 @@ def includeme(config):
 
     config.set_request_property(get_db, 'db', reify=True)
 
+    userdb = UserDB(config.registry.settings)
+    config.registry.settings['userdb'] = userdb
+    config.add_request_method(get_userdb, 'userdb', reify=True)
+
     # root views
-    config.add_route('home', '/')
+    config.add_route('home', '/', factory=PersonFactory)
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
 
@@ -56,6 +63,7 @@ def main(global_config, **settings):
         'mongo_uri',
         'site.name',
         'auth_shared_secret',
+        'mongo_uri_am',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -76,11 +84,16 @@ def main(global_config, **settings):
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
 
     config = Configurator(settings=settings,
+                          root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
+
+    config = configure_authtk(config, settings)
 
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
+
+    config.include('eduiddashboard.saml2')
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_static_view('deform', 'deform:static',
