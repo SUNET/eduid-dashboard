@@ -17,18 +17,18 @@ from eduiddashboard.utils import verify_auth_token, flash
              permission='edit')
 def home(context, request):
     user = request.session.get('user', None)
-    schema = Person()
-    form = Form(schema, buttons=('submit',))
+    person_schema = Person()
+    person_form = Form(person_schema, buttons=('submit',))
     if request.POST:
         controls = request.POST.items()
         try:
-            user_modified = form.validate(controls)
+            user_modified = person_form.validate(controls)
         except ValidationFailure:
             flash(request, 'error',
                   _('Please fix the highlighted errors in the form'))
-            person = schema.serialize(user)
+            person = person_schema.serialize(user)
         else:
-            person = schema.serialize(user_modified)
+            person = person_schema.serialize(user_modified)
             # update the session data
             request.session['user'].update(person)
 
@@ -48,14 +48,17 @@ def home(context, request):
                     'are distributed through all applications'))
             return HTTPFound(request.route_url('home'))
 
-    person = schema.serialize(user)
+    person = person_schema.serialize(user)
 
-    total_fields = len(schema.children)
+    total_fields = len(person_schema.children)
     filled_fields = len(person.keys())
+    for (key, value) in person.items():
+        if not value:
+            filled_fields -= 1
 
     return {
         'person': person,
-        'form': form,
+        'person_form': person_form,
         'profile_filled': (filled_fields / total_fields) * 100,
     }
 
