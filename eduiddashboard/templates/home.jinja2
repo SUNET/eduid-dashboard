@@ -44,101 +44,123 @@
     </div>
   </div>
 
-  <h3>{{ _("Profile") }}</h3>
 
-  <div class='row profile-form'>
-    {{ person_form.render(person)|safe }}
+  <div class='clear'></div>
+
+  <div class='profile-combo tabbable tabs-left'>
+    <ul class='nav nav-tabs'>
+      <li class='active'>
+        <a href='#personal' data-toggle='tab'>{{ _("Personal Info") }}</a>
+      </li>
+      <li>
+        <a href='#email' data-toggle='tab'>{{ _("Email") }}</a>
+      </li>
+      <li>
+        <a href='#passwords' data-toggle='tab'>{{ _("Passwords") }}</a>
+      </li>
+
+    </ul>
+
+    <div class='tab-content'>
+      <div class='tab-pane active' id='personal'>
+        <div class='row profile-form'>
+          {{ person_form.render(person)|safe }}
+        </div>
+      </div>
+
+      <div class='tab-pane email-form' id='email'>
+        <table class="table table-thin">
+          <tr class='success'>
+            <td>
+              <a title='{{ _('Change primary email') }}'
+                 data-toggle='tooltip'
+                 href="change-primary-email">
+                  <i class='icon-pencil'></i>
+              </a>
+            </td>
+            <td>
+              <span class='email-read-only'>email@example.com</span>
+            </td>
+            <td>
+              <a title='{{ _('Verified') }}'
+                 data-toggle='tooltip'
+                 href="#">
+                  <i class='icon-ok'></i>
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a title='{{ _('Remove this email') }}'
+                 data-toggle='tooltip'
+                 href="remove-email">
+                  <i class='icon-trash'></i>
+              </a>
+              <a title='{{ _('Edit') }}'
+                 data-toggle='tooltip'
+                 href="edit-email">
+                  <i class='icon-pencil'></i>
+              </a>
+              <form method="POST" class='form-inline inline' action='change-to-primary-email/'>
+                <input type='hidden' name='email' value='email@example.com'/>
+                <button class='btn btn-link btn-small'
+                        title='{{ _('Change this email to your primary email') }}'
+                      data-toggle='tooltip'>
+                  <i class='icon-arrow-up'></i>
+                </button>
+              </form>
+
+            </td>
+            <td>
+              <span class='email-read-only'>email@example.com</span>
+
+            </td>
+            <td>
+              <a title='{{ _('Verified') }}'
+                 data-toggle='tooltip'
+                 href="#">
+                  <i class='icon-ok'></i>
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <a title='{{ _('Remove this email') }}'
+                 data-toggle='tooltip'
+                 href="remove-email">
+                  <i class='icon-trash'></i>
+              </a>
+              <a title='{{ _('Edit') }}'
+                 data-toggle='tooltip'
+                 href="edit-email">
+                  <i class='icon-pencil'></i>
+              </a>
+            </td>
+            <td>
+              <span class='email-read-only'>email@example.com</span>
+            </td>
+            <td>
+              <a title='{{ _('Email not verified') }}'
+                 data-toggle='tooltip'
+                 href="verify">
+                <i class='icon-remove'></i>
+              </a>
+            </td>
+          </tr>
+        </table>
+
+      </div>
+
+      <div class='tab-pane' id='passwords'>
+        <div>
+          This is the change password form
+        </div>
+      </div>
+    </div>
   </div>
 
-
-  <h3>{{ _("Email") }}</h3>
-
-  <div class='row email-form'>
-    <h4>{{ _("Primary Email") }}</h4>
-    <table class="table table-thin">
-      <tr class='success'>
-        <td>
-          <a title='{{ _('Change primary email') }}'
-             data-toggle='tooltip'
-             href="change-primary-email">
-              <i class='icon-pencil'></i>
-          </a>
-        </td>
-        <td>
-          <span class='email-read-only'>email@example.com</span>
-        </td>
-        <td>
-          <a title='{{ _('Verified') }}'
-             data-toggle='tooltip'
-             href="#">
-              <i class='icon-ok'></i>
-          </a>
-        </td>
-      </tr>
-
-      <tr>
-        <td>
-          <a title='{{ _('Remove this email') }}'
-             data-toggle='tooltip'
-             href="remove-email">
-              <i class='icon-trash'></i>
-          </a>
-          <a title='{{ _('Edit') }}'
-             data-toggle='tooltip'
-             href="change-primary-email">
-              <i class='icon-pencil'></i>
-          </a>
-        </td>
-        <td>
-          <span class='email-read-only'>email@example.com</span>
-
-        </td>
-        <td>
-          <a title='{{ _('Verified') }}'
-             data-toggle='tooltip'
-             href="#">
-              <i class='icon-ok'></i>
-          </a>
-
-          <form method="POST" class='form-inline inline' action='change-to-primary-email/'>
-            <input type='hidden' name='email' value='email@example.com'/>
-            <button class='btn btn-link'
-                    title='{{ _('Change this email to your primary email') }}'
-                  data-toggle='tooltip'>
-              <i class='icon-arrow-up'></i>
-            </button>
-          </form>
-
-        </td>
-      </tr>
-
-      <tr>
-        <td>
-          <a title='{{ _('Remove this email') }}'
-             data-toggle='tooltip'
-             href="remove-email">
-              <i class='icon-trash'></i>
-          </a>
-          <a title='{{ _('Edit') }}'
-             data-toggle='tooltip'
-             href="change-primary-email">
-              <i class='icon-pencil'></i>
-          </a>
-        </td>
-        <td>
-          <span class='email-read-only'>email@example.com</span>
-        </td>
-        <td>
-          <a title='{{ _('Email not verified') }}'
-             data-toggle='tooltip'
-             href="change-primary-email">
-            <i class='icon-remove'></i>
-          </a>
-        </td>
-      </tr>
-    </table>
-
-  </div>
 
 {% endblock %}
 
@@ -146,6 +168,7 @@
 <script>
 $(document).ready(function() {
     $("a[data-toggle=tooltip]").tooltip();
+    $("button[data-toggle=tooltip]").tooltip();
 });
 </script>
 {% endblock %}
