@@ -7,7 +7,7 @@ class Email(colander.MappingSchema):
     verified = colander.SchemaNode(colander.Boolean())
 
 
-class AlternativeEmails(colander.Sequence):
+class Emails(colander.SequenceSchema):
     emails = Email()
 
 

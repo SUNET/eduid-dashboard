@@ -19,6 +19,8 @@ def home(context, request):
     user = request.session.get('user', None)
     person_schema = Person()
     person_form = Form(person_schema, buttons=('submit',))
+
+    user_modified = None
     if request.POST:
         controls = request.POST.items()
         try:
@@ -27,28 +29,42 @@ def home(context, request):
             flash(request, 'error',
                   _('Please fix the highlighted errors in the form'))
             person = person_schema.serialize(user)
-        else:
-            person = person_schema.serialize(user_modified)
-            # update the session data
-            request.session['user'].update(person)
 
-            # Remove items from changes queue, if exists
-            request.db.profiles.remove({
-                '_id': user['_id'],
-            })
+    if user_modified:
+        person = person_schema.serialize(user_modified)
+        # update the session data
+        request.session['user'].update(person)
 
-            # Insert the new user object
-            request.db.profiles.insert(user, safe=True)
+        # Remove items from changes queue, if exists
+        request.db.profiles.remove({
+            '_id': user['_id'],
+        })
 
-            update_attributes.delay('eduid_dashboard', str(user['_id']))
+        # Insert the new user object
+        request.db.profiles.insert(user, safe=True)
 
-            # Do the save staff
-            flash(request, 'info',
-                  _('Your changes was saved, please, wait before your changes'
-                    'are distributed through all applications'))
-            return HTTPFound(request.route_url('home'))
+        update_attributes.delay('eduid_dashboard', str(user['_id']))
+
+        # Do the save staff
+        flash(request, 'info',
+              _('Your changes was saved, please, wait before your changes'
+                'are distributed through all applications'))
+        return HTTPFound(request.route_url('home'))
 
     person = person_schema.serialize(user)
+    context = {
+        'person_form': person_form,
+        'person': person_schema.serialize(user),
+    }
+
+    if isinstance(user['email'], unicode):
+        context['primary_email'] = user['email']
+        context['emails'] = [
+            {'email': user['email'], 'verified': user['verified']},
+        ]
+    else:
+        context['primary_email'] = user.get('primary_email', '')
+        context['emails'] = user['email']
 
     total_fields = len(person_schema.children)
     filled_fields = len(person.keys())
@@ -56,11 +72,18 @@ def home(context, request):
         if not value:
             filled_fields -= 1
 
-    return {
-        'person': person,
-        'person_form': person_form,
-        'profile_filled': (filled_fields / total_fields) * 100,
-    }
+    context['profile_filled'] = (filled_fields / total_fields) * 100
+
+    return context
+
+
+@view_config(route_name='email-actions', request_method='POST')
+def email_actions(request):
+    # This view must handle the follow forms:
+    # * Add a new email
+    # * Remove an email
+    # * Resend a validation email
+    return {}
 
 
 @view_config(route_name='help')

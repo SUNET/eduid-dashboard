@@ -201,3 +201,7 @@ form.inline {
 .table-thin {
   width: 50%;
 }
+
+.email-form button.btn-icon {
+  width: 14px;
+}

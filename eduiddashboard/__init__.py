@@ -39,6 +39,8 @@ def includeme(config):
 
     # root views
     config.add_route('home', '/', factory=PersonFactory)
+    config.add_route('email-actions', '/email-actions/', factory=PersonFactory)
+
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
 
