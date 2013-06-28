@@ -107,16 +107,46 @@
       <h4>{{ _("Level of assurance") }}</h4>
 
         <ul class='circles-widget-labels'>
-          <li>{{ _('Level 5') }}</li>
-          <li>{{ _('Level 4') }}</li>
-          <li>{{ _('Level 3') }}</li>
-          <li>{{ _('Level 2') }}</li>
+          <li><a href='#' title="{{ _('Level 5') }}" data-toggle='popover'
+                data-content='{{ _("This is the lower level you can reach,"
+                                   "With this loa you can edit some attributes"
+                                   "of your profile") }}'>
+              {{ _('Level 5') }}</a></li>
+          <li><a href='#' title="{{ _('Level 4') }}" data-toggle='popover'
+                data-content='{{ _("This is the lower level you can reach,"
+                                   "With this loa you can edit some attributes"
+                                   "of your profile") }}'>
+              {{ _('Level 4') }}</a></li>
+          <li><a href='#' title="{{ _('Level 3') }}" data-toggle='popover'
+                data-content='{{ _("This is the lower level you can reach,"
+                                   "With this loa you can edit some attributes"
+                                   "of your profile") }}'>
+              {{ _('Level 3') }}</a></li>
+          <li><a href='#' title="{{ _('Level 2') }}" data-toggle='popover'
+                data-content='{{ _("This is the lower level you can reach,"
+                                   "With this loa you can edit some attributes"
+                                   "of your profile") }}'>
+              {{ _('Level 2') }}</a></li>
+
         </ul>
         <div class='circles-widget  level-{{ request.session.get('loa', 5) }}' >
           <img src="{{ 'eduiddashboard:static/img/circle-bar.png'|static_url }}" />
           <div class='bar'></div>
         </div>
 
+        <div class='popover-container'>
+        </div>
+
+        <div class='level-assurance-description'>
+          {% trans %}
+          <p>You are in 4 level. If you want to increase this level to ge
+          more permissions you need to:</p>
+          <ul>
+            <li>Validate your postal address</li>
+            <li>Validate your NIN number</li>
+          </ul>
+          {% endtrans %}
+        </div>
     </div>
 
     <div class='span6'>
@@ -181,12 +211,20 @@ var email_forms = function () {
   $('button.add-email').click(function (e) {
     $(this).before($('#add-email-form').html());
   });
-}
+};
+
+var loa_popovers = function () {
+  $('.circles-widget-labels a').popover({
+    placement: 'bottom',
+    trigger: 'hover'
+  });
+};
 
 $(document).ready(function () {
     $("a[data-toggle=tooltip]").tooltip();
     $("button[data-toggle=tooltip]").tooltip();
     email_forms();
+    loa_popovers();
 });
 
 </script>
