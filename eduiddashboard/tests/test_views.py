@@ -14,7 +14,7 @@ class ViewTests(unittest.TestCase):
         testing.tearDown()
 
     def test_my_view(self):
-        from eduiddashboard.views import home
+        from eduiddashboard.views.portal import home
         request = testing.DummyRequest()
 
         request.session = {
@@ -24,4 +24,4 @@ class ViewTests(unittest.TestCase):
         }
 
         response = home({}, request)
-        self.assertEqual(response['person']['email'], 'email@example.com')
+        self.assertEqual(response['emails'], 'email@example.com')
