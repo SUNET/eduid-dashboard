@@ -28,6 +28,8 @@
 {% macro add_email_button() -%}
   <button class='add-email btn btn-link btn-icon'
           title='{{ _('Add a new email') }}'
+          type='submit'
+          value='add-new-email'
           data-toggle='tooltip'>
     <i class='icon-plus'></i>
   </button>
@@ -38,6 +40,7 @@
   <button class='btn btn-link btn-icon {% if not show %}hide{% endif %}'
           title='{{ _('Remove this email') }}'
           type='submit'
+          value='remove-email'
           data-toggle='tooltip'>
     <i class='icon-trash'></i>
   </button>
@@ -48,6 +51,7 @@
   <button class='btn btn-link btn-icon'
           title='{{ _('Validate this email') }}'
           type='submit'
+          value='validate-email'
           data-toggle='tooltip'>
     <i class='icon-refresh'></i>
   </button>
@@ -74,7 +78,7 @@
     {% for email in emails %}
     <div class='row'>
       <div class='span2'>
-        <input type='radio' name='primary-email' value="{{ email['email'] }}" 
+        <input type='radio' name='primary-email' value="{{ email['email'] }}"
          {% if primary_email == email['email'] %}checked{% endif %}/>
         {{ email_actions(email) }}
       </div>
@@ -136,7 +140,7 @@
 
         <div class='level-assurance-description'>
           {% trans %}
-          <p>You are in 4 level. If you want to increase this level to ge
+          <p>You are in 4 level. If you want to increase this level to get
           more permissions you need to:</p>
           <ul>
             <li>Validate your postal address</li>
@@ -160,7 +164,7 @@
   <div class='profile-combo tabbable tabs-left'>
     <ul class='nav nav-tabs'>
       <li class='active'>
-        <a href='#personal' data-toggle='tab'>{{ _("Personal Info") }}</a>
+        <a href='#personaldata' data-toggle='tab'>{{ _("Personal Info") }}</a>
       </li>
       <li>
         <a href='#email' data-toggle='tab'>{{ _("Email") }}</a>
@@ -168,16 +172,17 @@
       <li>
         <a href='#passwords' data-toggle='tab'>{{ _("Passwords") }}</a>
       </li>
+      <li>
+        <a href='#phones' data-toggle='tab'>{{ _("Phones") }}</a>
+      </li>
+      <li>
+        <a href='#postaladdress' data-toggle='tab'>{{ _("Postal Address") }}</a>
+      </li>
+
     </ul>
 
     <div class='tab-content'>
-      <div class='tab-pane active' id='personal'>
-        <div class='profile-form'>
-          <div class='intro'>
-          {% trans %}This is your personal info{% endtrans %}
-          </div>
-          {{ person_form.render(person)|safe }}
-        </div>
+      <div class='tab-pane active' id='personaldata'>
       </div>
 
       <div class='tab-pane email-form' id='email'>
@@ -202,6 +207,14 @@
 {% endblock %}
 
 {% block extrajs %}
+
+<script src="{{'deform:static/scripts/jquery.form.js'|static_url}}"></script>
+<script src="{{'deform:static/scripts/deform.js'|static_url}}"></script>
+<script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
+
+
+<script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
+
 <script>
 
 var email_forms = function () {
