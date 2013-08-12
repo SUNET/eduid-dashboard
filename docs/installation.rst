@@ -29,7 +29,7 @@ Deb based example:
 
     $ sudo apt-get install xmlsec1 libxmlsec1 libxmlsec1-openssl libswig
     $ sudo apt-get install python-m2crypto
-
+    $ ln -s /usr/lib/libxmlsec1-openssl.so.1 /usr/lib/libxmlsec1-openssl.so
 
 You need a MongoDB instance. You can install the mongodb-server in the same
 server where is installed the eduid-dashboard or just in another server.
