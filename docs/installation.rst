@@ -237,3 +237,8 @@ capable server and also very handy for development.
 
 The next thing you should do is learn about all the configuration options
 and other WSGI server choices for production.
+
+Remember that you need a eduid-am application installed, and after that, you
+must setup the eduid-dashboard-amp plugin. The plugin allow that the changes
+made in eduid-dashboard update the attributes in the eduid-am, and other
+applications must it.

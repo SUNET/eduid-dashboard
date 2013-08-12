@@ -129,3 +129,33 @@ Some of the most common used are:
    mail_default_sender = no-reply@localhost.localdomain
 
 
+Saml2
+-----
+
+`COMPLETE THIS`
+
+
+eduid-am plugin
+---------------
+
+You must install the eduid-dashboard-amp plugin in the eduid-am instance.
+
+Supposing you have the eduid-am application deployed in the same host that
+eduid-dashboard and in the /opt directory, you must follow the next steps:
+
+.. code-block:: none
+
+   $ deactivate
+   $ cd /opt/eduid-am
+   $ source bin/activate
+   $ git clone https://github.com/SUNET/eduid-dashboard-amp.git
+   $ cd eduid-dashboard-amp
+   $ python setup.py develop
+
+
+Then, you need to restart the eduid-am celery instance.
+
+.. code-block:: none
+
+   $ pkill -f celery && celery worker --app=eduid_am
+
