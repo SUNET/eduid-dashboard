@@ -28,8 +28,15 @@ Deb based example:
 .. code-block:: none
 
     $ sudo apt-get install xmlsec1 libxmlsec1 libxmlsec1-openssl libswig
-    $ sudo apt-get install mongodb-server
     $ sudo apt-get install python-m2crypto
+
+
+You need a MongoDB instance. You can install the mongodb-server in the same
+server where is installed the eduid-dashboard or just in another server.
+
+.. code-block:: none
+
+    $ sudo apt-get install mongodb-server
 
 
 Installing virtualenv
@@ -122,7 +129,7 @@ its dependencies in the virtualenv:
    (eduid-signup)$ python setup.py develop
 
 Database setup
-------------^^
+--------------
 eduID Sign Up stores the information about registered users in a MongoDB
 database so you need it installed in the same machine or in other box that
 is accessible from the one you installed eduID Sign Up in.
@@ -157,6 +164,49 @@ Rpm based example:
    $ sudo systemctl enable mongod.service
 
 
+Saml2 setup
+-----------
+
+We need a Saml2 IDP instance up, you must use `eduid-IdP
+<https://github.com/SUNET/eduid-IdP>`_ but you can use a simplesamlphp instance
+if you have one.
+
+SSL Certs
+'''''''''
+
+You need HTTP SSL certificates (key and cert). According to saml2_settings.py
+from config-templates, the best place for put the certificates is in a
+directory called certs in the directory where is the saml2_settings.py file.
+
+You can use a verified SSL certificates from Verisign or RapidSSL.
+
+If you don't have any certs, you can create self-signed certs for development
+or testing environments. You must have installed openssl command, and then, you
+can follow the follow lines to get your certs.
+
+Remember set the correct domain name in the CN (common name) property:
+
+.. code-block:: none
+
+    $ sudo mkdir /opt/eduid-dashboard/certs
+    $ cd /opt/eduid-dashboard/certs
+    $ openssl genrsa -out server.key 2048
+    $ openssl req -new -key server.key -out server.csr
+    $ openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
+
+
+Saml2 Settings file
+'''''''''''''''''''
+
+The saml2 need another settings file. There are a template in
+`config-templates`. You need to setup your metadata, urls, and IDP url.
+
+.. code-block:: none
+
+    $ cd /opt/eduid-dashboard/
+    $ cp /opt/eduid-dashboard/eduid-dashboard/config-templates/saml2_settings.py \
+         /opt/eduid-dashboard
+
 Testing the application
 -----------------------
 Once everything is installed, the application can be started but first
@@ -165,13 +215,14 @@ example configuration files in the `config-templates` directory ready
 to be used. For example, the `development.ini` is a good starting point
 if you want to test or develop the application:
 
-.. code-block:: text
+.. code-block:: none
 
+   $ cd /opt/eduid-dashboard/
    $ cp config-templates/development.ini myconfig.ini
 
 It is important to activate the virtualenv before running the server:
 
-.. code-block:: text
+.. code-block:: none
 
    $ source /opt/eduid-signup/bin/activate
    (eduid-signup)$ pserver myconfig.ini

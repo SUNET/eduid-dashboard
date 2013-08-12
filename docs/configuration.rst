@@ -128,7 +128,4 @@ Some of the most common used are:
    mail.port = 25
    mail_default_sender = no-reply@localhost.localdomain
 
-Saml2
------
 
-COMPLETE THIS
