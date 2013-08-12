@@ -1,2 +1,3 @@
 include *.txt *.ini *.cfg *.rst
-recursive-include eduiddashboard *.jinja2 *.ico *.png *.css *.gif *.jpg *.pt *.txt *.mak *.mako *.js *.html *.xml
+recursive-include eduiddashboard *.jinja2 *.xml *.txt
+recursive-include *.ico *.png *.css *.gif *.jpg *.js *.html

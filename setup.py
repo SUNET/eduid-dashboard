@@ -13,10 +13,12 @@ requires = [
     'pyramid==1.4',
     'pyramid_jinja2==1.6',
     'pyramid_debugtoolbar==1.0.4',
+    'pyramid_beaker==0.7',
     'colander==1.0a5',
     'deform==0.9.7',
     'deform_bootstrap==0.2.7',
     'pysaml2==1.0.2',
+    'waitress==0.8.2'
 ]
 
 if sys.version_info[0] < 3:

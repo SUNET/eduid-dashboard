@@ -108,5 +108,5 @@ def main(global_config, **settings):
     # eudid specific configuration
     includeme(config)
 
-    config.scan(ignore=[re.compile('.*tests.*').search, '.testing'])
+    config.scan(ignore=[re.compile('.*test(s|ing).*').search])
     return config.make_wsgi_app()
