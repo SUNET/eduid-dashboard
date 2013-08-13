@@ -132,6 +132,9 @@ Some of the most common used are:
 Saml2
 -----
 
+This section is in :installation:`installation section`.
+
+
 `COMPLETE THIS`
 
 
