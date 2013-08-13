@@ -73,7 +73,7 @@ In order to be useful the virtual environment needs to be activated:
 .. code-block:: none
 
    $ source /opt/eduid-dashboard/bin/activate
-   (eduid-signup)$
+   (eduid-dashboard)$
 
 
 
@@ -111,8 +111,8 @@ the Git repository at Github.com:
 
 .. code-block:: text
 
-   (eduid-signup)$ cd /opt/eduid-dashboard
-   (eduid-signup)$ git clone git://github.com/SUNET/eduid-dashboard.git
+   (eduid-dashboard)$ cd /opt/eduid-dashboard
+   (eduid-dashboard)$ git clone git://github.com/SUNET/eduid-dashboard.git
    Cloning into 'eduid-signup'...
    remote: Counting objects: 424, done.
    remote: Compressing objects: 100% (259/259), done.
@@ -125,8 +125,8 @@ its dependencies in the virtualenv:
 
 .. code-block:: text
 
-   (eduid-signup)$ cd /opt/eduid-dashboard/eduid-dashboard
-   (eduid-signup)$ python setup.py develop
+   (eduid-dashboard)$ cd /opt/eduid-dashboard/eduid-dashboard
+   (eduid-dashboard)$ python setup.py develop
 
 Database setup
 --------------
@@ -190,9 +190,9 @@ Remember set the correct domain name in the CN (common name) property:
 
     $ sudo mkdir /opt/eduid-dashboard/certs
     $ cd /opt/eduid-dashboard/certs
-    $ openssl genrsa -out server.key 2048
-    $ openssl req -new -key server.key -out server.csr
-    $ openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
+    $ sudo openssl genrsa -out server.key 2048
+    $ sudo openssl req -new -key server.key -out server.csr
+    $ sudo openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
 
 
 Saml2 Settings file
@@ -204,7 +204,7 @@ The saml2 need another settings file. There are a template in
 .. code-block:: none
 
     $ cd /opt/eduid-dashboard/
-    $ cp /opt/eduid-dashboard/eduid-dashboard/config-templates/saml2_settings.py \
+    $ sudo cp /opt/eduid-dashboard/eduid-dashboard/config-templates/saml2_settings.py \
          /opt/eduid-dashboard
 
 Testing the application
@@ -218,18 +218,18 @@ if you want to test or develop the application:
 .. code-block:: none
 
    $ cd /opt/eduid-dashboard/
-   $ cp config-templates/development.ini myconfig.ini
+   $ sudo cp config-templates/development.ini myconfig.ini
 
 It is important to activate the virtualenv before running the server:
 
 .. code-block:: none
 
-   $ source /opt/eduid-signup/bin/activate
-   (eduid-signup)$ pserver myconfig.ini
+   $ source /opt/eduid-dashboard/bin/activate
+   (eduid-dashboard)$ pserve myconfig.ini
    Starting server in PID 16756.
    serving on http://0.0.0.0:6544
 
-Now you can open the link http://0.0.0.0:6543 in your browser and test
+Now you can open the link http://0.0.0.0:6544 in your browser and test
 the application.
 
 The `pserve` command will use the `Waitress` WSGI server which is a very
