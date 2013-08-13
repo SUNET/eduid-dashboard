@@ -1,10 +1,6 @@
 /*jslint vars: false, nomen: true, browser: true */
 /*global $, console, alert, deform */
 
-if (window.deform === undefined) {
-    window.deform = {};
-}
-
 var TabbedForm = function (container) {
     "use strict";
 
@@ -12,7 +8,7 @@ var TabbedForm = function (container) {
             $.get(url + '/', {}, function (data) {
                 target.empty();
                 target.html(data);
-                deform.load();
+                deform.processCallbacks();
             }, 'html');
         },
 
