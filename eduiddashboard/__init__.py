@@ -7,7 +7,7 @@ from pyramid.exceptions import ConfigurationError
 from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
-from eduiddashboard.permissions import RootFactory, PersonFactory
+from eduiddashboard.permissions import RootFactory, PersonFactory, PasswordsFactory
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -43,6 +43,7 @@ def includeme(config):
     config.add_route('token-login', '/tokenlogin/')
 
     config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
+    config.add_route('passwords', '/passwords/', factory=PasswordsFactory)
 
     config.add_route('email-actions', '/email-actions/', factory=PersonFactory)
 

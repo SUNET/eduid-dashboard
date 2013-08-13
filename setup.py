@@ -18,7 +18,8 @@ requires = [
     'deform==0.9.7',
     'deform_bootstrap==0.2.7',
     'pysaml2==1.0.2',
-    'waitress==0.8.2'
+    'waitress==0.8.2',
+    'vccs_client',
 ]
 
 if sys.version_info[0] < 3:

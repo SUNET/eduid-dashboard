@@ -17,3 +17,12 @@ class PersonFactory(object):
 
     def __init__(self, request):
         pass
+
+
+class PasswordsFactory(object):
+    __acl__ = [
+        (Allow, Authenticated, ALL_PERMISSIONS),
+    ]
+
+    def __init__(self, request):
+        pass
