@@ -43,8 +43,7 @@ def includeme(config):
     config.add_route('token-login', '/tokenlogin/')
 
     config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
-
-    config.add_route('email-actions', '/email-actions/', factory=PersonFactory)
+    config.add_route('emails', '/emails/', factory=PersonFactory)
 
 
 def main(global_config, **settings):

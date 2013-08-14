@@ -13,12 +13,19 @@ var TabbedForm = function (container) {
         },
 
         initialize = function () {
+            var opentab = location.toString().split('#')[1];
             container.find('.nav-tabs a').click(function (e) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
-                get_form(url, $('#' + named_tab));
+                get_form(url, $(".tab-pane.active"));
             });
-            container.find('.nav-tabs a').first().click();
+
+            if (opentab === undefined) {
+                container.find('.nav-tabs a').first().click();
+            }
+            else {
+                container.find('.nav-tabs a[href=#' + opentab + ']').click();
+            }
         };
 
     initialize();
