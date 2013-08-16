@@ -4,7 +4,8 @@
 
 from deform import ValidationFailure, widget
 
-from pyramid.view import view_config, view_defaults
+from pyramid.view import view_config
+
 
 from eduid_am.tasks import update_attributes
 
@@ -14,8 +15,8 @@ from eduiddashboard.models import EmailsPerson
 from eduiddashboard.views import BaseFormView
 
 
-@view_defaults(route_name='emails', permission='edit',
-               renderer='templates/emails-form.jinja2')
+@view_config(route_name='emails', permission='edit',
+             renderer='templates/emails-form.jinja2')
 class EmailsView(BaseFormView):
     """
     Provide the handler to emails
@@ -24,29 +25,28 @@ class EmailsView(BaseFormView):
                     return status and flash message
     """
 
-    schema = EmailsPerson
+    schema = EmailsPerson()
     route = 'emails'
 
-    def __init__(self, context, request):
-        super(EmailsView, self).__init__(context, request)
-        self.form['emails'].widget = widget.SequenceWidget(min_len=1)
+    def before(self, form):
+        form['emails'].widget = widget.SequenceWidget(min_len=1)
+        form['emails'].title = ""
 
-    @view_config(request_method='GET')
-    def get(self):
-        return self.context
+        form['emails']['emails']['primary'].widget = widget.RadioChoiceWidget(read_only=True,
+                                values=(('true', 'True'), ('false', 'False')))
 
-    @view_config(request_method='POST')
-    def post(self):
+        form['email'].widget = widget.TextInputWidget(readonly=True)
+        form['email'].title = _('Primary e-mail')
 
-        controls = self.request.POST.items()
-        try:
-            emails = self.form.validate(controls)
-        except ValidationFailure:
-            return self.context
-
+    def submit_success(self, emails):
         emails = self.schema.serialize(emails)
         # update the session data
-        self.request.session['user']['emails'].update(emails)
+
+        for email_dict in emails.get('emails', {}):
+            if email_dict.get('primary', False):
+                emails['email'] = email_dict.get('email')
+
+        self.request.session['user'].update(emails)
 
         # Do the save staff
 
@@ -61,6 +61,3 @@ class EmailsView(BaseFormView):
                                      'before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
-
-        self.context['object'] = emails
-        return self.context

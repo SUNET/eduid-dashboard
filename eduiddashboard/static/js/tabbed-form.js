@@ -5,6 +5,7 @@ var TabbedForm = function (container) {
     "use strict";
 
     var get_form = function (url, target) {
+            deform.clearCallbacks();
             $.get(url + '/', {}, function (data) {
                 target.empty();
                 target.html(data);

@@ -1,48 +1,52 @@
 import json
 
-from deform import Form
+from pyramid_deform import FormView
 
 
-class BaseFormView(object):
-    """
-    Provide the handler to personal data form
-        * GET = Rendering template
-        * POST = Creating or modifing personal data,
-                    return status and flash message
-    """
+class BaseFormView(FormView):
 
-    schema = None
-    route = None
+    route = ''
 
-    def __init__(self, context, request):
-        self.request = request
+    buttons = ('submit', )
+    use_ajax = True
+
+    def __init__(self, request):
+        super(BaseFormView, self).__init__(request)
         self.user = request.session.get('user', None)
-        self.schema = self.schema()
 
-        classname = self.__class__.__name__.lower()
+        self.classname = self.__class__.__name__.lower()
 
-        if self.route is None:
-            self.route = classname
-
-        ajax_options = {
+        self.ajax_options = json.dumps({
             'replaceTarget': True,
             'url': self.request.route_url(self.route),
-            'target': "div.{classname}-form".format(classname=classname)
+            'target': "div.{classname}-form-container".format(
+                classname=self.classname)
+        })
+
+        self.form_options = {
+            'formid': "{classname}-form".format(classname=self.classname),
         }
 
-        self.form = Form(self.schema, buttons=('submit',),
-                         use_ajax=True,
-                         ajax_options=json.dumps(ajax_options),
-                         formid="{classname}-form".format(classname=classname))
+    def appstruct(self):
+        return self.schema.serialize(self.user)
 
-        self.context = {
-            'form': self.form,
-            'formname': classname,
+    def failure(self, e):
+        context = super(BaseFormView, self).failure(e)
+
+        context.update({
+            'formname': self.classname,
             'object': self.schema.serialize(self.user),
-        }
+        })
 
-    def get(self):
-        raise NotImplemented()
+        return context
 
-    def post(self):
-        raise NotImplemented()
+    def show(self, form):
+        context = super(BaseFormView, self).show(form)
+
+        context.update({
+            'formname': self.classname,
+            'object': self.schema.serialize(self.user),
+        })
+
+        return context
+

@@ -95,6 +95,7 @@ def main(global_config, **settings):
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
+    config.include('pyramid_deform')
 
     config.include('eduiddashboard.saml2')
 
