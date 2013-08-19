@@ -49,4 +49,3 @@ class BaseFormView(FormView):
         })
 
         return context
-

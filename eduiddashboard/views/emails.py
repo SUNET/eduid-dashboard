@@ -2,7 +2,7 @@
 
 ## Emails form
 
-from deform import ValidationFailure, widget
+from deform import widget
 
 from pyramid.view import view_config
 
@@ -13,6 +13,8 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import EmailsPerson
 
 from eduiddashboard.views import BaseFormView
+
+from eduiddashboard.widgets import MongoCheckboxWidget
 
 
 @view_config(route_name='emails', permission='edit',
@@ -31,17 +33,15 @@ class EmailsView(BaseFormView):
     def before(self, form):
         form['emails'].widget = widget.SequenceWidget(min_len=1)
         form['emails'].title = ""
-
-        form['emails']['emails']['primary'].widget = widget.RadioChoiceWidget(read_only=True,
-                                values=(('true', 'True'), ('false', 'False')))
+        form['emails']['emails']['verified'].widget = MongoCheckboxWidget()
+        form['emails']['emails']['primary'].widget = MongoCheckboxWidget()
 
         form['email'].widget = widget.TextInputWidget(readonly=True)
         form['email'].title = _('Primary e-mail')
 
-    def submit_success(self, emails):
-        emails = self.schema.serialize(emails)
+    def submit_success(self, emailsform):
+        emails = self.schema.serialize(emailsform)
         # update the session data
-
         for email_dict in emails.get('emails', {}):
             if email_dict.get('primary', False):
                 emails['email'] = email_dict.get('email')

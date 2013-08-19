@@ -1,15 +1,22 @@
 import colander
 
 
+class BooleanMongo(colander.Boolean):
+
+    def __init__(self, false_choices=('False', 'false', '', False),
+                 true_choices=('True', 'true', True),
+                 false_val=False,
+                 true_val=True):
+        super(BooleanMongo, self).__init__(false_choices, true_choices,
+                                           false_val, true_val)
+
+
 class Email(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
                                 validator=colander.Email())
-    verified = colander.SchemaNode(colander.Boolean(false_choices=('false',),
-                                                    true_choices=('true',),
-                                                    false_val='false',
-                                                    true_val='true'),
+    verified = colander.SchemaNode(BooleanMongo(),
                                    missing=False)
-    primary = colander.SchemaNode(colander.Boolean(), default=False,
+    primary = colander.SchemaNode(BooleanMongo(), default=False,
                                   missing=False)
 
 
