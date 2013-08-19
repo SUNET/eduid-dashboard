@@ -14,8 +14,6 @@ from eduiddashboard.models import EmailsPerson
 
 from eduiddashboard.views import BaseFormView
 
-from eduiddashboard.widgets import MongoCheckboxWidget
-
 
 @view_config(route_name='emails', permission='edit',
              renderer='templates/emails-form.jinja2')
@@ -33,8 +31,6 @@ class EmailsView(BaseFormView):
     def before(self, form):
         form['emails'].widget = widget.SequenceWidget(min_len=1)
         form['emails'].title = ""
-        form['emails']['emails']['verified'].widget = MongoCheckboxWidget()
-        form['emails']['emails']['primary'].widget = MongoCheckboxWidget()
 
         form['email'].widget = widget.TextInputWidget(readonly=True)
         form['email'].title = _('Primary e-mail')

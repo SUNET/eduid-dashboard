@@ -1,5 +1,7 @@
 import colander
 
+from eduiddashboard.widgets import MongoCheckboxWidget
+
 
 class BooleanMongo(colander.Boolean):
 
@@ -15,8 +17,10 @@ class Email(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
                                 validator=colander.Email())
     verified = colander.SchemaNode(BooleanMongo(),
+                                   widget=MongoCheckboxWidget(),
                                    missing=False)
     primary = colander.SchemaNode(BooleanMongo(), default=False,
+                                  widget=MongoCheckboxWidget(),
                                   missing=False)
 
 
