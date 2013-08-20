@@ -1,0 +1,17 @@
+<div class='{{ formname }}-form-container'>
+   {% for message in request.session.pop_flash(queue='forms') %}
+     <div class="alert alert-{{ message|get_flash_message_type }}">
+       <button type="button" class="close" data-dismiss="alert">&times;</button>
+       {{ message }}
+     </div>
+   {% endfor %}
+
+   <div class='intro'>
+   {% block form_generic_description %}
+   {% endblock %}
+   </div>
+
+   {% block form_generic_form %}
+   {{ form|safe }}
+   {% endblock %}
+</div>

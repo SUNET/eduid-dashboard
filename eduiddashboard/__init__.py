@@ -42,6 +42,9 @@ def includeme(config):
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
 
+    config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
+    config.add_route('emails', '/emails/', factory=PersonFactory)
+
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
@@ -92,6 +95,7 @@ def main(global_config, **settings):
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
+    config.include('pyramid_deform')
 
     config.include('eduiddashboard.saml2')
 

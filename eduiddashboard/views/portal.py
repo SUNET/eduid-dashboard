@@ -4,60 +4,45 @@ from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
-from deform import Form, ValidationFailure
-
-from eduid_am.tasks import update_attributes
-
-from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
-from eduiddashboard.utils import verify_auth_token, flash
+from eduiddashboard.utils import verify_auth_token
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2',
-             permission='edit')
+             request_method='GET', permission='edit')
 def home(context, request):
+    """
+        HOME doesn't have forms. All forms are handle by ajax urls.
+    """
+
     user = request.session.get('user', None)
-    schema = Person()
-    form = Form(schema, buttons=('submit',))
-    if request.POST:
-        controls = request.POST.items()
-        try:
-            user_modified = form.validate(controls)
-        except ValidationFailure:
-            flash(request, 'error',
-                  _('Please fix the highlighted errors in the form'))
-            person = schema.serialize(user)
-        else:
-            person = schema.serialize(user_modified)
-            # update the session data
-            request.session['user'].update(person)
 
-            # Remove items from changes queue, if exists
-            request.db.profiles.remove({
-                '_id': user['_id'],
-            })
+    person_schema = Person()
 
-            # Insert the new user object
-            request.db.profiles.insert(user, safe=True)
-
-            update_attributes.delay('eduid_dashboard', str(user['_id']))
-
-            # Do the save staff
-            flash(request, 'info',
-                  _('Your changes was saved, please, wait before your changes'
-                    'are distributed through all applications'))
-            return HTTPFound(request.route_url('home'))
-
-    person = schema.serialize(user)
-
-    total_fields = len(schema.children)
-    filled_fields = len(person.keys())
-
-    return {
-        'person': person,
-        'form': form,
-        'profile_filled': (filled_fields / total_fields) * 100,
+    person = person_schema.serialize(user)
+    context = {
+        'person': person_schema.serialize(user),
     }
+
+    # TODO
+    if isinstance(user['email'], unicode):
+        context['primary_email'] = user['email']
+        context['emails'] = [
+            {'email': user['email'], 'verified': user['verified']},
+        ]
+    else:
+        context['primary_email'] = user.get('primary_email', '')
+        context['emails'] = user['email']
+
+    total_fields = len(person_schema.children)
+    filled_fields = len(person.keys())
+    for (key, value) in person.items():
+        if not value:
+            filled_fields -= 1
+
+    context['profile_filled'] = (filled_fields / total_fields) * 100
+
+    return context
 
 
 @view_config(route_name='help')
