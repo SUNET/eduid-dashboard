@@ -1,8 +1,7 @@
+## Personal data form
 
-## Personal data forms
+from pyramid.view import view_config
 from bson import ObjectId
-from deform import ValidationFailure
-from pyramid.view import view_config, view_defaults
 
 import vccs_client
 
@@ -14,9 +13,9 @@ from eduiddashboard.models import Person, Passwords
 from eduiddashboard.views import BaseFormView
 
 
-@view_defaults(route_name='personaldata', permission='edit',
-               renderer='templates/personaldata-form.jinja2')
-class PersonalData(BaseFormView):
+@view_config(route_name='personaldata', permission='edit',
+             renderer='templates/personaldata-form.jinja2')
+class PersonalDataView(BaseFormView):
     """
     Provide the handler to personal data form
         * GET = Rendering template
@@ -24,20 +23,10 @@ class PersonalData(BaseFormView):
                     return status and flash message
     """
 
-    schema = Person
+    schema = Person()
+    route = 'personaldata'
 
-    @view_config(request_method='GET')
-    def get(self):
-        return self.context
-
-    @view_config(request_method='POST')
-    def post(self):
-
-        controls = self.request.POST.items()
-        try:
-            user_modified = self.form.validate(controls)
-        except ValidationFailure:
-            return self.context
+    def submit_success(self, user_modified):
 
         person = self.schema.serialize(user_modified)
         # update the session data
@@ -56,9 +45,6 @@ class PersonalData(BaseFormView):
                                      'before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
-
-        self.context['object'] = person
-        return self.context
 
 
 @view_defaults(route_name='passwords', permission='edit',

@@ -7,94 +7,6 @@
 <script href="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url }}"></script>
 {% endblock %}
 
-
-{% macro email_status_macro(verified) -%}
-  {% if verified %}
-    <button title='{{ _('Verified') }}'
-       class='btn btn-link btn-icon'
-       data-toggle='tooltip'>
-       <i class='icon-ok'></i>
-    </button>
-  {% else %}
-    <button title='{{ _('Email not verified') }}'
-       class='btn btn-link btn-icon'
-       data-toggle='tooltip'>
-      <i class='icon-remove'></i>
-    </button>
-  {% endif %}
-{%- endmacro %}
-
-
-{% macro add_email_button() -%}
-  <button class='add-email btn btn-link btn-icon'
-          title='{{ _('Add a new email') }}'
-          type='submit'
-          value='add-new-email'
-          data-toggle='tooltip'>
-    <i class='icon-plus'></i>
-  </button>
-{%- endmacro %}
-
-
-{% macro remove_email_button(show=True) -%}
-  <button class='btn btn-link btn-icon {% if not show %}hide{% endif %}'
-          title='{{ _('Remove this email') }}'
-          type='submit'
-          value='remove-email'
-          data-toggle='tooltip'>
-    <i class='icon-trash'></i>
-  </button>
-{%- endmacro %}
-
-
-{% macro validate_email_button() -%}
-  <button class='btn btn-link btn-icon'
-          title='{{ _('Validate this email') }}'
-          type='submit'
-          value='validate-email'
-          data-toggle='tooltip'>
-    <i class='icon-refresh'></i>
-  </button>
-{%- endmacro %}
-
-
-{% macro email_actions(email, show_remove=True) -%}
-  <form method="POST" class='form-inline inline' action='{{ 'email-actions'|route_url}}'>
-    <input type='hidden' name='email' value="{{ email['email'] }}"/>
-    {% if primary_email == email['email'] %}
-      {{ remove_email_button(show=False) }}
-    {% else %}
-      {{ remove_email_button(show=True) }}
-    {% endif %}
-    {% if not email['verified'] %}
-      {{ validate_email_button() }}
-    {% endif %}
-  </form>
-{%- endmacro %}
-
-
-{% macro email_form_macro(emails, primary_email) -%}
-  <div class='emails-form'>
-    {% for email in emails %}
-    <div class='row'>
-      <div class='span2'>
-        <input type='radio' name='primary-email' value="{{ email['email'] }}"
-         {% if primary_email == email['email'] %}checked{% endif %}/>
-        {{ email_actions(email) }}
-      </div>
-      <div class='span3'>
-        <span class='email'>{{ email['email'] }}</span>
-      </div>
-      <div class='span1'>
-        {{ email_status_macro(email['verified']) }}
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  {{ add_email_button() }}
-{%- endmacro %}
-
-
 {% block contents %}
   <h2>{{ _("eduID dashboard.") }}</h2>
 
@@ -167,7 +79,7 @@
         <a href='#personaldata' data-toggle='tab'>{{ _("Personal Info") }}</a>
       </li>
       <li>
-        <a href='#email' data-toggle='tab'>{{ _("Email") }}</a>
+        <a href='#emails' data-toggle='tab'>{{ _("Email") }}</a>
       </li>
       <li>
         <a href='#passwords' data-toggle='tab'>{{ _("Passwords") }}</a>
@@ -182,24 +94,7 @@
     </ul>
 
     <div class='tab-content'>
-      <div class='tab-pane active' id='personaldata'>
-      </div>
-
-      <div class='tab-pane email-form' id='email'>
-        {% trans %}<p>These list contain all your emails registered in the
-        platform. You can change your primary email selected by radio buttons.
-        </p><p>Remember, if you select a not verified email as your primary
-        email, your level of assurance must be decreased.</p>
-        {% endtrans %}
-
-        {{ email_form_macro(emails, primary_email) }}
-      </div>
-
-      <div class='tab-pane' id='passwords'>
-        <div>
-          This is the change password form
-        </div>
-      </div>
+      <div class='tab-pane active'></div>
     </div>
   </div>
 
@@ -217,12 +112,6 @@
 
 <script>
 
-var email_forms = function () {
-  $('button.add-email').click(function (e) {
-    $(this).before($('#add-email-form').html());
-  });
-};
-
 var loa_popovers = function () {
   $('.circles-widget-labels a').popover({
     placement: 'bottom',
@@ -233,24 +122,9 @@ var loa_popovers = function () {
 $(document).ready(function () {
     $("a[data-toggle=tooltip]").tooltip();
     $("button[data-toggle=tooltip]").tooltip();
-    email_forms();
     loa_popovers();
 });
 
-</script>
-
-<script type='text/template' id='add-email-form'>
-  <form action="{{ 'email-actions'|route_url}}" method="POST">
-    <div class='row add-email-form'>
-      <div class='span2'>
-          <input type='radio' name='primary-email' disabled>
-      </div>
-      <div class='input-append span5'>
-        <input name='new-email' type='email' placeholder='Add a new email'/>
-        <button class="btn btn-success" type="submit" value='new-email'>{{ _('Submit') }}</button>
-      </div>
-    </div>
-  </form>
 </script>
 
 {% endblock %}

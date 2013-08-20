@@ -6,19 +6,32 @@ var TabbedForm = function (container) {
 
     var get_form = function (url, target) {
             $.get(url + '/', {}, function (data) {
-                target.empty();
                 target.html(data);
+                if (deform.callbacks !== undefined &&
+                        deform.callbacks.length === 0) {
+                    $('form script').each(function (i, e) {
+                        var f = new Function(e.innerHTML);
+                        f();
+                    });
+                }
                 deform.processCallbacks();
             }, 'html');
         },
 
         initialize = function () {
+            var opentab = location.toString().split('#')[1];
+
             container.find('.nav-tabs a').click(function (e) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
-                get_form(url, $('#' + named_tab));
+                get_form(url, $(".tab-pane.active"));
             });
-            container.find('.nav-tabs a').first().click();
+
+            if (opentab === undefined) {
+                container.find('.nav-tabs a').first().click();
+            } else {
+                container.find('.nav-tabs a[href=#' + opentab + ']').click();
+            }
         };
 
     initialize();
