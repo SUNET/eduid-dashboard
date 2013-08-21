@@ -1,6 +1,9 @@
 import os
 import re
 
+from pkg_resources import resource_filename
+from deform import Form
+
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 
@@ -18,6 +21,18 @@ def read_setting_from_env(settings, key, default=None):
         return os.environ[env_variable]
     else:
         return settings.get(key, default)
+
+
+def add_custom_deform_templates_path():
+    templates_path = 'templates/form-widgets'
+    try:
+        path = resource_filename('eduiddashboard', templates_path)
+    except ImportError:
+        from os.path import dirname, join
+        path = join(dirname(__file__), templates_path)
+
+    loader = Form.default_renderer.loader
+    loader.search_path = (path, ) + loader.search_path
 
 
 def includeme(config):
@@ -98,6 +113,8 @@ def main(global_config, **settings):
     config.include('pyramid_deform')
 
     config.include('eduiddashboard.saml2')
+
+    add_custom_deform_templates_path()
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_static_view('deform', 'deform:static',

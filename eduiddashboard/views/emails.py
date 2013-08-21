@@ -11,6 +11,7 @@ from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import EmailsPerson
+from eduiddashboard.widgets import HorizontalSequenceWidget
 
 from eduiddashboard.views import BaseFormView
 
@@ -29,7 +30,7 @@ class EmailsView(BaseFormView):
     route = 'emails'
 
     def before(self, form):
-        form['emails'].widget = widget.SequenceWidget(min_len=1)
+        form['emails'].widget = HorizontalSequenceWidget(min_len=1)
         form['emails'].title = ""
 
         form['email'].widget = widget.TextInputWidget(readonly=True)

@@ -19,3 +19,17 @@ class MongoCheckboxWidget(deform.widget.CheckboxWidget):
             return self.true_val
 
         return self.false_val
+
+
+class HorizontalSequenceWidget(deform.widget.SequenceWidget):
+
+    def __init__(
+            self,
+            template=('horizontal-squence'),
+            item_template=('horizontal-sequence_item'),
+            **kwargs
+    ):
+        super(HorizontalSequenceWidget, self).__init__(
+            item_template=item_template,
+            **kwargs
+        )
