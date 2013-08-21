@@ -1,9 +1,9 @@
 <div class="deformSeq"
      id="${field.oid}"
      tal:define="item_tmpl item_template|field.widget.item_template;
-		 oid oid|field.oid;
-		 name name|field.name;
-		 rndr field.renderer;
+                 oid oid|field.oid;
+                 name name|field.name;
+                 rndr field.renderer;
                  min_len field.widget.min_len or 0;
                  max_len field.widget.max_len or 100000;
                  now_len len(subfields);
@@ -25,7 +25,7 @@
           tal:attributes="min_len min_len;
                           max_len max_len;
                           now_len now_len;
-			  orderable orderable;"></span>
+                          orderable orderable;"></span>
   </div>
 
 

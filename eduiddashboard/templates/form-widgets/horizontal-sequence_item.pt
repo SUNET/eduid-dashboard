@@ -25,6 +25,10 @@
         content:"\2195";
         margin-right: 5px;
     }
+    .deformSeqItem.form-inline div {
+        display: inline-block;
+        margin-right: 1em;
+    }
 </style>
 
   <span tal:replace="structure field.serialize(cstruct)"/>

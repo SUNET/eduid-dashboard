@@ -30,6 +30,7 @@ class EmailsView(BaseFormView):
     route = 'emails'
 
     def before(self, form):
+        form.bootstrap_form_style = ''
         form['emails'].widget = HorizontalSequenceWidget(min_len=1)
         form['emails'].title = ""
 
