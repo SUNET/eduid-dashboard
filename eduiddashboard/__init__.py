@@ -45,7 +45,7 @@ def includeme(config):
 
     config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
     config.add_route('emails', '/emails/', factory=PersonFactory)
-
+    config.add_route('postaladdress', '/postaladdress/')
     config.add_route('passwords', '/passwords/', factory=PasswordsFactory)
 
 

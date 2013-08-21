@@ -59,3 +59,11 @@ class Passwords(colander.MappingSchema):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
                                    _("Both passwords don't match"))
+
+
+class PostalAddress(colander.MappingSchema):
+
+    address = colander.SchemaNode(colander.String())
+    municipality = colander.SchemaNode(colander.String())
+    postal_code = colander.SchemaNode(colander.String())
+    country = colander.SchemaNode(colander.String())
