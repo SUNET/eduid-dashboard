@@ -6,7 +6,6 @@ from deform import widget
 
 from pyramid.view import view_config
 
-
 from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
