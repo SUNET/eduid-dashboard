@@ -30,22 +30,11 @@ class PasswordsView(BaseFormView):
 
         passwords = self.schema.serialize(user_modified)
         new_password = passwords['new_password']
-        old_password = passwords['old_password']
         email = self.user['email']
-
         password_id = ObjectId()
-
         vccs = vccs_client.VCCSClient(
             base_url=self.request.registry.settings.get('vccs_url'),
         )
-        old_factor = vccs_client.VCCSPasswordFactor(old_password,
-                                                    credential_id=str(password_id))
-        if not vccs.authenticate(email, [old_factor]):
-            # TODO: include validation errors into form
-            self.request.session.flash(_('ERROR: Your old password do not match'),
-                                       queue='forms')
-            return self.context
-
         new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                     credential_id=str(password_id))
         vccs.add_credentials(email, [new_factor])
@@ -54,4 +43,3 @@ class PasswordsView(BaseFormView):
                                      'before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
-        return self.context

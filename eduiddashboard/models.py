@@ -1,7 +1,7 @@
 import colander
 import translationstring
 
-from .validators import PasswordValidator
+from .validators import PasswordValidator, old_password_validator
 
 _ = translationstring.TranslationStringFactory('eduiddashboard')
 
@@ -49,7 +49,8 @@ class Person(colander.MappingSchema):
 
 class Passwords(colander.MappingSchema):
 
-    old_password = colander.SchemaNode(colander.String())
+    old_password = colander.SchemaNode(colander.String(),
+                                       validator=old_password_validator)
     new_password = colander.SchemaNode(colander.String(),
                                        validator=PasswordValidator())
     new_password_repeated = colander.SchemaNode(colander.String())
