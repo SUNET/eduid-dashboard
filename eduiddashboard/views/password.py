@@ -31,15 +31,23 @@ class PasswordsView(BaseFormView):
         passwords = self.schema.serialize(user_modified)
         new_password = passwords['new_password']
         email = self.user['email']
-        password_id = ObjectId()
         vccs = vccs_client.VCCSClient(
             base_url=self.request.registry.settings.get('vccs_url'),
         )
+        # adding new credentials
+        password_id = ObjectId()
         new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                     credential_id=str(password_id))
-        vccs.add_credentials(email, [new_factor])
-
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
-                                   queue='forms')
+        if vccs.add_credentials(email, [new_factor]):
+            self.request.session.flash(_('Your changes was saved, please, wait '
+                                         'before your changes are distributed '
+                                         'through all applications'),
+                                       queue='forms')
+        else:
+            self.request.session.flash(_('Credentials has not been added for some reason.'
+                                         ' Please contact with the system administrator.'),
+                                       queue='forms')
+        # revoking old credentials
+        old_password_id = self.request.session['user']['passwords'][0]['id']
+        old_factor = vccs_client.VCCSRevokeFactor(str(old_password_id), 'changing password', reference='dashboard')
+        vccs.revoke_credentials(email, [old_factor])

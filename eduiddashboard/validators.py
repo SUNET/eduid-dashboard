@@ -25,13 +25,12 @@ class OldPasswordValidator(object):
 
     def __call__(self, node, value):
         old_password = value
-        password_id = ObjectId()
+        password_id = self.request.session['user']['passwords'][0]['id']
         vccs = vccs_client.VCCSClient(
             base_url=self.request.registry.settings.get('vccs_url'),
         )
         old_factor = vccs_client.VCCSPasswordFactor(old_password,
                                                     credential_id=str(password_id))
-        # XXX: Next line always returns a unknown 500 error
         if not vccs.authenticate(self.user_email, [old_factor]):
             err = _('Old password do not match')
             raise colander.Invalid(node, err)
