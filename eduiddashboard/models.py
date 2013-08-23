@@ -1,6 +1,7 @@
 import colander
 
-from eduiddashboard.widgets import MongoCheckboxWidget
+from eduiddashboard.widgets import (MongoCheckboxWidget,
+                                    HorizontalSequenceWidget)
 
 
 class BooleanMongo(colander.Boolean):
@@ -19,9 +20,6 @@ class Email(colander.MappingSchema):
     verified = colander.SchemaNode(BooleanMongo(),
                                    widget=MongoCheckboxWidget(),
                                    missing=False)
-    primary = colander.SchemaNode(BooleanMongo(), default=False,
-                                  widget=MongoCheckboxWidget(),
-                                  missing=False)
 
 
 class Emails(colander.SequenceSchema):
@@ -33,7 +31,9 @@ class EmailsPerson(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
                                 validator=colander.Email(),
                                 missing='')
-    emails = Emails()
+    emails = Emails(
+        widget=HorizontalSequenceWidget(min_len=1, orderable=True)
+    )
 
 
 class Person(colander.MappingSchema):

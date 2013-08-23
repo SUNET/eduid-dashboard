@@ -31,9 +31,6 @@ class EmailsView(BaseFormView):
 
     def before(self, form):
         form.bootstrap_form_style = ''
-        form['emails'].widget = HorizontalSequenceWidget(min_len=1)
-        form['emails'].title = ""
-
         form['email'].widget = widget.TextInputWidget(readonly=True)
         form['email'].title = _('Primary e-mail')
 
