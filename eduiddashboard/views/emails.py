@@ -1,9 +1,8 @@
-
-
 ## Emails form
 
 from deform import widget
 
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from pyramid.view import view_config
 
 
@@ -11,7 +10,7 @@ from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import EmailsPerson
-from eduiddashboard.widgets import HorizontalSequenceWidget
+from eduiddashboard.widgets import (BooleanActionWidget)
 
 from eduiddashboard.views import BaseFormView
 
@@ -33,6 +32,11 @@ class EmailsView(BaseFormView):
         form.bootstrap_form_style = ''
         form['email'].widget = widget.TextInputWidget(readonly=True)
         form['email'].title = _('Primary e-mail')
+
+        form['emails']['emails']['verified'].widget = BooleanActionWidget(
+            action=self.request.route_path('email-verification'),
+            action_title=_('Resend the verification email')
+        )
 
     def submit_success(self, emailsform):
         emails = self.schema.serialize(emailsform)
@@ -56,3 +60,35 @@ class EmailsView(BaseFormView):
                                      'before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
+
+
+def is_email_in_emails(email, emails):
+    """
+    emails is a dictionary like emails from person schema
+    """
+    for edict in emails:
+        if email == edict['email']:
+            return True
+    return False
+
+
+@view_config(route_name='email-verification', permission='edit',
+             request_method='POST', renderer='json')
+def email_verification(context, request):
+
+    email = request.POST.get('email')
+
+    if email is None:
+        raise HTTPBadRequest(_('You forgive the email to verificate'))
+
+    # TODO allow to take emails from context
+    emails = EmailsPerson().serialize(request.session.get('user'))
+
+    if not is_email_in_emails(email, emails['emails']):
+        return HTTPNotFound(
+            _('The given email is not in the user emails list')
+        )
+
+    # Do the email verification staff
+
+    return {'success': True}

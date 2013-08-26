@@ -1,6 +1,15 @@
 /*jslint vars: false, nomen: true, browser: true */
 /*global $, console, alert, deform */
 
+if (window.tabbedform === undefined) {
+    window.tabbedform = {};
+}
+
+if (window.tabbedform.changetabs_calls === undefined) {
+    window.tabbedform.changetabs_calls = [];
+}
+
+
 var TabbedForm = function (container) {
     "use strict";
 
@@ -15,6 +24,11 @@ var TabbedForm = function (container) {
                     });
                 }
                 deform.processCallbacks();
+                tabbedform.changetabs_calls.forEach(function (func) {
+                    if (func !== undefined){
+                        func(container)
+                    }
+                });
             }, 'html');
         },
 

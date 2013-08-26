@@ -1,7 +1,9 @@
 import colander
 
-from eduiddashboard.widgets import (MongoCheckboxWidget,
-                                    HorizontalSequenceWidget)
+from eduiddashboard.widgets import (HorizontalSequenceWidget,
+                                    BooleanActionWidget)
+
+from eduiddashboard.i18n import TranslationString as _
 
 
 class BooleanMongo(colander.Boolean):
@@ -18,7 +20,8 @@ class Email(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
                                 validator=colander.Email())
     verified = colander.SchemaNode(BooleanMongo(),
-                                   widget=MongoCheckboxWidget(),
+                                   widget=BooleanActionWidget(),
+                                   title=_('is verified?'),
                                    missing=False)
 
 

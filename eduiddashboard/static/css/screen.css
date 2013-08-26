@@ -205,3 +205,25 @@ form.inline {
 .email-form button.btn-icon {
   width: 14px;
 }
+
+span.deformOrderbutton {
+  float: none;
+}
+
+.form-inline .deformOrderbutton:before {
+  content: '';
+}
+
+.form-inline .deformOrderbutton {
+  opacity: 1;
+}
+.form-inline .deformOrderbutton i {
+  margin-top: 6px;
+}
+
+.form-inline label.control-label {
+  margin-right: 10px;
+  padding-top: 6px;
+}
+
+
