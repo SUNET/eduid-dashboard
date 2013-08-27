@@ -73,13 +73,13 @@ class EmailsView(BaseFormView):
 
         emails = self.user['emails']
 
-        new_emails = {}
+        new_emails = []
         for email in emails:
             if email['email'] != remove_email['email']:
                 new_emails.append(email)
 
-        self.request.session['user']['emails'] = emails
-        self.request.session['email'] = new_emails[0]['email']
+        self.request.session['user']['emails'] = new_emails
+        self.request.session['user']['email'] = new_emails[0]['email']
 
         # do the save staff
 
