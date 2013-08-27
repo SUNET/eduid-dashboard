@@ -38,23 +38,21 @@ class EmailsView(BaseFormView):
             action_title=_('Resend the verification email')
         )
 
-    def submit_success(self, emailsform):
+    def save_success(self, emailsform):
         emails = self.schema.serialize(emailsform)
+        import ipdb; ipdb.set_trace()
         # update the session data
-        for email_dict in emails.get('emails', {}):
-            if email_dict.get('primary', False):
-                emails['email'] = email_dict.get('email')
 
-        self.request.session['user'].update(emails)
+        # self.request.session['user'].update(emails)
 
         # Do the save staff
 
         # Insert the new user object
-        self.request.db.profiles.update({
-            '_id': self.user['_id'],
-        }, self.user, safe=True)
+        # self.request.db.profiles.update({
+        #     '_id': self.user['_id'],
+        # }, self.user, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        # update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '

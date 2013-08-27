@@ -7,7 +7,7 @@ class BaseFormView(FormView):
 
     route = ''
 
-    buttons = ('submit', )
+    buttons = ('save', )
     use_ajax = True
 
     def __init__(self, request):

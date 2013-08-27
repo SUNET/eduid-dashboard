@@ -26,6 +26,7 @@ class BooleanActionWidget(MongoCheckboxWidget):
     css_class = 'boolean-action-widget'
     template = 'boolean-action-widget'
     readonly_template = 'boolean-action-widget-readonly'
+    readonly = True
 
     def get_template_values(self, field, cstruct, kw):
         values = super(BooleanActionWidget, self).get_template_values(field,
@@ -36,12 +37,19 @@ class BooleanActionWidget(MongoCheckboxWidget):
             'action': self.action,
             'action_title': self.action_title,
         })
+
         return values
 
     def deserialize(self, field, pstruct):
         if pstruct is null:
             return self.false_val
-        return (pstruct == self.true_val) and self.true_val or self.false_val
+
+        if (pstruct == self.true_val or
+                (isinstance(self.true_val, bool) and
+                    bool(pstruct) == self.true_val)):
+            return self.true_val
+
+        return self.false_val
 
 
 class HorizontalSequenceWidget(deform.widget.SequenceWidget):
