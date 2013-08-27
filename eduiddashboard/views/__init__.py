@@ -30,22 +30,22 @@ class BaseFormView(FormView):
     def appstruct(self):
         return self.schema.serialize(self.user)
 
+    def get_template_context(self):
+
+        return {
+            'formname': self.classname
+        }
+
     def failure(self, e):
         context = super(BaseFormView, self).failure(e)
 
-        context.update({
-            'formname': self.classname,
-            'object': self.schema.serialize(self.user),
-        })
+        context.update(self.get_template_context())
 
         return context
 
     def show(self, form):
         context = super(BaseFormView, self).show(form)
 
-        context.update({
-            'formname': self.classname,
-            'object': self.schema.serialize(self.user),
-        })
+        context.update(self.get_template_context())
 
         return context

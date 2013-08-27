@@ -202,10 +202,6 @@ form.inline {
   width: 50%;
 }
 
-.email-form button.btn-icon {
-  width: 14px;
-}
-
 span.deformOrderbutton {
   float: none;
 }
@@ -226,4 +222,8 @@ span.deformOrderbutton {
   padding-top: 6px;
 }
 
-
+div.emailform button[name=verify],
+div.emailform button[name=remove],
+div.emailform button[name=reorder] {
+  display: none;
+}

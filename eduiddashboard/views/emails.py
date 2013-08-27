@@ -1,15 +1,12 @@
 ## Emails form
 
-from deform import widget
-
-from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.view import view_config
 
 from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
-from eduiddashboard.widgets import (BooleanActionWidget)
 
 from eduiddashboard.views import BaseFormView
 
@@ -27,26 +24,23 @@ class EmailsView(BaseFormView):
     schema = Email()
     route = 'emails'
 
-    buttons = ('save', 'verify', 'remove',)
+    buttons = ('add', 'verify', 'remove', 'reorder')
+
+    bootstrap_form_style = 'form-inline'
 
     def appstruct(self):
         return {}
 
-    def show(self, form):
-        context = super(BaseFormView, self).show(form)
-
-        from pprint import pprint
-        pprint(self.user['emails'])
-        pprint(self.request.session['user']['emails'])
+    def get_template_context(self):
+        context = super(EmailsView, self).get_template_context()
 
         context.update({
-            'formname': self.classname,
             'emails': self.user['emails'],
         })
 
         return context
 
-    def save_success(self, emailform):
+    def add_success(self, emailform):
         newemail = self.schema.serialize(emailform)
 
         # We need to add the new email to the emails list
@@ -78,8 +72,6 @@ class EmailsView(BaseFormView):
         remove_email = self.schema.serialize(emailform)
 
         emails = self.user['emails']
-
-
 
         new_emails = {}
         for email in emails:

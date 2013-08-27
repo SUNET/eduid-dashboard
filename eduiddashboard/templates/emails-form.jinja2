@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block extra_content %}
-  <table class='table table-striped'>
+  <table class='table table-striped table-thin emails'>
     {% for email in emails %}
     <tr class='emailrow'>
         <td>::</td>
@@ -19,25 +19,22 @@
         <td><i class="icon-ok"></i></td>
       {% else %}
         <td>
-          <button class='btn-link' class='verify'><i class='icon-refresh'></i></button>
+          <a href='#verify'><i class='icon-refresh'></i></button>
         </td>
       {% endif %}
         <td>
-          <button class='btn-link' class='remove'><i class='icon-remove'></i></button>
+          <a href='#remove'><i class='icon-remove'></i></button>
         </td>
     </tr>
     {% endfor %}
   </table>
-  <button class='btn'><i class='icon-plus'></i>{{_('Add a new email')}}</button>
-
-
-
-  <script src="{{'eduiddashboard:static/js/emails-verification-form.js'|static_url}}"></script>
+  <button class='btn add-new-email'><i class='icon-plus'></i>{{_('Add a new email')}}</button>
 {% endblock %}
 
 
 {% block form_generic_form %}
-  <div class='emailform  hide'>
+  <div class='emailform hide'>
   {{ form|safe }}
   </div>
+
 {% endblock %}

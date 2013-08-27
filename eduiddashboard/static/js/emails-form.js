@@ -5,23 +5,32 @@
 (function () {
     "use strict";
 
-    var send_verification = function (url, email, callback) {
-            $.post(url, {email: email}, callback, 'json');
+    var success = function(data) {
+            contaner_e.html(data);
         },
 
-        initialize = function (container) {
 
-            container.find('.boolean-action-widget a').click(function (e) {
-                var url = e.target.parentElement.href,
-                    email = $(e.target).parents('div.deformSeqItem')
-                            .find('input[name=email]').val();
+        initialize = function (container, url) {
 
+            container.find('.add-new-email').click(function (e) {
+                container.find('.emailform').removeClass('hide');
+                container.find('.add-new-email').addClass('disabled');
                 e.preventDefault();
-                send_verification(url, email);
+            });
 
+            container.find('table.emails a').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var action = e.target.parentNode.href.split('#')[1],
+                    email = $(e.target).parents('tr').find('td.email').html();
+
+                container.find('form input[name=email]').val(email);
+                container.find('form button[name=' + action + ']').click();
             });
 
         };
+
+        tabbedform.changetabs_calls.push(initialize);
 
     $(document).ready(function () {
         tabbedform.changetabs_calls.push(initialize);

@@ -26,7 +26,7 @@ var TabbedForm = function (container) {
                 deform.processCallbacks();
                 tabbedform.changetabs_calls.forEach(function (func) {
                     if (func !== undefined){
-                        func(container)
+                        func(container, url)
                     }
                 });
             }, 'html');
