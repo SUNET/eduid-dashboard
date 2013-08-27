@@ -8,3 +8,36 @@
    email, your level of assurance must be decreased.</p>
    {% endtrans %}
 {% endblock %}
+
+{% block extra_content %}
+  <table class='table table-striped'>
+    {% for email in emails %}
+    <tr class='emailrow'>
+        <td>::</td>
+        <td class='email'>{{ email.email }}</td>
+      {% if email.verified %}
+        <td><i class="icon-ok"></i></td>
+      {% else %}
+        <td>
+          <button class='btn-link' class='verify'><i class='icon-refresh'></i></button>
+        </td>
+      {% endif %}
+        <td>
+          <button class='btn-link' class='remove'><i class='icon-remove'></i></button>
+        </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <button class='btn'><i class='icon-plus'></i>{{_('Add a new email')}}</button>
+
+
+
+  <script src="{{'eduiddashboard:static/js/emails-verification-form.js'|static_url}}"></script>
+{% endblock %}
+
+
+{% block form_generic_form %}
+  <div class='emailform  hide'>
+  {{ form|safe }}
+  </div>
+{% endblock %}

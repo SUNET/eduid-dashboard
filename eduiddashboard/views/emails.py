@@ -5,11 +5,10 @@ from deform import widget
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotFound
 from pyramid.view import view_config
 
-
 from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.models import EmailsPerson
+from eduiddashboard.models import Email
 from eduiddashboard.widgets import (BooleanActionWidget)
 
 from eduiddashboard.views import BaseFormView
@@ -25,25 +24,41 @@ class EmailsView(BaseFormView):
                     return status and flash message
     """
 
-    schema = EmailsPerson()
+    schema = Email()
     route = 'emails'
 
-    def before(self, form):
-        form.bootstrap_form_style = ''
-        form['email'].widget = widget.TextInputWidget(readonly=True)
-        form['email'].title = _('Primary e-mail')
+    buttons = ('save', 'verify', 'remove',)
 
-        form['emails']['emails']['verified'].widget = BooleanActionWidget(
-            action=self.request.route_path('email-verification'),
-            action_title=_('Resend the verification email')
-        )
+    def appstruct(self):
+        return {}
 
-    def save_success(self, emailsform):
-        emails = self.schema.serialize(emailsform)
-        import ipdb; ipdb.set_trace()
-        # update the session data
+    def show(self, form):
+        context = super(BaseFormView, self).show(form)
 
-        # self.request.session['user'].update(emails)
+        from pprint import pprint
+        pprint(self.user['emails'])
+        pprint(self.request.session['user']['emails'])
+
+        context.update({
+            'formname': self.classname,
+            'emails': self.user['emails'],
+        })
+
+        return context
+
+    def save_success(self, emailform):
+        newemail = self.schema.serialize(emailform)
+
+        # We need to add the new email to the emails list
+
+        emails = self.user['emails']
+
+        emails.append({
+            'email': newemail['email'],
+            'verified': False,
+        })
+
+        self.request.session['user'].update(emails)
 
         # Do the save staff
 
@@ -59,34 +74,34 @@ class EmailsView(BaseFormView):
                                      'through all applications'),
                                    queue='forms')
 
+    def remove_success(self, emailform):
+        remove_email = self.schema.serialize(emailform)
 
-def is_email_in_emails(email, emails):
-    """
-    emails is a dictionary like emails from person schema
-    """
-    for edict in emails:
-        if email == edict['email']:
-            return True
-    return False
+        emails = self.user['emails']
 
 
-@view_config(route_name='email-verification', permission='edit',
-             request_method='POST', renderer='json')
-def email_verification(context, request):
 
-    email = request.POST.get('email')
+        new_emails = {}
+        for email in emails:
+            if email['email'] != remove_email['email']:
+                new_emails.append(email)
 
-    if email is None:
-        raise HTTPBadRequest(_('You forgive the email to verificate'))
+        self.request.session['user']['emails'] = emails
+        self.request.session['email'] = new_emails[0]['email']
 
-    # TODO allow to take emails from context
-    emails = EmailsPerson().serialize(request.session.get('user'))
+        # do the save staff
 
-    if not is_email_in_emails(email, emails['emails']):
-        return HTTPNotFound(
-            _('The given email is not in the user emails list')
-        )
+        self.request.session.flash(_('Your changes was saved, please, wait '
+                                     'before your changes are distributed '
+                                     'through all applications'),
+                                   queue='forms')
 
-    # Do the email verification staff
+    def verify_success(self, emailform):
+        email = self.schema.serialize(emailform)
 
-    return {'success': True}
+        # do the email verification staff
+
+        self.request.session.flash(_('A verification email has been sent to '
+                                     'the new account. Please revise your '
+                                     'inbox and click on the provided link'),
+                                   queue='forms')

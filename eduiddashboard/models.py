@@ -1,10 +1,5 @@
 import colander
 
-from eduiddashboard.widgets import (HorizontalSequenceWidget,
-                                    BooleanActionWidget)
-
-from eduiddashboard.i18n import TranslationString as _
-
 
 class BooleanMongo(colander.Boolean):
 
@@ -19,24 +14,6 @@ class BooleanMongo(colander.Boolean):
 class Email(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
                                 validator=colander.Email())
-    verified = colander.SchemaNode(BooleanMongo(),
-                                   widget=BooleanActionWidget(),
-                                   title=_('is verified?'),
-                                   missing=False)
-
-
-class Emails(colander.SequenceSchema):
-    emails = Email()
-
-
-class EmailsPerson(colander.MappingSchema):
-
-    email = colander.SchemaNode(colander.String(),
-                                validator=colander.Email(),
-                                missing='')
-    emails = Emails(
-        widget=HorizontalSequenceWidget(min_len=1, orderable=True)
-    )
 
 
 class Person(colander.MappingSchema):
