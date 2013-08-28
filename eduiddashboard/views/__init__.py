@@ -27,6 +27,10 @@ class BaseFormView(FormView):
             'formid': "{classname}-form".format(classname=self.classname),
         }
 
+        bootstrap_form_style = getattr(self, 'bootstrap_form_style', None)
+        if bootstrap_form_style is not None:
+            self.form_options['bootstrap_form_style'] = bootstrap_form_style
+
     def appstruct(self):
         return self.schema.serialize(self.user)
 

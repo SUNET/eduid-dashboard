@@ -194,32 +194,17 @@ div.profile-combo {
   margin-top: 40px;
 }
 
-form.inline {
-  display: inline;
+form.form-inline div {
+  display: inline-block;
 }
+
 
 .table-thin {
   width: 50%;
 }
 
-span.deformOrderbutton {
-  float: none;
-}
-
-.form-inline .deformOrderbutton:before {
-  content: '';
-}
-
-.form-inline .deformOrderbutton {
-  opacity: 1;
-}
-.form-inline .deformOrderbutton i {
-  margin-top: 6px;
-}
-
-.form-inline label.control-label {
-  margin-right: 10px;
-  padding-top: 6px;
+div.emailform {
+  margin-top: 10px;
 }
 
 div.emailform button[name=verify],
