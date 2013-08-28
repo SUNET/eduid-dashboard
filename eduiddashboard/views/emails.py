@@ -24,7 +24,7 @@ class EmailsView(BaseFormView):
     schema = Email()
     route = 'emails'
 
-    buttons = ('add', 'verify', 'remove', 'set_primary')
+    buttons = ('add', 'verify', 'remove', 'setprimary')
 
     bootstrap_form_style = 'form-inline'
 
@@ -36,6 +36,7 @@ class EmailsView(BaseFormView):
 
         context.update({
             'emails': self.user['emails'],
+            'primary_email': self.user['email'],
         })
 
         return context
@@ -53,15 +54,14 @@ class EmailsView(BaseFormView):
         })
 
         self.request.session['user'].update(emails)
+        self.user.update(emails)
 
         # Do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, self.user, upsert=True, safe=True)
 
-        # Insert the new user object
-        # self.request.db.profiles.update({
-        #     '_id': self.user['_id'],
-        # }, self.user, safe=True)
-
-        # update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
@@ -79,12 +79,19 @@ class EmailsView(BaseFormView):
                 new_emails.append(email)
 
         self.request.session['user']['emails'] = new_emails
-        self.request.session['user']['email'] = new_emails[0]['email']
+        if not self.user.get('email', ''):
+            self.request.session['user']['email'] = new_emails[0]['email']
 
+        self.user = self.request.session['user']
         # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, self.user, upsert=True, safe=True)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
+        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+
+        self.request.session.flash(_('One email has been removed, please, wait'
+                                     ' before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
 
@@ -96,4 +103,15 @@ class EmailsView(BaseFormView):
         self.request.session.flash(_('A verification email has been sent to '
                                      'the new account. Please revise your '
                                      'inbox and click on the provided link'),
+                                   queue='forms')
+
+    def setprimary_success(self, emailform):
+        email = self.schema.serialize(emailform)
+        primary_email = email.get('email')
+
+        self.request.session['user']['email'] = primary_email
+
+        # do the email verification staff
+
+        self.request.session.flash(_('Your primary email was changed'),
                                    queue='forms')

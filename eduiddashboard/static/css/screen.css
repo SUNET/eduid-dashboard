@@ -198,17 +198,21 @@ form.form-inline div {
   display: inline-block;
 }
 
+form.form-inline div.alert {
+  display: block;
+}
+
 
 .table-thin {
   width: 50%;
 }
 
-div.emailform {
+div.form-content {
   margin-top: 10px;
 }
 
-div.emailform button[name=verify],
-div.emailform button[name=remove],
-div.emailform button[name=reorder] {
+div.form-content button[name=verify],
+div.form-content button[name=remove],
+div.form-content button[name=setprimary] {
   display: none;
 }
