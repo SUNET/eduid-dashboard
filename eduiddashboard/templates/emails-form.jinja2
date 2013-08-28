@@ -28,7 +28,11 @@
     </tr>
     {% endfor %}
   </table>
-  <button class='btn add-new-email'><i class='icon-plus'></i>{{_('Add a new email')}}</button>
+  <button type='button'
+          class='btn add-new-email' 
+          data-toggle='button'>
+        <i class='icon-plus'></i>
+        {{_('Add a new email')}}</button>
 {% endblock %}
 
 

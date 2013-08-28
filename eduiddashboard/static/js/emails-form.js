@@ -13,9 +13,8 @@
         initialize = function (container, url) {
 
             container.find('.add-new-email').click(function (e) {
-                container.find('.emailform').removeClass('hide');
-                container.find('.add-new-email').addClass('disabled');
-                e.preventDefault();
+                container.find('.emailform').toggleClass('hide');
+                container.find('.add-new-email').toggleClass('active');
             });
 
             container.find('table.emails a').click(function (e) {
@@ -25,14 +24,7 @@
                     email = $(e.target).parents('tr').find('td.email').html();
 
                 container.find('form input[name=email]').val(email);
-                container.find('form button[name=' + action + ']').click();
-            });
-
-        };
-
+                container.find('form button[name=' + action + ']').clic(;  };  ;
         tabbedform.changetabs_calls.push(initialize);
 
-    $(document).ready(function () {
-        tabbedform.changetabs_calls.push(initialize);
-    });
 }());

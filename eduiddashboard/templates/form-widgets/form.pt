@@ -96,7 +96,7 @@
   </div>
 
   <script type="text/javascript" tal:condition="field.use_ajax">
-    deform.addCallback(
+    window.deform && deform.addCallback(
        '${field.formid}',
        function(oid) {
          var options = {
@@ -114,7 +114,7 @@
   </script>
   <script>
     // Highlight all tabs with errors, move to the first one with the error
-    deform.addCallback(
+    window.deform && deform.addCallback(
        '${field.formid}',
        function() {
         var alreadySelected = false;
@@ -136,6 +136,11 @@
           }
           $("ul.form-tabs li#" +errorId + '-list').addClass('error');
         });
+    });
+  </script>
+  <script type="text/javascript">
+    window.deform && deform.addCallback('${field.formid}', function () {
+        $('body').trigger('formready');
     });
   </script>
 

@@ -24,7 +24,7 @@ class EmailsView(BaseFormView):
     schema = Email()
     route = 'emails'
 
-    buttons = ('add', 'verify', 'remove', 'reorder')
+    buttons = ('add', 'verify', 'remove', 'set_primary')
 
     bootstrap_form_style = 'form-inline'
 
