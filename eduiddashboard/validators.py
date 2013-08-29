@@ -10,10 +10,6 @@ class EmailUniqueValidator(object):
         request = node.bindings.get('request')
 
         if 'add' in request.POST:
-
-            emails = request.session.get('user', {}).get('emails')
-
-            for email in emails:
-                if value == email['email']:
-                    raise colander.Invalid(node, _("This email is already "
-                                           "registered in your profile"))
+            if request.userdb.exists_by_field('emails.email', value):
+                raise colander.Invalid(node,
+                                       _("This email is already registered"))

@@ -32,6 +32,9 @@ class UserDB(IUserDB):
         except MultipleUsersReturned:
             raise self.MultipleUsersReturned()
 
+    def exists_by_field(self, field, value):
+        return self._db.exists_by_field(field, value)
+
 
 def get_userdb(request):
     return request.registry.settings['userdb']
