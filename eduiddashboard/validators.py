@@ -1,12 +1,11 @@
 from bson import ObjectId
 
-import translationstring
 import colander
 
 import vccs_client
 
+from eduiddashboard.i18n import TranslationString as _
 
-_ = translationstring.TranslationStringFactory('eduiddashboard')
 
 PASSWORD_MIN_LENGTH = 5
 
@@ -45,3 +44,15 @@ class PasswordValidator(object):
             err = _('"${val}" has to be more than ${len} characters length',
                     mapping={'val':value, 'len':PASSWORD_MIN_LENGTH})
             raise colander.Invalid(node, err)
+
+
+class EmailUniqueValidator(object):
+
+    def __call__(self, node, value):
+
+        request = node.bindings.get('request')
+
+        if 'add' in request.POST:
+            if request.userdb.exists_by_field('emails.email', value):
+                raise colander.Invalid(node,
+                                       _("This email is already registered"))

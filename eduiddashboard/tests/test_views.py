@@ -24,4 +24,4 @@ class ViewTests(unittest.TestCase):
         }
 
         response = home({}, request)
-        self.assertEqual(response['emails'], 'email@example.com')
+        self.assertEqual(response['email'], 'email@example.com')

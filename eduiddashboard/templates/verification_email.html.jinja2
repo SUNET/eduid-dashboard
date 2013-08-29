@@ -1,0 +1,10 @@
+{% trans verification_link=verification_link, site_url=site_url, site_name=site_name %}
+<h2>Welcome to {{ site_name }},</h2>
+
+<p>We send you an email with a verification link because you has
+registered at <a href="{{ site_url }}">{{ site_name }}</a>.</p>
+
+<p>Please, click on the follow link to verificate your email account.</p>
+
+<a href="{{ verification_link }}">{{ verification_link }}</a>
+{% endtrans %}

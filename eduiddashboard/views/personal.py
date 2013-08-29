@@ -26,7 +26,7 @@ class PersonalDataView(BaseFormView):
     schema = Person()
     route = 'personaldata'
 
-    def submit_success(self, user_modified):
+    def save_success(self, user_modified):
 
         person = self.schema.serialize(user_modified)
         # update the session data

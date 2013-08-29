@@ -194,14 +194,25 @@ div.profile-combo {
   margin-top: 40px;
 }
 
-form.inline {
-  display: inline;
+form.form-inline div {
+  display: inline-block;
 }
+
+form.form-inline div.alert {
+  display: block;
+}
+
 
 .table-thin {
   width: 50%;
 }
 
-.email-form button.btn-icon {
-  width: 14px;
+div.form-content {
+  margin-top: 10px;
+}
+
+div.form-content button[name=verify],
+div.form-content button[name=remove],
+div.form-content button[name=setprimary] {
+  display: none;
 }
