@@ -1,6 +1,5 @@
 ## Emails form
 
-from pyramid.httpexceptions import HTTPNotFound
 from pyramid.view import view_config
 
 from eduid_am.tasks import update_attributes

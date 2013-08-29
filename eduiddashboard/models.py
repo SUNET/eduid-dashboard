@@ -1,5 +1,7 @@
 import colander
 
+from eduiddashboard.validators import EmailUniqueValidator
+
 
 class BooleanMongo(colander.Boolean):
 
@@ -13,7 +15,9 @@ class BooleanMongo(colander.Boolean):
 
 class Email(colander.MappingSchema):
     email = colander.SchemaNode(colander.String(),
-                                validator=colander.Email())
+                                validator=colander.All(colander.Email(),
+                                                       EmailUniqueValidator())
+                                )
 
 
 class Person(colander.MappingSchema):
