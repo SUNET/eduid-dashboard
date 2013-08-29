@@ -8,6 +8,32 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
 
 from eduiddashboard.views import BaseFormView
+from eduiddashboard.emails import send_verification_mail
+
+
+def mark_as_verified_email(request, verified_email):
+        user = request.session.get('user')
+        emails = user['emails']
+
+        new_emails = []
+        for email in emails:
+            if email['email'] == verified_email:
+                email['verified'] = True
+            new_emails.append(email)
+
+        request.session['user'].update(new_emails)
+        user.update(new_emails)
+
+        # Do the save staff
+        request.db.profiles.find_and_modify({
+            '_id': user['_id'],
+        }, user, upsert=True, safe=True)
+
+        update_attributes.delay('eduid_dashboard', str(user['_id']))
+
+        request.session.flash(_('Your email {email} was verified'
+                                ).format(email=verified_email),
+                              queue='forms')
 
 
 @view_config(route_name='emails', permission='edit',
@@ -67,6 +93,13 @@ class EmailsView(BaseFormView):
                                      'through all applications'),
                                    queue='forms')
 
+        send_verification_mail(self.request, newemail['email'])
+
+        self.request.session.flash(_('A verification email has been sent '
+                                     'to your new account. Please revise your '
+                                     'inbox and click on the provided link'),
+                                   queue='forms')
+
     def remove_success(self, emailform):
         remove_email = self.schema.serialize(emailform)
 
@@ -97,10 +130,10 @@ class EmailsView(BaseFormView):
     def verify_success(self, emailform):
         email = self.schema.serialize(emailform)
 
-        # do the email verification staff
+        send_verification_mail(self.request, email['email'])
 
-        self.request.session.flash(_('A verification email has been sent to '
-                                     'the new account. Please revise your '
+        self.request.session.flash(_('A new verification email has been sent '
+                                     'to your account. Please revise your '
                                      'inbox and click on the provided link'),
                                    queue='forms')
 
