@@ -25,6 +25,10 @@ var TabbedForm = function (container) {
                 }
                 deform.processCallbacks();
 
+                container.find("a[data-toggle=tooltip]").tooltip();
+                container.find("button[data-toggle=tooltip]").tooltip();
+                container.find("label[data-toggle=tooltip]").tooltip();
+
             }, 'html');
         },
 
