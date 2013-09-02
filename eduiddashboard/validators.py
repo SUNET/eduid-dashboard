@@ -19,7 +19,7 @@ def old_password_validator(node, kw):
 class OldPasswordValidator(object):
 
     def __init__(self, request):
-        self.user_email = request.session['email']
+        self.user_email = request.session['mail']
         self.request = request
 
     def __call__(self, node, value):
