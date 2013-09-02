@@ -13,11 +13,11 @@ from eduiddashboard.emails import send_verification_mail
 
 def mark_as_verified_email(request, verified_email):
         user = request.session.get('user')
-        emails = user['emails']
+        emails = user['mailAliases']
 
         new_emails = []
         for email in emails:
-            if email['email'] == verified_email:
+            if email['mail'] == verified_email:
                 email['verified'] = True
             new_emails.append(email)
 
@@ -25,9 +25,7 @@ def mark_as_verified_email(request, verified_email):
         user.update(new_emails)
 
         # Do the save staff
-        request.db.profiles.find_and_modify({
-            '_id': user['_id'],
-        }, user, upsert=True, safe=True)
+        request.db.profiles.save(user, safe=True)
 
         update_attributes.delay('eduid_dashboard', str(user['_id']))
 
@@ -60,8 +58,8 @@ class EmailsView(BaseFormView):
         context = super(EmailsView, self).get_template_context()
 
         context.update({
-            'emails': self.user['emails'],
-            'primary_email': self.user['email'],
+            'emails': self.user['mailAliases'],
+            'primary_email': self.user['mail'],
         })
 
         return context
@@ -71,20 +69,24 @@ class EmailsView(BaseFormView):
 
         # We need to add the new email to the emails list
 
-        emails = self.user['emails']
+        emails = self.user['mailAliases']
 
-        emails.append({
-            'email': newemail['email'],
+        mailsubdoc = {
+            'mail': newemail['mail'],
             'verified': False,
-        })
+        }
 
+        emails.append(mailsubdoc)
         self.request.session['user'].update(emails)
-        self.user.update(emails)
 
         # Do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
-        }, self.user, upsert=True, safe=True)
+        }, {
+            '$push': {
+                'mail': mailsubdoc
+            }
+        }, safe=True)
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
@@ -101,24 +103,32 @@ class EmailsView(BaseFormView):
                                    queue='forms')
 
     def remove_success(self, emailform):
-        remove_email = self.schema.serialize(emailform)
+        remove_email_struct = self.schema.serialize(emailform)
+        remove_email = remove_email_struct['mail']
 
-        emails = self.user['emails']
+        emails = self.user['mailAliases']
 
         new_emails = []
         for email in emails:
-            if email['email'] != remove_email['email']:
+            if email['mail'] != remove_email:
                 new_emails.append(email)
 
-        self.request.session['user']['emails'] = new_emails
-        if not self.user.get('email', ''):
-            self.request.session['user']['email'] = new_emails[0]['email']
+        self.request.session['user']['mailAliases'] = new_emails
+        primary_email = self.user.get('mail', '')
 
-        self.user = self.request.session['user']
+        if not primary_email or primary_email == remove_email:
+            self.request.session['user']['mail'] = new_emails[0]['mail']
+
         # do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
-        }, self.user, upsert=True, safe=True)
+        }, {
+            '$pull': {
+                'mail': {
+                    'mail': remove_email,
+                }
+            }
+        }, safe=True)
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
@@ -130,7 +140,7 @@ class EmailsView(BaseFormView):
     def verify_success(self, emailform):
         email = self.schema.serialize(emailform)
 
-        send_verification_mail(self.request, email['email'])
+        send_verification_mail(self.request, email['mail'])
 
         self.request.session.flash(_('A new verification email has been sent '
                                      'to your account. Please revise your '
@@ -139,11 +149,20 @@ class EmailsView(BaseFormView):
 
     def setprimary_success(self, emailform):
         email = self.schema.serialize(emailform)
-        primary_email = email.get('email')
+        primary_email = email.get('mail')
 
-        self.request.session['user']['email'] = primary_email
+        self.request.session['user']['mail'] = primary_email
 
-        # do the email verification staff
+        # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, {
+            '$set': {
+                'mail': primary_email,
+            }
+        }, safe=True)
+
+        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
         self.request.session.flash(_('Your primary email was changed'),
                                    queue='forms')
