@@ -72,7 +72,7 @@ def token_login(context, request):
     if verify_auth_token(shared_key, email, token):
         # Do the auth
         user = request.userdb.get_user(email)
-        request.session['email'] = email
+        request.session['mail'] = email
         request.session['user'] = user
         request.session['loa'] = 5
         remember_headers = remember(request, email)
