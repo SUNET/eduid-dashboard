@@ -29,9 +29,18 @@ def home(context, request):
 
     view_context['profile_filled'] = 78
 
-    view_context['email'] = request.session.get('user', {}).get('email')
+    view_context['mail'] = request.session.get('user', {}).get('mail')
 
     return view_context
+
+
+@view_config(route_name='session-reload',
+             request_method='GET', permission='edit')
+def session_reload(context, request):
+    userid = request.session.get('user')['mail']
+    user = request.userdb.get_user(userid)
+    request.session['user'] = user
+    raise HTTPFound(request.route_path('home'))
 
 
 @view_config(route_name='help')

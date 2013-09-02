@@ -1,7 +1,7 @@
 
 from eduid_am.celery import celery, get_attribute_manager
 from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
-import eduid_am.tasks
+import eduid_am.tasks  # flake8: noqa
 
 from eduiddashboard.saml2.userdb import IUserDB
 
@@ -20,7 +20,7 @@ class UserDB(IUserDB):
         celery.conf.update(am_settings)
         self._db = get_attribute_manager(celery)
 
-        self.user_main_attribute = settings.get('saml2.user_main_attrubute',
+        self.user_main_attribute = settings.get('saml2.user_main_attribute',
                                                 'email')
 
     def get_user(self, userid):

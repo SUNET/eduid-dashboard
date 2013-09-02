@@ -58,6 +58,7 @@ def includeme(config):
     config.add_route('home', '/', factory=PersonFactory)
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
+    config.add_route('session-reload', '/session-reload/')
 
     config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
     config.add_route('emails', '/emails/', factory=PersonFactory)
