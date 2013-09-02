@@ -1,14 +1,11 @@
 ## Personal data form
 
 from pyramid.view import view_config
-from bson import ObjectId
-
-import vccs_client
 
 from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.models import Person, Passwords
+from eduiddashboard.models import Person
 
 from eduiddashboard.views import BaseFormView
 
@@ -35,9 +32,7 @@ class PersonalDataView(BaseFormView):
         # Do the save staff
 
         # Insert the new user object
-        self.request.db.profiles.update({
-            '_id': self.user['_id'],
-        }, self.user, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 

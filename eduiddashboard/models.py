@@ -21,10 +21,10 @@ class BooleanMongo(colander.Boolean):
 
 
 class Email(colander.MappingSchema):
-    email = colander.SchemaNode(colander.String(),
-                                validator=colander.All(colander.Email(),
-                                                       EmailUniqueValidator())
-                                )
+    mail = colander.SchemaNode(colander.String(),
+                               validator=colander.All(colander.Email(),
+                                                      EmailUniqueValidator()),
+                               title=_('email'))
 
 
 class NIN(colander.MappingSchema):
@@ -74,7 +74,7 @@ class Person(colander.MappingSchema):
                                             missing='',
                                             widget=preferred_language_widget)
 
-    NINs = NINs(title=_('personal identity numbers'))
+    norEduPersonNIN = NINs(title=_('personal identity numbers'))
 
 
 class Passwords(colander.MappingSchema):
