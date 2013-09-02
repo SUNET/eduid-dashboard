@@ -19,9 +19,9 @@ class ViewTests(unittest.TestCase):
 
         request.session = {
             'user': {
-                'email': 'email@example.com'
+                'mail': 'email@example.com'
             },
         }
 
         response = home({}, request)
-        self.assertEqual(response['email'], 'email@example.com')
+        self.assertEqual(response['mail'], 'email@example.com')
