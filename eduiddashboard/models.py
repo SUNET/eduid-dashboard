@@ -1,9 +1,11 @@
+import re
+
 import colander
-import translationstring
+import deform
 
-from .validators import PasswordValidator, old_password_validator
+from eduiddashboard.validators import PasswordValidator, old_password_validator
 
-_ = translationstring.TranslationStringFactory('eduiddashboard')
+from eduiddashboard.i18n import TranslationString as _
 
 from eduiddashboard.validators import EmailUniqueValidator
 
@@ -25,10 +27,54 @@ class Email(colander.MappingSchema):
                                 )
 
 
+class NIN(colander.MappingSchema):
+    norEduPersonNIN = colander.SchemaNode(
+        colander.String(),
+        title=_('personal identity number (NIN)'),
+        validator=colander.Regex(
+            regex=re.compile('[0-9]{12}'),
+            msg=_('The personal identity number consists of 12 digits')
+        )
+    )
+    verified = colander.SchemaNode(BooleanMongo(), missing=False,
+                                   title=_('verified'))
+    active = colander.SchemaNode(BooleanMongo(), missing=False,
+                                 title=_('active'))
+
+
+class NINs(colander.SequenceSchema):
+    NINs = NIN(title=_('personal identity numbers'))
+
+
+@colander.deferred
+def preferred_language_widget(node, kw):
+    request = kw.get('request')
+    languages = request.registry.settings.get('available_languages')
+    lang_choices = []
+    for lang in languages:
+        lang_choices.append((lang, _(lang)))
+
+    return deform.widget.RadioChoiceWidget(values=lang_choices)
+
+
 class Person(colander.MappingSchema):
-    first_name = colander.SchemaNode(colander.String())
-    last_name = colander.SchemaNode(colander.String())
-    screen_name = colander.SchemaNode(colander.String())
+    givenName = colander.SchemaNode(colander.String(),
+                                    title=_('given name'))
+    sn = colander.SchemaNode(colander.String(),
+                             title=_('surname'))
+    displayName = colander.SchemaNode(colander.String(),
+                                      title=_('display name'))
+    photo = colander.SchemaNode(colander.String(),
+                                title=_('photo'),
+                                description=_('A url link to your porsonal '
+                                              'avatar'),
+                                missing='')
+    preferredLanguage = colander.SchemaNode(colander.String(),
+                                            title=_('preferred language'),
+                                            missing='',
+                                            widget=preferred_language_widget)
+
+    NINs = NINs(title=_('personal identity numbers'))
 
 
 class Passwords(colander.MappingSchema):
