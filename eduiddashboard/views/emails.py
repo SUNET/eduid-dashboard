@@ -58,7 +58,7 @@ class EmailsView(BaseFormView):
         context = super(EmailsView, self).get_template_context()
 
         context.update({
-            'emails': self.user['mailAliases'],
+            'mails': self.user['mailAliases'],
             'primary_email': self.user['mail'],
         })
 
@@ -72,7 +72,7 @@ class EmailsView(BaseFormView):
         emails = self.user['mailAliases']
 
         mailsubdoc = {
-            'mail': newemail['mail'],
+            'email': newemail['mail'],
             'verified': False,
         }
 
@@ -84,7 +84,7 @@ class EmailsView(BaseFormView):
             '_id': self.user['_id'],
         }, {
             '$push': {
-                'mail': mailsubdoc
+                'mailAliases': mailsubdoc
             }
         }, safe=True)
 
@@ -95,7 +95,7 @@ class EmailsView(BaseFormView):
                                      'through all applications'),
                                    queue='forms')
 
-        send_verification_mail(self.request, newemail['email'])
+        send_verification_mail(self.request, newemail['mail'])
 
         self.request.session.flash(_('A verification email has been sent '
                                      'to your new account. Please revise your '
@@ -124,8 +124,8 @@ class EmailsView(BaseFormView):
             '_id': self.user['_id'],
         }, {
             '$pull': {
-                'mail': {
-                    'mail': remove_email,
+                'mailAliases': {
+                    'email': remove_email,
                 }
             }
         }, safe=True)
