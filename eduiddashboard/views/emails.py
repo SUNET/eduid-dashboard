@@ -110,14 +110,14 @@ class EmailsView(BaseFormView):
 
         new_emails = []
         for email in emails:
-            if email['mail'] != remove_email:
+            if email['email'] != remove_email:
                 new_emails.append(email)
 
         self.request.session['user']['mailAliases'] = new_emails
         primary_email = self.user.get('mail', '')
 
         if not primary_email or primary_email == remove_email:
-            self.request.session['user']['mail'] = new_emails[0]['mail']
+            self.request.session['user']['mail'] = new_emails[0]['email']
 
         # do the save staff
         self.request.db.profiles.find_and_modify({

@@ -30,7 +30,7 @@
                 container.find('.form-content').addClass('hide');
                 container.find('.add-new').removeClass('active');
 
-                container.find('form input[name=email]').val(email);
+                container.find('form input[name=mail]').val(email);
                 container.find('form button[name=' + action + ']').click();
             });
 
@@ -42,7 +42,7 @@
                 container.find('.form-content').addClass('hide');
                 container.find('.add-new').removeClass('active');
 
-                container.find('form input[name=email]').val(value);
+                container.find('form input[name=mail]').val(value);
                 container.find('form button[name=' + action + ']').click();
             });
 
