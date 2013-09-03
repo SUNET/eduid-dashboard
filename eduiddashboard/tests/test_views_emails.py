@@ -80,3 +80,44 @@ class MailsFormTests(LoggedInReguestTests):
             self.assertIn('johnsmith@example.org', response.body)
             self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_verify_not_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/emails/')
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'user@example.com'
+        with patch.object(UserDB, 'exists_by_field', clear=True):
+
+            UserDB.exists_by_field.return_value = False
+            response = form.submit('verify')
+
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('user@example.com', response.body)
+            self.assertIn('alert-error', response.body)
+            self.assertIn('This email is not registered', response.body)
+            self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_verify_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/emails/')
+
+        self.assertIn('johnsmith@example.org', response_form.body)
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'johnsmith@example.org'
+
+        with patch.object(UserDB, 'exists_by_field', clear=True):
+
+            UserDB.exists_by_field.return_value = True
+
+            response = form.submit('verify')
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('A new verification email has been sent to your'
+                          ' account', response.body)
+            self.assertIn('johnsmith@example.org', response.body)
+            self.assertIsNotNone(getattr(response, 'form', None))
