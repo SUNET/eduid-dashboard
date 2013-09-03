@@ -1,6 +1,8 @@
 from os import path
+from copy import deepcopy
 
 import pymongo
+from bson import ObjectId
 
 import unittest
 
@@ -19,6 +21,7 @@ MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
 MONGO_URI_AM_TEST = 'mongodb://localhost:27017/eduid_am_test'
 
 MOCKED_USER_STANDARD = {
+    '_id': ObjectId('012345678901234567890123'),
     'givenName': 'John',
     'sn': 'Smith',
     'displayName': 'John Smith',
@@ -80,7 +83,7 @@ class MockedUserDB(IUserDB):
     def get_user(self, userid):
         if userid not in self.test_users:
             raise self.UserDoesNotExist
-        return self.test_users.get(userid)
+        return deepcopy(self.test_users.get(userid))
 
 
 class LoggedInReguestTests(unittest.TestCase):
@@ -165,7 +168,6 @@ class LoggedInReguestTests(unittest.TestCase):
     def add_to_session(self, data):
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
-        # request = DummyRequest()
         request = self.dummy_request()
         session = session_factory(request)
         for key, value in data.items():
