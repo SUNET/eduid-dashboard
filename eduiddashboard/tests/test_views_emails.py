@@ -121,3 +121,37 @@ class MailsFormTests(LoggedInReguestTests):
                           ' account', response.body)
             self.assertIn('johnsmith@example.org', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_remove_not_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/emails/')
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'user@example.com'
+
+        response = form.submit('remove')
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn('user@example.com', response.body)
+        self.assertIn('alert-error', response.body)
+        self.assertIn("The email can't be found", response.body)
+        self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_remove_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/emails/')
+
+        self.assertIn('johnsmith@example.org', response_form.body)
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'johnsmith@example.org'
+
+        response = form.submit('remove')
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn('email has been removed,', response.body)
+        self.assertNotIn('johnsmith@example.org', response.body)
+        self.assertIsNotNone(getattr(response, 'form', None))

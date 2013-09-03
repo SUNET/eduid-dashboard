@@ -63,7 +63,16 @@ class EmailUniqueValidator(object):
                                        _("This email is not registered already"
                                          ", so you can not very it"))
 
-        elif ('remove' in request.POST and
-                len(request.session['user']['mailAliases']) <= 1):
+        elif 'remove' in request.POST:
+            email_discovered = False
+            for emaildict in request.session['user']['mailAliases']:
+                if emaildict['email'] == value:
+                    email_discovered = True
+                    break
+            if not email_discovered:
+                raise colander.Invalid(node,
+                                       _("The email can't be found"))
+
+            if len(request.session['user']['mailAliases']) <= 1:
                 raise colander.Invalid(node,
                                        _("At least one email is required"))
