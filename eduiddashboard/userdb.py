@@ -10,7 +10,7 @@ class UserDB(IUserDB):
 
     def __init__(self, settings):
 
-        am_settings = {'mongodb': settings['mongo_uri_am']}
+        am_settings = {'MONGO_URI': settings['mongo_uri_am']}
 
         mongo_replicaset = settings.get('mongo_replicaset', None)
 
