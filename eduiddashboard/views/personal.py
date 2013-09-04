@@ -23,7 +23,7 @@ class PersonalDataView(BaseFormView):
     schema = Person()
     route = 'personaldata'
 
-    def submit_success(self, user_modified):
+    def save_success(self, user_modified):
 
         person = self.schema.serialize(user_modified)
         # update the session data
@@ -32,9 +32,7 @@ class PersonalDataView(BaseFormView):
         # Do the save staff
 
         # Insert the new user object
-        self.request.db.profiles.update({
-            '_id': self.user['_id'],
-        }, self.user, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 

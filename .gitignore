@@ -8,4 +8,5 @@ __pycache__
 build/
 sessions/
 nosetests.xml
+coverage.xml
 /development.ini

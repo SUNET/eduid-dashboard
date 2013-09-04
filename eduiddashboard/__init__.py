@@ -1,13 +1,18 @@
 import os
 import re
 
+from pkg_resources import resource_filename
+from deform import Form
+
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
+from pyramid.settings import asbool
 
 from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
-from eduiddashboard.permissions import RootFactory, PersonFactory
+from eduiddashboard.permissions import (RootFactory, PersonFactory,
+                                        PasswordsFactory)
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -18,6 +23,18 @@ def read_setting_from_env(settings, key, default=None):
         return os.environ[env_variable]
     else:
         return settings.get(key, default)
+
+
+def add_custom_deform_templates_path():
+    templates_path = 'templates/form-widgets'
+    try:
+        path = resource_filename('eduiddashboard', templates_path)
+    except ImportError:
+        from os.path import dirname, join
+        path = join(dirname(__file__), templates_path)
+
+    loader = Form.default_renderer.loader
+    loader.search_path = (path, ) + loader.search_path
 
 
 def includeme(config):
@@ -41,9 +58,15 @@ def includeme(config):
     config.add_route('home', '/', factory=PersonFactory)
     config.add_route('help', '/help/')
     config.add_route('token-login', '/tokenlogin/')
+    config.add_route('session-reload', '/session-reload/')
 
     config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
     config.add_route('emails', '/emails/', factory=PersonFactory)
+    config.add_route('verifications',
+                     '/verificate/{model}/{code}/',
+                     factory=PersonFactory)
+
+    config.add_route('passwords', '/passwords/', factory=PasswordsFactory)
 
 
 def main(global_config, **settings):
@@ -53,6 +76,17 @@ def main(global_config, **settings):
     ``paster serve``.
     """
     settings = dict(settings)
+
+    # read pyramid_mailer options
+    for key, default in (
+        ('host', 'localhost'),
+        ('port', '25'),
+        ('username', None),
+        ('password', None),
+        ('default_sender', 'no-reply@example.com')
+    ):
+        option = 'mail.' + key
+        settings[option] = read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
     available_languages = read_setting_from_env(settings,
@@ -98,6 +132,15 @@ def main(global_config, **settings):
     config.include('pyramid_deform')
 
     config.include('eduiddashboard.saml2')
+
+    if 'testing' in settings and asbool(settings['testing']):
+        config.include('pyramid_mailer.testing')
+    else:
+        config.include('pyramid_mailer')
+
+    config.include('pyramid_tm')
+
+    add_custom_deform_templates_path()
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_static_view('deform', 'deform:static',

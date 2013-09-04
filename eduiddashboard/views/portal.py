@@ -4,7 +4,6 @@ from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
-from eduiddashboard.models import Person
 from eduiddashboard.utils import verify_auth_token
 
 
@@ -15,34 +14,33 @@ def home(context, request):
         HOME doesn't have forms. All forms are handle by ajax urls.
     """
 
-    user = request.session.get('user', None)
+    view_context = {}
 
-    person_schema = Person()
+    # TODO we need to count fields from all schemas
+    # user = request.session.get('user', None)
+    # person = person_schema.serialize(user)
+    #
+    # total_fields = len(person_schema.children)
+    # filled_fields = len(person.keys())
+    # for (key, value) in person.items():
+    #     if not value:
+    #         filled_fields -= 1
+    # view_context['profile_filled'] = (filled_fields / total_fields) * 100
 
-    person = person_schema.serialize(user)
-    context = {
-        'person': person_schema.serialize(user),
-    }
+    view_context['profile_filled'] = 78
 
-    # TODO
-    if isinstance(user['email'], unicode):
-        context['primary_email'] = user['email']
-        context['emails'] = [
-            {'email': user['email'], 'verified': user['verified']},
-        ]
-    else:
-        context['primary_email'] = user.get('primary_email', '')
-        context['emails'] = user['email']
+    view_context['mail'] = request.session.get('user', {}).get('mail')
 
-    total_fields = len(person_schema.children)
-    filled_fields = len(person.keys())
-    for (key, value) in person.items():
-        if not value:
-            filled_fields -= 1
+    return view_context
 
-    context['profile_filled'] = (filled_fields / total_fields) * 100
 
-    return context
+@view_config(route_name='session-reload',
+             request_method='GET', permission='edit')
+def session_reload(context, request):
+    userid = request.session.get('user')['mail']
+    user = request.userdb.get_user(userid)
+    request.session['user'] = user
+    raise HTTPFound(request.route_path('home'))
 
 
 @view_config(route_name='help')
@@ -74,7 +72,7 @@ def token_login(context, request):
     if verify_auth_token(shared_key, email, token):
         # Do the auth
         user = request.userdb.get_user(email)
-        request.session['email'] = email
+        request.session['mail'] = email
         request.session['user'] = user
         request.session['loa'] = 5
         remember_headers = remember(request, email)
