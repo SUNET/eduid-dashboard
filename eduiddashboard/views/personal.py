@@ -2,8 +2,6 @@
 
 from pyramid.view import view_config
 
-from eduid_am.tasks import update_attributes
-
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 
@@ -24,17 +22,14 @@ class PersonalDataView(BaseFormView):
     route = 'personaldata'
 
     def save_success(self, user_modified):
-
         person = self.schema.serialize(user_modified)
-        # update the session data
-        self.request.session['user'].update(person)
-
-        # Do the save staff
 
         # Insert the new user object
+        self.user.update(person)
         self.request.db.profiles.save(self.user, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        # update the session data
+        self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
