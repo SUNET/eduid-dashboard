@@ -128,7 +128,8 @@ class LoggedInReguestTests(unittest.TestCase):
         try:
             app = eduiddashboard_main({}, **self.settings)
         except pymongo.errors.ConnectionFailure:
-            pass
+            raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
+                    self.settings['mongo_uri']))
 
         self.testapp = TestApp(app)
 
