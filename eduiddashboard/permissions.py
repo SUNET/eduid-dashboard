@@ -1,5 +1,7 @@
 from pyramid.security import Allow, Authenticated, Everyone, ALL_PERMISSIONS
 
+from eduid_am.tasks import update_attributes
+
 
 class RootFactory(object):
     __acl__ = [
@@ -38,9 +40,15 @@ class BaseFactory(object):
             userid = self.request.matchdict.get('userid', None)
             return self.request.route_url(route, userid=userid, **kw)
 
-    def update_user(self, request):
+    def update_context_user(self):
         userid = self.user[self.main_attribute]
         self.user = self.request.userdb.get_user(userid)
+
+    def propagate_user_changes(self, newuser):
+        if self.workmode == 'personal':
+            self.request.session['user'] = newuser
+
+        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
 
 class PersonFactory(BaseFactory):

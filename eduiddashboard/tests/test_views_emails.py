@@ -12,19 +12,19 @@ class MailsFormTests(LoggedInReguestTests):
 
     def test_logged_get(self):
         self.set_logged()
-        response = self.testapp.get('/emails/')
+        response = self.testapp.get('/profile/emails/')
 
         self.assertEqual(response.status, '200 OK')
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_notlogged_get(self):
-        response = self.testapp.get('/emails/')
+        response = self.testapp.get('/profile/emails/')
         self.assertEqual(response.status, '302 Found')
 
     def test_add_valid_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         self.assertNotIn('johnsmith@example.info', response_form.body)
 
@@ -44,7 +44,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_add_not_valid_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         form = response_form.forms[self.formname]
 
@@ -63,7 +63,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_add_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         self.assertIn('johnsmith@example.org', response_form.body)
 
@@ -85,7 +85,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_verify_not_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         form = response_form.forms[self.formname]
 
@@ -104,7 +104,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_verify_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         self.assertIn('johnsmith@example.org', response_form.body)
 
@@ -126,7 +126,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_remove_not_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         form = response_form.forms[self.formname]
 
@@ -143,7 +143,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_remove_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         self.assertIn('johnsmith@example.org', response_form.body)
 
@@ -160,7 +160,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_setprimary_not_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         form = response_form.forms[self.formname]
 
@@ -179,7 +179,7 @@ class MailsFormTests(LoggedInReguestTests):
     def test_setprimary_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/emails/')
+        response_form = self.testapp.get('/profile/emails/')
 
         self.assertIn('johnsmith@example.org', response_form.body)
 
