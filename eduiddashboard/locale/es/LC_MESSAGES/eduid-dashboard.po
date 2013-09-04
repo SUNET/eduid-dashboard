@@ -1,18 +1,17 @@
-# Translations template for eduid-dashboard.
-# Copyright (C) 2013 ORGANIZATION
-# This file is distributed under the same license as the eduid-dashboard
-# project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+# Spanish translations for PROJECT.
+# Copyright (C) 2011 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard 0.0\n"
+"Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-09-04 10:29+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -113,7 +112,8 @@ msgstr ""
 #: eduiddashboard/templates/emails-form.jinja2:4
 msgid ""
 "<p>These list contain all your emails registered in the\n"
-"   platform. You can change your preferred email by clicking in the radio\n"
+"   platform. You can change your preferred email by clicking in the radio"
+"\n"
 "   buttons.</p>\n"
 "   <p>Remember, if you select a not verified email as your primary\n"
 "   email, your level of assurance must be decreased.</p>\n"
@@ -169,7 +169,8 @@ msgstr ""
 msgid "Level of assurance"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:23 eduiddashboard/templates/home.jinja2:27
+#: eduiddashboard/templates/home.jinja2:23
+#: eduiddashboard/templates/home.jinja2:27
 msgid "Level 5"
 msgstr ""
 
@@ -179,27 +180,32 @@ msgid ""
 "attributesof your profile"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:28 eduiddashboard/templates/home.jinja2:31
+#: eduiddashboard/templates/home.jinja2:28
+#: eduiddashboard/templates/home.jinja2:31
 msgid "Level 4"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:29 eduiddashboard/templates/home.jinja2:33
+#: eduiddashboard/templates/home.jinja2:29
+#: eduiddashboard/templates/home.jinja2:33
 #: eduiddashboard/templates/home.jinja2:37
 msgid "With this loa you can edit some attributesof your profile"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:32 eduiddashboard/templates/home.jinja2:35
+#: eduiddashboard/templates/home.jinja2:32
+#: eduiddashboard/templates/home.jinja2:35
 msgid "Level 3"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:36 eduiddashboard/templates/home.jinja2:39
+#: eduiddashboard/templates/home.jinja2:36
+#: eduiddashboard/templates/home.jinja2:39
 msgid "Level 2"
 msgstr ""
 
 #: eduiddashboard/templates/home.jinja2:51
 msgid ""
 "\n"
-"          <p>You are in 4 level. If you want to increase this level to get\n"
+"          <p>You are in 4 level. If you want to increase this level to "
+"get\n"
 "          more permissions you need to:</p>\n"
 "          <ul>\n"
 "            <li>Validate your postal address</li>\n"
@@ -249,7 +255,8 @@ msgid ""
 "<p>We send you an email with a verification link because you has\n"
 "registered at <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
 "\n"
-"<p>Please, click on the follow link to verificate your email account.</p>\n"
+"<p>Please, click on the follow link to verificate your email account.</p>"
+"\n"
 "\n"
 "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
 msgstr ""
@@ -273,7 +280,9 @@ msgid "Where are you from?"
 msgstr ""
 
 #: eduiddashboard/templates/wayf.jinja2:7
-msgid "Please select your <strong>Identity Provider</strong> from the following list:"
+msgid ""
+"Please select your <strong>Identity Provider</strong> from the following "
+"list:"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:32
@@ -289,23 +298,26 @@ msgstr ""
 
 #: eduiddashboard/views/emails.py:100
 msgid ""
-"A verification email has been sent to your new account. Please revise your "
-"inbox and click on the provided link"
+"A verification email has been sent to your new account. Please revise "
+"your inbox and click on the provided link"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:135
 msgid ""
-"One email has been removed, please, wait before your changes are distributed "
-"through all applications"
+"One email has been removed, please, wait before your changes are "
+"distributed through all applications"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:145
 msgid ""
-"A new verification email has been sent to your account. Please revise your "
-"inbox and click on the provided link"
+"A new verification email has been sent to your account. Please revise "
+"your inbox and click on the provided link"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:167
 msgid "Your primary email was changed"
 msgstr ""
+
+#~ msgid "Hello!"
+#~ msgstr ""
 
