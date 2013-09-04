@@ -7,11 +7,11 @@ from pyramid.view import view_config
 from eduiddashboard.utils import verify_auth_token
 
 
-@view_config(route_name='home', renderer='templates/home.jinja2',
+@view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
              request_method='GET', permission='edit')
-def home(context, request):
+def profile_editor(context, request):
     """
-        HOME doesn't have forms. All forms are handle by ajax urls.
+        Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
 
     view_context = {}
@@ -29,17 +29,28 @@ def home(context, request):
 
     view_context['profile_filled'] = 78
 
-    view_context['mail'] = request.session.get('user', {}).get('mail')
+    view_context['userid'] = context.user.get(context.main_attribute)
 
     return view_context
+
+
+@view_config(route_name='home', renderer='templates/home.jinja2',
+             request_method='GET', permission='edit')
+def home(context, request):
+    """
+        HOME doesn't have forms. All forms are handle by ajax urls.
+    """
+
+    if context.workmode == 'personal':
+        raise HTTPFound(context.route_url('profile-editor'))
+
+    return {}
 
 
 @view_config(route_name='session-reload',
              request_method='GET', permission='edit')
 def session_reload(context, request):
-    userid = request.session.get('user')['mail']
-    user = request.userdb.get_user(userid)
-    request.session['user'] = user
+    context.update_user()
     raise HTTPFound(request.route_path('home'))
 
 
