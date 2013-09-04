@@ -202,9 +202,4 @@ class MailsFormTests(LoggedInReguestTests):
             )
             self.assertRegexpMatches(response.body, checked_email_re)
 
-           #  self.assertIn('<input type="radio" name="setprimary" '
-           #                'value="johnsmith@example.org" title="Set this '
-           #                'email as your primary email" checked/>',
-           #                response.body)
-
             self.assertIsNotNone(getattr(response, 'form', None))
