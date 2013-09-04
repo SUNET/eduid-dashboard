@@ -57,11 +57,11 @@ class EmailUniqueValidator(object):
                 raise colander.Invalid(node,
                                        _("This email is already registered"))
 
-        if 'verify' in request.POST:
+        elif 'verify' in request.POST or 'setprimary' in request.POST:
             if not request.userdb.exists_by_field('mailAliases.mail', value):
                 raise colander.Invalid(node,
                                        _("This email is not registered already"
-                                         ", so you can not very it"))
+                                         ))
 
         elif 'remove' in request.POST:
             email_discovered = False

@@ -1,7 +1,8 @@
-from eduiddashboard.testing import LoggedInReguestTests
+import re
 
 from mock import patch
 
+from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard.userdb import UserDB
 
 
@@ -155,3 +156,55 @@ class MailsFormTests(LoggedInReguestTests):
         self.assertIn('email has been removed,', response.body)
         self.assertNotIn('johnsmith@example.org', response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_setprimary_not_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/emails/')
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'user@example.com'
+        with patch.object(UserDB, 'exists_by_field', clear=True):
+
+            UserDB.exists_by_field.return_value = False
+            response = form.submit('setprimary')
+
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('user@example.com', response.body)
+            self.assertIn('alert-error', response.body)
+            self.assertIn('This email is not registered', response.body)
+            self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_setprimary_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/emails/')
+
+        self.assertIn('johnsmith@example.org', response_form.body)
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'johnsmith@example.org'
+
+        with patch.object(UserDB, 'exists_by_field', clear=True):
+
+            UserDB.exists_by_field.return_value = True
+
+            response = form.submit('setprimary')
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('Your primary email was changed', response.body)
+
+            checked_email_re = re.compile(
+                r"<[^>]*type='radio'[^>]*"
+                "value='johnsmith@example.org'[^>]*"
+                "checked/>"
+            )
+            self.assertRegexpMatches(response.body, checked_email_re)
+
+           #  self.assertIn('<input type="radio" name="setprimary" '
+           #                'value="johnsmith@example.org" title="Set this '
+           #                'email as your primary email" checked/>',
+           #                response.body)
+
+            self.assertIsNotNone(getattr(response, 'form', None))
