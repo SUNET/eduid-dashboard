@@ -111,9 +111,9 @@ class UserSearcher(colander.MappingSchema):
         colander.String(),
         title=_('attribute type'),
         description=_('Select the attribute to search'),
+        default='mail',
         widget=deform.widget.RadioChoiceWidget(
             values=SEARCHER_ATTTRIBUTE_TYPES,
-            inline=True,
-            null_value='email'
+            inline=True
         )
     )

@@ -1,4 +1,4 @@
-import colander
+import deform
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
@@ -67,10 +67,11 @@ def home(context, request):
         controls = request.GET.items()
         try:
             searcher_data = searcher_form.validate(controls)
-        except colander.ValidationFailure, form:
+        except deform.ValidationFailure, form:
             return {
                 'form': form,
-                'users': []
+                'users': [],
+                'showresults': False,
             }
 
         filter_key = SEARCHER_KEYS_MAPPING.get(searcher_data['attribute_type'])
@@ -85,6 +86,10 @@ def home(context, request):
             users = request.userdb.get_users(filter_dict)
 
         showresults = True
+
+    if users and users.count() == 1:
+        raise HTTPFound(request.route_url('profile-editor',
+                        userid=users[0][context.main_attribute]))
 
     return {
         'form': searcher_form,
