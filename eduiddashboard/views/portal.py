@@ -1,6 +1,7 @@
 import deform
 
 from pyramid.i18n import get_locale_name
+from pyramid.i18n import TranslationString as _
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
@@ -8,8 +9,32 @@ from pyramid.view import view_config
 
 from deform_bootstrap import Form
 
-from eduiddashboard.utils import verify_auth_token
+from eduiddashboard.utils import verify_auth_token, filter_tab
 from eduiddashboard.models import UserSearcher
+
+from eduiddashboard.views import emails, personal, get_dummy_status
+
+AVAILABLE_TABS = [
+    personal.get_tab(),
+    emails.get_tab(),
+    {
+        'label': _('Authorization'),
+        'status': get_dummy_status,
+        'id': 'authorization',
+    }, {
+        'label': _('Passwords'),
+        'status': get_dummy_status,
+        'id': 'passwords',
+    }, {
+        'label': _('Phones'),
+        'status': get_dummy_status,
+        'id': 'phones',
+    }, {
+        'label': _('Postal Address'),
+        'status': get_dummy_status,
+        'id': 'postaladdress',
+    },
+]
 
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
@@ -35,6 +60,16 @@ def profile_editor(context, request):
     view_context['profile_filled'] = 78
 
     view_context['userid'] = context.user.get(context.main_attribute)
+    view_context['user'] = context.user
+
+    if context.workmode == 'personal':
+        view_context['tabs'] = filter_tab(AVAILABLE_TABS, ['authorization'])
+
+    elif context.workmode == 'helpdesk':
+        view_context['tabs'] = filter_tab(AVAILABLE_TABS, ['passwords',
+                                                           'authorization'])
+    else:
+        view_context['tabs'] = AVAILABLE_TABS
 
     return view_context
 

@@ -72,22 +72,19 @@
 
   <div class='profile-combo tabbable tabs-left'>
     <ul class='nav nav-tabs'>
-      <li class='active'>
-        <a href='#personaldata' data-toggle='tab'>{{ _("Personal Info") }}</a>
-      </li>
-      <li>
-        <a href='#emails' data-toggle='tab'>{{ _("Email") }}</a>
-      </li>
-      <li>
-        <a href='#passwords' data-toggle='tab'>{{ _("Passwords") }}</a>
-      </li>
-      <li>
-        <a href='#phones' data-toggle='tab'>{{ _("Phones") }}</a>
-      </li>
-      <li>
-        <a href='#postaladdress' data-toggle='tab'>{{ _("Postal Address") }}</a>
-      </li>
-
+      {% for tab in tabs %}
+        <li {% if loop.first %}class='active'{% endif %}>
+          {% with status = tab.status(user) %}
+          <a href='#{{tab.id}}' data-toggle='tab'
+            {% if status %}title='{{status.msg}}'{% endif %}>
+            {{tab.label}}
+              {% if status %}
+                <li class='{{status.icon}}'></li>
+              {% endif %}
+          </a>
+          {% endwith %}
+        </li>
+      {% endfor %}
     </ul>
 
     <div class='tab-content'>

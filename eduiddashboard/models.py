@@ -66,6 +66,7 @@ def preferred_language_widget(node, kw):
 
 class Person(colander.MappingSchema):
     givenName = colander.SchemaNode(colander.String(),
+                                    readonly=True,
                                     title=_('given name'))
     sn = colander.SchemaNode(colander.String(),
                              title=_('surname'))

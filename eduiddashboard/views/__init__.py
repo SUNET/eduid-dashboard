@@ -3,6 +3,10 @@ import json
 from pyramid_deform import FormView
 
 
+def get_dummy_status(user):
+    return None
+
+
 class BaseFormView(FormView):
 
     route = ''
@@ -26,6 +30,7 @@ class BaseFormView(FormView):
 
         self.form_options = {
             'formid': "{classname}-form".format(classname=self.classname),
+            'action': context.route_url(self.route),
         }
 
         bootstrap_form_style = getattr(self, 'bootstrap_form_style', None)

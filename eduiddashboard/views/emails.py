@@ -2,11 +2,33 @@
 
 from pyramid.view import view_config
 
+from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
-
+from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.emails import send_verification_mail
+
+
+def get_status(user):
+    """
+    Check if all emails are verified already
+
+    return msg and icon
+    """
+    icon = get_icon_string('warning-sign')
+    {
+        'icon': None,
+        'msg': '',
+    }
+    return None
+
+
+def get_tab():
+    return {
+        'status': get_status,
+        'label': _('Emails'),
+        'id': 'emails',
+    }
 
 
 def mark_as_verified_email(request, context, verified_email):
