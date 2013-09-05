@@ -3,7 +3,6 @@
 {% block nav_class_home %}active{% endblock %}
 
 
-
 {% block contents %}
   <h2>{{ _("eduID dashboard.") }}</h2>
 
@@ -12,8 +11,42 @@
   </div>
 
 
-  <p>This portal is not working in personal mode</p>
+  {{ form.render()|safe }}
 
-  <p>Then, this page must display a user searcher</p>
 
+{% if showresults %}
+  <h3>{{_("Results")}}</h3>
+  {% if users %}
+    <p>{{_("%(number)d users was found")|format(number=users.count()) }}</p>
+
+    <table class='table table-striped'>
+      <thead>
+        <tr>
+          <th>{{_('first name')}}</th>
+          <th>{{_('surname')}}</th>
+          <th>{{_('preferred email')}}</th>
+          <th>{{_('NIN')}}</th>
+        </tr>
+      </thead>
+      {% for user in users %}
+      <tr>
+        <td>{{user.givenName}}</td>
+        <td>{{user.sn}}</td>
+        <td><a href='{{request.route_url("profile-editor", userid=user.mail)}}'>{{user.mail}}</a></li>
+        <td>
+          {% if user.norEduPersonNIN %}
+            {% for nin in user.norEduPersonNIN %}
+              {% if nin.active %}
+                {{nin.norEduPersonNIN}}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p>{{_("Any user match with the filter")}}</p>
+  {% endif %}
+{% endif %}
 {% endblock %}

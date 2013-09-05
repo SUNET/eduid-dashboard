@@ -1,10 +1,15 @@
+import colander
+
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
 
+from deform_bootstrap import Form
+
 from eduiddashboard.utils import verify_auth_token
+from eduiddashboard.models import UserSearcher
 
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
@@ -34,17 +39,58 @@ def profile_editor(context, request):
     return view_context
 
 
+SEARCHER_KEYS_MAPPING = {
+    'mail': 'mailAliases.email',
+    'mobile': 'mobile.mobile',
+    'norEduPersonNIN': 'norEduPersonNIN.norEduPersonNIN',
+}
+
+
 @view_config(route_name='home', renderer='templates/home.jinja2',
              request_method='GET', permission='edit')
 def home(context, request):
     """
-        HOME doesn't have forms. All forms are handle by ajax urls.
+        If workmode is not personal mode, then show a user searcher
     """
 
     if context.workmode == 'personal':
         raise HTTPFound(context.route_url('profile-editor'))
 
-    return {}
+    searcher_schema = UserSearcher()
+    searcher_form = Form(searcher_schema, buttons=('search', ),
+                         method='get', formid='user-searcher')
+
+    users = []
+    showresults = False
+
+    if 'search' in request.GET:
+        controls = request.GET.items()
+        try:
+            searcher_data = searcher_form.validate(controls)
+        except colander.ValidationFailure, form:
+            return {
+                'form': form,
+                'users': []
+            }
+
+        filter_key = SEARCHER_KEYS_MAPPING.get(searcher_data['attribute_type'])
+        if searcher_data['attribute_type'] in SEARCHER_KEYS_MAPPING:
+            filter_dict = {
+                filter_key: searcher_data['text']
+            }
+        else:
+            filter_dict = None
+
+        if filter_dict:
+            users = request.userdb.get_users(filter_dict)
+
+        showresults = True
+
+    return {
+        'form': searcher_form,
+        'users': users,
+        'showresults': showresults,
+    }
 
 
 @view_config(route_name='session-reload',

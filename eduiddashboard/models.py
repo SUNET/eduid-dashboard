@@ -10,6 +10,13 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import EmailUniqueValidator
 
 
+SEARCHER_ATTTRIBUTE_TYPES = [
+    (u'mail', _('email')),
+    (u'mobile', _('phone mobile number')),
+    (u'norEduPersonNIN', _('NIN')),
+]
+
+
 class BooleanMongo(colander.Boolean):
 
     def __init__(self, false_choices=('False', 'false', '', False),
@@ -89,3 +96,24 @@ class Passwords(colander.MappingSchema):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
                                    _("Both passwords don't match"))
+
+
+class UserSearcher(colander.MappingSchema):
+
+    text = colander.SchemaNode(colander.String(),
+                               title=_('text'),
+                               description=_('the exact match text for the '
+                                             'attribute type selected for '
+                                             'search')
+                               )
+
+    attribute_type = colander.SchemaNode(
+        colander.String(),
+        title=_('attribute type'),
+        description=_('Select the attribute to search'),
+        widget=deform.widget.RadioChoiceWidget(
+            values=SEARCHER_ATTTRIBUTE_TYPES,
+            inline=True,
+            null_value='email'
+        )
+    )
