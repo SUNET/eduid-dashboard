@@ -1,36 +1,19 @@
-from bson import ObjectId
-
 import colander
 
-import vccs_client
-
 from eduiddashboard.i18n import TranslationString as _
+from eduiddashboard.vccs import check_password
 
 
 PASSWORD_MIN_LENGTH = 5
 
 
-@colander.deferred
-def old_password_validator(node, kw):
-    request = kw['request']
-    return OldPasswordValidator(request)
-
-
 class OldPasswordValidator(object):
 
-    def __init__(self, request):
-        self.user_email = request.session['mail']
-        self.request = request
-
     def __call__(self, node, value):
+        request = node.bindings.get('request')
         old_password = value
-        password_id = self.request.session['user']['passwords'][0]['id']
-        vccs = vccs_client.VCCSClient(
-            base_url=self.request.registry.settings.get('vccs_url'),
-        )
-        old_factor = vccs_client.VCCSPasswordFactor(old_password,
-                                                    credential_id=str(password_id))
-        if not vccs.authenticate(self.user_email, [old_factor]):
+        password = check_password(old_password, request)
+        if not password:
             err = _('Old password do not match')
             raise colander.Invalid(node, err)
 

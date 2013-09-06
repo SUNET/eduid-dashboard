@@ -9,7 +9,7 @@ from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Passwords
-
+from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 
 
@@ -26,20 +26,15 @@ class PasswordsView(BaseFormView):
     schema = Passwords()
     route = 'passwords'
 
-    def submit_success(self, user_modified):
+    def save_success(self, user_modified):
+        passwords_data = self.schema.serialize(user_modified)
+        new_password = passwords_data['new_password']
+        old_password = passwords_data['old_password']
 
-        passwords = self.schema.serialize(user_modified)
-        new_password = passwords['new_password']
-        email = self.user['email']
-        password_id = ObjectId()
-        vccs = vccs_client.VCCSClient(
-            base_url=self.request.registry.settings.get('vccs_url'),
-        )
         # adding new credentials
-        password_id = ObjectId()
-        new_factor = vccs_client.VCCSPasswordFactor(new_password,
-                                                    credential_id=str(password_id))
-        if vccs.add_credentials(email, [new_factor]):
+        added = add_credentials(old_password, new_password, self.request)
+
+        if added:
             self.request.session.flash(_('Your changes was saved, please, wait '
                                          'before your changes are distributed '
                                          'through all applications'),
@@ -48,7 +43,8 @@ class PasswordsView(BaseFormView):
             self.request.session.flash(_('Credentials has not been added for some reason.'
                                          ' Please contact with the system administrator.'),
                                        queue='forms')
-        # revoking old credentials
-        old_password_id = self.request.session['user']['passwords'][0]['id']
-        old_factor = vccs_client.VCCSRevokeFactor(str(old_password_id), 'changing password', reference='dashboard')
-        vccs.revoke_credentials(email, [old_factor])
+
+        # do the save staff
+        self.request.db.profiles.save(self.user, safe=True)
+
+        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
