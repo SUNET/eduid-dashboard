@@ -9,18 +9,35 @@ from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView
 
 
+def pending_verifications(user):
+    """ Return a list of dicts like this:
+        [{'field': 'email',
+          'form': 'emails',
+          'msg': _('You need to verify emails'),
+        }]
+    """
+
+    for email in user.get('mailAliases', []):
+        if not email['verified']:
+            return [{
+                'field': 'email',
+                'form': 'emails',
+                'msg': _('You have to verificate some emails'),
+            }]
+    return []
+
+
 def get_status(user):
     """
     Check if all emails are verified already
 
     return msg and icon
     """
-    for email in user.get('mailAliases', []):
-        if not email['verified']:
-            return {
-                'icon': get_icon_string('warning-sign'),
-                'msg': _('You have not verified emails')
-            }
+    if pending_verifications(user):
+        return {
+            'icon': get_icon_string('warning-sign'),
+            'msg': _('You have to verificate some emails'),
+        }
     return None
 
 
