@@ -19,11 +19,16 @@ from eduiddashboard.userdb import UserDB, get_userdb
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
 
-DEFAULT_REQUIRED_PERMISSIONS = {
+
+REQUIRED_GROUP_PER_WORKMODE = {
     'personal': '',
     'helpdesk': 'urn:mace:eduid.se:role:ra',
     'admin': 'urn:mace:eduid.se:role:admin',
 }
+
+
+def groups_callback(userid, request):
+    return request.context.get_groups(userid, request)
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -32,6 +37,23 @@ def read_setting_from_env(settings, key, default=None):
         return os.environ[env_variable]
     else:
         return settings.get(key, default)
+
+
+def read_permissions(raw):
+    if raw.strip() == '':
+        return REQUIRED_GROUP_PER_WORKMODE
+
+    rows = raw.split('\n')
+
+    permissions = {}
+
+    for row in rows:
+        workmode = row.split('=').strip()[0]
+        urn = row.split('=').strip()[1]
+        if workmode in AVAILABLE_WORK_MODES:
+            permissions[workmode] = urn
+
+    return permissions
 
 
 def add_custom_deform_templates_path():
@@ -159,11 +181,17 @@ def main(global_config, **settings):
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')
 
+    raw_permissions = read_setting_from_env(settings, 'mongo_replicaset', '')
+    settings['permission_mapping'] = read_permissions(raw_permissions)
+
     if settings['workmode'] not in AVAILABLE_WORK_MODES:
         raise ConfigurationError(
             'The workmode {0} is not in available work modes'.format(
                 settings['workmode'])
         )
+
+
+    settings['groups_callback'] = groups_callback
 
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
@@ -175,7 +203,6 @@ def main(global_config, **settings):
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
     config.include('pyramid_deform')
-
     config.include('eduiddashboard.saml2')
 
     if 'testing' in settings and asbool(settings['testing']):

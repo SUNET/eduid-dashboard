@@ -1,4 +1,5 @@
-from pyramid.security import Allow, Authenticated, Everyone, ALL_PERMISSIONS
+from pyramid.security import (Allow, Authenticated, Everyone,
+                              ALL_PERMISSIONS)
 
 from eduid_am.tasks import update_attributes
 
@@ -11,11 +12,26 @@ class RootFactory(object):
     def __init__(self, request):
         self.request = request
 
+    def get_groups(self, userid, request):
+        return []
+
 
 class BaseFactory(object):
     __acl__ = [
         (Allow, Authenticated, ALL_PERMISSIONS),
     ]
+
+    acls = {
+        'personal': [
+            (Allow, Authenticated, 'edit'),
+        ],
+        'helpdesk': [
+            (Allow, 'helpdesk', 'edit'),
+        ],
+        'admin': [
+            (Allow, 'admin', 'edit'),
+        ],
+    }
 
     def __init__(self, request):
         self.request = request
@@ -24,6 +40,7 @@ class BaseFactory(object):
         self.user = self.get_user()
         self.main_attribute = self.request.registry.settings.get(
             'saml2.user_main_attribute', 'mail')
+        self.__acl__ = self.acls[self.workmode]
 
     def get_user(self):
         if self.workmode == 'personal':
@@ -49,6 +66,14 @@ class BaseFactory(object):
             self.request.session['user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+
+    def get_groups(self, userid, request):
+        user = self.request.session.get('user')
+        permissions_mapping = self.request.registry.settings.get(
+            'permission_mapping', {})
+        required_urn = permissions_mapping.get(self.workmode, '')
+        if required_urn in user.get('eduPersonEntitlement', []):
+            return [self.workmode]
 
 
 class PersonFactory(BaseFactory):

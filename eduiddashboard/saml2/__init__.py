@@ -16,8 +16,10 @@ def read_setting_from_env(settings, key, default=None):
 
 
 def configure_authtk(config, settings):
+
     authn_policy = AuthTktAuthenticationPolicy(
-        settings['auth_tk_secret'], hashalg='sha512')
+        settings['auth_tk_secret'], hashalg='sha512',
+        callback=settings['groups_callback'])
 
     authz_policy = ACLAuthorizationPolicy()
 
