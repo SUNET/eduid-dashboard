@@ -15,11 +15,12 @@ def get_status(user):
 
     return msg and icon
     """
-    icon = get_icon_string('warning-sign')
-    {
-        'icon': None,
-        'msg': '',
-    }
+    for email in user.get('mailAliases', []):
+        if not email['verified']:
+            return {
+                'icon': get_icon_string('warning-sign'),
+                'msg': _('You have not verified emails')
+            }
     return None
 
 

@@ -3,7 +3,6 @@
 {% block nav_class_home %}active{% endblock %}
 
 
-
 {% block contents %}
   <h2>{{ _("eduID dashboard.") }}</h2>
 
@@ -67,7 +66,6 @@
     </div>
   </div>
 
-
   <div class='clear'></div>
 
   <div class='profile-combo tabbable tabs-left'>
@@ -77,10 +75,10 @@
           {% with status = tab.status(user) %}
           <a href='#{{tab.id}}' data-toggle='tab'
             {% if status %}title='{{status.msg}}'{% endif %}>
-            {{tab.label}}
               {% if status %}
-                <li class='{{status.icon}}'></li>
+                <i class='{{status.icon}}'></i>
               {% endif %}
+            {{tab.label}}
           </a>
           {% endwith %}
         </li>
