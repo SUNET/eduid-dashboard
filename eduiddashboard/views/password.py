@@ -31,6 +31,7 @@ class PasswordsView(BaseFormView):
         passwords = self.schema.serialize(user_modified)
         new_password = passwords['new_password']
         email = self.user['email']
+        password_id = ObjectId()
         vccs = vccs_client.VCCSClient(
             base_url=self.request.registry.settings.get('vccs_url'),
         )

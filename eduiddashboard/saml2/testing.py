@@ -64,7 +64,7 @@ class ObjectFactory(object):
 def saml2_main(global_config, **settings):
     """ This function returns a WSGI application.
 
-        This is only useful for testing
+        This is only useful for saml2 testing
 
     """
     settings = dict(settings)
@@ -84,7 +84,8 @@ def saml2_main(global_config, **settings):
 
 
 class Saml2RequestTests(unittest.TestCase):
-    """Base TestCase for those tests that need a full environment setup"""
+    """Base TestCase for those tests usign saml2 that need a full environment setup
+    """
 
     def setUp(self, settings={}):
         # Don't call DBTests.setUp because we are getting the

@@ -1,6 +1,15 @@
 /*jslint vars: false, nomen: true, browser: true */
 /*global $, console, alert, deform */
 
+if (window.tabbedform === undefined) {
+    window.tabbedform = {};
+}
+
+if (window.tabbedform.changetabs_calls === undefined) {
+    window.tabbedform.changetabs_calls = [];
+}
+
+
 var TabbedForm = function (container) {
     "use strict";
 
@@ -8,13 +17,18 @@ var TabbedForm = function (container) {
             $.get(url + '/', {}, function (data) {
                 target.html(data);
                 if (deform.callbacks !== undefined &&
-                        deform.callbacks.length === 0) {
-                    $('form script').each(function (i, e) {
-                        var f = new Function(e.innerHTML);
-                        f();
-                    });
+                         deform.callbacks.length === 0) {
+                      $('form script').each(function (i, e) {
+                          var f = new Function(e.innerHTML);
+                          f();
+                      });
                 }
                 deform.processCallbacks();
+
+                container.find("a[data-toggle=tooltip]").tooltip();
+                container.find("button[data-toggle=tooltip]").tooltip();
+                container.find("label[data-toggle=tooltip]").tooltip();
+
             }, 'html');
         },
 
@@ -25,6 +39,14 @@ var TabbedForm = function (container) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
                 get_form(url, $(".tab-pane.active"));
+            });
+
+            $('body').bind('formready', function () {
+                tabbedform.changetabs_calls.forEach(function (func) {
+                    if (func !== undefined){
+                        func(container)
+                    }
+                });
             });
 
             if (opentab === undefined) {
