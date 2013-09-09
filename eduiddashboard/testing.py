@@ -1,20 +1,20 @@
 from os import path
 from copy import deepcopy
 
-import pymongo
 from bson import ObjectId
+from mock import patch
+import pymongo
 
 import unittest
 
 from webtest import TestApp, TestRequest
-
 
 from pyramid.interfaces import ISessionFactory, IDebugLogger
 from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard import main as eduiddashboard_main, groups_callback
+from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard.saml2.userdb import IUserDB
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
@@ -150,6 +150,13 @@ class LoggedInReguestTests(unittest.TestCase):
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
         self.testapp.reset()
+
+    def dummy_get_user(self, userid=''):
+        return self.user
+
+    def set_mocked_get_user(self):
+        patcher = patch('eduiddashboard.userdb.UserDB.get_user', self.dummy_get_user)
+        patcher.start()
 
     def dummy_request(self, cookies={}):
         request = DummyRequest()
