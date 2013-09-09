@@ -14,8 +14,6 @@ class OldPasswordValidator(object):
         old_password = value
         user = request.session['user']
         vccs_url = request.registry.settings.get('vccs_url')
-        # TODO: remove next line when the problem found with python vccs client was fixed
-        return False
         password = check_password(vccs_url, old_password, user)
         if not password:
             err = _('Old password do not match')
