@@ -7,7 +7,7 @@ from eduiddashboard.userdb import UserDB
 from eduiddashboard.vccs import check_password, add_credentials
 
 
-class MailsFormTests(LoggedInReguestTests):
+class PasswordFormTests(LoggedInReguestTests):
 
     formname = 'passwordsview-form'
 
