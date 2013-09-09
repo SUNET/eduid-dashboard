@@ -9,7 +9,9 @@ from pyramid.view import view_config
 
 from deform_bootstrap import Form
 
-from eduiddashboard.utils import verify_auth_token, filter_tab
+from eduiddashboard.utils import (verify_auth_token, filter_tabs,
+                                  calculate_filled_profile)
+
 from eduiddashboard.models import UserSearcher
 
 from eduiddashboard.views import emails, personal, get_dummy_status
@@ -57,19 +59,24 @@ def profile_editor(context, request):
     #         filled_fields -= 1
     # view_context['profile_filled'] = (filled_fields / total_fields) * 100
 
-    view_context['profile_filled'] = 78
-
-    view_context['userid'] = context.user.get(context.main_attribute)
-    view_context['user'] = context.user
-
     if context.workmode == 'personal':
-        view_context['tabs'] = filter_tab(AVAILABLE_TABS, ['authorization'])
-
+        tabs = filter_tabs(AVAILABLE_TABS, ['authorization'])
     elif context.workmode == 'helpdesk':
-        view_context['tabs'] = filter_tab(AVAILABLE_TABS, ['passwords',
-                                                           'authorization'])
+        tabs = filter_tabs(AVAILABLE_TABS, ['passwords', 'authorization'])
     else:
-        view_context['tabs'] = AVAILABLE_TABS
+        tabs = AVAILABLE_TABS
+
+    profile_filled = calculate_filled_profile(context.user, tabs)
+    percent_p_filled = int((float(profile_filled[0])
+                            / float(profile_filled[1]))
+                           * 100)
+
+    view_context = {
+        'tabs': tabs,
+        'userid': context.user.get(context.main_attribute),
+        'user': context.user,
+        'profile_filled': percent_p_filled,
+    }
 
     return view_context
 

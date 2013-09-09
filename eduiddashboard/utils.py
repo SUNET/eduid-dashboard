@@ -14,5 +14,16 @@ def get_icon_string(status):
     return "icon-{0}".format(status)
 
 
-def filter_tab(tabs, remove_tabs):
+def filter_tabs(tabs, remove_tabs):
     return filter(lambda tab: tab['id'] not in remove_tabs, tabs)
+
+
+def calculate_filled_profile(user, tabs):
+    tuples = []
+    for tab in tabs:
+        if tab['status'] is not None:
+            status = tab['status'](user)
+            if status is not None:
+                tuples.append(status.get('completed'))
+
+    return [sum(a) for a in zip(*tuples)]
