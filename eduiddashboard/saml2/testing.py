@@ -58,7 +58,7 @@ class ObjectFactory(object):
     ]
 
     def __init__(self, request):
-        pass
+        self.request = request
 
 
 def saml2_main(global_config, **settings):
@@ -128,17 +128,6 @@ class Saml2RequestTests(unittest.TestCase):
         super(Saml2RequestTests, self).tearDown()
         self.testapp.reset()
 
-    def _makeOne(self, userid=None, callback=None):
-        from pyramid.authentication import CallbackAuthenticationPolicy
-
-        class MyAuthenticationPolicy(CallbackAuthenticationPolicy):
-            def unauthenticated_userid(self, request):
-                return userid
-        policy = MyAuthenticationPolicy()
-        policy.debug = True
-        policy.callback = callback
-        return policy
-
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
         request.registry = self.testapp.app.registry
@@ -146,27 +135,6 @@ class Saml2RequestTests(unittest.TestCase):
         cookie_value = remember_headers[0][1].split('"')[1]
         self.testapp.cookies['auth_tkt'] = cookie_value
         return request
-
-    def add_to_session(self, data):
-        queryUtility = self.testapp.app.registry.queryUtility
-        session_factory = queryUtility(ISessionFactory)
-        request = DummyRequest()
-        session = session_factory(request)
-        for key, value in data.items():
-            session[key] = value
-        session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
-        return request
-
-    def add_to_session_kv(self, key, value):
-        queryUtility = self.testapp.app.registry.queryUtility
-        session_factory = queryUtility(ISessionFactory)
-        request = DummyRequest()
-        session = session_factory(request)
-        session[key] = value
-        session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
-        return request, session
 
     def dummy_request(self):
         request = DummyRequest()
@@ -187,17 +155,6 @@ class Saml2RequestTests(unittest.TestCase):
         self.pol = self.config.testing_securitypolicy(
             'user', ('editors', ),
             permissive=False, remember_result=True)
-        return request
-
-    def get_request_with_session_nologged(self):
-        queryUtility = self.testapp.app.registry.queryUtility
-        session_factory = queryUtility(ISessionFactory)
-
-        request = self.dummy_request()
-        request.userdb = MockedUserDB()
-        session = session_factory(request)
-        session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
         return request
 
     def get_fake_session_info(self, user=None):
