@@ -10,6 +10,12 @@ from eduiddashboard.vccs import check_password, add_credentials
 class PasswordFormTests(LoggedInReguestTests):
 
     formname = 'passwordsview-form'
+    initial_password = 'old-password'
+
+    def setUp(self, settings={}):
+        super(PasswordFormTests, self).setUp(settings=settings)
+        vccs_url = self.settings['vccs_url']
+        add_credentials(vccs_url, 'xxx', self.initial_password, self.user)
 
     def test_logged_get(self):
         self.set_logged()
@@ -23,29 +29,55 @@ class PasswordFormTests(LoggedInReguestTests):
         self.assertEqual(response.status, '302 Found')
 
     def test_add_credentials(self):
-        new_pwd = 'new_pwd'
         vccs_url = self.settings['vccs_url']
-        add_credentials(vccs_url, 'xxx', new_pwd, self.user)
-        self.assertTrue(check_password(vccs_url, new_pwd, self.user))
+        self.assertTrue(check_password(vccs_url, self.initial_password, self.user))
+        new_password = 'new-password'
+        add_credentials(vccs_url, self.initial_password, new_password, self.user)
+        self.assertTrue(check_password(vccs_url, new_password, self.user))
+        self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
 
-    # def test_add_valid_password(self):
-    #     # XXX: To implement
-    #     self.set_logged()
+    def test_valid_password(self):
+        self.set_logged()
+        response_form = self.testapp.get('/profile/passwords/')
 
-    #     response_form = self.testapp.get('/passwords/')
+        form = response_form.forms[self.formname]
+        form['old_password'].value = self.initial_password
+        form['new_password'].value = 'new-password'
+        form['new_password_repeated'].value = 'new-password'
 
-    #     self.assertNotIn('johnsmith@example.info', response_form.body)
+        response = form.submit('save')
 
-    #     form = response_form.forms[self.formname]
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn('Your changes was saved', response.body)
+        self.assertNotIn('Old password do not match', response.body)
+        self.assertNotIn("Both passwords don't match", response.body)
 
-    #     form['old_password'].value = 'oldpassword'
+    def test_not_valid_old_password(self):
+        self.set_logged()
+        response_form = self.testapp.get('/profile/passwords/')
 
-    #     with patch.object(UserDB, 'exists_by_field', clear=True):
+        form = response_form.forms[self.formname]
+        form['old_password'].value = 'nonexistingpassword'
+        form['new_password'].value = 'newpassword'
+        form['new_password_repeated'].value = 'newpassword'
 
-    #         UserDB.exists_by_field.return_value = False
+        response = form.submit('save')
 
-    #         response = form.submit('add')
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn('Old password do not match', response.body)
+        self.assertIsNotNone(getattr(response, 'form', None))
 
-    #         self.assertEqual(response.status, '200 OK')
-    #         self.assertIn('johnsmith@example.info', response.body)
-    #         self.assertIsNotNone(getattr(response, 'form', None))
+    def test_not_valid_repeated_password(self):
+        self.set_logged()
+        response_form = self.testapp.get('/profile/passwords/')
+
+        form = response_form.forms[self.formname]
+        form['old_password'].value = self.initial_password
+        form['new_password'].value = 'newpassword'
+        form['new_password_repeated'].value = 'newpassword2'
+
+        response = form.submit('save')
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn("Both passwords don't match", response.body)
+        self.assertIsNotNone(getattr(response, 'form', None))
