@@ -13,13 +13,13 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_logged_get(self):
         self.set_logged()
-        response = self.testapp.get('/passwords/')
+        response = self.testapp.get('/profile/passwords/')
 
         self.assertEqual(response.status, '200 OK')
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_notlogged_get(self):
-        response = self.testapp.get('/passwords/')
+        response = self.testapp.get('/profile/passwords/')
         self.assertEqual(response.status, '302 Found')
 
     def test_add_credentials(self):
