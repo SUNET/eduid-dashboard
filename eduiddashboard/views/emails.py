@@ -2,17 +2,55 @@
 
 from pyramid.view import view_config
 
-from eduid_am.tasks import update_attributes
-
+from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
-
+from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.emails import send_verification_mail
 
 
-def mark_as_verified_email(request, verified_email):
-        user = request.session.get('user')
+def pending_verifications(user):
+    """ Return a list of dicts like this:
+        [{'field': 'email',
+          'form': 'emails',
+          'msg': _('You need to verify emails'),
+        }]
+    """
+
+    for email in user.get('mailAliases', []):
+        if not email['verified']:
+            return [{
+                'field': 'email',
+                'form': 'emails',
+                'msg': _('You have to verificate some emails'),
+            }]
+    return []
+
+
+def get_status(user):
+    """
+    Check if all emails are verified already
+
+    return msg and icon
+    """
+    if pending_verifications(user):
+        return {
+            'icon': get_icon_string('warning-sign'),
+            'msg': _('You have to verificate some emails'),
+        }
+    return None
+
+
+def get_tab():
+    return {
+        'status': get_status,
+        'label': _('Emails'),
+        'id': 'emails',
+    }
+
+
+def mark_as_verified_email(request, context, verified_email):
+        user = context.get_user()
         emails = user['mailAliases']
 
         new_emails = []
@@ -21,13 +59,12 @@ def mark_as_verified_email(request, verified_email):
                 email['verified'] = True
             new_emails.append(email)
 
-        request.session['user'].update(new_emails)
         user.update(new_emails)
 
         # Do the save staff
         request.db.profiles.save(user, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(user['_id']))
+        request.context.propagate_user_changes(user)
 
         request.session.flash(_('Your email {email} was verified'
                                 ).format(email=verified_email),
@@ -77,7 +114,8 @@ class EmailsView(BaseFormView):
         }
 
         emails.append(mailsubdoc)
-        self.request.session['user'].update(emails)
+
+        self.user.update(emails)
 
         # Do the save staff
         self.request.db.profiles.find_and_modify({
@@ -88,7 +126,7 @@ class EmailsView(BaseFormView):
             }
         }, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
@@ -113,11 +151,11 @@ class EmailsView(BaseFormView):
             if email['email'] != remove_email:
                 new_emails.append(email)
 
-        self.request.session['user']['mailAliases'] = new_emails
+        self.user['mailAliases'] = new_emails
         primary_email = self.user.get('mail', '')
 
         if not primary_email or primary_email == remove_email:
-            self.request.session['user']['mail'] = new_emails[0]['email']
+            self.user['mail'] = new_emails[0]['email']
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
@@ -130,7 +168,7 @@ class EmailsView(BaseFormView):
             }
         }, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('One email has been removed, please, wait'
                                      ' before your changes are distributed '
@@ -151,7 +189,7 @@ class EmailsView(BaseFormView):
         email = self.schema.serialize(emailform)
         primary_email = email.get('mail')
 
-        self.request.session['user']['mail'] = primary_email
+        self.user['mail'] = primary_email
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
@@ -162,7 +200,7 @@ class EmailsView(BaseFormView):
             }
         }, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('Your primary email was changed'),
                                    queue='forms')

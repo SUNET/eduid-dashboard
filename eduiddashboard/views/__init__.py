@@ -3,6 +3,10 @@ import json
 from pyramid_deform import FormView
 
 
+def get_dummy_status(user):
+    return None
+
+
 class BaseFormView(FormView):
 
     route = ''
@@ -10,21 +14,23 @@ class BaseFormView(FormView):
     buttons = ('save', )
     use_ajax = True
 
-    def __init__(self, request):
+    def __init__(self, context, request):
         super(BaseFormView, self).__init__(request)
-        self.user = request.session.get('user', None)
+        self.user = context.user
+        self.context = context
 
         self.classname = self.__class__.__name__.lower()
 
         self.ajax_options = json.dumps({
             'replaceTarget': True,
-            'url': self.request.route_url(self.route),
+            'url': context.route_url(self.route),
             'target': "div.{classname}-form-container".format(
                 classname=self.classname)
         })
 
         self.form_options = {
             'formid': "{classname}-form".format(classname=self.classname),
+            'action': context.route_url(self.route),
         }
 
         bootstrap_form_style = getattr(self, 'bootstrap_form_style', None)
