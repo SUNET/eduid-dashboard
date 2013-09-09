@@ -85,10 +85,13 @@ class Person(colander.MappingSchema):
 class Passwords(colander.MappingSchema):
 
     old_password = colander.SchemaNode(colander.String(),
+                                       widget=deform.widget.PasswordWidget(size=20),
                                        validator=OldPasswordValidator())
     new_password = colander.SchemaNode(colander.String(),
+                                       widget=deform.widget.PasswordWidget(size=20),
                                        validator=PasswordValidator())
-    new_password_repeated = colander.SchemaNode(colander.String())
+    new_password_repeated = colander.SchemaNode(colander.String(),
+                                                widget=deform.widget.PasswordWidget(size=20))
 
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:
