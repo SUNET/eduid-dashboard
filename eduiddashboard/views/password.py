@@ -32,7 +32,9 @@ class PasswordsView(BaseFormView):
         old_password = passwords_data['old_password']
 
         # adding new credentials
-        added = add_credentials(old_password, new_password, self.request)
+        user = self.request.session['user']
+        vccs_url = self.request.registry.settings.get('vccs_url')
+        added = add_credentials(vccs_url, old_password, new_password, user)
 
         if added:
             self.request.session.flash(_('Your changes was saved, please, wait '

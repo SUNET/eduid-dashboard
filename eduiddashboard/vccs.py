@@ -3,38 +3,36 @@ from bson import ObjectId
 import vccs_client
 
 
-def check_password(password, request):
+def check_password(vccs_url, password, user):
     """ return False or the password dict related
         to the password literal passed by param """
-    user = request.session['user']
     if 'passwords' in user:
         for password_dict in user['passwords']:
             password_id = password_dict['id']
             vccs = vccs_client.VCCSClient(
-                base_url=request.registry.settings.get('vccs_url'),
+                base_url=vccs_url,
             )
-            old_factor = vccs_client.VCCSPasswordFactor(
+            factor = vccs_client.VCCSPasswordFactor(
                 password, credential_id=str(password_id),
             )
             try:
-                if vccs.authenticate(user['mail'], [old_factor]):
+                if vccs.authenticate(user['mail'], [factor]):
                     return password_dict
             except Exception, exc:
                 pass
     return False
 
 
-def add_credentials(old_password, new_password, request):
+def add_credentials(vccs_url, old_password, new_password, user):
     """ add new credentials to the user in session """
     password_id = ObjectId()
-    user = request.session['user']
     vccs = vccs_client.VCCSClient(
-        base_url=request.registry.settings.get('vccs_url'),
+        base_url=vccs_url,
     )
     new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                 credential_id=str(password_id))
     if not vccs.add_credentials(user['mail'], [new_factor]):
-        return False  # something fail
+        return False  # something failed
 
     if 'passwords' not in user:
         passwords = []
@@ -43,7 +41,7 @@ def add_credentials(old_password, new_password, request):
 
     if passwords:
         # revoking old credentials
-        old_password = check_password(old_password, request)
+        old_password = check_password(vccs_url, old_password, user)
         if old_password:
             old_factor = vccs_client.VCCSRevokeFactor(str(old_password['id']), 'changing password', reference='dashboard')
             vccs.revoke_credentials(user['mail'], [old_factor])

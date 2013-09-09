@@ -121,7 +121,7 @@ class LoggedInReguestTests(unittest.TestCase):
                 get_flash_message_type = eduiddashboard.filters:get_flash_message_type
             """,
             'available_languages': 'en es',
-
+            'vccs_url': 'http://localhost:8550/',
         }
         self.settings.update(settings)
 
