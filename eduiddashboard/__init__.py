@@ -181,17 +181,17 @@ def main(global_config, **settings):
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')
 
-    raw_permissions = read_setting_from_env(settings, 'mongo_replicaset', '')
-    settings['permission_mapping'] = read_permissions(raw_permissions)
-
     if settings['workmode'] not in AVAILABLE_WORK_MODES:
         raise ConfigurationError(
             'The workmode {0} is not in available work modes'.format(
                 settings['workmode'])
         )
 
-
-    settings['groups_callback'] = groups_callback
+    raw_permissions = read_setting_from_env(settings, 'mongo_replicaset', '')
+    settings['permission_mapping'] = read_permissions(raw_permissions)
+    settings['groups_callback'] = read_setting_from_env(settings,
+                                                        'groups_callback',
+                                                        groups_callback)
 
     config = Configurator(settings=settings,
                           root_factory=RootFactory,

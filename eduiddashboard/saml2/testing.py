@@ -83,8 +83,13 @@ def saml2_main(global_config, **settings):
     return config.make_wsgi_app()
 
 
+def dummy_groups_callback(userid, request):
+    return ['']
+
+
 class Saml2RequestTests(unittest.TestCase):
-    """Base TestCase for those tests usign saml2 that need a full environment setup
+    """Base TestCase for those tests usign saml2 that need a full environment
+       setup
     """
 
     def setUp(self, settings={}):
@@ -108,6 +113,9 @@ class Saml2RequestTests(unittest.TestCase):
             """,
         }
         self.settings.update(settings)
+
+        if not self.settings.get('groups_callback', None):
+            self.settings['groups_callback'] = dummy_groups_callback
 
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)

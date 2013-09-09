@@ -72,7 +72,9 @@ class BaseFactory(object):
         permissions_mapping = self.request.registry.settings.get(
             'permission_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
-        if required_urn in user.get('eduPersonEntitlement', []):
+        if required_urn is '':
+            return ['']
+        elif required_urn in user.get('eduPersonEntitlement', []):
             return [self.workmode]
 
 

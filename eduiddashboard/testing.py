@@ -14,7 +14,7 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard import main as eduiddashboard_main
+from eduiddashboard import main as eduiddashboard_main, groups_callback
 from eduiddashboard.saml2.userdb import IUserDB
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
@@ -86,6 +86,10 @@ class MockedUserDB(IUserDB):
         return deepcopy(self.test_users.get(userid))
 
 
+def dummy_groups_callback(userid, request):
+    return [request.context.workmode]
+
+
 class LoggedInReguestTests(unittest.TestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
@@ -106,6 +110,7 @@ class LoggedInReguestTests(unittest.TestCase):
             'saml2.login_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'saml2.attribute_mapping': "mail = mail",
+            'groups_callback': dummy_groups_callback,
             'session.type': 'memory',
             'session.lock_dir': '/tmp',
             'session.webtest_varname': 'session',
@@ -120,9 +125,12 @@ class LoggedInReguestTests(unittest.TestCase):
                 get_flash_message_text = eduiddashboard.filters:get_flash_message_text
                 get_flash_message_type = eduiddashboard.filters:get_flash_message_type
             """,
+            'jinja2.i18n.domain': 'eduid-dashboard',
+            'jinja2.extensions': ['jinja2.ext.with_'],
             'available_languages': 'en es',
 
         }
+
         self.settings.update(settings)
 
         try:
