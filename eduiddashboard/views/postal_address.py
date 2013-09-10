@@ -1,6 +1,7 @@
 ## Postal address forms
 
 from deform import widget
+import pycountry
 from pyramid.view import view_config
 
 from eduid_am.tasks import update_attributes
@@ -24,8 +25,13 @@ class PostalAddressView(BaseFormView):
     route = 'postaladdress'
 
     def before(self, form):
-        allowed_countries = self.request.registry.settings.get('allowed_countries').split(',')
-        form['country'].widget = widget.SelectWidget(values=[(c.strip(), c.strip()) for c in allowed_countries])
+        allowed_countries_in_settings = self.request.registry.settings.get('allowed_countries')
+        if allowed_countries_in_settings:
+            allowed_countries = [l.split('=') for l in allowed_countries_in_settings.splitlines() if l]
+        else:
+            allowed_countries = [(c.alpha2, c.name) for c in pycountry.countries]
+            
+        form['country'].widget = widget.SelectWidget(values=[(code.strip(), country.strip()) for code, country in allowed_countries])
 
     def save_success(self, addressform):
         address = self.schema.serialize(addressform)

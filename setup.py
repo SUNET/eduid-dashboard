@@ -21,6 +21,7 @@ requires = [
     'deform==0.9.7',
     'deform_bootstrap==0.2.9',
     'pysaml2==1.0.2',
+    'pycountry==1.0',
     'waitress==0.8.2',
     'vccs_client',
 ]
