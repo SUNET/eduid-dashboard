@@ -17,29 +17,34 @@
   <div class='row'>
     <div class='span6'>
       <h4>{{ _("Level of assurance") }}</h4>
-
+        {% with loa = request.session.get('loa') %}
         <ul class='circles-widget-labels'>
           <li><a href='#' title="{{ _('Level 5') }}" data-toggle='popover'
                 data-content='{{ _("This is the lower level you can reach,"
-                                   "With this loa you can edit some attributes"
-                                   "of your profile") }}'>
+                                   " With this loa you can edit some "
+                                   " attributes of your profile") }}'>
               {{ _('Level 5') }}</a></li>
+          {% if max_loa <= 4 %}
           <li><a href='#' title="{{ _('Level 4') }}" data-toggle='popover'
-                data-content='{{ _("With this loa you can edit some attributes"
-                                   "of your profile") }}'>
+                data-content='{{ _("With this loa you can edit some"
+                                   " attributes of your profile") }}'>
               {{ _('Level 4') }}</a></li>
+          {% endif %}{% if max_loa <= 3 %}
           <li><a href='#' title="{{ _('Level 3') }}" data-toggle='popover'
-                data-content='{{ _("With this loa you can edit some attributes"
-                                   "of your profile") }}'>
+                data-content='{{ _("With this loa you can edit some"
+                                   " attributes of your profile") }}'>
               {{ _('Level 3') }}</a></li>
+          {% endif %}{% if max_loa <= 2 %}
           <li><a href='#' title="{{ _('Level 2') }}" data-toggle='popover'
-                data-content='{{ _("With this loa you can edit some attributes"
-                                   "of your profile") }}'>
+                data-content='{{ _("With this loa you can edit all"
+                                   " attributes of your profile") }}'>
               {{ _('Level 2') }}</a></li>
+          {% endif %}
+
 
         </ul>
-        <div class='circles-widget  level-{{ request.session.get('loa', 5) }}' >
-          <img src="{{ 'eduiddashboard:static/img/circle-bar.png'|static_url }}" />
+        <div class='circles-widget level-{{ request.session.get('loa', 5) }} max-level-{{ max_loa }}' >
+          <img src="{{ 'eduiddashboard:static/img/circle-bar.png'|static_url }}"/>
           <div class='bar'></div>
         </div>
 
@@ -47,15 +52,29 @@
         </div>
 
         <div class='level-assurance-description'>
-          {% trans %}
-          <p>You are in 4 level. If you want to increase this level to get
-          more permissions you need to:</p>
-          <ul>
-            <li>Validate your postal address</li>
-            <li>Validate your NIN number</li>
+          {% if context.workmode == 'personal' %}
+
+              {{_("You are in {0} level").format(loa)}}
+              {% if loa == max_loa %}
+                {% trans %}
+                <p>This is the highest level of assurance available for your profile</p>
+                {% endtrans %}
+              {% else %}
+                {% trans %}
+                <p>If you want to increase this level to get
+                more permissions you need to:</p>
+                {% endtrans %}
+              {% endif %}
+
+          {% endif %}
+
+          <ul class='unstyled pending-actions'>
+          {% for formid, msg in pending_actions %}
+            <li><a href='#{{ formid }}'>{{ msg }}</a></li>
+          {% endfor %}
           </ul>
-          {% endtrans %}
         </div>
+        {% endwith %}
     </div>
 
     <div class='span6'>
@@ -73,7 +92,7 @@
       {% for tab in tabs %}
         <li {% if loop.first %}class='active'{% endif %}>
           {% with status = tab.status(user) %}
-          <a href='#{{tab.id}}' data-toggle='tab'
+          <a href='#{{tab.id}}'
             {% if status %}title='{{status.msg}}'{% endif %}>
               {% if status %}
                 <i class='{{status.icon}}'></i>

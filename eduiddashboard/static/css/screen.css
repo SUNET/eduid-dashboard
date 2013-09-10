@@ -149,8 +149,30 @@ body {
   width: 300px;
 }
 
+.circles-widget.max-level-5 {
+  width: 25px;
+}
+
+.circles-widget.max-level-4 {
+  width: 100px;
+}
+
+.circles-widget.max-level-3 {
+  width: 175px;
+}
+
+.circles-widget.max-level-2 {
+  width: 237px;
+}
+
+.circles-widget.max-level-1 {
+  width: 300px;
+}
+
+
 .circles-widget img {
   position: absolute;
+  overflow: hidden;
   z-index: 10;
 }
 

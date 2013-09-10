@@ -10,7 +10,9 @@ from pyramid.view import view_config
 from deform_bootstrap import Form
 
 from eduiddashboard.utils import (verify_auth_token, filter_tabs,
-                                  calculate_filled_profile)
+                                  calculate_filled_profile,
+                                  get_pending_actions,
+                                  get_max_available_loa)
 
 from eduiddashboard.models import UserSearcher
 
@@ -48,17 +50,6 @@ def profile_editor(context, request):
 
     view_context = {}
 
-    # TODO we need to count fields from all schemas
-    # user = request.session.get('user', None)
-    # person = person_schema.serialize(user)
-    #
-    # total_fields = len(person_schema.children)
-    # filled_fields = len(person.keys())
-    # for (key, value) in person.items():
-    #     if not value:
-    #         filled_fields -= 1
-    # view_context['profile_filled'] = (filled_fields / total_fields) * 100
-
     if context.workmode == 'personal':
         tabs = filter_tabs(AVAILABLE_TABS, ['authorization'])
     elif context.workmode == 'helpdesk':
@@ -71,11 +62,16 @@ def profile_editor(context, request):
                             / float(profile_filled[1]))
                            * 100)
 
+    pending_actions = get_pending_actions(context.user, tabs)
+
     view_context = {
         'tabs': tabs,
         'userid': context.user.get(context.main_attribute),
         'user': context.user,
         'profile_filled': percent_p_filled,
+        'pending_actions': pending_actions,
+        'workmode': context.workmode,
+        'max_loa': get_max_available_loa(context.get_groups())
     }
 
     return view_context
