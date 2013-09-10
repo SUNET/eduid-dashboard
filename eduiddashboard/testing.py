@@ -1,13 +1,13 @@
 from os import path
 from copy import deepcopy
 
-import pymongo
 from bson import ObjectId
+from mock import patch
+import pymongo
 
 import unittest
 
 from webtest import TestApp, TestRequest
-
 
 from pyramid.interfaces import ISessionFactory, IDebugLogger
 from pyramid.security import remember
@@ -86,6 +86,10 @@ class MockedUserDB(IUserDB):
         return deepcopy(self.test_users.get(userid))
 
 
+def dummy_groups_callback(userid, request):
+    return [request.context.workmode]
+
+
 class LoggedInReguestTests(unittest.TestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
@@ -106,6 +110,7 @@ class LoggedInReguestTests(unittest.TestCase):
             'saml2.login_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'saml2.attribute_mapping': "mail = mail",
+            'groups_callback': dummy_groups_callback,
             'session.type': 'memory',
             'session.lock_dir': '/tmp',
             'session.webtest_varname': 'session',
@@ -120,9 +125,12 @@ class LoggedInReguestTests(unittest.TestCase):
                 get_flash_message_text = eduiddashboard.filters:get_flash_message_text
                 get_flash_message_type = eduiddashboard.filters:get_flash_message_type
             """,
+            'jinja2.i18n.domain': 'eduid-dashboard',
+            'jinja2.extensions': ['jinja2.ext.with_'],
             'available_languages': 'en es',
-
+            'vccs_url': 'http://localhost:8550/',
         }
+
         self.settings.update(settings)
 
         try:
@@ -142,6 +150,13 @@ class LoggedInReguestTests(unittest.TestCase):
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
         self.testapp.reset()
+
+    def dummy_get_user(self, userid=''):
+        return self.user
+
+    def set_mocked_get_user(self):
+        patcher = patch('eduiddashboard.userdb.UserDB.get_user', self.dummy_get_user)
+        patcher.start()
 
     def dummy_request(self, cookies={}):
         request = DummyRequest()

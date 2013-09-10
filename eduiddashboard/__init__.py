@@ -17,12 +17,43 @@ from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
 
+AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
+
+
+REQUIRED_GROUP_PER_WORKMODE = {
+    'personal': '',
+    'helpdesk': 'urn:mace:eduid.se:role:ra',
+    'admin': 'urn:mace:eduid.se:role:admin',
+}
+
+
+def groups_callback(userid, request):
+    return request.context.get_groups(userid, request)
+
+
 def read_setting_from_env(settings, key, default=None):
     env_variable = key.upper()
     if env_variable in os.environ:
         return os.environ[env_variable]
     else:
         return settings.get(key, default)
+
+
+def read_permissions(raw):
+    if raw.strip() == '':
+        return REQUIRED_GROUP_PER_WORKMODE
+
+    rows = raw.split('\n')
+
+    permissions = {}
+
+    for row in rows:
+        workmode = row.split('=').strip()[0]
+        urn = row.split('=').strip()[1]
+        if workmode in AVAILABLE_WORK_MODES:
+            permissions[workmode] = urn
+
+    return permissions
 
 
 def add_custom_deform_templates_path():
@@ -37,14 +68,39 @@ def add_custom_deform_templates_path():
     loader.search_path = (path, ) + loader.search_path
 
 
+def add_custom_workmode_templates_path(workmode='personal'):
+    if workmode != 'personal':
+
+        templates_path = 'templates/{0}'.format(workmode)
+        try:
+            path = resource_filename('eduiddashboard', templates_path)
+        except ImportError:
+            from os.path import dirname, join
+            path = join(dirname(__file__), templates_path)
+
+        loader = Form.default_renderer.loader
+        loader.search_path = (path, ) + loader.search_path
+
+
+def profile_urls(config):
+    config.add_route('profile-editor', '/', factory=PersonFactory)
+    config.add_route('personaldata', '/personaldata/',
+                     factory=PersonFactory)
+    config.add_route('emails', '/emails/',
+                     factory=PersonFactory)
+    config.add_route('passwords', '/passwords/',
+                     factory=PasswordsFactory)
+
+
 def includeme(config):
     # DB setup
-    mongo_replicaset = config.registry.settings.get('mongo_replicaset', None)
+    settings = config.registry.settings
+    mongo_replicaset = settings.get('mongo_replicaset', None)
     if mongo_replicaset is not None:
-        mongodb = MongoDB(config.registry.settings['mongo_uri'],
+        mongodb = MongoDB(settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
     else:
-        mongodb = MongoDB(config.registry.settings['mongo_uri'])
+        mongodb = MongoDB(settings['mongo_uri'])
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
@@ -54,19 +110,20 @@ def includeme(config):
     config.registry.settings['userdb'] = userdb
     config.add_request_method(get_userdb, 'userdb', reify=True)
 
-    # root views
-    config.add_route('home', '/', factory=PersonFactory)
-    config.add_route('help', '/help/')
-    config.add_route('token-login', '/tokenlogin/')
-    config.add_route('session-reload', '/session-reload/')
+    if settings['workmode'] == 'personal':
+        config.include(profile_urls, route_prefix='/profile/')
+        config.add_route('home', '/', factory=PersonFactory)
 
-    config.add_route('personaldata', '/personaldata/', factory=PersonFactory)
-    config.add_route('emails', '/emails/', factory=PersonFactory)
+    else:
+        config.add_route('home', '/', factory=PersonFactory)
+        config.include(profile_urls, route_prefix='/users/{userid}/')
+
+    config.add_route('token-login', '/tokenlogin/')
     config.add_route('verifications',
                      '/verificate/{model}/{code}/',
-                     factory=PersonFactory)
-
-    config.add_route('passwords', '/passwords/', factory=PasswordsFactory)
+                     factory=RootFactory)
+    config.add_route('help', '/help/')
+    config.add_route('session-reload', '/session-reload/')
 
 
 def main(global_config, **settings):
@@ -119,6 +176,22 @@ def main(global_config, **settings):
     settings['broker_url'] = broker_url
 
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
+    settings.setdefault('jinja2.extensions', ['jinja2.ext.with_'])
+
+    settings['workmode'] = read_setting_from_env(settings, 'workmode',
+                                                 'personal')
+
+    if settings['workmode'] not in AVAILABLE_WORK_MODES:
+        raise ConfigurationError(
+            'The workmode {0} is not in available work modes'.format(
+                settings['workmode'])
+        )
+
+    raw_permissions = read_setting_from_env(settings, 'mongo_replicaset', '')
+    settings['permission_mapping'] = read_permissions(raw_permissions)
+    settings['groups_callback'] = read_setting_from_env(settings,
+                                                        'groups_callback',
+                                                        groups_callback)
 
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
@@ -130,7 +203,6 @@ def main(global_config, **settings):
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
     config.include('pyramid_deform')
-
     config.include('eduiddashboard.saml2')
 
     if 'testing' in settings and asbool(settings['testing']):
@@ -141,6 +213,7 @@ def main(global_config, **settings):
     config.include('pyramid_tm')
 
     add_custom_deform_templates_path()
+    add_custom_workmode_templates_path()
 
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_static_view('deform', 'deform:static',

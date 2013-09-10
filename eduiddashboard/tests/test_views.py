@@ -1,27 +1,10 @@
-import unittest
-from pyramid import testing
-from pyramid.i18n import TranslationStringFactory
-
-_ = TranslationStringFactory('eduiddashboard')
+from eduiddashboard.testing import LoggedInReguestTests
 
 
-class ViewTests(unittest.TestCase):
+class ViewTests(LoggedInReguestTests):
 
-    def setUp(self):
-        testing.setUp()
-
-    def tearDown(self):
-        testing.tearDown()
-
-    def test_my_view(self):
-        from eduiddashboard.views.portal import home
-        request = testing.DummyRequest()
-
-        request.session = {
-            'user': {
-                'mail': 'email@example.com'
-            },
-        }
-
-        response = home({}, request)
-        self.assertEqual(response['mail'], 'email@example.com')
+    def test_home_view(self):
+        self.set_logged()
+        res = self.testapp.get('/')
+        self.assertEqual(res.status, '302 Found')
+        self.assertEqual('http://localhost/profile/', res.location)

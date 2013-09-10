@@ -3,11 +3,15 @@ import re
 import colander
 import deform
 
-from eduiddashboard.validators import PasswordValidator, old_password_validator
-
 from eduiddashboard.i18n import TranslationString as _
+from eduiddashboard.validators import EmailUniqueValidator, PasswordValidator, OldPasswordValidator
 
-from eduiddashboard.validators import EmailUniqueValidator
+
+SEARCHER_ATTTRIBUTE_TYPES = [
+    (u'mail', _('email')),
+    (u'mobile', _('phone mobile number')),
+    (u'norEduPersonNIN', _('NIN')),
+]
 
 
 class BooleanMongo(colander.Boolean):
@@ -59,6 +63,7 @@ def preferred_language_widget(node, kw):
 
 class Person(colander.MappingSchema):
     givenName = colander.SchemaNode(colander.String(),
+                                    readonly=True,
                                     title=_('given name'))
     sn = colander.SchemaNode(colander.String(),
                              title=_('surname'))
@@ -80,12 +85,36 @@ class Person(colander.MappingSchema):
 class Passwords(colander.MappingSchema):
 
     old_password = colander.SchemaNode(colander.String(),
-                                       validator=old_password_validator)
+                                       widget=deform.widget.PasswordWidget(size=20),
+                                       validator=OldPasswordValidator())
     new_password = colander.SchemaNode(colander.String(),
+                                       widget=deform.widget.PasswordWidget(size=20),
                                        validator=PasswordValidator())
-    new_password_repeated = colander.SchemaNode(colander.String())
+    new_password_repeated = colander.SchemaNode(colander.String(),
+                                                widget=deform.widget.PasswordWidget(size=20))
 
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
                                    _("Both passwords don't match"))
+
+
+class UserSearcher(colander.MappingSchema):
+
+    text = colander.SchemaNode(colander.String(),
+                               title=_('text'),
+                               description=_('the exact match text for the '
+                                             'attribute type selected for '
+                                             'search')
+                               )
+
+    attribute_type = colander.SchemaNode(
+        colander.String(),
+        title=_('attribute type'),
+        description=_('Select the attribute to search'),
+        default='mail',
+        widget=deform.widget.RadioChoiceWidget(
+            values=SEARCHER_ATTTRIBUTE_TYPES,
+            inline=True
+        )
+    )
