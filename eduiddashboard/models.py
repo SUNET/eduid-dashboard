@@ -3,11 +3,8 @@ import re
 import colander
 import deform
 
-from eduiddashboard.validators import PasswordValidator, old_password_validator
-
 from eduiddashboard.i18n import TranslationString as _
-
-from eduiddashboard.validators import EmailUniqueValidator
+from eduiddashboard.validators import EmailUniqueValidator, PasswordValidator, OldPasswordValidator
 
 
 SEARCHER_ATTTRIBUTE_TYPES = [
@@ -88,10 +85,13 @@ class Person(colander.MappingSchema):
 class Passwords(colander.MappingSchema):
 
     old_password = colander.SchemaNode(colander.String(),
-                                       validator=old_password_validator)
+                                       widget=deform.widget.PasswordWidget(size=20),
+                                       validator=OldPasswordValidator())
     new_password = colander.SchemaNode(colander.String(),
+                                       widget=deform.widget.PasswordWidget(size=20),
                                        validator=PasswordValidator())
-    new_password_repeated = colander.SchemaNode(colander.String())
+    new_password_repeated = colander.SchemaNode(colander.String(),
+                                                widget=deform.widget.PasswordWidget(size=20))
 
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:

@@ -128,7 +128,7 @@ class LoggedInReguestTests(unittest.TestCase):
             'jinja2.i18n.domain': 'eduid-dashboard',
             'jinja2.extensions': ['jinja2.ext.with_'],
             'available_languages': 'en es',
-
+            'vccs_url': 'http://localhost:8550/',
         }
 
         self.settings.update(settings)
