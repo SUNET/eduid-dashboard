@@ -1,10 +1,45 @@
-import re
-
 from mock import patch
 
+import simplejson as json
+import vccs_client
+
 from eduiddashboard.testing import LoggedInReguestTests
-from eduiddashboard.userdb import UserDB
+from eduiddashboard import vccs
 from eduiddashboard.vccs import check_password, add_credentials
+
+
+class FakeVCCSClient(vccs_client.VCCSClient):
+
+    def __init__(self, fake_response=None):
+        self.fake_response = fake_response
+
+    def _execute_request_response(self, _service, _values):
+        if self.fake_response is not None:
+            return self.fake_response
+
+        fake_response = {}
+        if _service == 'add_creds':
+            fake_response = {
+                'add_creds_response': {
+                    'version': 1,
+                    'success': True,
+                },
+            }
+        elif _service == 'authenticate':
+            fake_response = {
+                'auth_response': {
+                    'version': 1,
+                    'authenticated': True,
+                },
+            }
+        elif _service == 'revoke_creds':
+            fake_response = {
+                'revoke_creds_response': {
+                    'version': 1,
+                    'success': True,
+                },
+            }
+        return json.dumps(fake_response)
 
 
 class PasswordFormTests(LoggedInReguestTests):
@@ -15,6 +50,12 @@ class PasswordFormTests(LoggedInReguestTests):
     def setUp(self, settings={}):
         super(PasswordFormTests, self).setUp(settings=settings)
         vccs_url = self.settings['vccs_url']
+        fake_vccs_client = FakeVCCSClient()
+        mock_config = {
+            'return_value': fake_vccs_client,
+        }
+        self.patcher = patch.object(vccs, 'get_vccs_client', **mock_config)
+        self.patcher.start()
         add_credentials(vccs_url, 'xxx', self.initial_password, self.user)
 
     def test_logged_get(self):
@@ -34,7 +75,15 @@ class PasswordFormTests(LoggedInReguestTests):
         new_password = 'new-password'
         add_credentials(vccs_url, self.initial_password, new_password, self.user)
         self.assertTrue(check_password(vccs_url, new_password, self.user))
-        self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
+
+        with patch('eduiddashboard.vccs', clear=True):
+            vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
+                'auth_response': {
+                    'version': 1,
+                    'authenticated': False,
+                },
+            })
+            self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
 
     def test_valid_password(self):
         self.set_logged()
@@ -61,11 +110,17 @@ class PasswordFormTests(LoggedInReguestTests):
         form['new_password'].value = 'newpassword'
         form['new_password_repeated'].value = 'newpassword'
 
-        response = form.submit('save')
-
-        self.assertEqual(response.status, '200 OK')
-        self.assertIn('Old password do not match', response.body)
-        self.assertIsNotNone(getattr(response, 'form', None))
+        with patch('eduiddashboard.vccs', clear=True):
+            vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
+                'auth_response': {
+                    'version': 1,
+                    'authenticated': False,
+                },
+            })
+            response = form.submit('save')
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('Old password do not match', response.body)
+            self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_not_valid_repeated_password(self):
         self.set_logged()
@@ -81,3 +136,7 @@ class PasswordFormTests(LoggedInReguestTests):
         self.assertEqual(response.status, '200 OK')
         self.assertIn("Both passwords don't match", response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
+
+    def tearDown(self):
+        super(PasswordFormTests, self).tearDown()
+        self.patcher.stop()

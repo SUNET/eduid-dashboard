@@ -3,15 +3,19 @@ from bson import ObjectId
 import vccs_client
 
 
+def get_vccs_client(vccs_url):
+    return vccs_client.VCCSClient(
+        base_url=vccs_url,
+    )
+
+
 def check_password(vccs_url, password, user):
     """ return False or the password dict related
         to the password literal passed by param """
     if 'passwords' in user:
         for password_dict in user['passwords']:
             password_id = password_dict['id']
-            vccs = vccs_client.VCCSClient(
-                base_url=vccs_url,
-            )
+            vccs = get_vccs_client(vccs_url)
             factor = vccs_client.VCCSPasswordFactor(
                 password,
                 credential_id=str(password_id),
@@ -28,9 +32,7 @@ def check_password(vccs_url, password, user):
 def add_credentials(vccs_url, old_password, new_password, user):
     """ add new credentials to the user in session """
     password_id = ObjectId()
-    vccs = vccs_client.VCCSClient(
-        base_url=vccs_url,
-    )
+    vccs = get_vccs_client(vccs_url)
     new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                 credential_id=str(password_id))
     if not vccs.add_credentials(user['mail'], [new_factor]):

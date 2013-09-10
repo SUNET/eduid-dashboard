@@ -1,9 +1,6 @@
 ## Passwords form
 
 from pyramid.view import view_config
-from bson import ObjectId
-
-import vccs_client
 
 from eduid_am.tasks import update_attributes
 
