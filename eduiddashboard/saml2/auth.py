@@ -67,16 +67,12 @@ def authenticate(request, session_info, attribute_mapping):
     logger.debug('Retrieving existing user "%s"' % saml_user)
     try:
         user = request.userdb.get_user(saml_user)
+        return user
     except request.userdb.UserDoesNotExist:
         logger.error('The user "%s" does not exist' % saml_user)
-        return None
-
     except request.userdb.MultipleUsersReturned:
         logger.error("There are more than one user with %s = %s" %
                      (user_main_attribute, saml_user))
-        return None
-    else:
-        return user
 
 
 def login(request, session_info, user):
