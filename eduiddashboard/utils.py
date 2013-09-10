@@ -50,6 +50,8 @@ def get_pending_actions(user, tabs):
 
 
 def get_max_available_loa(groups):
+    if not groups:
+        return MAX_LOA_ROL['user']
     loas = [v for (k, v) in MAX_LOA_ROL.iteritems() if k in groups]
     if len(loas) > 0:
         return max(loas)
