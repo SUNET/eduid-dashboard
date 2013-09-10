@@ -67,7 +67,7 @@ class BaseFactory(object):
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
-    def get_groups(self, userid, request):
+    def get_groups(self, userid=None, request=None):
         user = self.request.session.get('user')
         permissions_mapping = self.request.registry.settings.get(
             'permission_mapping', {})
