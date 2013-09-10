@@ -100,11 +100,15 @@ class Passwords(colander.MappingSchema):
 
 
 class PostalAddress(colander.MappingSchema):
+    type = colander.SchemaNode(colander.String())
     address = colander.SchemaNode(colander.String())
     locality = colander.SchemaNode(colander.String())
     postalCode = colander.SchemaNode(colander.String(),
                                      validator=colander.Length(min=5, max=6))
     country = colander.SchemaNode(colander.String())
+    verified = colander.SchemaNode(BooleanMongo(), missing=False,
+                                   title=_('verified'))
+
 
 
 class UserSearcher(colander.MappingSchema):

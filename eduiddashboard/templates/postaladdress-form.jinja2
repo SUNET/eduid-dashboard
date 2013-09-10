@@ -1,5 +1,62 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}Change your postal address{% endtrans %}
+   {% trans %}
+   <p>These list contain all your postal addresses registered in the
+   platform. You can change your preferred address by clicking in the radio
+   buttons.</p>
+   {% endtrans %}
+{% endblock %}
+
+{% block extra_content %}
+  <table class='table table-striped table-thin postal-addresses'>
+    <thead>
+      <tr>
+        <th>{{_("preferred")}}</th>
+        <th>{{_("email")}}</th>
+        <th>{{_("verification status")}}</th>
+        <th>{{_("remove")}}</th>
+      </tr>
+    </thead>
+    {% for address in postal_addresses %}
+    <tr class='postal-addresses-row'>
+        <td>
+          <input type='radio' name='setprimary' value='{{ loop.index0 }}'
+           title='{{_("Set this address as your primary postal address")}}'
+           {% if address.type == 'preferred' %}checked{% endif %}/></td>
+
+        <td class='address'>{{ address.address }}</td>
+
+      {% if address.verified %}
+        <td><i class="icon-ok"
+               title='{{_("Already verified")}}'></i></td>
+      {% else %}
+        <td>
+          <label>
+            <i class='icon-refresh' title='{{_("Resend verification")}}'></i>
+            <input class='hide' type='radio' name='verify' value='{{ loop.index0 }}'>
+          </label>
+        </td>
+      {% endif %}
+        <td>
+          <label>
+            <i class='icon-remove' title='{{_("Remove this postal address")}}'></i>
+            <input class='hide' type='radio' name='remove' value='{{ loop.index0 }}'>
+          </label>
+        </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <button type='button'
+          class='btn add-new' 
+          data-toggle='button'>
+        <i class='icon-plus'></i>
+        {{_('Add a new postal address')}}</button>
+{% endblock %}
+
+
+{% block form_generic_form %}
+  <div class='form-content hide'>
+  {{ form|safe }}
+  </div>
 {% endblock %}

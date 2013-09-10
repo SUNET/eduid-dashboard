@@ -92,7 +92,6 @@ class EmailsView(BaseFormView):
 
     def get_template_context(self):
         context = super(EmailsView, self).get_template_context()
-
         context.update({
             'mails': self.user['mailAliases'],
             'primary_email': self.user['mail'],

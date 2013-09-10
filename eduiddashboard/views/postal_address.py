@@ -22,6 +22,20 @@ class PostalAddressView(BaseFormView):
     schema = PostalAddress()
     route = 'postaladdress'
 
+    buttons = ('add', 'verify', 'remove',)
+    bootstrap_form_style = 'form-inline'
+
+    def appstruct(self):
+        return {}
+
+    def get_template_context(self):
+        context = super(PostalAddressView, self).get_template_context()
+        context.update({
+            'postal_addresses': self.user.get('postalAddresses', []),
+        })
+
+        return context
+
     def before(self, form):
         allowed_countries_in_settings = self.request.registry.settings.get('allowed_countries')
         if allowed_countries_in_settings:
@@ -31,12 +45,23 @@ class PostalAddressView(BaseFormView):
             
         form['country'].widget = widget.SelectWidget(values=[(code.strip(), country.strip()) for code, country in allowed_countries])
 
-    def save_success(self, addressform):
+    def add_success(self, addressform):
         address = self.schema.serialize(addressform)
+
+        addresses = self.user.get('postalAddresses', [])
+        addresses.append(address)
+
         # update the session data
-        self.user.update(address)
-        # Insert the new user object
-        self.request.db.profiles.save(self.user, safe=True)
+        self.user['postalAddresses'] = addresses
+
+        # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, {
+            '$push': {
+                'postalAddresses': addresses,
+            }
+        }, safe=True)
 
         # update the session data
         self.context.propagate_user_changes(self.user)
