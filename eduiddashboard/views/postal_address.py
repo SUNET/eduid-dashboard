@@ -4,15 +4,13 @@ from deform import widget
 import pycountry
 from pyramid.view import view_config
 
-from eduid_am.tasks import update_attributes
-
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
 from eduiddashboard.views import BaseFormView
 
 
 @view_config(route_name='postaladdress', permission='edit',
-             renderer='templates/passwords-form.jinja2')
+             renderer='templates/postaladdress-form.jinja2')
 class PostalAddressView(BaseFormView):
     """
     Change user postal address
