@@ -92,13 +92,15 @@
       {% for tab in tabs %}
         <li {% if loop.first %}class='active'{% endif %}>
           {% with status = tab.status(user) %}
-          <a href='#{{tab.id}}'
-            {% if status %}title='{{status.msg}}'{% endif %}>
-              {% if status %}
-                <i class='{{status.icon}}'></i>
-              {% endif %}
-            {{tab.label}}
-          </a>
+            {% if status and 'icon' in status %}
+              <a href='#{{tab.id}}'
+                 title='{{status.msg}}'>
+                    <i class='{{status.icon}}'></i>
+                {{tab.label}}
+              </a>
+            {% else %}
+              <a href='#{{tab.id}}'>{{tab.label}}</a>
+            {% endif %}
           {% endwith %}
         </li>
       {% endfor %}
