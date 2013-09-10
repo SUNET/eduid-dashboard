@@ -1,16 +1,34 @@
 ## Personal data form
 
 from pyramid.view import view_config
-from bson import ObjectId
-
-import vccs_client
-
-from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.models import Person, Passwords
+from eduiddashboard.models import Person
 
+from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView
+
+
+def get_status(user):
+    """
+    Check if there is one norEduPersonNIN active and verified
+
+    return msg and icon
+    """
+    icon = get_icon_string('warning-sign')
+    {
+        'icon': None,
+        'msg': '',
+    }
+    return None
+
+
+def get_tab():
+    return {
+        'status': get_status,
+        'label': _('Personal info'),
+        'id': 'personaldata',
+    }
 
 
 @view_config(route_name='personaldata', permission='edit',
@@ -26,20 +44,20 @@ class PersonalDataView(BaseFormView):
     schema = Person()
     route = 'personaldata'
 
-    def submit_success(self, user_modified):
+    def before(self, form):
+        workmode = self.context.workmode
+        if workmode == 'personal':
+            form['norEduPersonNIN'].widget.readonly = True
 
+    def save_success(self, user_modified):
         person = self.schema.serialize(user_modified)
-        # update the session data
-        self.request.session['user'].update(person)
-
-        # Do the save staff
 
         # Insert the new user object
-        self.request.db.profiles.update({
-            '_id': self.user['_id'],
-        }, self.user, safe=True)
+        self.user.update(person)
+        self.request.db.profiles.save(self.user, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        # update the session data
+        self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '

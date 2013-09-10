@@ -1,0 +1,16 @@
+<span tal:define="name name|field.name;
+                   true_val true_val|field.widget.true_val;
+                   css_class css_class|field.widget.css_class;
+                   oid oid|field.oid"
+       id="${oid}"
+       class='${css_class}'>
+    <tal:cond tal:condition='cstruct == true_val'>
+        <i class="icon-ok"></i>
+    </tal:cond>
+
+    <tal:cond tal:condition='cstruct != true_val'>
+    <a href='${action}' title='${action_title}'><i class='icon-refresh'></i></a>
+    </tal:cond>
+
+    <input type='hidden' name="${name}" value="${cstruct}"/>
+</span>

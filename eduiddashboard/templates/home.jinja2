@@ -2,10 +2,6 @@
 
 {% block nav_class_home %}active{% endblock %}
 
-{% block headjs %}
-<script href="{{'deform:static/scripts/deform.js'|static_url }}"></script>
-<script href="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url }}"></script>
-{% endblock %}
 
 {% block contents %}
   <h2>{{ _("eduID dashboard.") }}</h2>
@@ -14,117 +10,41 @@
     <div>{{ _('Level %(level)s')|format(level=request.session.get('loa', 5)) }}</div>
   </div>
 
-  <h3>{{ _("Summary") }}</h3>
+  {{ form.render()|safe }}
 
-  <div class='clearfix'></div>
+  {% if showresults %}
+    <h3>{{_("Results")}}</h3>
+    {% if users %}
+      <p>{{_("%(number)d users was found")|format(number=users.count()) }}</p>
 
-  <div class='row'>
-    <div class='span6'>
-      <h4>{{ _("Level of assurance") }}</h4>
-
-        <ul class='circles-widget-labels'>
-          <li><a href='#' title="{{ _('Level 5') }}" data-toggle='popover'
-                data-content='{{ _("This is the lower level you can reach,"
-                                   "With this loa you can edit some attributes"
-                                   "of your profile") }}'>
-              {{ _('Level 5') }}</a></li>
-          <li><a href='#' title="{{ _('Level 4') }}" data-toggle='popover'
-                data-content='{{ _("With this loa you can edit some attributes"
-                                   "of your profile") }}'>
-              {{ _('Level 4') }}</a></li>
-          <li><a href='#' title="{{ _('Level 3') }}" data-toggle='popover'
-                data-content='{{ _("With this loa you can edit some attributes"
-                                   "of your profile") }}'>
-              {{ _('Level 3') }}</a></li>
-          <li><a href='#' title="{{ _('Level 2') }}" data-toggle='popover'
-                data-content='{{ _("With this loa you can edit some attributes"
-                                   "of your profile") }}'>
-              {{ _('Level 2') }}</a></li>
-
-        </ul>
-        <div class='circles-widget  level-{{ request.session.get('loa', 5) }}' >
-          <img src="{{ 'eduiddashboard:static/img/circle-bar.png'|static_url }}" />
-          <div class='bar'></div>
-        </div>
-
-        <div class='popover-container'>
-        </div>
-
-        <div class='level-assurance-description'>
-          {% trans %}
-          <p>You are in 4 level. If you want to increase this level to get
-          more permissions you need to:</p>
-          <ul>
-            <li>Validate your postal address</li>
-            <li>Validate your NIN number</li>
-          </ul>
-          {% endtrans %}
-        </div>
-    </div>
-
-    <div class='span6'>
-      <h4>{{ _("Profile filled") }}: {{ profile_filled }}%</h4>
-      <div class="progress progress-striped">
-        <div class="bar" style="width: {{ profile_filled }}%;"></div>
-      </div>
-    </div>
-  </div>
-
-
-  <div class='clear'></div>
-
-  <div class='profile-combo tabbable tabs-left'>
-    <ul class='nav nav-tabs'>
-      <li class='active'>
-        <a href='#personaldata' data-toggle='tab'>{{ _("Personal Info") }}</a>
-      </li>
-      <li>
-        <a href='#emails' data-toggle='tab'>{{ _("Email") }}</a>
-      </li>
-      <li>
-        <a href='#passwords' data-toggle='tab'>{{ _("Passwords") }}</a>
-      </li>
-      <li>
-        <a href='#phones' data-toggle='tab'>{{ _("Phones") }}</a>
-      </li>
-      <li>
-        <a href='#postaladdress' data-toggle='tab'>{{ _("Postal Address") }}</a>
-      </li>
-
-    </ul>
-
-    <div class='tab-content'>
-      <div class='tab-pane active'></div>
-    </div>
-  </div>
-
-
-{% endblock %}
-
-{% block extrajs %}
-
-<script src="{{'deform:static/scripts/jquery.form.js'|static_url}}"></script>
-<script src="{{'deform:static/scripts/deform.js'|static_url}}"></script>
-<script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
-
-
-<script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
-
-<script>
-
-var loa_popovers = function () {
-  $('.circles-widget-labels a').popover({
-    placement: 'bottom',
-    trigger: 'hover'
-  });
-};
-
-$(document).ready(function () {
-    $("a[data-toggle=tooltip]").tooltip();
-    $("button[data-toggle=tooltip]").tooltip();
-    loa_popovers();
-});
-
-</script>
-
+      <table class='table table-striped'>
+        <thead>
+          <tr>
+            <th>{{_('first name')}}</th>
+            <th>{{_('surname')}}</th>
+            <th>{{_('preferred email')}}</th>
+            <th>{{_('NIN')}}</th>
+          </tr>
+        </thead>
+        {% for user in users %}
+        <tr>
+          <td>{{user.givenName}}</td>
+          <td>{{user.sn}}</td>
+          <td><a href='{{request.route_url("profile-editor", userid=user.mail)}}'>{{user.mail}}</a></li>
+          <td>
+            {% if user.norEduPersonNIN %}
+              {% for nin in user.norEduPersonNIN %}
+                {% if nin.active %}
+                  {{nin.norEduPersonNIN}}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>{{_("Any user match with the filter")}}</p>
+    {% endif %}
+  {% endif %}
 {% endblock %}
