@@ -100,10 +100,9 @@ class Passwords(colander.MappingSchema):
 
 
 class PostalAddress(colander.MappingSchema):
-
     address = colander.SchemaNode(colander.String())
-    municipality = colander.SchemaNode(colander.String())
-    postal_code = colander.SchemaNode(colander.String())
+    locality = colander.SchemaNode(colander.String())
+    postalCode = colander.SchemaNode(colander.String())
     country = colander.SchemaNode(colander.String())
 
 

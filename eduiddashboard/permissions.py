@@ -84,3 +84,7 @@ class PersonFactory(BaseFactory):
 
 class PasswordsFactory(BaseFactory):
     pass
+
+
+class PostalAddressFactory(BaseFactory):
+    pass

@@ -27,17 +27,15 @@ class PostalAddressView(BaseFormView):
         allowed_countries = self.request.registry.settings.get('allowed_countries').split(',')
         form['country'].widget = widget.SelectWidget(values=[(c.strip(), c.strip()) for c in allowed_countries])
 
-    def submit_success(self, addressform):
+    def save_success(self, addressform):
         address = self.schema.serialize(addressform)
         # update the session data
-        self.request.session['user'].update(address)
-
+        self.user.update(address)
         # Insert the new user object
-        self.request.db.profiles.update({
-            '_id': self.user['_id'],
-        }, self.user, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        # update the session data
+        self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
