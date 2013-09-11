@@ -15,6 +15,8 @@
         <th>{{_("preferred")}}</th>
         <th>{{_("type")}}</th>
         <th>{{_("address")}}</th>
+        <th>{{_("locality")}}</th>
+        <th>{{_("country")}}</th>
         <th>{{_("verification status")}}</th>
         <th>{{_("remove")}}</th>
       </tr>
@@ -29,6 +31,10 @@
         <td class='type'>{{ address.type|address_type_text }}</td>
 
         <td class='address'>{{ address.address }}</td>
+
+        <td class='locality'>{{ address.locality }}</td>
+
+        <td class='country'>{{ address.country|country_name }}</td>
 
       {% if address.verified|default(False) %}
         <td><i class="icon-ok"

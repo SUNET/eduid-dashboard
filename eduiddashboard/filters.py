@@ -1,4 +1,4 @@
-
+import pycountry
 
 FLASH_SEPARATOR = '|'
 
@@ -14,3 +14,7 @@ def get_flash_message_text(message):
 def address_type_text(value):
     from eduiddashboard.models import POSTAL_ADDRESS_TYPES
     return dict(POSTAL_ADDRESS_TYPES)[value]
+
+
+def country_name(value):
+    return pycountry.countries.get(alpha2=value).name
