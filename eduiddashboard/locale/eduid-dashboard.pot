@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-11 13:28+0200\n"
+"POT-Creation-Date: 2013-09-11 14:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,60 +22,60 @@ msgstr ""
 msgid "{site_name} verification email"
 msgstr ""
 
-#: eduiddashboard/models.py:14 eduiddashboard/models.py:34
+#: eduiddashboard/models.py:11 eduiddashboard/models.py:31
 #: eduiddashboard/templates/emails-form.jinja2:17
 msgid "email"
 msgstr ""
 
-#: eduiddashboard/models.py:15
+#: eduiddashboard/models.py:12
 msgid "phone mobile number"
 msgstr ""
 
-#: eduiddashboard/models.py:16 eduiddashboard/templates/home.jinja2:26
+#: eduiddashboard/models.py:13 eduiddashboard/templates/home.jinja2:26
 msgid "NIN"
 msgstr ""
 
-#: eduiddashboard/models.py:40
+#: eduiddashboard/models.py:37
 msgid "personal identity number (NIN)"
 msgstr ""
 
-#: eduiddashboard/models.py:43
+#: eduiddashboard/models.py:40
 msgid "The personal identity number consists of 12 digits"
 msgstr ""
 
-#: eduiddashboard/models.py:47
+#: eduiddashboard/models.py:44
 msgid "verified"
 msgstr ""
 
-#: eduiddashboard/models.py:49
+#: eduiddashboard/models.py:46
 msgid "active"
 msgstr ""
 
-#: eduiddashboard/models.py:53 eduiddashboard/models.py:85
+#: eduiddashboard/models.py:50 eduiddashboard/models.py:82
 msgid "personal identity numbers"
 msgstr ""
 
-#: eduiddashboard/models.py:70
+#: eduiddashboard/models.py:67
 msgid "given name"
 msgstr ""
 
-#: eduiddashboard/models.py:72 eduiddashboard/templates/home.jinja2:24
+#: eduiddashboard/models.py:69 eduiddashboard/templates/home.jinja2:24
 msgid "surname"
 msgstr ""
 
-#: eduiddashboard/models.py:74
+#: eduiddashboard/models.py:71
 msgid "display name"
 msgstr ""
 
-#: eduiddashboard/models.py:76
+#: eduiddashboard/models.py:73
 msgid "photo"
 msgstr ""
 
-#: eduiddashboard/models.py:77
+#: eduiddashboard/models.py:74
 msgid "A url link to your porsonal avatar"
 msgstr ""
 
-#: eduiddashboard/models.py:81
+#: eduiddashboard/models.py:78
 msgid "preferred language"
 msgstr ""
 
@@ -99,27 +99,27 @@ msgstr ""
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/validators.py:35
+#: eduiddashboard/validators.py:19
 msgid "Old password do not match"
 msgstr ""
 
-#: eduiddashboard/validators.py:44
+#: eduiddashboard/validators.py:28
 msgid "\"${val}\" has to be more than ${len} characters length"
 msgstr ""
 
-#: eduiddashboard/validators.py:58
+#: eduiddashboard/validators.py:42
 msgid "This email is already registered"
 msgstr ""
 
-#: eduiddashboard/validators.py:63
+#: eduiddashboard/validators.py:47
 msgid "This email is not registered already"
 msgstr ""
 
-#: eduiddashboard/validators.py:74
+#: eduiddashboard/validators.py:58
 msgid "The email can't be found"
 msgstr ""
 
-#: eduiddashboard/validators.py:78
+#: eduiddashboard/validators.py:62
 msgid "At least one email is required"
 msgstr ""
 
@@ -219,69 +219,65 @@ msgstr ""
 msgid "eduID dashboard"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:9
-msgid "algo"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:11
+#: eduiddashboard/templates/profile.jinja2:10
 #, python-format
 msgid "Level %(level)d"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:15
+#: eduiddashboard/templates/profile.jinja2:14
 msgid "Your profile"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:17
+#: eduiddashboard/templates/profile.jinja2:16
 #, python-format
 msgid "Editing %(email)s user"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:25
+#: eduiddashboard/templates/profile.jinja2:24
 msgid "Level of assurance"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:28
-#: eduiddashboard/templates/profile.jinja2:30
+#: eduiddashboard/templates/profile.jinja2:27
+#: eduiddashboard/templates/profile.jinja2:29
 msgid "Level 5"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:29
+#: eduiddashboard/templates/profile.jinja2:28
 msgid ""
 "This is the lower level you can reach With this loa you can edit some "
 "attributes of your profile"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:32
-#: eduiddashboard/templates/profile.jinja2:34
+#: eduiddashboard/templates/profile.jinja2:31
+#: eduiddashboard/templates/profile.jinja2:33
 msgid "Level 4"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:33
-#: eduiddashboard/templates/profile.jinja2:37
+#: eduiddashboard/templates/profile.jinja2:32
+#: eduiddashboard/templates/profile.jinja2:36
 msgid "With this loa you can edit some attributes of your profile"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:36
-#: eduiddashboard/templates/profile.jinja2:38
+#: eduiddashboard/templates/profile.jinja2:35
+#: eduiddashboard/templates/profile.jinja2:37
 msgid "Level 3"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:40
-#: eduiddashboard/templates/profile.jinja2:42
+#: eduiddashboard/templates/profile.jinja2:39
+#: eduiddashboard/templates/profile.jinja2:41
 msgid "Level 2"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:41
+#: eduiddashboard/templates/profile.jinja2:40
 msgid "With this loa you can edit all attributes of your profile"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:55
+#: eduiddashboard/templates/profile.jinja2:54
 #, python-format
-msgid "You are in %(loa)d level"
+msgid "You are in %(loa)s level"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:57
+#: eduiddashboard/templates/profile.jinja2:56
 msgid ""
 "\n"
 "               <p>This is the highest level of assurance available for your "
@@ -289,7 +285,7 @@ msgid ""
 "               "
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:61
+#: eduiddashboard/templates/profile.jinja2:60
 msgid ""
 "\n"
 "               <p>If you want to increase this level to get\n"
@@ -297,11 +293,11 @@ msgid ""
 "               "
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:72
+#: eduiddashboard/templates/profile.jinja2:71
 msgid "Pending Actions"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:83
+#: eduiddashboard/templates/profile.jinja2:82
 msgid "Profile filled"
 msgstr ""
 
@@ -353,7 +349,7 @@ msgstr ""
 msgid "Your email {email} was verified"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:137 eduiddashboard/views/password.py:42
+#: eduiddashboard/views/emails.py:137 eduiddashboard/views/password.py:37
 #: eduiddashboard/views/personal.py:85
 msgid ""
 "Your changes was saved, please, wait before your changes are distributed "
@@ -380,6 +376,12 @@ msgstr ""
 
 #: eduiddashboard/views/emails.py:211
 msgid "Your primary email was changed"
+msgstr ""
+
+#: eduiddashboard/views/password.py:42
+msgid ""
+"Credentials has not been added for some reason. Please contact with the "
+"system administrator."
 msgstr ""
 
 #: eduiddashboard/views/personal.py:32
