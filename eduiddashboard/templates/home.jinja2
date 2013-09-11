@@ -7,7 +7,7 @@
   <h2>{{ _("eduID dashboard.") }}</h2>
 
   <div class='loa-big'>
-    <div>{{ _('Level %(level)s')|format(level=request.session.get('loa', 5)) }}</div>
+    <div>{{ _('Level %(level)s', level=request.session.get('loa', 5)) }}</div>
   </div>
 
   {{ form.render()|safe }}
@@ -15,7 +15,7 @@
   {% if showresults %}
     <h3>{{_("Results")}}</h3>
     {% if users %}
-      <p>{{_("%(number)d users was found")|format(number=users.count()) }}</p>
+      <p>{{_("%(number)d users was found", number=users.count()) }}</p>
 
       <table class='table table-striped'>
         <thead>

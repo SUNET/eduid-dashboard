@@ -4,13 +4,18 @@
 
 
 {% block contents %}
-  <h2>{{ _("eduID dashboard.") }}</h2>
+  <h2>{{ _("eduID dashboard") }}</h2>
 
+  <h2>{{ _("algo") }}</h2>
   <div class='loa-big'>
-    <div>{{ _('Level %(level)s')|format(level=request.session.get('loa', 5)) }}</div>
+    <div>{{ _("Level %(level)d", level=request.session.get('loa', 5)) }}</div>
   </div>
 
-  <h3>{{ _("Summary") }}</h3>
+  {% if context.workmode == 'personal' %}
+  <h3>{{ _("Your profile") }}</h3>
+  {% else %}
+  <h3>{{ _("Editing %(email)s user", email=context.user.get('mail')) }}</h3>
+  {% endif %}
 
   <div class='clearfix'></div>
 
@@ -21,30 +26,24 @@
           {% with loa = request.session.get('loa') %}
           <ul class='circles-widget-labels'>
             <li><a href='#' title="{{ _('Level 5') }}" data-toggle='popover'
-                  data-content='{{ _("This is the lower level you can reach,"
-                                     " With this loa you can edit some "
-                                     " attributes of your profile") }}'>
+                  data-content='{{_("This is the lower level you can reach With this loa you can edit some attributes of your profile")}}'>
                 {{ _('Level 5') }}</a></li>
             {% if max_loa <= 4 %}
             <li><a href='#' title="{{ _('Level 4') }}" data-toggle='popover'
-                  data-content='{{ _("With this loa you can edit some"
-                                     " attributes of your profile") }}'>
+                  data-content='{{ _("With this loa you can edit some attributes of your profile")}}'>
                 {{ _('Level 4') }}</a></li>
             {% endif %}{% if max_loa <= 3 %}
             <li><a href='#' title="{{ _('Level 3') }}" data-toggle='popover'
-                  data-content='{{ _("With this loa you can edit some"
-                                     " attributes of your profile") }}'>
+                  data-content='{{ _("With this loa you can edit some attributes of your profile")}}'>
                 {{ _('Level 3') }}</a></li>
             {% endif %}{% if max_loa <= 2 %}
             <li><a href='#' title="{{ _('Level 2') }}" data-toggle='popover'
-                  data-content='{{ _("With this loa you can edit all"
-                                     " attributes of your profile") }}'>
+                  data-content='{{_("With this loa you can edit all attributes of your profile")}}'>
                 {{ _('Level 2') }}</a></li>
             {% endif %}
-
-
           </ul>
-          <div class='circles-widget level-{{ request.session.get('loa', 5) }} max-level-{{ max_loa }}' >
+
+          <div class='circles-widget level-{{ request.session.get('loa', 5) }} max-level-{{ max_loa }}'>
             <div class='img'></div>
             <div class='bar'></div>
           </div>
@@ -53,7 +52,7 @@
           </div>
 
           <div class='level-assurance-description'>
-             {{_("You are in {0} level").format(loa)}}
+             {{_("You are in %(loa)d level", loa=loa)}}
              {% if loa == max_loa %}
                {% trans %}
                <p>This is the highest level of assurance available for your profile</p>

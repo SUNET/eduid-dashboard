@@ -176,6 +176,8 @@ def main(global_config, **settings):
     settings['broker_url'] = broker_url
 
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
+    settings.setdefault('jinja2.newstyle', True)
+
     settings.setdefault('jinja2.extensions', ['jinja2.ext.with_'])
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
