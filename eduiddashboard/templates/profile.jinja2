@@ -91,7 +91,7 @@
   <div class='profile-combo tabbable tabs-left'>
     <ul class='nav nav-tabs'>
       {% for tab in tabs %}
-        <li {% if loop.first %}class='active'{% endif %}>
+        <li>
           {% with status = tab.status(user) %}
             {% if status and 'icon' in status %}
               <a href='#{{tab.id}}'
