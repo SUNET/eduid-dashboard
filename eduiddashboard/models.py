@@ -13,6 +13,11 @@ SEARCHER_ATTTRIBUTE_TYPES = [
     (u'norEduPersonNIN', _('NIN')),
 ]
 
+POSTAL_ADDRESS_TYPES = [
+    (u'home', _('Home')),
+    (u'work', _('Work')),
+]
+
 
 class BooleanMongo(colander.Boolean):
 
@@ -100,14 +105,15 @@ class Passwords(colander.MappingSchema):
 
 
 class PostalAddress(colander.MappingSchema):
-    type = colander.SchemaNode(colander.String())
+    type = colander.SchemaNode(colander.String(),
+                               missing='registered',
+                               validator=colander.OneOf([k for k, v in POSTAL_ADDRESS_TYPES]),
+                               widget=deform.widget.SelectWidget(values=POSTAL_ADDRESS_TYPES))
     address = colander.SchemaNode(colander.String())
     locality = colander.SchemaNode(colander.String())
     postalCode = colander.SchemaNode(colander.String(),
                                      validator=colander.Length(min=5, max=6))
     country = colander.SchemaNode(colander.String())
-    verified = colander.SchemaNode(BooleanMongo(), missing=False,
-                                   title=_('verified'))
 
 
 

@@ -13,7 +13,8 @@
     <thead>
       <tr>
         <th>{{_("preferred")}}</th>
-        <th>{{_("email")}}</th>
+        <th>{{_("type")}}</th>
+        <th>{{_("address")}}</th>
         <th>{{_("verification status")}}</th>
         <th>{{_("remove")}}</th>
       </tr>
@@ -23,11 +24,13 @@
         <td>
           <input type='radio' name='setprimary' value='{{ loop.index0 }}'
            title='{{_("Set this address as your primary postal address")}}'
-           {% if address.type == 'preferred' %}checked{% endif %}/></td>
+           {% if address.preferred|default(False) %}checked{% endif %}/></td>
+
+        <td class='type'>{{ address.type|address_type_text }}</td>
 
         <td class='address'>{{ address.address }}</td>
 
-      {% if address.verified %}
+      {% if address.verified|default(False) %}
         <td><i class="icon-ok"
                title='{{_("Already verified")}}'></i></td>
       {% else %}

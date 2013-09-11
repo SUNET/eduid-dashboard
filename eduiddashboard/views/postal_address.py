@@ -33,7 +33,6 @@ class PostalAddressView(BaseFormView):
         context.update({
             'postal_addresses': self.user.get('postalAddresses', []),
         })
-
         return context
 
     def before(self, form):
@@ -47,6 +46,8 @@ class PostalAddressView(BaseFormView):
 
     def add_success(self, addressform):
         address = self.schema.serialize(addressform)
+        address['verified'] = False
+        address['preferred'] = False
 
         addresses = self.user.get('postalAddresses', [])
         addresses.append(address)

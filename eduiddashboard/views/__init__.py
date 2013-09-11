@@ -2,13 +2,15 @@ import json
 
 from pyramid_deform import FormView
 
+from eduiddashboard.forms import BaseForm
+
 
 def get_dummy_status(user):
     return None
 
 
 class BaseFormView(FormView):
-
+    form_class = BaseForm
     route = ''
 
     buttons = ('save', )
@@ -41,7 +43,6 @@ class BaseFormView(FormView):
         return self.schema.serialize(self.user)
 
     def get_template_context(self):
-
         return {
             'formname': self.classname
         }
