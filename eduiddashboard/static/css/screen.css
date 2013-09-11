@@ -216,3 +216,14 @@ div.form-content button[name=remove],
 div.form-content button[name=setprimary] {
   display: none;
 }
+
+
+/* Postal address view styles
+-------------------------------------------------- */
+
+table.postal-addresses {
+  width: 80%;
+}
+
+/* End of postal address view styles
+-------------------------------------------------- */
