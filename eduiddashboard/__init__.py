@@ -88,6 +88,8 @@ def profile_urls(config):
                      factory=PersonFactory)
     config.add_route('emails', '/emails/',
                      factory=PersonFactory)
+    config.add_route('emails-actions', '/emails-actions/',
+                     factory=PersonFactory)
     config.add_route('passwords', '/passwords/',
                      factory=PasswordsFactory)
     config.add_route('postaladdress', '/postaladdress/',

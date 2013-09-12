@@ -1,5 +1,8 @@
 ## Emails form
 
+import json
+
+from pyramid.response import Response
 from pyramid.view import view_config
 
 from eduiddashboard.emails import send_verification_mail
@@ -70,6 +73,85 @@ def mark_as_verified_email(request, context, verified_email):
                               queue='forms')
 
 
+@view_config(route_name='emails-actions', permission='edit')
+class EmailsActionsView(object):
+    buttons = ('add', 'verify', 'remove', 'setprimary')
+
+    def __init__(self, context, request):
+        self.request = request
+        self.context = context
+        self.user = context.user
+
+    def __call__(self):
+        action = self.request.POST['action']
+        action_method = getattr(self, '%s_action' % action)
+        post_data = self.request.POST
+        index = int(post_data['identifier'])
+        result = action_method(index, post_data)
+        result['action'] = action
+        result['identifier'] = index
+        return Response(json.dumps(result))
+
+    def setprimary_action(self, index, post_data):
+        primary_email = self.user['mailAliases'][index]['email']
+        self.user['mail'] = primary_email
+
+        # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, {
+            '$set': {
+                'mail': primary_email,
+            }
+        }, safe=True)
+
+        self.context.propagate_user_changes(self.user)
+        return {'result': 'ok', 'message': _('Your primary email was changed')}
+
+    def verify_action(self, index, post_data):
+        email = self.user['mailAliases'][index]
+
+        send_verification_mail(self.request, email['email'])
+
+        return {
+            'result': 'ok',
+            'message': _('A new verification email has been sent '
+                         'to your account. Please revise your '
+                         'inbox and click on the provided link'),
+        }
+
+    def remove_action(self, index, post_data):
+        emails = self.user['mailAliases']
+        remove_email = emails[index]['email']
+        emails.remove(emails[index])
+
+        self.user['mailAliases'] = emails
+        primary_email = self.user.get('mail', '')
+
+        if not primary_email or primary_email == remove_email:
+            self.user['mail'] = emails[0]['email']
+
+        # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, {
+            '$pull': {
+                'mailAliases': {
+                    'email': remove_email,
+                }
+            }
+        }, safe=True)
+
+        self.context.propagate_user_changes(self.user)
+
+        return {
+            'result': 'ok',
+            'message': _('One email has been removed, please, wait'
+                         ' before your changes are distributed '
+                         'through all applications'),
+        }
+
+
 @view_config(route_name='emails', permission='edit',
              renderer='templates/emails-form.jinja2')
 class EmailsView(BaseFormView):
@@ -79,11 +161,10 @@ class EmailsView(BaseFormView):
         * POST = Creating or modifing emails,
                     return status and flash message
     """
-
     schema = Email()
     route = 'emails'
 
-    buttons = ('add', 'verify', 'remove', 'setprimary')
+    buttons = ('add', )
 
     bootstrap_form_style = 'form-inline'
 
@@ -136,69 +217,4 @@ class EmailsView(BaseFormView):
         self.request.session.flash(_('A verification email has been sent '
                                      'to your new account. Please revise your '
                                      'inbox and click on the provided link'),
-                                   queue='forms')
-
-    def remove_success(self, emailform):
-        remove_email_struct = self.schema.serialize(emailform)
-        remove_email = remove_email_struct['mail']
-
-        emails = self.user['mailAliases']
-
-        new_emails = []
-        for email in emails:
-            if email['email'] != remove_email:
-                new_emails.append(email)
-
-        self.user['mailAliases'] = new_emails
-        primary_email = self.user.get('mail', '')
-
-        if not primary_email or primary_email == remove_email:
-            self.user['mail'] = new_emails[0]['email']
-
-        # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$pull': {
-                'mailAliases': {
-                    'email': remove_email,
-                }
-            }
-        }, safe=True)
-
-        self.context.propagate_user_changes(self.user)
-
-        self.request.session.flash(_('One email has been removed, please, wait'
-                                     ' before your changes are distributed '
-                                     'through all applications'),
-                                   queue='forms')
-
-    def verify_success(self, emailform):
-        email = self.schema.serialize(emailform)
-
-        send_verification_mail(self.request, email['mail'])
-
-        self.request.session.flash(_('A new verification email has been sent '
-                                     'to your account. Please revise your '
-                                     'inbox and click on the provided link'),
-                                   queue='forms')
-
-    def setprimary_success(self, emailform):
-        email = self.schema.serialize(emailform)
-        primary_email = email.get('mail')
-
-        self.user['mail'] = primary_email
-
-        # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'mail': primary_email,
-            }
-        }, safe=True)
-
-        self.context.propagate_user_changes(self.user)
-
-        self.request.session.flash(_('Your primary email was changed'),
                                    queue='forms')
