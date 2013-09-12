@@ -9,7 +9,11 @@ from pyramid.view import view_config
 
 from deform_bootstrap import Form
 
-from eduiddashboard.utils import verify_auth_token, filter_tab
+from eduiddashboard.utils import (verify_auth_token, filter_tabs,
+                                  calculate_filled_profile,
+                                  get_pending_actions,
+                                  get_max_available_loa)
+
 from eduiddashboard.models import UserSearcher
 
 from eduiddashboard.views import emails, personal, get_dummy_status
@@ -46,30 +50,29 @@ def profile_editor(context, request):
 
     view_context = {}
 
-    # TODO we need to count fields from all schemas
-    # user = request.session.get('user', None)
-    # person = person_schema.serialize(user)
-    #
-    # total_fields = len(person_schema.children)
-    # filled_fields = len(person.keys())
-    # for (key, value) in person.items():
-    #     if not value:
-    #         filled_fields -= 1
-    # view_context['profile_filled'] = (filled_fields / total_fields) * 100
-
-    view_context['profile_filled'] = 78
-
-    view_context['userid'] = context.user.get(context.main_attribute)
-    view_context['user'] = context.user
-
     if context.workmode == 'personal':
-        view_context['tabs'] = filter_tab(AVAILABLE_TABS, ['authorization'])
-
+        tabs = filter_tabs(AVAILABLE_TABS, ['authorization'])
     elif context.workmode == 'helpdesk':
-        view_context['tabs'] = filter_tab(AVAILABLE_TABS, ['passwords',
-                                                           'authorization'])
+        tabs = filter_tabs(AVAILABLE_TABS, ['passwords', 'authorization'])
     else:
-        view_context['tabs'] = AVAILABLE_TABS
+        tabs = AVAILABLE_TABS
+
+    profile_filled = calculate_filled_profile(context.user, tabs)
+    percent_p_filled = int((float(profile_filled[0])
+                            / float(profile_filled[1]))
+                           * 100)
+
+    pending_actions = get_pending_actions(context.user, tabs)
+
+    view_context = {
+        'tabs': tabs,
+        'userid': context.user.get(context.main_attribute),
+        'user': context.user,
+        'profile_filled': percent_p_filled,
+        'pending_actions': pending_actions,
+        'workmode': context.workmode,
+        'max_loa': get_max_available_loa(context.get_groups())
+    }
 
     return view_context
 

@@ -38,7 +38,16 @@ var TabbedForm = function (container) {
             container.find('.nav-tabs a').click(function (e) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
+
+                container.find('ul.nav-tabs a').parent().removeClass('active');
+                container.find('ul.nav-tabs a[href=#' + named_tab + ']').parent().addClass('active');
+
                 get_form(url, $(".tab-pane.active"));
+            });
+
+            $('ul.pending-actions a').click(function (e) {
+                var named_tab = e.target.href.split('#')[1];
+                container.find('.nav-tabs a[href=#' + named_tab + ']').click();
             });
 
             $('body').bind('formready', function () {

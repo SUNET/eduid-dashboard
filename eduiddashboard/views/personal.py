@@ -12,15 +12,38 @@ from eduiddashboard.views import BaseFormView
 def get_status(user):
     """
     Check if there is one norEduPersonNIN active and verified
+        is already verified if the active NIN was verified
 
     return msg and icon
     """
+    schema = Person()
+
+    completed_fields = 0
+    pending_actions = []
+    for field in schema.children:
+        if field.name == 'norEduPersonNIN':
+            nins = user.get(field.name, [])
+            nin_pending = True
+            for nin in nins:
+                if nin.get('verified') and nin.get('active'):
+                    completed_fields += 1
+                    nin_pending = False
+            if not nins:
+                pending_actions = _('You to add your NIN number')
+            elif nin_pending:
+                pending_actions = _('You must validate your NIN number')
+
+        else:
+            if user.get(field.name, None) is not None:
+                completed_fields += 1
+
     icon = get_icon_string('warning-sign')
-    {
-        'icon': None,
+    return {
+        'icon': icon,
         'msg': '',
+        'completed': (completed_fields, len(schema.children)),
+        'pending_actions': pending_actions,
     }
-    return None
 
 
 def get_tab():

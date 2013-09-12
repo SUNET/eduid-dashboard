@@ -130,11 +130,11 @@ body {
 
 
 .circles-widget.level-5 .bar {
-  width: 25px;
+  width: 19px;
 }
 
 .circles-widget.level-4 .bar {
-  width: 100px;
+  width: 90px;
 }
 
 .circles-widget.level-3 .bar {
@@ -145,12 +145,25 @@ body {
   width: 237px;
 }
 
-.circles-widget.level-1 .bar {
-  width: 300px;
+.circles-widget.max-level-5 div.img {
+  width: 10px;
 }
 
-.circles-widget img {
+.circles-widget.max-level-4 div.img {
+  width: 90px;
+}
+
+.circles-widget.max-level-3 div.img {
+  width: 161px;
+}
+
+
+.circles-widget div.img {
+  background: url(/static/img/circle-bar.png) no-repeat 0 0;
+  float: right;
   position: absolute;
+  overflow: hidden;
+  height: 32px;
   z-index: 10;
 }
 

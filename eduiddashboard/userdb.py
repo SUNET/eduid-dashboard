@@ -5,6 +5,9 @@ import eduid_am.tasks  # flake8: noqa
 
 from eduiddashboard.saml2.userdb import IUserDB
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class UserDB(IUserDB):
 
@@ -25,11 +28,16 @@ class UserDB(IUserDB):
 
     def get_user(self, userid):
         try:
-            return self._db.get_user_by_field(
-                self.user_main_attribute, userid)
+            logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
+                    self._db, self.user_main_attribute, userid))
+            user = self._db.get_user_by_field(self.user_main_attribute, userid)
+            logger.debug("Found user {!r}".format(user))
+            return user
         except UserDoesNotExist:
+            logger.error("UserDoesNotExist")
             raise self.UserDoesNotExist()
         except MultipleUsersReturned:
+            logger.error("MultipleUsersReturned")
             raise self.MultipleUsersReturned()
 
     def exists_by_field(self, field, value):

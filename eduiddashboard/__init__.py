@@ -39,6 +39,23 @@ def read_setting_from_env(settings, key, default=None):
         return settings.get(key, default)
 
 
+def jinja2_settings(settings):
+    settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
+    settings.setdefault('jinja2.newstyle', True)
+
+    settings.setdefault('jinja2.extensions', ['jinja2.ext.with_'])
+
+    settings.setdefault('jinja2.directories', 'eduiddashboard:templates')
+    settings.setdefault('jinja2.undefined', 'strict')
+    settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
+    settings.setdefault('jinja2.filters', """
+        route_url = pyramid_jinja2.filters:route_url_filter
+        static_url = pyramid_jinja2.filters:static_url_filter
+        get_flash_message_text = eduiddashboard.filters:get_flash_message_text
+        get_flash_message_type = eduiddashboard.filters:get_flash_message_type
+    """)
+
+
 def read_permissions(raw):
     if raw.strip() == '':
         return REQUIRED_GROUP_PER_WORKMODE
@@ -180,8 +197,7 @@ def main(global_config, **settings):
     settings['celery'] = celery
     settings['broker_url'] = broker_url
 
-    settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
-    settings.setdefault('jinja2.extensions', ['jinja2.ext.with_'])
+
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')
@@ -197,6 +213,8 @@ def main(global_config, **settings):
     settings['groups_callback'] = read_setting_from_env(settings,
                                                         'groups_callback',
                                                         groups_callback)
+
+    jinja2_settings(settings)
 
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
