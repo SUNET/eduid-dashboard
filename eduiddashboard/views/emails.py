@@ -2,14 +2,13 @@
 
 import json
 
-from pyramid.response import Response
 from pyramid.view import view_config
 
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
 from eduiddashboard.utils import get_icon_string
-from eduiddashboard.views import BaseFormView
+from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
 def pending_verifications(user):
@@ -74,23 +73,7 @@ def mark_as_verified_email(request, context, verified_email):
 
 
 @view_config(route_name='emails-actions', permission='edit')
-class EmailsActionsView(object):
-    buttons = ('verify', 'remove', 'setprimary')
-
-    def __init__(self, context, request):
-        self.request = request
-        self.context = context
-        self.user = context.user
-
-    def __call__(self):
-        action = self.request.POST['action']
-        action_method = getattr(self, '%s_action' % action)
-        post_data = self.request.POST
-        index = int(post_data['identifier'])
-        result = action_method(index, post_data)
-        result['action'] = action
-        result['identifier'] = index
-        return Response(json.dumps(result))
+class EmailsActionsView(BaseActionsView):
 
     def setprimary_action(self, index, post_data):
         primary_email = self.user['mailAliases'][index]['email']

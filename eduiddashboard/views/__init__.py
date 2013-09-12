@@ -1,5 +1,6 @@
 import json
 
+from pyramid.response import Response
 from pyramid_deform import FormView
 
 from eduiddashboard.forms import BaseForm
@@ -60,3 +61,21 @@ class BaseFormView(FormView):
         context.update(self.get_template_context())
 
         return context
+
+
+class BaseActionsView(object):
+
+    def __init__(self, context, request):
+        self.request = request
+        self.context = context
+        self.user = context.user
+
+    def __call__(self):
+        action = self.request.POST['action']
+        action_method = getattr(self, '%s_action' % action)
+        post_data = self.request.POST
+        index = int(post_data['identifier'])
+        result = action_method(index, post_data)
+        result['action'] = action
+        result['identifier'] = index
+        return Response(json.dumps(result))

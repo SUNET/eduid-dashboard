@@ -6,7 +6,58 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
-from eduiddashboard.views import BaseFormView
+from eduiddashboard.views import BaseFormView, BaseActionsView
+
+
+@view_config(route_name='postaladdress-actions', permission='edit')
+class PostalAddressActionsView(BaseActionsView):
+
+    def setpreferred_action(self, index, post_data):
+        addresses = self.user.get('postalAddresses', [])
+        preferred_address = addresses[index]
+        for address in addresses:
+            if address == preferred_address:
+                address['preferred'] = True
+            else:
+                address['preferred'] = False
+
+        self.user['postalAddresses'] = addresses
+        # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, {
+            '$set': {
+                'postalAddresses': addresses,
+            }
+        }, safe=True)
+
+        self.context.propagate_user_changes(self.user)
+        return {'result': 'ok', 'message': _('Your preferred address was changed')}
+
+    def remove_action(self, index, post_data):
+        addresses = self.user['postalAddresses']
+        address_to_remove = addresses[index]
+        addresses.remove(address_to_remove)
+
+        self.user['postalAddresses'] = addresses
+
+        # do the save staff
+        self.request.db.profiles.find_and_modify({
+            '_id': self.user['_id'],
+        }, {
+            '$set': {
+                'postalAddresses': addresses,
+            }
+        }, safe=True)
+
+        self.context.propagate_user_changes(self.user)
+
+        return {
+            'result': 'ok',
+            'message': _('One address has been removed, please, wait'
+                         ' before your changes are distributed '
+                         'through all applications'),
+        }
 
 
 @view_config(route_name='postaladdress', permission='edit',
@@ -22,8 +73,7 @@ class PostalAddressView(BaseFormView):
     schema = PostalAddress()
     route = 'postaladdress'
 
-    buttons = ('add', 'verify', 'remove',)
-    bootstrap_form_style = 'form-inline'
+    buttons = ('add', )
 
     def appstruct(self):
         return {}

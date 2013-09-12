@@ -94,6 +94,8 @@ def profile_urls(config):
                      factory=PasswordsFactory)
     config.add_route('postaladdress', '/postaladdress/',
                      factory=PostalAddressFactory)
+    config.add_route('postaladdress-actions', '/postaladdress-actions/',
+                     factory=PostalAddressFactory)
 
 
 def includeme(config):
