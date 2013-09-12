@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-11 14:21+0200\n"
+"POT-Creation-Date: 2013-09-12 13:15+0200\n"
 "PO-Revision-Date: 2013-09-11 09:02+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -183,6 +183,7 @@ msgid "eduID dashboard."
 msgstr ""
 
 #: eduiddashboard/templates/home.jinja2:10
+#: eduiddashboard/templates/profile.jinja2:10
 #, python-format
 msgid "Level %(level)s"
 msgstr ""
@@ -218,11 +219,6 @@ msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:7
 msgid "eduID dashboard"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:10
-#, python-format
-msgid "Level %(level)d"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:14
@@ -279,27 +275,21 @@ msgid "You are in %(loa)s level"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:56
-msgid ""
-"\n"
-"               <p>This is the highest level of assurance available for "
-"your profile</p>\n"
-"               "
+msgid "<p>This is the highest level of assurance available for your profile</p>"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:60
+#: eduiddashboard/templates/profile.jinja2:58
 msgid ""
-"\n"
-"               <p>If you want to increase this level to get\n"
+"<p>If you want to increase this level to get\n"
 "               more permissions you need to resolve the pending "
-"actions</p>\n"
-"               "
+"actions</p>"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:71
+#: eduiddashboard/templates/profile.jinja2:67
 msgid "Pending Actions"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:82
+#: eduiddashboard/templates/profile.jinja2:78
 msgid "Profile filled"
 msgstr ""
 
@@ -390,7 +380,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/views/personal.py:32
-msgid "You to add your NIN number"
+msgid "You have to add your NIN number"
 msgstr ""
 
 #: eduiddashboard/views/personal.py:34
@@ -401,19 +391,28 @@ msgstr ""
 msgid "Personal info"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:25
+#: eduiddashboard/views/portal.py:34
 msgid "Authorization"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:29
+#: eduiddashboard/views/portal.py:38
 msgid "Passwords"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:33
+#: eduiddashboard/views/portal.py:42
 msgid "Phones"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:37
+#: eduiddashboard/views/portal.py:46
 msgid "Postal Address"
 msgstr ""
+
+#~ msgid "Level %(level)d"
+#~ msgstr ""
+
+#~ msgid ""
+#~ msgstr ""
+
+#~ msgid "You to add your NIN number"
+#~ msgstr ""
 

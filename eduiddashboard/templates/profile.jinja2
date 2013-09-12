@@ -7,7 +7,7 @@
   <h2>{{ _("eduID dashboard") }}</h2>
 
   <div class='loa-big'>
-    <div>{{ _("Level %(level)d", level=request.session.get('loa', 5)) }}</div>
+    <div>{{ _("Level %(level)s", level=request.session.get('loa', 5)) }}</div>
   </div>
 
   {% if context.workmode == 'personal' %}
@@ -53,14 +53,10 @@
           <div class='level-assurance-description'>
              {{_("You are in %(loa)s level", loa=loa)}}
              {% if loa == max_loa %}
-               {% trans %}
-               <p>This is the highest level of assurance available for your profile</p>
-               {% endtrans %}
+               {% trans %}<p>This is the highest level of assurance available for your profile</p>{% endtrans %}
              {% else %}
-               {% trans %}
-               <p>If you want to increase this level to get
-               more permissions you need to resolve the pending actions</p>
-               {% endtrans %}
+               {% trans %}<p>If you want to increase this level to get
+               more permissions you need to resolve the pending actions</p>{% endtrans %}
              {% endif %}
           </div>
 

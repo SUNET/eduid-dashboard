@@ -18,27 +18,6 @@ from eduiddashboard.models import UserSearcher
 
 from eduiddashboard.views import emails, personal, get_dummy_status
 
-AVAILABLE_TABS = [
-    personal.get_tab(),
-    emails.get_tab(),
-    {
-        'label': _('Authorization'),
-        'status': get_dummy_status,
-        'id': 'authorization',
-    }, {
-        'label': _('Passwords'),
-        'status': get_dummy_status,
-        'id': 'passwords',
-    }, {
-        'label': _('Phones'),
-        'status': get_dummy_status,
-        'id': 'phones',
-    }, {
-        'label': _('Postal Address'),
-        'status': get_dummy_status,
-        'id': 'postaladdress',
-    },
-]
 
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
@@ -47,6 +26,28 @@ def profile_editor(context, request):
     """
         Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
+
+    AVAILABLE_TABS = [
+        personal.get_tab(),
+        emails.get_tab(),
+        {
+            'label': _('Authorization'),
+            'status': get_dummy_status,
+            'id': 'authorization',
+        }, {
+            'label': _('Passwords'),
+            'status': get_dummy_status,
+            'id': 'passwords',
+        }, {
+            'label': _('Phones'),
+            'status': get_dummy_status,
+            'id': 'phones',
+        }, {
+            'label': _('Postal Address'),
+            'status': get_dummy_status,
+            'id': 'postaladdress',
+        },
+    ]
 
     view_context = {}
 

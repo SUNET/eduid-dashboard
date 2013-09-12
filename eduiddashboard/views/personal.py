@@ -29,7 +29,7 @@ def get_status(user):
                     completed_fields += 1
                     nin_pending = False
             if not nins:
-                pending_actions = _('You to add your NIN number')
+                pending_actions = _('You have to add your NIN number')
             elif nin_pending:
                 pending_actions = _('You must validate your NIN number')
 
