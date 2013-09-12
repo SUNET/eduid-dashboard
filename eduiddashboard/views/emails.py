@@ -75,7 +75,7 @@ def mark_as_verified_email(request, context, verified_email):
 
 @view_config(route_name='emails-actions', permission='edit')
 class EmailsActionsView(object):
-    buttons = ('add', 'verify', 'remove', 'setprimary')
+    buttons = ('verify', 'remove', 'setprimary')
 
     def __init__(self, context, request):
         self.request = request
