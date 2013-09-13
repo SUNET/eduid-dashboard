@@ -75,6 +75,9 @@ class PersonalDataView(BaseFormView):
     def save_success(self, user_modified):
         person = self.schema.serialize(user_modified)
 
+        new_preferred_language = person.get('preferredLanguage')
+        old_preferred_language = self.user.get('preferredLanguage')
+
         # Insert the new user object
         self.user.update(person)
         self.request.db.profiles.save(self.user, safe=True)
@@ -86,3 +89,6 @@ class PersonalDataView(BaseFormView):
                                      'before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
+
+        if new_preferred_language != old_preferred_language:
+            self.full_page_reload()

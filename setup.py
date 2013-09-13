@@ -32,7 +32,7 @@ requires = [
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
     'colander==1.0a5',
-    'deform==0.9.7',
+    'deform==0.9.8',
     'deform_bootstrap==0.2.9',
     'pysaml2==1.0.2',
     'pycountry==1.0',

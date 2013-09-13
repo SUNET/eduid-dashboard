@@ -1,6 +1,8 @@
 import json
 
+from pyramid.httpexceptions import HTTPOk
 from pyramid.response import Response
+
 from pyramid_deform import FormView
 
 from eduiddashboard.forms import BaseForm
@@ -13,6 +15,7 @@ def get_dummy_status(user):
 class BaseFormView(FormView):
     form_class = BaseForm
     route = ''
+    base_route = 'profile-editor'
 
     buttons = ('save', )
     use_ajax = True
@@ -28,7 +31,8 @@ class BaseFormView(FormView):
             'replaceTarget': True,
             'url': context.route_url(self.route),
             'target': "div.{classname}-form-container".format(
-                classname=self.classname)
+                classname=self.classname),
+
         })
 
         self.form_options = {
@@ -62,6 +66,13 @@ class BaseFormView(FormView):
 
         return context
 
+    def full_page_reload(self):
+        location = self.request.route_path(self.base_route)
+        raise HTTPXRelocate(location)
+        raise HTTPOk('', body_template=' ', headers=[
+            ('X-Relocate', location),
+        ])
+
 
 class BaseActionsView(object):
 
@@ -79,3 +90,13 @@ class BaseActionsView(object):
         result['action'] = action
         result['identifier'] = index
         return Response(json.dumps(result))
+
+
+class HTTPXRelocate(HTTPOk):
+
+    empty_body = True
+
+    def __init__(self, new_location, **kwargs):
+        super(HTTPXRelocate, self).__init__('', headers=[
+            ('X-Relocate', new_location),
+        ])
