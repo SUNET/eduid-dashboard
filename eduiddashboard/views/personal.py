@@ -40,7 +40,6 @@ def get_status(user):
     icon = get_icon_string('warning-sign')
     return {
         'icon': icon,
-        'msg': '',
         'completed': (completed_fields, len(schema.children)),
         'pending_actions': pending_actions,
     }

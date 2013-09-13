@@ -91,9 +91,9 @@
           {% with status = tab.status(user) %}
             {% if status and 'icon' in status %}
               <a href='#{{tab.id}}'
-                 title='{{_(status.msg)}}'>
+                 title='{{_(status.pending_actions)}}'>
                     <i class='{{status.icon}}'></i>
-                {{tab.label}}
+                {{_(tab.label)}}
               </a>
             {% else %}
               <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
