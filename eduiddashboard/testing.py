@@ -14,6 +14,7 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
+from eduiddashboard.db import MongoDB
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard.saml2.userdb import IUserDB
 
@@ -74,8 +75,10 @@ class MockedUserDB(IUserDB):
 
     test_users = {
         'johnsmith@example.com': MOCKED_USER_STANDARD,
-        'johnsmith@example.org': MOCKED_USER_STANDARD,
+        'johnsmith@example.org': deepcopy(MOCKED_USER_STANDARD),
     }
+    test_users['johnsmith@example.org']['mail'] = 'johnsmith@example.org'
+    test_users['johnsmith@example.org']['_id'] = ObjectId('901234567890123456789012')
 
     def __init__(self):
         pass
@@ -84,6 +87,10 @@ class MockedUserDB(IUserDB):
         if userid not in self.test_users:
             raise self.UserDoesNotExist
         return deepcopy(self.test_users.get(userid))
+
+    def all_users(self):
+        for userid, user in self.test_users.items():
+            yield deepcopy(user)
 
 
 def dummy_groups_callback(userid, request):
@@ -144,8 +151,17 @@ class LoggedInReguestTests(unittest.TestCase):
         self.config = testing.setUp()
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
-
+        mongo_replicaset = self.settings.get('mongo_replicaset', None)
+        if mongo_replicaset is not None:
+            mongodb = MongoDB(self.settings['mongo_uri'],
+                              replicaSet=mongo_replicaset)
+        else:
+            mongodb = MongoDB(self.settings['mongo_uri'])
+        self.db = mongodb.get_database()
         self.userdb = self.MockedUserDB()
+        self.db.profiles.remove()
+        for user in self.userdb.all_users():
+            self.db.profiles.insert(user)
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()

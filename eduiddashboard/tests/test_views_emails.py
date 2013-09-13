@@ -1,3 +1,4 @@
+import json
 import re
 
 from mock import patch
@@ -85,121 +86,73 @@ class MailsFormTests(LoggedInReguestTests):
     def test_verify_not_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/profile/emails/')
-
-        form = response_form.forms[self.formname]
-
-        form['mail'].value = 'user@example.com'
-        with patch.object(UserDB, 'exists_by_field', clear=True):
-
-            UserDB.exists_by_field.return_value = False
-            response = form.submit('verify')
-
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn('user@example.com', response.body)
-            self.assertIn('alert-error', response.body)
-            self.assertIn('This email is not registered', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
+        with self.assertRaises(IndexError):
+            self.testapp.post(
+                '/profile/emails-actions/',
+                {'identifier': 10, 'action': 'verify'}
+            )
 
     def test_verify_existant_email(self):
         self.set_logged()
 
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': 0, 'action': 'verify'}
+        )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'ok')
         response_form = self.testapp.get('/profile/emails/')
 
-        self.assertIn('johnsmith@example.org', response_form.body)
-
-        form = response_form.forms[self.formname]
-
-        form['mail'].value = 'johnsmith@example.org'
-
-        with patch.object(UserDB, 'exists_by_field', clear=True):
-
-            UserDB.exists_by_field.return_value = True
-
-            response = form.submit('verify')
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn('A new verification email has been sent to your'
-                          ' account', response.body)
-            self.assertIn('johnsmith@example.org', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
-
-    def test_remove_not_existant_email(self):
-        self.set_logged()
-
-        response_form = self.testapp.get('/profile/emails/')
-
-        form = response_form.forms[self.formname]
-
-        form['mail'].value = 'user@example.com'
-
-        response = form.submit('remove')
-
-        self.assertEqual(response.status, '200 OK')
-        self.assertIn('user@example.com', response.body)
-        self.assertIn('alert-error', response.body)
-        self.assertIn("The email can't be found", response.body)
-        self.assertIsNotNone(getattr(response, 'form', None))
+        self.assertIn('A new verification email has been sent to your'
+                      ' account', response_json['message'])
 
     def test_remove_existant_email(self):
         self.set_logged()
+        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
+        emails_number = len(userdb['mailAliases'])
 
-        response_form = self.testapp.get('/profile/emails/')
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': 0, 'action': 'remove'}
+        )
+        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(emails_number - 1, len(userdb_after['mailAliases']))
 
-        self.assertIn('johnsmith@example.org', response_form.body)
+    def test_remove_not_existant_email(self):
+        self.set_logged()
+        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
+        emails_number = len(userdb['mailAliases'])
 
-        form = response_form.forms[self.formname]
-
-        form['mail'].value = 'johnsmith@example.org'
-
-        response = form.submit('remove')
-        self.assertEqual(response.status, '200 OK')
-        self.assertIn('email has been removed,', response.body)
-        self.assertNotIn('johnsmith@example.org', response.body)
-        self.assertIsNotNone(getattr(response, 'form', None))
+        with self.assertRaises(IndexError):
+            self.testapp.post(
+                '/profile/emails-actions/',
+                {'identifier': 10, 'action': 'remove'}
+            )
+        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        self.assertEqual(emails_number, len(userdb_after['mailAliases']))
 
     def test_setprimary_not_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/profile/emails/')
+        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
 
-        form = response_form.forms[self.formname]
-
-        form['mail'].value = 'user@example.com'
-        with patch.object(UserDB, 'exists_by_field', clear=True):
-
-            UserDB.exists_by_field.return_value = False
-            response = form.submit('setprimary')
-
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn('user@example.com', response.body)
-            self.assertIn('alert-error', response.body)
-            self.assertIn('This email is not registered', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
+        with self.assertRaises(IndexError):
+            self.testapp.post(
+                '/profile/emails-actions/',
+                {'identifier': 10, 'action': 'setprimary'}
+            )
 
     def test_setprimary_existant_email(self):
         self.set_logged()
 
-        response_form = self.testapp.get('/profile/emails/')
-
-        self.assertIn('johnsmith@example.org', response_form.body)
-
-        form = response_form.forms[self.formname]
-
-        form['mail'].value = 'johnsmith@example.org'
-
-        with patch.object(UserDB, 'exists_by_field', clear=True):
-
-            UserDB.exists_by_field.return_value = True
-
-            response = form.submit('setprimary')
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn('Your primary email was changed', response.body)
-
-            checked_email_re = re.compile(
-                r"<[^>]*type='radio'[^>]*"
-                "value='johnsmith@example.org'[^>]*"
-                "checked/>"
-            )
-            self.assertRegexpMatches(response.body, checked_email_re)
-
-            self.assertIsNotNone(getattr(response, 'form', None))
+        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': 0, 'action': 'setprimary'}
+        )
+        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
