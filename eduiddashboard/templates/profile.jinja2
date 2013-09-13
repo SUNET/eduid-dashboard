@@ -67,7 +67,7 @@
           <h4>{{_("Pending Actions")}}</h4>
           <ul class='unstyled pending-actions'>
           {% for formid, msg in pending_actions %}
-            <li><a href='#{{ formid }}'>{{ msg }}</a></li>
+            <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
           {% endfor %}
           </ul>
         {% endif %}
@@ -91,12 +91,12 @@
           {% with status = tab.status(user) %}
             {% if status and 'icon' in status %}
               <a href='#{{tab.id}}'
-                 title='{{status.msg}}'>
+                 title='{{_(status.msg)}}'>
                     <i class='{{status.icon}}'></i>
                 {{tab.label}}
               </a>
             {% else %}
-              <a href='#{{tab.id}}'>{{tab.label}}</a>
+              <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
             {% endif %}
           {% endwith %}
         </li>

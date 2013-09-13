@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-12 13:15+0200\n"
+"POT-Creation-Date: 2013-09-13 08:32+0200\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -415,7 +415,7 @@ msgstr ""
 
 #: eduiddashboard/views/personal.py:32
 msgid "You have to add your NIN number"
-msgstr ""
+msgstr "Tienes que añadir tu número de identificación personal"
 
 #: eduiddashboard/views/personal.py:34
 msgid "You must validate your NIN number"
@@ -425,19 +425,19 @@ msgstr ""
 msgid "Personal info"
 msgstr "Información pesonal"
 
-#: eduiddashboard/views/portal.py:34
+#: eduiddashboard/views/portal.py:33
 msgid "Authorization"
 msgstr "Autorizaciones"
 
-#: eduiddashboard/views/portal.py:38
+#: eduiddashboard/views/portal.py:37
 msgid "Passwords"
 msgstr "Contraseñas"
 
-#: eduiddashboard/views/portal.py:42
+#: eduiddashboard/views/portal.py:41
 msgid "Phones"
 msgstr "Teléfonos"
 
-#: eduiddashboard/views/portal.py:46
+#: eduiddashboard/views/portal.py:45
 msgid "Postal Address"
 msgstr "Dirección Postal"
 

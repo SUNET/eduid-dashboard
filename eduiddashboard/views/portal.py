@@ -19,7 +19,6 @@ from eduiddashboard.models import UserSearcher
 from eduiddashboard.views import emails, personal, get_dummy_status
 
 
-
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
              request_method='GET', permission='edit')
 def profile_editor(context, request):

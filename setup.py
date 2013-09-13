@@ -43,6 +43,7 @@ requires = [
 if sys.version_info[0] < 3:
     # Babel does not work with Python 3
     requires.append('Babel==1.3')
+    requires.append('lingua==1.5')
 
 
 test_requires = [
