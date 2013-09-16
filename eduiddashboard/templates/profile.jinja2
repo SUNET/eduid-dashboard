@@ -119,7 +119,7 @@
 
 {% block extrajs %}
 
-<script src="{{'deform:static/scripts/jquery-ui-1.8.18.custom.min.js'|static_url}}"></script>
+<script src="{{'deform:static/scripts/jquery-ui-1.8.11.custom.min.js'|static_url}}"></script>
 <script src="{{'deform:static/scripts/jquery.maskedinput-1.2.2.min.js'|static_url}}"></script>
 <script src="{{'deform:static/scripts/jquery.form-3.09.js'|static_url}}"></script>
 
@@ -129,6 +129,13 @@
 <script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/tablelist-form.js'|static_url}}"></script>
+
+<script id='communication-error-template' language='text/template'>
+  <div class='alert communication-error'>
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>{{_('Warning!')}}</strong> {{_('Something goes wrong. Please, tray it later.')}}
+  </div>
+</script>
 
 <script>
 
@@ -143,6 +150,14 @@ $(document).ready(function () {
     $("a[data-toggle=tooltip]").tooltip();
     $("button[data-toggle=tooltip]").tooltip();
     loa_popovers();
+
+    $('body').on('communication-error', function(){
+      var message = $('#communication-error-template').text();
+      $('.container div.messages').append(message);
+      window.setTimeout(function () {
+        $('.communication-error').fadeOut();
+      }, 5*1000);
+    });
 });
 
 </script>

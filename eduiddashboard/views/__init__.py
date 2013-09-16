@@ -69,9 +69,6 @@ class BaseFormView(FormView):
     def full_page_reload(self):
         location = self.request.route_path(self.base_route)
         raise HTTPXRelocate(location)
-        raise HTTPOk('', body_template=' ', headers=[
-            ('X-Relocate', location),
-        ])
 
 
 class BaseActionsView(object):
