@@ -67,7 +67,7 @@ MOCKED_USER_STANDARD = {
         'address': "Calle Ancha, 49",
         'postalCode': "123456",
         'locality': "Punta Umbria",
-    }]
+    }],
 }
 
 

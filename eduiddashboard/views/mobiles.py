@@ -15,7 +15,7 @@ def pending_verifications(user):
           'msg': _('You need to verify mobile'),
         }]
     """
-    for mobile in user.get('mobiles', []):
+    for mobile in user.get('mobile', []):
         if not mobile['verified']:
             return [{
                 'field': 'mobile',
@@ -57,18 +57,18 @@ def get_tab():
 class MobilesActionsView(BaseActionsView):
 
     def remove_action(self, index, post_data):
-        mobiles = self.user['mobiles']
+        mobiles = self.user.get('mobile', [])
         mobile_to_remove = mobiles[index]
         mobiles.remove(mobile_to_remove)
 
-        self.user['mobiles'] = mobiles
+        self.user['mobile'] = mobiles
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
         }, {
             '$set': {
-                'mobiles': mobiles,
+                'mobile': mobiles,
             }
         }, safe=True)
 
@@ -103,7 +103,7 @@ class MobilesView(BaseFormView):
     def get_template_context(self):
         context = super(MobilesView, self).get_template_context()
         context.update({
-            'mobiles': self.user.get('mobiles', []),
+            'mobiles': self.user.get('mobile', []),
         })
         return context
 
@@ -111,18 +111,18 @@ class MobilesView(BaseFormView):
         mobile = self.schema.serialize(mobileform)
         mobile['verified'] = False
 
-        mobiles = self.user.get('mobiles', [])
+        mobiles = self.user.get('mobile', [])
         mobiles.append(mobile)
 
         # update the session data
-        self.user['mobiles'] = mobiles
+        self.user['mobile'] = mobiles
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
         }, {
             '$push': {
-                'mobiles': mobiles,
+                'mobile': mobiles,
             }
         }, safe=True)
 
