@@ -117,6 +117,10 @@ class PostalAddress(colander.MappingSchema):
     country = colander.SchemaNode(colander.String(), title=_('country'))
 
 
+class Mobile(colander.MappingSchema):
+    mobile = colander.SchemaNode(colander.String(),
+                                 title=_('mobile'))
+
 
 class UserSearcher(colander.MappingSchema):
 

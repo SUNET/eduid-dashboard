@@ -31,9 +31,9 @@ AVAILABLE_TABS = [
         'status': get_dummy_status,
         'id': 'passwords',
     }, {
-        'label': _('Phones'),
+        'label': _('Mobile phones'),
         'status': get_dummy_status,
-        'id': 'phones',
+        'id': 'mobiles',
     },
     postal_address.get_tab(),
 ]

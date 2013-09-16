@@ -1,0 +1,57 @@
+{% extends "templates/baseform.jinja2" %}
+
+{% block form_generic_description %}
+   {% trans %}
+   <p>These list contain all your mobile phones registered in the
+   platform.</p>
+   {% endtrans %}
+{% endblock %}
+
+{% block extra_content %}
+  {{ actions_url('mobiles-actions'|route_url) }}
+
+  <table class='table table-striped table-thin mobiles'>
+    <thead>
+      <tr>
+        <th>{{_("phone")}}</th>
+        <th>{{_("verification status")}}</th>
+        <th>{{_("remove")}}</th>
+      </tr>
+    </thead>
+
+    {% for mobile in mobiles %}
+    <tr class='mobile-row' data-identifier="{{ loop.index0 }}">
+        <td class='address'>{{ mobile.mobile }}</td>
+
+      {% if mobile.verified|default(False) %}
+        <td><i class="icon-ok"
+               title='{{_("Already verified")}}'></i></td>
+      {% else %}
+        <td>
+          <label>
+            <i class='icon-refresh' title='{{_("Resend verification")}}'></i>
+            <input class='hide' type='radio' name='verify' value='{{ loop.index0 }}'>
+          </label>
+        </td>
+      {% endif %}
+        <td>
+          <label>
+            <i class='icon-remove' title='{{_("Remove this postal address")}}'></i>
+            <input class='hide' type='radio' name='remove' value='{{ loop.index0 }}'>
+          </label>
+        </td>
+    </tr>
+    {% endfor %}
+  </table>
+  <button type='button'
+          class='btn add-new' 
+          data-toggle='button'>
+        <i class='icon-plus'></i>
+        {{_('Add a new mobile phone')}}</button>
+{% endblock %}
+
+{% block form_generic_form %}
+  <div class='form-content hide'>
+  {{ form|safe }}
+  </div>
+{% endblock %}

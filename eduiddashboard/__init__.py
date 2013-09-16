@@ -12,7 +12,8 @@ from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
-                                        PasswordsFactory, PostalAddressFactory)
+                                        PasswordsFactory, PostalAddressFactory,
+                                        MobilesFactory)
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -115,6 +116,10 @@ def profile_urls(config):
                      factory=PostalAddressFactory)
     config.add_route('postaladdress-actions', '/postaladdress-actions/',
                      factory=PostalAddressFactory)
+    config.add_route('mobiles', '/mobiles/',
+                     factory=MobilesFactory)
+    config.add_route('mobiles-actions', '/mobiles-actions/',
+                     factory=MobilesFactory)
 
 
 def includeme(config):
