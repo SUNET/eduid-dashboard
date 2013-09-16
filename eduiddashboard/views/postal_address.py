@@ -10,23 +10,6 @@ from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
-def pending_verifications(user):
-    """ Return a list of dicts like this:
-        [{'field': 'address',
-          'form': 'address',
-          'msg': _('You need to verify emails'),
-        }]
-    """
-    for address in user.get('postalAddresses', []):
-        if not address['verified']:
-            return [{
-                'field': 'address',
-                'form': 'address',
-                'msg': _('You have to verificate some address'),
-            }]
-    return []
-
-
 def get_status(user):
     """
     Check if all postal addresses are verified already
@@ -34,12 +17,19 @@ def get_status(user):
     return msg and icon
     """
 
-    if pending_verifications(user):
-        msg = _('You have to verificate some postal addresses')
+    pending_actions = None
+    postalAddresses = user.get('postalAddresses', [])
+    if not postalAddresses:
+        pending_actions = _('You have to add a postal address')
+    else:
+        for address in postalAddresses:
+            if not address['verified']:
+                pending_actions = _('You have to verificate some postal address')
+
+    if pending_actions:
         return {
             'icon': get_icon_string('warning-sign'),
-            'msg': msg,
-            'pending_actions': msg,
+            'pending_actions': pending_actions,
             'completed': (0, 1),
         }
     return {
@@ -137,7 +127,7 @@ class PostalAddressView(BaseFormView):
             allowed_countries = [l.split('=') for l in allowed_countries_in_settings.splitlines() if l]
         else:
             allowed_countries = [(c.alpha2, c.name) for c in pycountry.countries]
-            
+
         form['country'].widget = widget.SelectWidget(values=[(code.strip(), country.strip()) for code, country in allowed_countries])
 
     def add_success(self, addressform):

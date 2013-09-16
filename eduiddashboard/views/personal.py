@@ -19,7 +19,7 @@ def get_status(user):
     schema = Person()
 
     completed_fields = 0
-    pending_actions = []
+    pending_actions = None
     for field in schema.children:
         if field.name == 'norEduPersonNIN':
             nins = user.get(field.name, [])
@@ -37,12 +37,16 @@ def get_status(user):
             if user.get(field.name, None) is not None:
                 completed_fields += 1
 
-    icon = get_icon_string('warning-sign')
-    return {
-        'icon': icon,
-        'completed': (completed_fields, len(schema.children)),
-        'pending_actions': pending_actions,
+    status = {
+        'completed': (completed_fields, len(schema.children))
     }
+    if pending_actions:
+        status.update({
+            'icon': get_icon_string('warning-sign'),
+            'pending_actions': pending_actions,
+
+        })
+    return status
 
 
 def get_tab():

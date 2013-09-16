@@ -1,7 +1,5 @@
 ## Emails form
 
-import json
-
 from pyramid.view import view_config
 
 from eduiddashboard.emails import send_verification_mail
@@ -11,23 +9,6 @@ from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
-def pending_verifications(user):
-    """ Return a list of dicts like this:
-        [{'field': 'email',
-          'form': 'emails',
-          'msg': _('You need to verify emails'),
-        }]
-    """
-    for email in user.get('mailAliases', []):
-        if not email['verified']:
-            return [{
-                'field': 'email',
-                'form': 'emails',
-                'msg': _('You have to verificate some emails'),
-            }]
-    return []
-
-
 def get_status(user):
     """
     Check if all emails are verified already
@@ -35,7 +16,13 @@ def get_status(user):
     return msg and icon
     """
 
-    if pending_verifications(user):
+    pending_actions = None
+    for email in user.get('mailAliases', []):
+        if not email['verified']:
+            pending_actions = _('You have to verificate some emails')
+            break
+
+    if pending_actions:
         msg = _('You have to verificate some emails')
         return {
             'icon': get_icon_string('warning-sign'),
