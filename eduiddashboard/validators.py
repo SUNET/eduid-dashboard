@@ -26,8 +26,21 @@ class PasswordValidator(object):
     def __call__(self, node, value):
         if len(value) < PASSWORD_MIN_LENGTH:
             err = _('"${val}" has to be more than ${len} characters length',
-                    mapping={'val':value, 'len':PASSWORD_MIN_LENGTH})
+                    mapping={'val': value, 'len': PASSWORD_MIN_LENGTH})
             raise colander.Invalid(node, err)
+
+
+class PermissionsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        available_permissions = request.registry.settings.get('available_permissions')
+        for item in value:
+            if item not in available_permissions:
+                raise colander.Invalid(
+                    node,
+                    _('The permission selected is not available')
+                )
 
 
 class EmailUniqueValidator(object):

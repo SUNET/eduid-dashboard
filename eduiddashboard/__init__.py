@@ -13,7 +13,7 @@ from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PasswordsFactory, PostalAddressFactory,
-                                        MobilesFactory)
+                                        MobilesFactory, PermissionsFactory)
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -26,6 +26,11 @@ REQUIRED_GROUP_PER_WORKMODE = {
     'helpdesk': 'urn:mace:eduid.se:role:ra',
     'admin': 'urn:mace:eduid.se:role:admin',
 }
+
+AVAILABLE_PERMISSIONS = (
+    'urn:mace:eduid.se:role:ra',
+    'urn:mace:eduid.se:role:admin',
+)
 
 
 def groups_callback(userid, request):
@@ -120,6 +125,8 @@ def profile_urls(config):
                      factory=MobilesFactory)
     config.add_route('mobiles-actions', '/mobiles-actions/',
                      factory=MobilesFactory)
+    config.add_route('permissions', '/permissions/',
+                     factory=PersonFactory)
 
 
 def includeme(config):
@@ -215,7 +222,22 @@ def main(global_config, **settings):
 
     raw_permissions = read_setting_from_env(settings, 'permissions_mapping',
                                             '')
-    settings['permissions_mapping'] = read_permissions(raw_permissions)
+    if raw_permissions:
+        settings['permissions_mapping'] = read_permissions(raw_permissions)
+    else:
+        settings['permissions_mapping'] = REQUIRED_GROUP_PER_WORKMODE
+
+    raw_available_permissions = read_setting_from_env(settings,
+                                                      'available_permissions',
+                                                      '')
+
+    if raw_available_permissions:
+        available_permissions = tuple(raw_available_permissions.split('\n'))
+    else:
+        available_permissions = AVAILABLE_PERMISSIONS
+
+    settings['available_permissions'] = available_permissions
+
     settings['groups_callback'] = read_setting_from_env(settings,
                                                         'groups_callback',
                                                         groups_callback)

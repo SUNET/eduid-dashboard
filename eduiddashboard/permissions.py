@@ -1,4 +1,4 @@
-from pyramid.security import (Allow, Authenticated, Everyone,
+from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 
 from eduid_am.tasks import update_attributes
@@ -70,7 +70,7 @@ class BaseFactory(object):
     def get_groups(self, userid=None, request=None):
         user = self.request.session.get('user')
         permissions_mapping = self.request.registry.settings.get(
-            'permission_mapping', {})
+            'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         if required_urn is '':
             return ['']
@@ -92,3 +92,22 @@ class PostalAddressFactory(BaseFactory):
 
 class MobilesFactory(BaseFactory):
     pass
+
+
+class PermissionsFactory(BaseFactory):
+    __acl__ = [
+        (Allow, 'admin', 'edit'),
+        (Allow, 'helpdesk', 'edit'),
+    ]
+
+    acls = {
+        'personal': [
+            (Deny, Authenticated, 'edit'),
+        ],
+        'helpdesk': [
+            (Allow, 'helpdesk', 'edit'),
+        ],
+        'admin': [
+            (Allow, 'admin', 'edit'),
+        ],
+    }
