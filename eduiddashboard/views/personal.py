@@ -29,7 +29,7 @@ def get_status(user):
                     completed_fields += 1
                     nin_pending = False
             if not nins:
-                pending_actions = _('You to add your NIN number')
+                pending_actions = _('You have to add your NIN number')
             elif nin_pending:
                 pending_actions = _('You must validate your NIN number')
 
@@ -40,7 +40,6 @@ def get_status(user):
     icon = get_icon_string('warning-sign')
     return {
         'icon': icon,
-        'msg': '',
         'completed': (completed_fields, len(schema.children)),
         'pending_actions': pending_actions,
     }
@@ -75,6 +74,9 @@ class PersonalDataView(BaseFormView):
     def save_success(self, user_modified):
         person = self.schema.serialize(user_modified)
 
+        new_preferred_language = person.get('preferredLanguage')
+        old_preferred_language = self.user.get('preferredLanguage')
+
         # Insert the new user object
         self.user.update(person)
         self.request.db.profiles.save(self.user, safe=True)
@@ -86,3 +88,6 @@ class PersonalDataView(BaseFormView):
                                      'before your changes are distributed '
                                      'through all applications'),
                                    queue='forms')
+
+        if new_preferred_language != old_preferred_language:
+            self.full_page_reload()

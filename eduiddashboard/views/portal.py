@@ -18,6 +18,7 @@ from eduiddashboard.models import UserSearcher
 
 from eduiddashboard.views import emails, personal, postal_address, get_dummy_status
 
+
 AVAILABLE_TABS = [
     personal.get_tab(),
     emails.get_tab(),
