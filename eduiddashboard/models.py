@@ -119,6 +119,10 @@ class PostalAddress(colander.MappingSchema):
 
 class Mobile(colander.MappingSchema):
     mobile = colander.SchemaNode(colander.String(),
+                                 validator=colander.Regex(
+                                    r'^\+[\d ]+$',
+                                    msg=_('Invalid telephone number. It must be written using international notation, starting with "+".'),
+                                 ),
                                  title=_('mobile'))
 
 
