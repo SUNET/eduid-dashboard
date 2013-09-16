@@ -8,23 +8,6 @@ from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
-def pending_verifications(user):
-    """ Return a list of dicts like this:
-        [{'field': 'mobile',
-          'form': 'mobile',
-          'msg': _('You need to verify mobile'),
-        }]
-    """
-    for mobile in user.get('mobile', []):
-        if not mobile['verified']:
-            return [{
-                'field': 'mobile',
-                'form': 'mobile',
-                'msg': _('You have to verificate some mobile'),
-            }]
-    return []
-
-
 def get_status(user):
     """
     Check if all mobiles are verified already
@@ -32,12 +15,19 @@ def get_status(user):
     return msg and icon
     """
 
-    if pending_verifications(user):
-        msg = _('You have to verificate some mobiles')
+    mobiles = user.get('mobile', [])
+
+    if not mobiles:
+        pending_actions = _('You have to add a mobile phone')
+    else:
+        for mobile in mobiles:
+            if not mobile['verified']:
+                pending_actions = _('You have to verificate some mobile phone')
+
+    if pending_actions:
         return {
             'icon': get_icon_string('warning-sign'),
-            'msg': msg,
-            'pending_actions': msg,
+            'pending_actions': pending_actions,
             'completed': (0, 1),
         }
     return {
