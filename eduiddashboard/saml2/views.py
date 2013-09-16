@@ -5,16 +5,15 @@ from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest,
-                                    HTTPUnauthorized, HTTPForbidden)
+                                    HTTPUnauthorized)
 from pyramid.response import Response
-from pyramid.renderers import render_to_response
+from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login
 from eduiddashboard.saml2.cache import IdentityCache, OutstandingQueriesCache
-
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +31,10 @@ def _get_subject_id(session):
 def forbidden_view(request):
     # do not allow a user to login if they are already logged in
     if authenticated_userid(request):
-        login_redirect_url = request.registry.settings.get(
-            'saml2.login_redirect_url', '/')
-        return HTTPFound(login_redirect_url)
+        # Return a plain forbbiden page
+        response = Response(render('templates/forbidden.jinja2', {}))
+        response.status_int = 401
+        return response
 
     loginurl = request.route_url('saml2-login',
                                  _query=(('next', request.path),))

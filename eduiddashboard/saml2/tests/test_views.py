@@ -21,9 +21,8 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         self.set_user_cookie('user')
 
-        res = self.testapp.get('/saml2/forbidden/')
-        self.assertEqual(res.status, '302 Found')
-        self.assertEqual('http://localhost/', res.location)
+        self.testapp.get('/saml2/forbidden/', expect_errors=True,
+                         status='401 Unauthorized')
 
     def test_login_nologgedin(self):
         res = self.testapp.get('/saml2/login/')
