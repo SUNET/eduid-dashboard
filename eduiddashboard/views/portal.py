@@ -16,7 +16,7 @@ from eduiddashboard.utils import (verify_auth_token, filter_tabs,
 
 from eduiddashboard.models import UserSearcher
 
-from eduiddashboard.views import emails, personal, postal_address, get_dummy_status
+from eduiddashboard.views import emails, personal, postal_address, mobiles, get_dummy_status
 
 
 AVAILABLE_TABS = [
@@ -30,11 +30,8 @@ AVAILABLE_TABS = [
         'label': _('Passwords'),
         'status': get_dummy_status,
         'id': 'passwords',
-    }, {
-        'label': _('Mobile phones'),
-        'status': get_dummy_status,
-        'id': 'mobiles',
     },
+    mobiles.get_tab(),
     postal_address.get_tab(),
 ]
 
