@@ -17,11 +17,11 @@ var TabbedForm = function (container) {
             $.get(url + '/', {}, function (data) {
                 target.html(data);
                 if (deform.callbacks !== undefined &&
-                         deform.callbacks.length === 0) {
-                      $('form script').each(function (i, e) {
-                          var f = new Function(e.innerHTML);
-                          f();
-                      });
+                        deform.callbacks.length === 0) {
+                    $('form script').each(function (i, e) {
+                        var f = new Function(e.innerHTML);
+                        f();
+                    });
                 }
                 deform.processCallbacks();
 
@@ -29,7 +29,9 @@ var TabbedForm = function (container) {
                 container.find("button[data-toggle=tooltip]").tooltip();
                 container.find("label[data-toggle=tooltip]").tooltip();
 
-            }, 'html');
+            }, 'html').fail(function () {
+                $('body').trigger('communication-error');
+            });
         },
 
         initialize = function () {
@@ -40,7 +42,8 @@ var TabbedForm = function (container) {
                     url = named_tab;
 
                 container.find('ul.nav-tabs a').parent().removeClass('active');
-                container.find('ul.nav-tabs a[href=#' + named_tab + ']').parent().addClass('active');
+                container.find('ul.nav-tabs a[href=#' + named_tab + ']').
+                    parent().addClass('active');
 
                 get_form(url, $(".tab-pane.active"));
             });
@@ -51,9 +54,9 @@ var TabbedForm = function (container) {
             });
 
             $('body').bind('formready', function () {
-                tabbedform.changetabs_calls.forEach(function (func) {
-                    if (func !== undefined){
-                        func(container)
+                window.tabbedform.changetabs_calls.forEach(function (func) {
+                    if (func !== undefined) {
+                        func(container);
                     }
                 });
             });
