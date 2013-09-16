@@ -106,14 +106,15 @@ class Passwords(colander.MappingSchema):
 
 class PostalAddress(colander.MappingSchema):
     type = colander.SchemaNode(colander.String(),
+                               title=_('type'),
                                missing='registered',
                                validator=colander.OneOf([k for k, v in POSTAL_ADDRESS_TYPES]),
                                widget=deform.widget.SelectWidget(values=POSTAL_ADDRESS_TYPES))
-    address = colander.SchemaNode(colander.String())
-    locality = colander.SchemaNode(colander.String())
-    postalCode = colander.SchemaNode(colander.String(),
+    address = colander.SchemaNode(colander.String(), title=_('address'))
+    locality = colander.SchemaNode(colander.String(), title=_('locality'))
+    postalCode = colander.SchemaNode(colander.String(), title=_('postal code'),
                                      validator=colander.Length(min=5, max=6))
-    country = colander.SchemaNode(colander.String())
+    country = colander.SchemaNode(colander.String(), title=_('country'))
 
 
 

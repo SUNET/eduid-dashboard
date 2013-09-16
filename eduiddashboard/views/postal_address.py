@@ -6,7 +6,53 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
+from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
+
+
+def pending_verifications(user):
+    """ Return a list of dicts like this:
+        [{'field': 'address',
+          'form': 'address',
+          'msg': _('You need to verify emails'),
+        }]
+    """
+    for address in user.get('postalAddresses', []):
+        if not address['verified']:
+            return [{
+                'field': 'address',
+                'form': 'address',
+                'msg': _('You have to verificate some address'),
+            }]
+    return []
+
+
+def get_status(user):
+    """
+    Check if all postal addresses are verified already
+
+    return msg and icon
+    """
+
+    if pending_verifications(user):
+        msg = _('You have to verificate some postal addresses')
+        return {
+            'icon': get_icon_string('warning-sign'),
+            'msg': msg,
+            'pending_actions': msg,
+            'completed': (0, 1),
+        }
+    return {
+        'completed': (1, 1),
+    }
+
+
+def get_tab():
+    return {
+        'status': get_status,
+        'label': _('Postal Address'),
+        'id': 'postaladdress',
+    }
 
 
 @view_config(route_name='postaladdress-actions', permission='edit')
