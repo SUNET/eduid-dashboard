@@ -109,6 +109,9 @@
              };
              deform.processCallbacks();
              deform.focusFirstInput();
+           },
+           error: function() {
+              $('body').trigger('communication-error');
            }
          };
          var extra_options = ${field.ajax_options} || {};
