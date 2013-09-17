@@ -1,0 +1,23 @@
+{% extends "templates/baseform.jinja2" %}
+
+{% if confirmation_required %}
+  {% block extraformclass %}permissions-confirmation-required{% endblock %}
+{% endif %}
+
+{% block form_generic_description %}
+   {% trans %}Available permissions for this user{% endtrans %}
+{% endblock %}
+
+
+{% block extrajs %}
+<script>
+  if ($('#{{ formname }}-form').length > 0) {
+      window.beforeSubmit = function (arr, $form, options) {
+          var q=confirm("{{_('Your are editing your own permissions, Are you sure about your changes?')}}");
+          if (!q) {
+            return false
+          }
+      }
+  }
+</script>
+{% endblock %}

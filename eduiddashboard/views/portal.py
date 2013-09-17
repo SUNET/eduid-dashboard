@@ -16,17 +16,15 @@ from eduiddashboard.utils import (verify_auth_token, filter_tabs,
 
 from eduiddashboard.models import UserSearcher
 
-from eduiddashboard.views import emails, personal, postal_address, mobiles, get_dummy_status
+from eduiddashboard.views import (emails, personal, postal_address, mobiles,
+                                  permissions, get_dummy_status)
 
 
 AVAILABLE_TABS = [
     personal.get_tab(),
     emails.get_tab(),
+    permissions.get_tab(),
     {
-        'label': _('Authorization'),
-        'status': get_dummy_status,
-        'id': 'authorization',
-    }, {
         'label': _('Passwords'),
         'status': get_dummy_status,
         'id': 'passwords',
@@ -46,7 +44,7 @@ def profile_editor(context, request):
     view_context = {}
 
     if context.workmode == 'personal':
-        tabs = filter_tabs(AVAILABLE_TABS, ['authorization'])
+        tabs = filter_tabs(AVAILABLE_TABS, ['permissions'])
     elif context.workmode == 'helpdesk':
         tabs = filter_tabs(AVAILABLE_TABS, ['passwords', 'authorization'])
     else:
@@ -134,7 +132,10 @@ def home(context, request):
 @view_config(route_name='session-reload',
              request_method='GET', permission='edit')
 def session_reload(context, request):
-    context.update_user()
+    main_attribute = request.registry.settings.get('saml2.user_main_attribute')
+    userid = request.session.get('user', {}).get(main_attribute)
+    user = request.userdb.get_user(userid)
+    request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
 
 

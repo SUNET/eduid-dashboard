@@ -4,7 +4,12 @@ import colander
 import deform
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.validators import EmailUniqueValidator, PasswordValidator, OldPasswordValidator
+from eduiddashboard.validators import (EmailUniqueValidator,
+                                       PasswordValidator,
+                                       OldPasswordValidator,
+                                       PermissionsValidator)
+
+from eduiddashboard.widgets import permissions_widget
 
 
 SEARCHER_ATTTRIBUTE_TYPES = [
@@ -131,6 +136,15 @@ class Mobile(colander.MappingSchema):
                                     msg=_('Invalid telephone number. It must be written using international notation, starting with "+".'),
                                  ),
                                  title=_('mobile'))
+
+
+class Permissions(colander.Schema):
+    eduPersonEntitlement = colander.SchemaNode(colander.List(),
+                                               title=_('permissions'),
+                                               validator=PermissionsValidator(),
+                                               missing=[],
+                                               default=[],
+                                               widget=permissions_widget)
 
 
 class UserSearcher(colander.MappingSchema):

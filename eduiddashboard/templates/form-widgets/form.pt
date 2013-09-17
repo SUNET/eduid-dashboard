@@ -96,25 +96,31 @@
   </div>
 
   <script type="text/javascript" tal:condition="field.use_ajax">
+
     window.deform && deform.addCallback(
        '${field.formid}',
        function(oid) {
+         if (window.beforeSubmit === undefined) {
+            window.beforeSubmit = function () {};
+         }
+
          var options = {
-           target: '#' + oid,
-           replaceTarget: true,
-           success: function(response_text, status_text, xhr) {
-             var loc = xhr.getResponseHeader('X-Relocate');
-             if (loc) {
-                 document.location = loc;
-             };
-             deform.processCallbacks();
-             deform.focusFirstInput();
-           },
-           error: function() {
-              $('body').trigger('communication-error');
-           }
-         };
-         var extra_options = ${field.ajax_options} || {};
+                target: '#' + oid,
+                replaceTarget: true,
+                success: function(response_text, status_text, xhr) {
+                  var loc = xhr.getResponseHeader('X-Relocate');
+                  if (loc) {
+                      document.location = loc;
+                  };
+                  deform.processCallbacks();
+                  deform.focusFirstInput();
+                },
+                error: function() {
+                   $('body').trigger('communication-error');
+                },
+                beforeSubmit: window.beforeSubmit
+             },
+             extra_options = ${field.ajax_options} || {};
          $('#' + oid).ajaxForm($.extend(options, extra_options));
        }
     );

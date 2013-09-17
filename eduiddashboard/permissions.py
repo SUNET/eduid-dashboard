@@ -1,4 +1,4 @@
-from pyramid.security import (Allow, Authenticated, Everyone,
+from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 
 from eduid_am.tasks import update_attributes
@@ -43,12 +43,14 @@ class BaseFactory(object):
         self.__acl__ = self.acls[self.workmode]
 
     def get_user(self):
+
         if self.workmode == 'personal':
-            user = self.request.session.get('user', None)
+            return self.request.session.get('user', None)
         else:
             userid = self.request.matchdict.get('userid', None)
-            user = self.request.userdb.get_user(userid)
-        return user
+            if userid:
+                return self.request.userdb.get_user(userid)
+        return None
 
     def route_url(self, route, **kw):
         if self.workmode == 'personal':
@@ -61,21 +63,32 @@ class BaseFactory(object):
         userid = self.user[self.main_attribute]
         self.user = self.request.userdb.get_user(userid)
 
+    def update_session_user(self):
+        userid = self.request.session.get('user', {}).get(self.main_attribute,
+                                                          None)
+        self.user = self.request.userdb.get_user(userid)
+        self.request.session['user'] = self.user
+
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':
             self.request.session['user'] = newuser
+        else:
+            user_session = self.request.session['user'][self.main_attribute]
+            if user_session == newuser[self.main_attribute]:
+                self.request.session['user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
     def get_groups(self, userid=None, request=None):
         user = self.request.session.get('user')
         permissions_mapping = self.request.registry.settings.get(
-            'permission_mapping', {})
+            'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         if required_urn is '':
             return ['']
         elif required_urn in user.get('eduPersonEntitlement', []):
             return [self.workmode]
+        return []
 
 
 class PersonFactory(BaseFactory):
@@ -96,3 +109,19 @@ class MobilesFactory(BaseFactory):
 
 class ResetPasswordFactory(RootFactory):
     pass
+
+
+class PermissionsFactory(BaseFactory):
+    acls = {
+        'personal': [
+            (Allow, 'admin', 'edit'),
+            (Deny, Authenticated, 'edit'),
+        ],
+        'helpdesk': [
+            (Allow, 'helpdesk', 'edit'),
+            (Allow, 'admin', 'edit'),
+        ],
+        'admin': [
+            (Allow, 'admin', 'edit'),
+        ],
+    }

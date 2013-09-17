@@ -1,5 +1,19 @@
 from colander import null
+import colander
 import deform
+
+
+@colander.deferred
+def permissions_widget(node, kw):
+    request = kw.get('request')
+    settings = request.registry.settings
+
+    available_permissions = settings.get('available_permissions', [])
+    if (len(available_permissions) > 1 and
+            not isinstance(available_permissions[0], tuple)):
+        available_permissions = tuple([(p, p) for p in available_permissions])
+
+    return deform.widget.CheckboxChoiceWidget(values=available_permissions)
 
 
 class MongoCheckboxWidget(deform.widget.CheckboxWidget):
