@@ -19,8 +19,8 @@ SEARCHER_ATTTRIBUTE_TYPES = [
 ]
 
 POSTAL_ADDRESS_TYPES = [
-    (u'home', _('Home')),
-    (u'work', _('Work')),
+    (u'home', _('Home address')),
+    (u'work', _('Work address')),
 ]
 
 

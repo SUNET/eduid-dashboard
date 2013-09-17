@@ -10,6 +10,8 @@
 {% block extra_content %}
   {{ actions_url('mobiles-actions'|route_url) }}
 
+  {% if mobiles %}
+
   <table class='table table-striped table-thin mobiles'>
     <thead>
       <tr>
@@ -43,6 +45,11 @@
     </tr>
     {% endfor %}
   </table>
+
+  {% else %}
+    <p>{% trans %}There is no content created. You can add first element by clicking the button below{% endtrans %}</p>
+  {% endif %}
+
   <button type='button'
           class='btn add-new' 
           data-toggle='button'>

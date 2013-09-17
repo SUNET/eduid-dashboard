@@ -56,13 +56,13 @@ MOCKED_USER_STANDARD = {
         'verified': True,
     }],
     'postalAddress': [{
-        'type': 'preferred',
+        'type': 'home',
         'country': 'SE',
         'address': "Long street, 48",
         'postalCode': "123456",
         'locality': "Stockholm",
     }, {
-        'type': 'registered',
+        'type': 'work',
         'country': 'ES',
         'address': "Calle Ancha, 49",
         'postalCode': "123456",
@@ -145,6 +145,8 @@ class LoggedInReguestTests(unittest.TestCase):
                 static_url = pyramid_jinja2.filters:static_url_filter
                 get_flash_message_text = eduiddashboard.filters:get_flash_message_text
                 get_flash_message_type = eduiddashboard.filters:get_flash_message_type
+                address_type_text = eduiddashboard.filters:address_type_text
+                country_name = eduiddashboard.filters:country_name
             """,
             'jinja2.i18n.domain': 'eduid-dashboard',
             'jinja2.extensions': ['jinja2.ext.with_'],

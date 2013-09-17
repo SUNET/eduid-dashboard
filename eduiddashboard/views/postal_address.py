@@ -18,11 +18,11 @@ def get_status(user):
     """
 
     pending_actions = None
-    postalAddresses = user.get('postalAddresses', [])
-    if not postalAddresses:
+    postalAddress = user.get('postalAddress', [])
+    if not postalAddress:
         pending_actions = _('You have to add a postal address')
     else:
-        for address in postalAddresses:
+        for address in postalAddress:
             if not address['verified']:
                 pending_actions = _('You have to verificate some postal address')
 
@@ -49,7 +49,7 @@ def get_tab():
 class PostalAddressActionsView(BaseActionsView):
 
     def setpreferred_action(self, index, post_data):
-        addresses = self.user.get('postalAddresses', [])
+        addresses = self.user.get('postalAddress', [])
         preferred_address = addresses[index]
         for address in addresses:
             if address == preferred_address:
@@ -57,13 +57,13 @@ class PostalAddressActionsView(BaseActionsView):
             else:
                 address['preferred'] = False
 
-        self.user['postalAddresses'] = addresses
+        self.user['postalAddress'] = addresses
         # do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
         }, {
             '$set': {
-                'postalAddresses': addresses,
+                'postalAddress': addresses,
             }
         }, safe=True)
 
@@ -71,18 +71,18 @@ class PostalAddressActionsView(BaseActionsView):
         return {'result': 'ok', 'message': _('Your preferred address was changed')}
 
     def remove_action(self, index, post_data):
-        addresses = self.user['postalAddresses']
+        addresses = self.user['postalAddress']
         address_to_remove = addresses[index]
         addresses.remove(address_to_remove)
 
-        self.user['postalAddresses'] = addresses
+        self.user['postalAddress'] = addresses
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
         }, {
             '$set': {
-                'postalAddresses': addresses,
+                'postalAddress': addresses,
             }
         }, safe=True)
 
@@ -117,7 +117,7 @@ class PostalAddressView(BaseFormView):
     def get_template_context(self):
         context = super(PostalAddressView, self).get_template_context()
         context.update({
-            'postal_addresses': self.user.get('postalAddresses', []),
+            'postal_addresses': self.user.get('postalAddress', []),
         })
         return context
 
@@ -133,20 +133,23 @@ class PostalAddressView(BaseFormView):
     def add_success(self, addressform):
         address = self.schema.serialize(addressform)
         address['verified'] = False
-        address['preferred'] = False
 
-        addresses = self.user.get('postalAddresses', [])
+        addresses = self.user.get('postalAddress', [])
+        if len(addresses) == 0:
+            address['preferred'] = True
+        else:
+            address['preferred'] = False
         addresses.append(address)
 
         # update the session data
-        self.user['postalAddresses'] = addresses
+        self.user['postalAddress'] = addresses
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
         }, {
             '$push': {
-                'postalAddresses': addresses,
+                'postalAddress': addresses,
             }
         }, safe=True)
 
