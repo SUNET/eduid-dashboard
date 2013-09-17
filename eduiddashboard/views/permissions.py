@@ -30,6 +30,15 @@ class PermissionsView(BaseFormView):
     route = 'permissions'
     attributte = 'eduPersonEntitlement'
 
+    def get_template_context(self):
+        tempcontext = super(PermissionsView, self).get_template_context()
+        ma = self.context.main_attribute
+        if self.context.user[ma] == self.request.session.get('user', {}).get(ma):
+            tempcontext['confirmation_required'] = True
+        else:
+            tempcontext['confirmation_required'] = False
+        return tempcontext
+
     def save_success(self, new_entitletments):
 
         # Insert the new user object
