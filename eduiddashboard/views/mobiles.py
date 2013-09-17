@@ -16,6 +16,7 @@ def get_status(user):
     """
 
     mobiles = user.get('mobile', [])
+    pending_actions = None
 
     if not mobiles:
         pending_actions = _('You have to add a mobile phone')
