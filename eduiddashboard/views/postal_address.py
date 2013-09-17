@@ -133,9 +133,12 @@ class PostalAddressView(BaseFormView):
     def add_success(self, addressform):
         address = self.schema.serialize(addressform)
         address['verified'] = False
-        address['preferred'] = False
 
         addresses = self.user.get('postalAddress', [])
+        if len(addresses) == 0:
+            address['preferred'] = True
+        else:
+            address['preferred'] = False
         addresses.append(address)
 
         # update the session data
