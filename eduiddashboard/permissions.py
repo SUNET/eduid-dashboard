@@ -1,5 +1,5 @@
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
-                              ALL_PERMISSIONS)
+                              ALL_PERMISSIONS, DENY_ALL)
 
 from eduid_am.tasks import update_attributes
 
@@ -43,14 +43,14 @@ class BaseFactory(object):
         self.__acl__ = self.acls[self.workmode]
 
     def get_user(self):
-        user = None
+
         if self.workmode == 'personal':
-            user = self.request.session.get('user', None)
+            return self.request.session.get('user', None)
         else:
             userid = self.request.matchdict.get('userid', None)
             if userid:
-                user = self.request.userdb.get_user(userid)
-        return user
+                return self.request.userdb.get_user(userid)
+        return None
 
     def route_url(self, route, **kw):
         if self.workmode == 'personal':
@@ -78,6 +78,7 @@ class BaseFactory(object):
             return ['']
         elif required_urn in user.get('eduPersonEntitlement', []):
             return [self.workmode]
+        return []
 
 
 class PersonFactory(BaseFactory):
@@ -97,17 +98,14 @@ class MobilesFactory(BaseFactory):
 
 
 class PermissionsFactory(BaseFactory):
-    __acl__ = [
-        (Allow, 'admin', 'edit'),
-        (Allow, 'helpdesk', 'edit'),
-    ]
-
     acls = {
         'personal': [
+            (Allow, 'admin', 'edit'),
             (Deny, Authenticated, 'edit'),
         ],
         'helpdesk': [
             (Allow, 'helpdesk', 'edit'),
+            (Allow, 'admin', 'edit'),
         ],
         'admin': [
             (Allow, 'admin', 'edit'),

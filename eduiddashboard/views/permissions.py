@@ -30,11 +30,6 @@ class PermissionsView(BaseFormView):
     route = 'permissions'
     attributte = 'eduPersonEntitlement'
 
-    def before(self, form):
-        workmode = self.context.workmode
-        if workmode == 'helpdesk':
-            form['norEduPersonNIN'].widget.readonly = True
-
     def save_success(self, new_entitletments):
 
         # Insert the new user object
