@@ -80,8 +80,10 @@ class MockedUserDB(IUserDB):
     test_users['johnsmith@example.org']['mail'] = 'johnsmith@example.org'
     test_users['johnsmith@example.org']['_id'] = ObjectId('901234567890123456789012')
 
-    def __init__(self):
-        pass
+    def __init__(self, users=[]):
+        for user in users:
+            if user.get('mail', '') in self.test_users:
+                self.test_users[user['mail']].update(user)
 
     def get_user(self, userid):
         if userid not in self.test_users:
@@ -97,12 +99,23 @@ def dummy_groups_callback(userid, request):
     return [request.context.workmode]
 
 
+def get_db(settings):
+    mongo_replicaset = settings.get('mongo_replicaset', None)
+    if mongo_replicaset is not None:
+        mongodb = MongoDB(settings['mongo_uri'],
+                          replicaSet=mongo_replicaset)
+    else:
+        mongodb = MongoDB(settings['mongo_uri'])
+    return mongodb.get_database()
+
+
 class LoggedInReguestTests(unittest.TestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
     MockedUserDB = MockedUserDB
 
     user = MOCKED_USER_STANDARD
+    users = []
 
     def setUp(self, settings={}):
         # Don't call DBTests.setUp because we are getting the
@@ -117,7 +130,8 @@ class LoggedInReguestTests(unittest.TestCase):
             'saml2.login_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'saml2.attribute_mapping': "mail = mail",
-            'groups_callback': dummy_groups_callback,
+            # Required only if not dont want mongodb
+            # 'groups_callback': dummy_groups_callback,
             'session.type': 'memory',
             'session.lock_dir': '/tmp',
             'session.webtest_varname': 'session',
@@ -146,7 +160,7 @@ class LoggedInReguestTests(unittest.TestCase):
             app = eduiddashboard_main({}, **self.settings)
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
-                    self.settings['mongo_uri']))
+                self.settings['mongo_uri']))
 
         self.testapp = TestApp(app)
 
@@ -154,26 +168,34 @@ class LoggedInReguestTests(unittest.TestCase):
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
         mongo_replicaset = self.settings.get('mongo_replicaset', None)
-        if mongo_replicaset is not None:
-            mongodb = MongoDB(self.settings['mongo_uri'],
-                              replicaSet=mongo_replicaset)
-        else:
-            mongodb = MongoDB(self.settings['mongo_uri'])
-        self.db = mongodb.get_database()
-        self.userdb = self.MockedUserDB()
-        self.db.profiles.remove()
+
+        self.db = get_db(self.settings)
+        self.amdb = get_db({
+            'mongo_replicaset': mongo_replicaset,
+            'mongo_uri': self.settings.get('mongo_uri_am'),
+        })
+
+        self.userdb = self.MockedUserDB(self.users)
+
+        self.db.profiles.drop()
+        self.amdb.attributes.drop()
+
         for user in self.userdb.all_users():
             self.db.profiles.insert(user)
+            self.amdb.attributes.insert(user)
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
+        self.db.profiles.drop()
+        self.amdb.attributes.drop()
         self.testapp.reset()
 
     def dummy_get_user(self, userid=''):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduiddashboard.userdb.UserDB.get_user', self.dummy_get_user)
+        patcher = patch('eduiddashboard.userdb.UserDB.get_user',
+                        self.dummy_get_user)
         patcher.start()
 
     def dummy_request(self, cookies={}):
@@ -185,10 +207,8 @@ class LoggedInReguestTests(unittest.TestCase):
 
     def set_logged(self, user='johnsmith@example.com'):
         request = self.set_user_cookie(user)
-        user = self.userdb.get_user(user)
-
-        self.add_to_session({'user': user})
-
+        user_obj = self.userdb.get_user(user)
+        request = self.add_to_session({'user': user_obj})
         return request
 
     def set_user_cookie(self, user_id):

@@ -126,7 +126,7 @@ def profile_urls(config):
     config.add_route('mobiles-actions', '/mobiles-actions/',
                      factory=MobilesFactory)
     config.add_route('permissions', '/permissions/',
-                     factory=PersonFactory)
+                     factory=PermissionsFactory)
 
 
 def includeme(config):
