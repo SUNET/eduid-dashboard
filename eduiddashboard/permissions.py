@@ -43,11 +43,13 @@ class BaseFactory(object):
         self.__acl__ = self.acls[self.workmode]
 
     def get_user(self):
+        user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
         else:
             userid = self.request.matchdict.get('userid', None)
-            user = self.request.userdb.get_user(userid)
+            if userid:
+                user = self.request.userdb.get_user(userid)
         return user
 
     def route_url(self, route, **kw):
