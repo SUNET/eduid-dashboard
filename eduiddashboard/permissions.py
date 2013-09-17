@@ -92,3 +92,7 @@ class PostalAddressFactory(BaseFactory):
 
 class MobilesFactory(BaseFactory):
     pass
+
+
+class ResetPasswordFactory(RootFactory):
+    pass

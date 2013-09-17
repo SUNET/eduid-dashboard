@@ -1,11 +1,12 @@
 ## Passwords form
 
 from pyramid.view import view_config
+from pyramid_deform import FormView
 
 from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.models import Passwords
+from eduiddashboard.models import Passwords, ResetPassword
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 
@@ -47,3 +48,19 @@ class PasswordsView(BaseFormView):
         self.request.db.profiles.save(self.user, safe=True)
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+
+
+@view_config(route_name='reset-password', permission='edit',
+             renderer='templates/reset-password-form.jinja2')
+class ResetPasswordView(FormView):
+    """
+    Reset user password.
+    """
+
+    schema = ResetPassword()
+    route = 'reset-password'
+    buttons = ('reset', )
+
+    def reset_success(self, passwordform):
+        passwords_data = self.schema.serialize(passwordform)
+        # TODO: to implement

@@ -240,3 +240,18 @@ table.postal-addresses {
 
 /* End of postal address view styles
 -------------------------------------------------- */
+
+
+/* Reset password view styles
+-------------------------------------------------- */
+
+.reset-password-form-container .controls {
+  margin-left: 220px;
+}
+
+.reset-password-form-container .control-label {
+  width: 200px;
+}
+
+/* End of reset password view styles
+-------------------------------------------------- */

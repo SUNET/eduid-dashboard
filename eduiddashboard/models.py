@@ -104,6 +104,13 @@ class Passwords(colander.MappingSchema):
                                    _("Both passwords don't match"))
 
 
+class ResetPassword(colander.MappingSchema):
+
+    email = colander.SchemaNode(colander.String(),
+                                validator=colander.All(colander.Email()),
+                                title=_("Enter your email address"))
+
+
 class PostalAddress(colander.MappingSchema):
     type = colander.SchemaNode(colander.String(),
                                title=_('type'),
