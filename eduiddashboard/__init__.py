@@ -114,6 +114,8 @@ def profile_urls(config):
                      factory=PasswordsFactory)
     config.add_route('reset-password', '/reset-password/',
                      factory=ResetPasswordFactory)
+    config.add_route('reset-password-form', '/reset-password-form/{code}/',
+                     factory=ResetPasswordFactory)
     config.add_route('postaladdress', '/postaladdress/',
                      factory=PostalAddressFactory)
     config.add_route('postaladdress-actions', '/postaladdress-actions/',
