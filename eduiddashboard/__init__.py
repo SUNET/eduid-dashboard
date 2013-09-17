@@ -147,11 +147,10 @@ def includeme(config):
     config.registry.settings['userdb'] = userdb
     config.add_request_method(get_userdb, 'userdb', reify=True)
 
+    config.add_route('home', '/', factory=PersonFactory)
     if settings['workmode'] == 'personal':
         config.include(profile_urls, route_prefix='/profile/')
-        config.add_route('home', '/', factory=PersonFactory)
     else:
-        config.add_route('home', '/', factory=PersonFactory)
         config.include(profile_urls, route_prefix='/users/{userid}/')
 
     config.add_route('token-login', '/tokenlogin/')

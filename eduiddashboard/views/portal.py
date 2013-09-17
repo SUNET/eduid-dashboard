@@ -132,7 +132,10 @@ def home(context, request):
 @view_config(route_name='session-reload',
              request_method='GET', permission='edit')
 def session_reload(context, request):
-    context.update_user()
+    main_attribute = request.registry.settings.get('saml2.user_main_attribute')
+    userid = request.session.get('user', {}).get(main_attribute)
+    user = request.userdb.get_user(userid)
+    request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
 
 

@@ -1,5 +1,5 @@
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
-                              ALL_PERMISSIONS, DENY_ALL)
+                              ALL_PERMISSIONS)
 
 from eduid_am.tasks import update_attributes
 
@@ -63,9 +63,19 @@ class BaseFactory(object):
         userid = self.user[self.main_attribute]
         self.user = self.request.userdb.get_user(userid)
 
+    def update_session_user(self):
+        userid = self.request.session.get('user', {}).get(self.main_attribute,
+                                                          None)
+        self.user = self.request.userdb.get_user(userid)
+        self.request.session['user'] = self.user
+
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':
             self.request.session['user'] = newuser
+        else:
+            user_session = self.request.session['user'][self.main_attribute]
+            if user_session == newuser[self.main_attribute]:
+                self.request.session['user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(self.user['_id']))
 
