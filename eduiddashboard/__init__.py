@@ -57,11 +57,13 @@ def jinja2_settings(settings):
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
     settings.setdefault('jinja2.filters', """
         route_url = pyramid_jinja2.filters:route_url_filter
+
         static_url = pyramid_jinja2.filters:static_url_filter
         get_flash_message_text = eduiddashboard.filters:get_flash_message_text
         get_flash_message_type = eduiddashboard.filters:get_flash_message_type
         address_type_text = eduiddashboard.filters:address_type_text
         country_name = eduiddashboard.filters:country_name
+        context_route_url = eduiddashboard.filters:context_route_url
     """)
 
 
@@ -74,8 +76,12 @@ def read_permissions(raw):
     permissions = {}
 
     for row in rows:
-        workmode = row.split('=').strip()[0]
-        urn = row.split('=').strip()[1]
+        splitted_row = row.split('=')
+        workmode = row.split('=')[0].strip()
+        if len(splitted_row) > 1:
+            urn = row.split('=')[1].strip()
+        else:
+            urn = ''
         if workmode in AVAILABLE_WORK_MODES:
             permissions[workmode] = urn
 
