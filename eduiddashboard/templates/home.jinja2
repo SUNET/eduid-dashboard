@@ -4,11 +4,15 @@
 
 
 {% block contents %}
-  <h2>{{ _("eduID dashboard.") }}</h2>
+  <h3>{{ _("Dashboard %(mode)s mode", mode=context.workmode) }}</h3>
 
   <div class='loa-big'>
     <div>{{ _('Level %(level)s', level=request.session.get('loa', 5)) }}</div>
   </div>
+
+  <div class='clearfix'></div>
+
+  {% trans %}<p>Please, fill the follow form to search the user</p>{% endtrans %}
 
   {{ form.render()|safe }}
 
