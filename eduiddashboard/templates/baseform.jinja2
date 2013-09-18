@@ -21,11 +21,11 @@
    {% block form_generic_form %}
    {{ form|safe }}
    {% endblock %}
+
+
+   {% block extrajs %}
+   <script>
+       window.beforeSubmit = function () {};
+   </script>
+   {% endblock %}
 </div>
-
-
-{% block extrajs %}
-<script>
-    window.beforeSubmit = function () {};
-</script>
-{% endblock %}
