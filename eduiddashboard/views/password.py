@@ -173,7 +173,6 @@ class ResetPasswordStep2View(BaseResetPasswordView):
     def __call__(self):
         hash_code = self.request.matchdict['code']
         reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
-        # import ipdb; ipdb.set_trace()
         if reset_passwords.count() == 0:
             return HTTPNotFound()
         return super(ResetPasswordStep2View, self).__call__()
