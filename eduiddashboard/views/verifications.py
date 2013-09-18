@@ -20,7 +20,7 @@ def verifications(context, request):
     obj_id = verificate_code(request.db, model_name, code)
 
     if obj_id is not None:
-        verifiers[model_name](request, obj_id)
+        verifiers[model_name](request, context, obj_id)
         return HTTPFound(location=request.route_url('home'))
 
     else:

@@ -48,7 +48,7 @@ def mark_as_verified_email(request, context, verified_email):
 
         new_emails = []
         for email in emails:
-            if email['mail'] == verified_email:
+            if email['email'] == verified_email:
                 email['verified'] = True
             new_emails.append(email)
 

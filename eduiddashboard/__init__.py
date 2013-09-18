@@ -14,7 +14,7 @@ from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PasswordsFactory, ResetPasswordFactory,
                                         PostalAddressFactory, MobilesFactory,
-                                        PermissionsFactory)
+                                        PermissionsFactory, VerificationsFactory)
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -161,7 +161,7 @@ def includeme(config):
     config.add_route('token-login', '/tokenlogin/')
     config.add_route('verifications',
                      '/verificate/{model}/{code}/',
-                     factory=RootFactory)
+                     factory=VerificationsFactory)
     config.add_route('help', '/help/')
     config.add_route('session-reload', '/session-reload/')
 

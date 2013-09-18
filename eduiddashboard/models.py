@@ -5,6 +5,7 @@ import deform
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import (EmailUniqueValidator,
+                                       EmailExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator)
@@ -112,7 +113,10 @@ class Passwords(colander.MappingSchema):
 class ResetPassword(colander.MappingSchema):
 
     email = colander.SchemaNode(colander.String(),
-                                validator=colander.All(colander.Email()),
+                                validator=colander.All(
+                                    colander.Email(),
+                                    EmailExistsValidator(),
+                                ),
                                 title=_("Enter your email address"))
 
 

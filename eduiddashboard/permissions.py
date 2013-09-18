@@ -125,3 +125,7 @@ class PermissionsFactory(BaseFactory):
             (Allow, 'admin', 'edit'),
         ],
     }
+
+
+class VerificationsFactory(BaseFactory):
+    pass

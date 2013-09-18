@@ -51,12 +51,12 @@ class EmailUniqueValidator(object):
         request = node.bindings.get('request')
 
         if 'add' in request.POST:
-            if request.userdb.exists_by_field('mailAliases.mail', value):
+            if request.userdb.exists_by_field('mailAliases.email', value):
                 raise colander.Invalid(node,
                                        _("This email is already registered"))
 
         elif 'verify' in request.POST or 'setprimary' in request.POST:
-            if not request.userdb.exists_by_field('mailAliases.mail', value):
+            if not request.userdb.exists_by_field('mailAliases.email', value):
                 raise colander.Invalid(node,
                                        _("This email is not registered already"
                                          ))
@@ -74,3 +74,13 @@ class EmailUniqueValidator(object):
             if len(request.session['user']['mailAliases']) <= 1:
                 raise colander.Invalid(node,
                                        _("At least one email is required"))
+
+
+class EmailExistsValidator(object):
+
+    def __call__(self, node, value):
+
+        request = node.bindings.get('request')
+        if not request.userdb.exists_by_field('mailAliases.email', value):
+            raise colander.Invalid(node,
+                                   _("This email does not exist"))
