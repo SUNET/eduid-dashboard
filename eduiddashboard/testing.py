@@ -231,3 +231,16 @@ class LoggedInReguestTests(unittest.TestCase):
         session.persist()
         self.testapp.cookies['beaker.session.id'] = session._sess.id
         return request
+
+    def check_values(self, fields, values):
+        for field in fields:
+            if field.attrs['type'] == 'checkbox':
+                old_status = field.checked
+                field.checked = True
+                if field.value not in values:
+                    field.checked = old_status
+
+    def values_are_checked(self, fields, values):
+        checked = [f.value for f in fields if f.value is not None]
+
+        self.assertEqual(values, checked)
