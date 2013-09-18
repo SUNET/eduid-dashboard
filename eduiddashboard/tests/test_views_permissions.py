@@ -37,14 +37,52 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
 
-    def test_logged_addpermissions_get(self):
+    def test_logged_addpermissions(self):
         self.set_logged()
-        res = self.testapp.get('/users/johnsmith@example.com/permissions/',
+        res = self.testapp.get('/users/johnsmith@example.org/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
-        # add any permission
-        # change the form
-        # query for changed permissions
+
+        self.check_values(res.form.fields.get('checkbox'),
+                          ['urn:mace:eduid.se:role:admin'])
+
+        res = res.form.submit('save')
+
+        self.values_are_checked(res.form.fields.get('checkbox'),
+                                ['urn:mace:eduid.se:role:admin'])
+
+    def test_logged_remove_admin_permissions(self):
+        self.set_logged(user='johnsmith@example.com')
+        res = self.testapp.get('/users/johnsmith@example.org/permissions/',
+                               status=200)
+        self.assertIsNotNone(getattr(res, 'form', None))
+
+        self.check_values(res.form.fields.get('checkbox'),
+                          ['urn:mace:eduid.se:role:ra'])
+
+        res = res.form.submit('save')
+
+        self.values_are_checked(res.form.fields.get('checkbox'),
+                                ['urn:mace:eduid.se:role:ra'])
+
+        self.set_logged(user='johnsmith@example.org')
+
+        self.testapp.get('/users/johnsmith@example.com/permissions/',
+                         status=401)
+
+    def test_logged_add_dirty_permissions(self):
+        self.set_logged()
+        res = self.testapp.get('/users/johnsmith@example.org/permissions/',
+                               status=200)
+        self.assertIsNotNone(getattr(res, 'form', None))
+
+        self.check_values(res.form.fields.get('checkbox'),
+                          ['urn:mace:eduid.se:role:admin', 'dirty-permissions'])
+
+        res = res.form.submit('save')
+
+        self.values_are_checked(res.form.fields.get('checkbox'),
+                                ['urn:mace:eduid.se:role:admin'])
 
 
 class PermissionsFormTestsPersonalMode(LoggedInReguestTests):
