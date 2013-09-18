@@ -242,8 +242,19 @@ table.postal-addresses {
 -------------------------------------------------- */
 
 
-/* Reset password view styles
+/* Password view styles
 -------------------------------------------------- */
+
+.progress {
+  width: 206px;
+  margin-top: 10px;
+  height: 10px;
+}
+
+.password-verdict {
+  margin-left: 10px;
+  font-size: 10px;
+}
 
 .reset-password-form-container .controls {
   margin-left: 220px;
