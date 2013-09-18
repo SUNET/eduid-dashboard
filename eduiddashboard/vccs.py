@@ -43,7 +43,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
     else:
         passwords = user['passwords']
 
-    if passwords:
+    if passwords and old_password:
         # revoking old credentials
         old_password = check_password(vccs_url, old_password, user)
         if old_password:

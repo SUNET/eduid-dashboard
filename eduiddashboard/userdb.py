@@ -24,7 +24,7 @@ class UserDB(IUserDB):
         self._db = get_attribute_manager(celery)
 
         self.user_main_attribute = settings.get('saml2.user_main_attribute',
-                                                'email')
+                                                'mail')
 
     def get_user(self, userid):
         try:

@@ -116,6 +116,19 @@ class ResetPassword(colander.MappingSchema):
                                 title=_("Enter your email address"))
 
 
+class ResetPasswordStep2(colander.MappingSchema):
+    new_password = colander.SchemaNode(colander.String(),
+                                       widget=deform.widget.PasswordWidget(size=20),
+                                       validator=PasswordValidator())
+    new_password_repeated = colander.SchemaNode(colander.String(),
+                                                widget=deform.widget.PasswordWidget(size=20))
+
+    def validator(self, node, data):
+        if data['new_password'] != data['new_password_repeated']:
+            raise colander.Invalid(node,
+                                   _("Both passwords don't match"))
+
+
 class PostalAddress(colander.MappingSchema):
     type = colander.SchemaNode(colander.String(),
                                title=_('type'),

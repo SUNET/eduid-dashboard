@@ -120,7 +120,7 @@ def profile_urls(config):
                      factory=PasswordsFactory)
     config.add_route('reset-password', '/reset-password/',
                      factory=ResetPasswordFactory)
-    config.add_route('reset-password-form', '/reset-password-form/{code}/',
+    config.add_route('reset-password-step2', '/reset-password/{code}/',
                      factory=ResetPasswordFactory)
     config.add_route('postaladdress', '/postaladdress/',
                      factory=PostalAddressFactory)
