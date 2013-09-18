@@ -1,10 +1,10 @@
 from uuid import uuid4
 
-from eduiddashboard.compat import text_type
+from eduiddashboard.utils import get_unique_hash
 
 
 def get_verification_code(db, model_name, obj_id):
-    code = text_type(uuid4())
+    code = get_unique_hash()
     obj = {
         "model_name": model_name,
         "obj_id": obj_id,

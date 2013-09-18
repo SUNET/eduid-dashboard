@@ -1,8 +1,5 @@
 ## Passwords form
 
-import uuid
-from md5 import md5
-
 from pyramid.renderers import render
 from pyramid.view import view_config
 
@@ -17,7 +14,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Passwords, ResetPassword, ResetPasswordStep2
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.utils import flash
+from eduiddashboard.utils import flash, get_unique_hash
 
 
 def change_password(request, user, old_password, new_password):
@@ -37,7 +34,7 @@ def send_reset_password_mail(request, email):
     user = request.userdb.get_user(email)
     if not user:
         raise UserDoesNotExist()
-    hash_code = md5(str(uuid.uuid4())).hexdigest()
+    hash_code = get_unique_hash()
 
     request.db.reset_passwords.insert({
         'email': email,

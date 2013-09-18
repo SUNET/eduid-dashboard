@@ -1,4 +1,8 @@
 from hashlib import sha256
+from uuid import uuid4
+
+from eduiddashboard.compat import text_type
+
 
 MAX_LOA_ROL = {
     'user': 3,
@@ -57,3 +61,7 @@ def get_max_available_loa(groups):
         return max(loas)
     else:
         return MAX_LOA_ROL['user']
+
+
+def get_unique_hash():
+    return text_type(uuid4())
