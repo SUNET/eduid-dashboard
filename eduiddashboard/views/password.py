@@ -1,5 +1,6 @@
 ## Passwords form
 
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
 from pyramid.view import view_config
 
@@ -111,6 +112,15 @@ class BaseResetPasswordView(FormView):
     buttons = ('reset', )
     intro_message = None  # to override in subclasses
 
+    def __init__(self, context, request):
+        super(BaseResetPasswordView, self).__init__(request)
+
+        self.classname = self.__class__.__name__.lower()
+
+        self.form_options = {
+            'formid': "{classname}-form".format(classname=self.classname),
+        }
+
     def get_template_context(self):
         return {
             'intro_message': self.intro_message
@@ -160,14 +170,23 @@ class ResetPasswordStep2View(BaseResetPasswordView):
     buttons = ('reset', )
     intro_message = _('Finish your password reset')
 
+    def __call__(self):
+        hash_code = self.request.matchdict['code']
+        reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
+        # import ipdb; ipdb.set_trace()
+        if reset_passwords.count() == 0:
+            return HTTPNotFound()
+        return super(ResetPasswordStep2View, self).__call__()
+
     def reset_success(self, passwordform):
         hash_code = self.request.matchdict['code']
-        email = self.request.db.reset_passwords.find({'hash_code': hash_code})[0]['email']
-        user = self.request.userdb.get_user(email)
+        reset_password = self.request.db.reset_passwords.find({'hash_code': hash_code})[0]
+        user = self.request.userdb.get_user(reset_password['email'])
 
         new_password = passwordform['new_password']
         ok = change_password(self.request, user, '', new_password)
         if ok:
+            self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:
             flash(self.request, 'info', _('Credentials has not been added for some reason.'

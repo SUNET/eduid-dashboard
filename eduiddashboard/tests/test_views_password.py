@@ -137,6 +137,28 @@ class PasswordFormTests(LoggedInReguestTests):
         self.assertIn("Both passwords don't match", response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
 
+    def test_reset_password(self):
+        response_form = self.testapp.get('/profile/reset-password/')
+
+        form = response_form.forms['resetpasswordview-form']
+
+        form['email'].value = 'notvalidemail'
+        response = form.submit('reset')
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn("Invalid email address", response.body)
+
+        form['email'].value = 'notexistingmail@foodomain.com'
+        response = form.submit('reset')
+        self.assertIn("This email does not exist", response.body)
+
+        reset_passwords = list(self.db.reset_passwords.find())
+        for email in self.user['mailAliases']:
+            form['email'].value = email['email']
+            response = form.submit('reset')
+            self.assertIn("An email has been sent to you with the instructions to reset your password", response.body)
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertNotEqual(len(reset_passwords), len(reset_passwords_after))
+
     def tearDown(self):
         super(PasswordFormTests, self).tearDown()
         self.patcher.stop()
