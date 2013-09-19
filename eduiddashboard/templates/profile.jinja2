@@ -149,6 +149,10 @@ $(document).ready(function () {
     $("button[data-toggle=tooltip]").tooltip();
     loa_popovers();
 
+    $('body').on('form-submitted', function() {
+      userstatus.renderStatus('{{ request.route_path('userstatus') }}');
+    });
+
     $('body').on('communication-error', function(){
       var message = $('#communication-error-template').text();
       $('.container div.messages').append(message);
