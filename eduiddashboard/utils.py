@@ -44,10 +44,10 @@ def get_pending_actions(user, tabs):
     for tab in tabs:
         if tab['status'] is not None:
             status = tab['status'](user)
-            if status:
+            if status and 'pending_actions' in status:
                 tuples.append((
-                    tab.get('id'),
-                    status.get('pending_actions')
+                    tab['id'],
+                    status['pending_actions']
                 ))
 
     return tuples
