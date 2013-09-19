@@ -57,7 +57,6 @@ def jinja2_settings(settings):
     settings.setdefault('jinja2.i18n.domain', 'eduid-dashboard')
     settings.setdefault('jinja2.filters', """
         route_url = pyramid_jinja2.filters:route_url_filter
-
         static_url = pyramid_jinja2.filters:static_url_filter
         get_flash_message_text = eduiddashboard.filters:get_flash_message_text
         get_flash_message_type = eduiddashboard.filters:get_flash_message_type
@@ -242,7 +241,10 @@ def main(global_config, **settings):
                                                       '')
 
     if raw_available_permissions:
-        available_permissions = tuple(raw_available_permissions.split('\n'))
+        available_permissions = filter(lambda e: e is not None and
+                                       e.strip() != '',
+                                       raw_available_permissions.split('\n'))
+
     else:
         available_permissions = AVAILABLE_PERMISSIONS
 

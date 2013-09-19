@@ -157,7 +157,7 @@ class Mobile(colander.MappingSchema):
 
 class Permissions(colander.Schema):
     eduPersonEntitlement = colander.SchemaNode(colander.List(),
-                                               title=_('permissions'),
+                                               title='',
                                                validator=PermissionsValidator(),
                                                missing=[],
                                                default=[],
