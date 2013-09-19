@@ -4,7 +4,7 @@
 var userstatus = {
 
   renderStatus: function (status_url) {
-    var result;
+    var result, pendingActionsHTML, index;
 
     $.ajax({
       url: status_url,
@@ -15,6 +15,13 @@ var userstatus = {
       $('.profile-filled .percentaje').html(userData.profile_filled);
       $('.profile-filled .bar').css('width', userData.profile_filled);
       $('.circles-widget').addClass('level-' + userData.loa);
+      pendingActionsHTML = '';
+      for (index in userData.pending_actions) {
+        var formid = userData.pending_actions[index][0],
+          action = userData.pending_actions[index][1];
+        pendingActionsHTML = pendingActionsHTML + '<li><a href="#' + formid + '"' + '>' + action + '</a></li>';
+      }
+      $('.pending-actions').html(pendingActionsHTML);
     });
 
     return result;

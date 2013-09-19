@@ -40,6 +40,7 @@
                         // special case of removing rows
                         container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
                     }
+                    $('body').trigger('action-executed');
                 },
                 'json');
             });

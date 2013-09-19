@@ -149,7 +149,7 @@ $(document).ready(function () {
     $("button[data-toggle=tooltip]").tooltip();
     loa_popovers();
 
-    $('body').on('form-submitted', function() {
+    $('body').on('form-submitted action-executed', function() {
       userstatus.renderStatus('{{ request.route_path('userstatus') }}');
     });
 
