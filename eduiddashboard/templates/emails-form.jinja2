@@ -11,7 +11,7 @@
 
 {% block extra_content %}
 
-  {{ actions_url('emails-actions') }}
+  {{ safe_actions_url('emails-actions') }}
 
   {% if mails %}
   <table class='table table-striped table-thin emails'>

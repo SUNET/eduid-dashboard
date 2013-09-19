@@ -1,7 +1,15 @@
+import re
+
+from pyramid.httpexceptions import HTTPNotFound
+
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 
 from eduid_am.tasks import update_attributes
+
+
+EMAIL_RE = re.compile(r'[^@]+@[^@]+')
+OID_RE = re.compile(r'[0-9a-fA-F]{12}')
 
 
 class RootFactory(object):
@@ -44,19 +52,31 @@ class BaseFactory(object):
 
     def get_user(self):
 
+        user = None
         if self.workmode == 'personal':
-            return self.request.session.get('user', None)
+            user = self.request.session.get('user', None)
         else:
-            userid = self.request.matchdict.get('userid', None)
-            if userid:
-                return self.request.userdb.get_user(userid)
-        return None
+            userid = self.request.matchdict.get('userid', '')
+            if EMAIL_RE.match(userid):
+                user = self.request.userdb.get_user(userid)
+            elif OID_RE.match(userid):
+                user = self.request.userdb.get_user_by_oid(userid)
+            if not user and userid:
+                raise HTTPNotFound()
+        return user
 
     def route_url(self, route, **kw):
         if self.workmode == 'personal':
             return self.request.route_url(route, **kw)
         else:
             userid = self.request.matchdict.get('userid', None)
+            return self.request.route_url(route, userid=userid, **kw)
+
+    def safe_route_url(self, route, **kw):
+        if self.workmode == 'personal':
+            return self.request.route_url(route, **kw)
+        else:
+            userid = self.user['_id']
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):

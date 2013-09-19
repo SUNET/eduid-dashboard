@@ -2,6 +2,10 @@
     <span class="hide actions-url" data-url="{{ action_url|context_route_url }}" />
 {%- endmacro %}
 
+{% macro safe_actions_url(action_url) -%}
+    <span class="hide actions-url" data-url="{{ action_url|safe_context_route_url }}" />
+{%- endmacro %}
+
 <div class='{{ formname }}-form-container {% block extraformclass %}{% endblock %}'>
    {% for message in request.session.pop_flash(queue='forms') %}
      <div class="alert alert-{{ message|get_flash_message_type }}">
