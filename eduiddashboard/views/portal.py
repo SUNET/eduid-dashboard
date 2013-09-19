@@ -1,7 +1,6 @@
 import deform
 
 from pyramid.i18n import get_locale_name
-from pyramid.i18n import TranslationString as _
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
@@ -9,29 +8,13 @@ from pyramid.view import view_config
 
 from deform_bootstrap import Form
 
-from eduiddashboard.utils import (verify_auth_token, filter_tabs,
+from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
-                                  get_max_available_loa)
+                                  get_max_available_loa,
+                                  get_available_tabs)
 
 from eduiddashboard.models import UserSearcher
-
-from eduiddashboard.views import (emails, personal, postal_address, mobiles,
-                                  permissions, get_dummy_status)
-
-
-AVAILABLE_TABS = [
-    personal.get_tab(),
-    emails.get_tab(),
-    permissions.get_tab(),
-    {
-        'label': _('Passwords'),
-        'status': get_dummy_status,
-        'id': 'passwords',
-    },
-    mobiles.get_tab(),
-    postal_address.get_tab(),
-]
 
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
@@ -43,17 +26,9 @@ def profile_editor(context, request):
 
     view_context = {}
 
-    if context.workmode == 'personal':
-        tabs = filter_tabs(AVAILABLE_TABS, ['permissions'])
-    elif context.workmode == 'helpdesk':
-        tabs = filter_tabs(AVAILABLE_TABS, ['passwords', 'authorization'])
-    else:
-        tabs = AVAILABLE_TABS
+    tabs = get_available_tabs(context)
 
     profile_filled = calculate_filled_profile(context.user, tabs)
-    percent_p_filled = int((float(profile_filled[0])
-                            / float(profile_filled[1]))
-                           * 100)
 
     pending_actions = get_pending_actions(context.user, tabs)
 
@@ -61,7 +36,7 @@ def profile_editor(context, request):
         'tabs': tabs,
         'userid': context.user.get(context.main_attribute),
         'user': context.user,
-        'profile_filled': percent_p_filled,
+        'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,
         'max_loa': get_max_available_loa(context.get_groups())

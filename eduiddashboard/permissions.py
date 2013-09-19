@@ -129,3 +129,7 @@ class PermissionsFactory(BaseFactory):
 
 class VerificationsFactory(BaseFactory):
     pass
+
+
+class StatusFactory(BaseFactory):
+    pass

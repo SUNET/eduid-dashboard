@@ -51,7 +51,13 @@
 
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-2.3.1.min.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/pwstrength.js'|static_url}}"></script>
+    <script>
+       jQuery('body').on('form-submitted', function() {
+         userstatus.renderStatus('{{ request.route_path('userstatus') }}');
+       });
+    </script>
     {% block extrajs %}
     {% endblock %}
   </body>

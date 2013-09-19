@@ -5,7 +5,7 @@
 
 {% block contents %}
   <div class='loa-big'>
-    <div>{{ _("Level %(level)s", level=request.session.get('loa', 5)) }}</div>
+    <div>{{ _("Level") }} <span class="level">{{ request.session.get('loa', 5) }}</span></div>
   </div>
 
   {% if context.workmode == 'personal' %}
@@ -72,8 +72,8 @@
 
     </div>
 
-    <div class='span6'>
-      <h4>{{ _("Profile filled") }}: {{ profile_filled }}%</h4>
+    <div class='span6 profile-filled'>
+      <h4>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></h4>
       <div class="progress progress-striped">
         <div class="bar" style="width: {{ profile_filled }}%;"></div>
       </div>

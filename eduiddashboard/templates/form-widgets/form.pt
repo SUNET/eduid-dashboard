@@ -114,9 +114,10 @@
                   };
                   deform.processCallbacks();
                   deform.focusFirstInput();
+                  $('body').trigger('form-submitted');
                 },
                 error: function() {
-                   $('body').trigger('communication-error');
+                  $('body').trigger('communication-error');
                 },
                 beforeSubmit: window.beforeSubmit
              },
