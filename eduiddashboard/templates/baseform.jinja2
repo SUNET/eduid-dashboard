@@ -1,5 +1,5 @@
 {% macro actions_url(action_url) -%}
-    <span class="hide actions-url" data-url="{{ action_url }}" />
+    <span class="hide actions-url" data-url="{{ action_url|context_route_url }}" />
 {%- endmacro %}
 
 <div class='{{ formname }}-form-container {% block extraformclass %}{% endblock %}'>

@@ -62,6 +62,7 @@ def jinja2_settings(settings):
         get_flash_message_type = eduiddashboard.filters:get_flash_message_type
         address_type_text = eduiddashboard.filters:address_type_text
         country_name = eduiddashboard.filters:country_name
+        context_route_url = eduiddashboard.filters:context_route_url
     """)
 
 
@@ -74,8 +75,12 @@ def read_permissions(raw):
     permissions = {}
 
     for row in rows:
-        workmode = row.split('=').strip()[0]
-        urn = row.split('=').strip()[1]
+        splitted_row = row.split('=')
+        workmode = row.split('=')[0].strip()
+        if len(splitted_row) > 1:
+            urn = row.split('=')[1].strip()
+        else:
+            urn = ''
         if workmode in AVAILABLE_WORK_MODES:
             permissions[workmode] = urn
 
@@ -236,7 +241,10 @@ def main(global_config, **settings):
                                                       '')
 
     if raw_available_permissions:
-        available_permissions = tuple(raw_available_permissions.split('\n'))
+        available_permissions = filter(lambda e: e is not None and
+                                       e.strip() != '',
+                                       raw_available_permissions.split('\n'))
+
     else:
         available_permissions = AVAILABLE_PERMISSIONS
 

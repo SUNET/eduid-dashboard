@@ -1,4 +1,5 @@
 import pycountry
+from pyramid.threadlocal import get_current_request
 
 FLASH_SEPARATOR = '|'
 
@@ -18,3 +19,8 @@ def address_type_text(value):
 
 def country_name(value):
     return pycountry.countries.get(alpha2=value).name
+
+
+def context_route_url(value):
+    request = get_current_request()
+    return request.context.route_url(value)
