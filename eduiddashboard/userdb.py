@@ -1,3 +1,4 @@
+from bson import ObjectId
 
 from eduid_am.celery import celery, get_attribute_manager
 from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
@@ -31,6 +32,22 @@ class UserDB(IUserDB):
             logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
                     self._db, self.user_main_attribute, userid))
             user = self._db.get_user_by_field(self.user_main_attribute, userid)
+            logger.debug("Found user {!r}".format(user))
+            return user
+        except UserDoesNotExist:
+            logger.error("UserDoesNotExist")
+            raise self.UserDoesNotExist()
+        except MultipleUsersReturned:
+            logger.error("MultipleUsersReturned")
+            raise self.MultipleUsersReturned()
+
+    def get_user_by_oid(self, oid):
+        if not isinstance(oid, ObjectId):
+            oid = ObjectId(oid)
+        try:
+            logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
+                    self._db, '_id', oid))
+            user = self._db.get_user_by_field('_id', oid)
             logger.debug("Found user {!r}".format(user))
             return user
         except UserDoesNotExist:

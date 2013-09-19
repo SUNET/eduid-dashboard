@@ -24,3 +24,8 @@ def country_name(value):
 def context_route_url(value):
     request = get_current_request()
     return request.context.route_url(value)
+
+
+def safe_context_route_url(value):
+    request = get_current_request()
+    return request.context.route_url(value)
