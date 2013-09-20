@@ -23,6 +23,21 @@ var userstatus = {
       }
       $('.pending-actions').html(pendingActionsHTML);
       $('body').trigger('reloadtabs');
+
+      for (index in userData.tabs) {
+        var tab = userData.tabs[index],
+          tabHTML = tab.label,
+          pending_actions = '';
+
+        if (tab.status && tab.status.pending_actions) {
+            pending_actions = tab.status.pending_actions;
+        }
+        if (tab.status && tab.status.icon) {
+          tabHTML = '<i class="' + tab.status.icon + '"></i> ' + tabHTML;
+        }
+        $('.nav-tabs a[href=#' + tab.id + ']').html(tabHTML);
+        $('.nav-tabs a[href=#' + tab.id + ']').attr('title', pending_actions);
+      }
     });
 
     return result;
