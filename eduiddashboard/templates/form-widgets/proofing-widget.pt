@@ -1,0 +1,3 @@
+<button type='proofing' class='btn' value="${cstruct}" id="${oid|field.oid}">
+    ${name|field.name}
+</button>
