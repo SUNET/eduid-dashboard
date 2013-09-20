@@ -50,6 +50,8 @@ def get_available_tabs(context):
         tabs = filter_tabs(default_tabs, ['passwords', 'authorization'])
     else:
         tabs = default_tabs
+    for tab in tabs:
+        tab['status'] = tab['status'](context.user)
     return tabs
 
 
@@ -57,7 +59,7 @@ def calculate_filled_profile(user, tabs):
     tuples = []
     for tab in tabs:
         if tab['status'] is not None:
-            status = tab['status'](user)
+            status = tab['status']
             if status is not None:
                 tuples.append(status.get('completed'))
 
@@ -70,7 +72,7 @@ def get_pending_actions(user, tabs):
     tuples = []
     for tab in tabs:
         if tab['status'] is not None:
-            status = tab['status'](user)
+            status = tab['status']
             if status and 'pending_actions' in status:
                 tuples.append((
                     tab['id'],

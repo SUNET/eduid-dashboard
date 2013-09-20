@@ -11,7 +11,7 @@
   {% if context.workmode == 'personal' %}
   <h3>{{ _("Your profile") }}</h3>
   {% else %}
-  <h3>{{ _("Editing %(email)s user", email=context.user.get('mail')) }}</h3>
+  <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
   {% endif %}
 
   <div class='clearfix'></div>
@@ -86,7 +86,7 @@
     <ul class='nav nav-tabs'>
       {% for tab in tabs %}
         <li>
-          {% with status = tab.status(user) %}
+          {% with status = tab.status %}
             {% if status and 'icon' in status %}
               <a href='#{{tab.id}}'
                  title='{{_(status.pending_actions)}}'>

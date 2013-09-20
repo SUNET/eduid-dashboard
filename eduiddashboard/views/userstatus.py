@@ -16,4 +16,5 @@ def userstatus(context, request):
         'max_loa': get_max_available_loa(context.get_groups()),
         'profile_filled': '%s%%' % profile_filled,
         'pending_actions': get_pending_actions(user, tabs),
+        'tabs': tabs,
     }
