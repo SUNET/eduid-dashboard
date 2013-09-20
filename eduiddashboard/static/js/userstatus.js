@@ -21,6 +21,7 @@ var userstatus = {
           action = userData.pending_actions[index][1];
         pendingActionsHTML = pendingActionsHTML + '<li><a href="#' + formid + '"' + '>' + action + '</a></li>';
       }
+      $('.pending-actions').empty();
       $('.pending-actions').html(pendingActionsHTML);
       $('body').trigger('reloadtabs');
 

@@ -150,7 +150,7 @@ $(document).ready(function () {
     loa_popovers();
 
     $('body').on('form-submitted action-executed', function() {
-      userstatus.renderStatus('{{ request.route_path('userstatus') }}');
+      userstatus.renderStatus('{{ context.safe_route_url('userstatus') }}');
     });
 
     $('body').on('communication-error', function(){
