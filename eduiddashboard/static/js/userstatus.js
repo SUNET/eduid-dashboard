@@ -22,10 +22,7 @@ var userstatus = {
         pendingActionsHTML = pendingActionsHTML + '<li><a href="#' + formid + '"' + '>' + action + '</a></li>';
       }
       $('.pending-actions').html(pendingActionsHTML);
-      $('ul.pending-actions a').click(function (e) {
-        var named_tab = e.target.href.split('#')[1];
-        $('.tabbable').find('.nav-tabs a[href=#' + named_tab + ']').click();
-      });
+      $('body').trigger('reloadtabs');
     });
 
     return result;

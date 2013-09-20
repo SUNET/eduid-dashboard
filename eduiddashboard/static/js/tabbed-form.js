@@ -34,9 +34,14 @@ var TabbedForm = function (container) {
             });
         },
 
-        initialize = function () {
-            var opentab = location.toString().split('#')[1];
+        initialize_pending_actions = function () {
+            $('ul.pending-actions a').click(function (e) {
+                var named_tab = e.target.href.split('#')[1];
+                container.find('.nav-tabs a[href=#' + named_tab + ']').click();
+            });
+        },
 
+        initialize_nav_tabs = function () {
             container.find('.nav-tabs a').click(function (e) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
@@ -47,11 +52,14 @@ var TabbedForm = function (container) {
 
                 get_form(url, $(".tab-pane.active"));
             });
+        },
 
-            $('ul.pending-actions a').click(function (e) {
-                var named_tab = e.target.href.split('#')[1];
-                container.find('.nav-tabs a[href=#' + named_tab + ']').click();
-            });
+        initialize = function () {
+            var opentab = location.toString().split('#')[1];
+
+            initialize_nav_tabs();
+
+            initialize_pending_actions();
 
             $('body').bind('formready', function () {
                 window.tabbedform.changetabs_calls.forEach(function (func) {
@@ -59,6 +67,11 @@ var TabbedForm = function (container) {
                         func(container);
                     }
                 });
+            });
+
+            $('body').bind('reloadtabs', function () {
+                initialize_nav_tabs();
+                initialize_pending_actions();
             });
 
             if (opentab === undefined) {
