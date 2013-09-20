@@ -4,7 +4,7 @@
 var userstatus = {
 
   renderStatus: function (status_url) {
-    var result, pendingActionsHTML, index;
+    var pendingActionsHTML, index;
 
     $.ajax({
       url: status_url,
@@ -40,8 +40,6 @@ var userstatus = {
         $('.nav-tabs a[href=#' + tab.id + ']').attr('title', pending_actions);
       }
     });
-
-    return result;
   }
 };
 

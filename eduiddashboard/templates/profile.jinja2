@@ -149,9 +149,21 @@ $(document).ready(function () {
     $("button[data-toggle=tooltip]").tooltip();
     loa_popovers();
 
-    $('body').on('form-submitted action-executed', function() {
+    function showStatus() {
       userstatus.renderStatus('{{ context.safe_route_url('userstatus') }}');
-    });
+    }
+
+    {% if context.workmode == 'personal' %}
+      $('body').on('form-submitted action-executed', function() {
+        showStatus();
+      });
+    {% else %}
+      function statusPolling() {
+        showStatus();
+        window.setTimeout(statusPolling, 2000);
+      }
+      statusPolling();
+    {% endif %}
 
     $('body').on('communication-error', function(){
       var message = $('#communication-error-template').text();
