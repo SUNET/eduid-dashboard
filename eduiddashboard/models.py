@@ -35,11 +35,50 @@ class BooleanMongo(colander.Boolean):
                                            false_val, true_val)
 
 
+class ProofingWidget(deform.widget.Widget):
+
+    template = 'proofing-widget'
+    hidden = False
+
+    def serialize(self, field, cstruct, **kw):
+        if cstruct in (colander.null, None):
+            cstruct = ''
+        values = self.get_template_values(field, cstruct, kw)
+        return field.renderer(self.template, **values)
+
+    def deserialize(self, field, cstruct, **kw):
+        return colander.null
+
+
+class ProofingNode(colander.SchemaNode):
+
+    def __init__(self, default='', **kw):
+        nkw = {
+            'widget': ProofingWidget(),
+            'default': default,
+            'name': _('Save the verification proof'),
+            'title': '',
+            'missing': colander.drop,
+        }
+        nkw.update(kw)
+        super(ProofingNode, self).__init__(colander.String(), **nkw)
+
+    def deserialize(self, cstruct):
+        return colander.drop
+
+
 class Email(colander.MappingSchema):
     mail = colander.SchemaNode(colander.String(),
                                validator=colander.All(colander.Email(),
                                                       EmailUniqueValidator()),
                                title=_('email'))
+
+
+@colander.deferred
+def nin_proofing_link(node, kw):
+
+    request = kw['request']
+    return request.context.safe_route_url('nin-proofing')
 
 
 class NIN(colander.MappingSchema):
@@ -55,9 +94,14 @@ class NIN(colander.MappingSchema):
                                    title=_('verified'))
     active = colander.SchemaNode(BooleanMongo(), missing=False,
                                  title=_('active'))
+    verify = ProofingNode(default=nin_proofing_link)
 
 
 class NINs(colander.SequenceSchema):
+    widget = deform.widget.SequenceWidget(
+        readonly_template='nins-readonly',
+    )
+
     NINs = NIN(title=_('personal identity numbers'))
 
 

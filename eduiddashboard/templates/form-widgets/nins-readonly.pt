@@ -1,0 +1,20 @@
+<div tal:define="item_tmpl item_template|field.widget.readonly_item_template;"
+     class="deformSeq readonly">
+  <!-- sequence -->
+
+  <metal:content tal:condition="python:len(cstruct) == 0">
+    <div class='wheel' i18n:translate=''>
+        <p>You haven't any registered NIN</p>
+        <p>You have to apply to administration to add your NIN.</p>
+        <p>Remember to carry your personal identity card to allow to the office 
+        staff complete your identity verification.</p>
+    </div>
+  </metal:content>
+
+  <ul tal:condition="python:len(cstruct)">
+    <tal:block repeat="tup subfields"
+         content="structure field.render_template(item_tmpl, field=tup[1], cstruct=tup[0])"/>
+  </ul>
+
+  <!-- /sequence -->
+</div>
