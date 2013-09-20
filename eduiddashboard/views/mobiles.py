@@ -112,7 +112,7 @@ class MobilesView(BaseFormView):
         self.request.db.profiles.find_and_modify({
             '_id': self.user['_id'],
         }, {
-            '$push': {
+            '$set': {
                 'mobile': mobiles,
             }
         }, safe=True)
