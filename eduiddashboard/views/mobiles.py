@@ -1,10 +1,13 @@
 ## Mobile phones forms
 
+from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
-from eduiddashboard.utils import get_icon_string
+from eduiddashboard.sms import send_sms
+from eduiddashboard.utils import get_icon_string, get_short_hash
+from eduiddashboard.verifications import get_verification_code, new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
@@ -70,6 +73,26 @@ class MobilesActionsView(BaseActionsView):
             'message': _('One mobile has been removed, please, wait'
                          ' before your changes are distributed '
                          'through all applications'),
+        }
+
+
+    def verify_action(self, index, post_data):
+        mobile_to_verify = self.user.get('mobile', [])[index]
+        mobile_number = mobile_to_verify['mobile']
+        code = new_verification_code(self.request.db, 'mobiles', mobile_number, hasher=get_short_hash)
+
+        msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
+            'mobile_number': mobile_number,
+            'code': code,
+        })
+        msg = get_localizer(self.request).translate(msg)
+        send_sms(mobile_number, msg)
+
+        return {
+            'result': 'ok',
+            'message': _('A new verification email has been sent '
+                         'to your account. Please revise your '
+                         'inbox and click on the provided link'),
         }
 
 

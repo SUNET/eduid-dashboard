@@ -1,10 +1,15 @@
-from uuid import uuid4
-
 from eduiddashboard.utils import get_unique_hash
 
 
 def get_verification_code(db, model_name, obj_id):
-    code = get_unique_hash()
+    obj = db.verifications.find({'obj_id': obj_id})[0]
+    return obj['code']
+
+
+def new_verification_code(db, model_name, obj_id, hasher=None):
+    if hasher is None:
+        hasher = get_unique_hash()
+    code = hasher()
     obj = {
         "model_name": model_name,
         "obj_id": obj_id,
@@ -36,6 +41,6 @@ def verificate_code(db, model_name, code):
 
 
 def generate_verification_link(request, db, model, obj_id):
-    code = get_verification_code(db, model, obj_id)
+    code = new_verification_code(db, model, obj_id)
     link = request.route_url("verifications", model=model, code=code)
     return link

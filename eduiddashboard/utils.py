@@ -94,3 +94,7 @@ def get_max_available_loa(groups):
 
 def get_unique_hash():
     return text_type(uuid4())
+
+
+def get_short_hash():
+    return uuid4().hex[:6]
