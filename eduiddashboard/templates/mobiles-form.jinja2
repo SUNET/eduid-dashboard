@@ -55,6 +55,46 @@
           data-toggle='button'>
         <i class='icon-plus'></i>
         {{_('Add a new mobile phone')}}</button>
+
+  <div id="askDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="windowTitleLabel" aria-hidden="true">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="askDialogPrompt"></h3>
+    </div>
+    <div class="modal-body">
+      <div class="divDialogElements">
+        <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn" onclick="closeAskDialog();">Cancel</a>
+      <a href="#" class="btn btn-primary" onclick="okAskDialog ();">OK</a>
+    </div>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      $("#askDialog").bind ('show', function () {
+        });
+      });
+    function closeAskDialog () {
+      $("#askDialog").modal('hide'); 
+    };
+    function okAskDialog () {
+      var input = document.getElementById("askDialogInput");
+      input.askcallback(input.value);
+      closeAskDialog ();
+    };
+    function askDialog (prompt, defaultvalue, placeholder, askcallback) {
+      var input = document.getElementById("askDialogInput");
+      input.value = defaultvalue;
+      input.placeholder = placeholder;
+      input.askcallback = askcallback; // radical
+      document.getElementById("askDialogPrompt").innerHTML = prompt;
+      $("#askDialog").modal("show");
+    };
+  </script>
+
 {% endblock %}
 
 {% block form_generic_form %}

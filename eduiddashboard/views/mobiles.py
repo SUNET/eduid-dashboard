@@ -89,10 +89,10 @@ class MobilesActionsView(BaseActionsView):
         send_sms(mobile_number, msg)
 
         return {
-            'result': 'ok',
-            'message': _('A new verification email has been sent '
-                         'to your account. Please revise your '
-                         'inbox and click on the provided link'),
+            'result': 'getcode',
+            'message': _('A new verification message has been sent '
+                         'to your mobile phone. Please revise your '
+                         'SMS inbox and fill below with the given code'),
         }
 
 

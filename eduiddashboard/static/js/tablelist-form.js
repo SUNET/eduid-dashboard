@@ -39,6 +39,8 @@
                     if(data.action == 'remove' && data.result == 'ok') {
                         // special case of removing rows
                         container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
+                    } else if (data.result == 'getcode') {
+                        
                     }
                     $('body').trigger('action-executed');
                 },
