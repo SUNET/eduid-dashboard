@@ -36,7 +36,7 @@
                     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
                     data.message + '</div>';
                     container.find('.tab-content').prepend(messageHTML);
-                    if(data.action == 'remove') {
+                    if(data.action == 'remove' && data.result == 'ok') {
                         // special case of removing rows
                         container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
                     }

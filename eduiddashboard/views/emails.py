@@ -97,6 +97,11 @@ class EmailsActionsView(BaseActionsView):
 
     def remove_action(self, index, post_data):
         emails = self.user['mailAliases']
+        if len(emails) == 1:
+            return {
+                'result': 'error',
+                'message': _('Error: You only have one email and this cannot be deleted'),
+            }
         remove_email = emails[index]['email']
         emails.remove(emails[index])
 
