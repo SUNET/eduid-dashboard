@@ -82,7 +82,7 @@ class Person(colander.MappingSchema):
                                       title=_('display name'))
     photo = colander.SchemaNode(colander.String(),
                                 title=_('photo'),
-                                description=_('A url link to your porsonal '
+                                description=_('A url link to your personal '
                                               'avatar'),
                                 missing='')
     preferredLanguage = colander.SchemaNode(colander.String(),

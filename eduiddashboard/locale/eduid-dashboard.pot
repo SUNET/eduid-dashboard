@@ -72,7 +72,7 @@ msgid "photo"
 msgstr ""
 
 #: eduiddashboard/models.py:74
-msgid "A url link to your porsonal avatar"
+msgid "A url link to your personal avatar"
 msgstr ""
 
 #: eduiddashboard/models.py:78
