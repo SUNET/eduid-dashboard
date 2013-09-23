@@ -43,25 +43,25 @@ def get_tab():
 
 
 def mark_as_verified_email(request, context, verified_email):
-        user = context.get_user()
-        emails = user['mailAliases']
+    user = context.get_user()
+    emails = user['mailAliases']
 
-        new_emails = []
-        for email in emails:
-            if email['email'] == verified_email:
-                email['verified'] = True
-            new_emails.append(email)
+    new_emails = []
+    for email in emails:
+        if email['email'] == verified_email:
+            email['verified'] = True
+        new_emails.append(email)
 
-        user.update(new_emails)
+    user.update(new_emails)
 
-        # Do the save staff
-        request.db.profiles.save(user, safe=True)
+    # Do the save staff
+    request.db.profiles.save(user, safe=True)
 
-        request.context.propagate_user_changes(user)
+    request.context.propagate_user_changes(user)
 
-        request.session.flash(_('Your email {email} was verified'
-                                ).format(email=verified_email),
-                              queue='forms')
+    request.session.flash(_('Your email {email} was verified'
+                            ).format(email=verified_email),
+                          queue='forms')
 
 
 @view_config(route_name='emails-actions', permission='edit')
