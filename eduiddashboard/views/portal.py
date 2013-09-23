@@ -39,7 +39,8 @@ def profile_editor(context, request):
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,
-        'max_loa': get_max_available_loa(context.get_groups())
+        'max_loa': get_max_available_loa(context.get_groups()),
+        'polling_timeout_for_admin': request.registry.settings.get('polling_timeout_for_admin', 2000),
     }
 
     return view_context

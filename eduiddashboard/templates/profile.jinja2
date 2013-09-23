@@ -160,7 +160,7 @@ $(document).ready(function () {
     {% else %}
       function statusPolling() {
         showStatus();
-        window.setTimeout(statusPolling, 2000);
+        window.setTimeout(statusPolling, {{ polling_timeout_for_admin }});
       }
       statusPolling();
     {% endif %}
