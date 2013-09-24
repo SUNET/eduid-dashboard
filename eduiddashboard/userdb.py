@@ -60,6 +60,9 @@ class UserDB(IUserDB):
     def exists_by_field(self, field, value):
         return self._db.exists_by_field(field, value)
 
+    def exists_by_filter(self, filter):
+        return self._db.exists_by_filter(filter)
+
     def get_users(self, filter, proyection=None):
         return self._db.get_users(filter, proyection)
 
