@@ -56,12 +56,10 @@ def mark_as_verified_email(request, context, verified_email):
 
     # Do the save staff
     request.db.profiles.save(user, safe=True)
-
-    request.context.propagate_user_changes(user)
-
     request.session.flash(_('Your email {email} was verified'
-                            ).format(email=verified_email),
+                          ).format(email=verified_email),
                           queue='forms')
+    context.propagate_user_changes(user)
 
 
 @view_config(route_name='emails-actions', permission='edit')

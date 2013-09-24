@@ -5,8 +5,11 @@
 (function () {
     "use strict";
 
-    var success = function(data) {
-            contaner_e.html(data);
+    var sendInfo = function(container, cls, msg) {
+            var messageHTML = '<div class="alert alert-' + cls +
+    '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
+            msg + '</div>';
+            container.find('.tab-content').prepend(messageHTML);
         },
 
         initialize = function (container, url) {
@@ -32,15 +35,23 @@
                     identifier: value
                 },
                 function(data, statusText, xhr) {
-                    var messageHTML = '<div class="alert alert-' + data.result +
-                    '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
-                    data.message + '</div>';
-                    container.find('.tab-content').prepend(messageHTML);
-                    if(data.action == 'remove' && data.result == 'ok') {
-                        // special case of removing rows
-                        container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
-                    } else if (data.result == 'getcode') {
-                        
+                    if (data.result == 'getcode') {
+                        askDialog(data.message, '', data.placeholder, function(code) {
+                            $.post(actions_url, {
+                                action: action,
+                                identifier: value,
+                                code: code
+                            },
+                            function(data, statusText, xhr) {
+                                sendInfo(container, data.result, data.message);
+                            },
+                            'json')});
+                    } else {
+                        sendInfo(container, data.result, data.message);
+                        if(data.action == 'remove' && data.result == 'ok') {
+                            // special case of removing rows
+                            container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
+                        }
                     }
                     $('body').trigger('action-executed');
                 },

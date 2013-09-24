@@ -83,9 +83,9 @@
     function okAskDialog () {
       var input = document.getElementById("askDialogInput");
       input.askcallback(input.value);
-      closeAskDialog ();
+      closeAskDialog();
     };
-    function askDialog (prompt, defaultvalue, placeholder, askcallback) {
+    function askDialog(prompt, defaultvalue, placeholder, askcallback) {
       var input = document.getElementById("askDialogInput");
       input.value = defaultvalue;
       input.placeholder = placeholder;

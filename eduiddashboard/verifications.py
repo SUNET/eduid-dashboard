@@ -1,14 +1,14 @@
 from eduiddashboard.utils import get_unique_hash
 
 
-def get_verification_code(db, model_name, obj_id):
-    obj = db.verifications.find({'obj_id': obj_id})[0]
-    return obj['code']
+def get_verification_codes(db, model_name, obj_id):
+    results = db.verifications.find({'obj_id': obj_id})
+    return [obj['code'] for obj in results]
 
 
 def new_verification_code(db, model_name, obj_id, hasher=None):
     if hasher is None:
-        hasher = get_unique_hash()
+        hasher = get_unique_hash
     code = hasher()
     obj = {
         "model_name": model_name,
@@ -20,8 +20,16 @@ def new_verification_code(db, model_name, obj_id, hasher=None):
     return code
 
 
-def verificate_code(db, model_name, code):
-    result = db.verifications.find_and_modify(
+def verificate_code(request, model_name, code):
+    from eduiddashboard.views.emails import mark_as_verified_email
+    from eduiddashboard.views.mobiles import mark_as_verified_mobile
+
+    verifiers = {
+        'email': mark_as_verified_email,
+        'mobiles': mark_as_verified_mobile,
+    }
+
+    result = request.db.verifications.find_and_modify(
         {
             "model_name": model_name,
             "code": code,
@@ -37,7 +45,10 @@ def verificate_code(db, model_name, code):
 
     if not result:
         return None
-    return result['obj_id']
+    obj_id = result['obj_id']
+    if obj_id:
+        verifiers[model_name](request, request.context, obj_id)
+    return obj_id
 
 
 def generate_verification_link(request, db, model, obj_id):

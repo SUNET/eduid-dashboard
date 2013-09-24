@@ -7,7 +7,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
 from eduiddashboard.sms import send_sms
 from eduiddashboard.utils import get_icon_string, get_short_hash
-from eduiddashboard.verifications import get_verification_code, new_verification_code
+from eduiddashboard.verifications import get_verification_codes, new_verification_code, verificate_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
@@ -47,6 +47,19 @@ def get_tab():
     }
 
 
+def mark_as_verified_mobile(request, context, verified_mobile):
+    user = context.get_user()
+    mobiles = user['mobile']
+
+    for mobile in mobiles:
+        if mobile['mobile'] == verified_mobile:
+            mobile['verified'] = True
+
+    # Do the save staff
+    request.db.profiles.save(user, safe=True)
+    request.context.propagate_user_changes(user)
+
+
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
 
@@ -79,21 +92,37 @@ class MobilesActionsView(BaseActionsView):
     def verify_action(self, index, post_data):
         mobile_to_verify = self.user.get('mobile', [])[index]
         mobile_number = mobile_to_verify['mobile']
-        code = new_verification_code(self.request.db, 'mobiles', mobile_number, hasher=get_short_hash)
+        if 'code' in post_data:
+            code_sent = post_data['code']
+            codes = get_verification_codes(self.request.db, 'mobiles', mobile_number)
+            if code_sent in codes:
+                verificate_code(self.request, 'mobiles', code_sent)
 
-        msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
-            'mobile_number': mobile_number,
-            'code': code,
-        })
-        msg = get_localizer(self.request).translate(msg)
-        send_sms(mobile_number, msg)
+                return {
+                    'result': 'ok',
+                    'message': _('The mobile phone has been verified'),
+                }
+            else:
+                return {
+                    'result': 'error',
+                    'message': _('The confirmation code is not the one have been sent to your mobile phone')
+                }
+        else:
+            code = new_verification_code(self.request.db, 'mobiles', mobile_number, hasher=get_short_hash)
+            msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
+                'mobile_number': mobile_number,
+                'code': code,
+            })
+            msg = get_localizer(self.request).translate(msg)
+            send_sms(mobile_number, msg)
 
-        return {
-            'result': 'getcode',
-            'message': _('A new verification message has been sent '
-                         'to your mobile phone. Please revise your '
-                         'SMS inbox and fill below with the given code'),
-        }
+            return {
+                'result': 'getcode',
+                'message': _('A new verification message has been sent '
+                             'to your mobile phone. Please revise your '
+                             'SMS inbox and fill below with the given code'),
+                'placeholder': _('Mobile phone code'),
+            }
 
 
 @view_config(route_name='mobiles', permission='edit',
