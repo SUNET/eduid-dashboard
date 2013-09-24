@@ -32,6 +32,7 @@ def filter_tabs(tabs, remove_tabs):
 
 
 def get_available_tabs(context):
+
     from eduiddashboard.views import (emails, personal, postal_address,
                                       mobiles, nins, permissions,
                                       get_dummy_status)

@@ -130,8 +130,6 @@ def jinja2_settings(settings):
     """)
 
 
-<<<<<<< HEAD
-=======
 def read_permissions(raw):
     if raw.strip() == '':
         return REQUIRED_GROUP_PER_WORKMODE
