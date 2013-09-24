@@ -32,14 +32,16 @@ def filter_tabs(tabs, remove_tabs):
 
 def get_available_tabs(context):
     from eduiddashboard.views import (emails, personal, postal_address, mobiles,
-                                      permissions, get_dummy_status)
+                                      nins, permissions, get_dummy_status)
     default_tabs = [
         personal.get_tab(),
+        nins.get_tab(),
         emails.get_tab(),
         permissions.get_tab(),
-        {'label': _('Passwords'),
-         'status': get_dummy_status,
-         'id': 'passwords',
+        {
+            'label': _('Passwords'),
+            'status': get_dummy_status,
+            'id': 'passwords',
         },
         mobiles.get_tab(),
         postal_address.get_tab(),
@@ -65,7 +67,6 @@ def calculate_filled_profile(user, tabs):
 
     filled_profile = [sum(a) for a in zip(*tuples)]
     return int((float(filled_profile[0]) / float(filled_profile[1])) * 100)
-
 
 
 def get_pending_actions(user, tabs):
