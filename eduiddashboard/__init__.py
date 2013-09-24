@@ -153,8 +153,7 @@ def read_permissions(raw):
 
 def read_proofing_links(settings):
 
-    raw_proofing_links = read_setting_from_env(settings, 'proofing_links',
-                                               None)
+    raw_proofing_links = read_setting_from_env(settings, 'proofing_links', '')
 
     proofing_links = {}
     added_links = []
@@ -170,7 +169,7 @@ def read_proofing_links(settings):
             proofing_links[proofing_component] = url
             added_links.append(proofing_component)
 
-    if len(added_links) != len(REQUIRED_PROOFING_LINKS):
+    if len(added_links) != len(REQUIRED_PROOFING_LINKS) and not 'testing' in settings:
         raise ConfigurationError('The proofing_links configuration is not OK')
 
     return proofing_links
