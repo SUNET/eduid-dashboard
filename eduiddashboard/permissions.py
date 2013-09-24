@@ -257,3 +257,7 @@ class VerificationsFactory(BaseFactory):
 
 class StatusFactory(BaseFactory):
     pass
+
+
+class ProofingFactory(BaseFactory):
+    pass

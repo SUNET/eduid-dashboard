@@ -16,6 +16,24 @@ from eduiddashboard.utils import (verify_auth_token,
 
 from eduiddashboard.models import UserSearcher
 
+from eduiddashboard.views import (emails, personal, postal_address, mobiles,
+                                  nins, permissions, get_dummy_status)
+
+
+AVAILABLE_TABS = [
+    personal.get_tab(),
+    nins.get_tab(),
+    emails.get_tab(),
+    permissions.get_tab(),
+    {
+        'label': _('Passwords'),
+        'status': get_dummy_status,
+        'id': 'passwords',
+    },
+    mobiles.get_tab(),
+    postal_address.get_tab(),
+]
+
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
              request_method='GET', permission='edit')

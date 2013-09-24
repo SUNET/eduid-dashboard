@@ -118,6 +118,8 @@ class NINsActionsView(BaseActionsView):
         else:
             raise HTTPNotFound("The index provides can't be found")
 
+        remove_nin = nins[index]
+
         if remove_nin['verified']:
             raise HTTPConflict("This nin can't be removed")
 
