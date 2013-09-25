@@ -13,10 +13,14 @@ def new_verification_code(db, model_name, obj_id, hasher=None):
     obj = {
         "model_name": model_name,
         "obj_id": obj_id,
-        "code": code,
-        "verified": False
+        "verified": False,
     }
-    db.verifications.find_and_modify(obj, obj, upsert=True, safe=True)
+    db.verifications.find_and_modify(
+        obj,
+        {"$set": {"code": code}},
+        upsert=True,
+        safe=True,
+    )
     return code
 
 
