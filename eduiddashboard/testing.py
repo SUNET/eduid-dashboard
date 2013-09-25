@@ -32,8 +32,12 @@ MOCKED_USER_STANDARD = {
         'active': False,
     }, {
         'norEduPersonNIN': '123456789012',
-        'verified': True,
-        'active': True,
+        'verified': False,
+        'active': False,
+    }, {
+        'norEduPersonNIN': '123456789013',
+        'verified': False,
+        'active': False,
     }],
     'photo': 'https://pointing.to/your/photo',
     'preferredLanguage': 'en',

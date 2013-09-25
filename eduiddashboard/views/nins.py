@@ -1,7 +1,7 @@
 # NINS form
 
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPConflict
+from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN
@@ -113,7 +113,10 @@ class NINsActionsView(BaseActionsView):
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
         nins = self.user.get('norEduPersonNIN', [])
-        remove_nin = nins[index]
+        if len(nins) > index:
+            remove_nin = nins[index]
+        else:
+            raise HTTPNotFound("The index provides can't be found")
 
         if remove_nin['verified']:
             raise HTTPConflict("This nin can't be removed")
