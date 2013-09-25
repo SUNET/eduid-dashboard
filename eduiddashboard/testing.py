@@ -150,6 +150,7 @@ class LoggedInReguestTests(unittest.TestCase):
                 address_type_text = eduiddashboard.filters:address_type_text
                 country_name = eduiddashboard.filters:country_name
                 context_route_url = eduiddashboard.filters:context_route_url
+                safe_context_route_url = eduiddashboard.filters:safe_context_route_url
             """,
             'jinja2.i18n.domain': 'eduid-dashboard',
             'jinja2.extensions': ['jinja2.ext.with_'],
