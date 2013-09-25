@@ -74,13 +74,13 @@
 
   <script>
     $(document).ready(function() {
-      $("#askDialog").bind ('show', function () {
+      $("#askDialog").bind('show', function () {
         });
       });
-    function closeAskDialog () {
+    function closeAskDialog() {
       $("#askDialog").modal('hide'); 
     };
-    function okAskDialog () {
+    function okAskDialog() {
       var input = document.getElementById("askDialogInput");
       input.askcallback(input.value);
       closeAskDialog();
