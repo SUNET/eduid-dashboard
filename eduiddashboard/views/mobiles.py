@@ -171,7 +171,7 @@ class MobilesView(BaseFormView):
             'code': code,
         })
         msg = get_localizer(self.request).translate(msg)
-        send_sms(mobile_number, msg)
+        send_sms(self.request, mobile_number, msg)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
