@@ -94,9 +94,9 @@ class MobilesActionsView(BaseActionsView):
         mobile_number = mobile_to_verify['mobile']
         if 'code' in post_data:
             code_sent = post_data['code']
-            codes = get_verification_codes(self.request.db, 'mobiles', mobile_number)
+            codes = get_verification_codes(self.request.db, 'mobile', mobile_number)
             if code_sent in codes:
-                verificate_code(self.request, 'mobiles', code_sent)
+                verificate_code(self.request, 'mobile', code_sent)
 
                 return {
                     'result': 'ok',
@@ -108,14 +108,6 @@ class MobilesActionsView(BaseActionsView):
                     'message': _('The confirmation code is not the one have been sent to your mobile phone')
                 }
         else:
-            code = new_verification_code(self.request.db, 'mobiles', mobile_number, hasher=get_short_hash)
-            msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
-                'mobile_number': mobile_number,
-                'code': code,
-            })
-            msg = get_localizer(self.request).translate(msg)
-            send_sms(mobile_number, msg)
-
             return {
                 'result': 'getcode',
                 'message': _('A new verification message has been sent '
@@ -152,6 +144,7 @@ class MobilesView(BaseFormView):
 
     def add_success(self, mobileform):
         mobile = self.schema.serialize(mobileform)
+        mobile_number = mobile['mobile']
         mobile['verified'] = False
 
         mobiles = self.user.get('mobile', [])
@@ -171,6 +164,14 @@ class MobilesView(BaseFormView):
 
         # update the session data
         self.context.propagate_user_changes(self.user)
+
+        code = new_verification_code(self.request.db, 'mobile', mobile_number, hasher=get_short_hash)
+        msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
+            'mobile_number': mobile_number,
+            'code': code,
+        })
+        msg = get_localizer(self.request).translate(msg)
+        send_sms(mobile_number, msg)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '

@@ -26,7 +26,7 @@ def verificate_code(request, model_name, code):
 
     verifiers = {
         'email': mark_as_verified_email,
-        'mobiles': mark_as_verified_mobile,
+        'mobile': mark_as_verified_mobile,
     }
 
     result = request.db.verifications.find_and_modify(
@@ -42,7 +42,6 @@ def verificate_code(request, model_name, code):
         new=True,
         safe=True
     )
-
     if not result:
         return None
     obj_id = result['obj_id']
