@@ -36,8 +36,8 @@ MOCKED_USER_STANDARD = {
         'active': False,
     }, {
         'norEduPersonNIN': '123456789013',
-        'verified': False,
-        'active': False,
+        'verified': True,
+        'active': True,
     }],
     'photo': 'https://pointing.to/your/photo',
     'preferredLanguage': 'en',
@@ -146,18 +146,9 @@ class LoggedInReguestTests(unittest.TestCase):
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',
             'jinja2.undefined': 'strict',
-            'jinja2.filters': """
-        route_url = pyramid_jinja2.filters:route_url_filter
-        static_url = pyramid_jinja2.filters:static_url_filter
-        get_flash_message_text = eduiddashboard.filters:get_flash_message_text
-        get_flash_message_type = eduiddashboard.filters:get_flash_message_type
-        address_type_text = eduiddashboard.filters:address_type_text
-        country_name = eduiddashboard.filters:country_name
-        context_route_url = eduiddashboard.filters:context_route_url
-        safe_context_route_url = eduiddashboard.filters:safe_context_route_url
+            'proofing_links': """
+                nin = http://another.platform/nins/{nin}/
             """,
-            'jinja2.i18n.domain': 'eduid-dashboard',
-            'jinja2.extensions': ['jinja2.ext.with_'],
             'available_languages': 'en es',
             'vccs_url': 'http://localhost:8550/',
         }
