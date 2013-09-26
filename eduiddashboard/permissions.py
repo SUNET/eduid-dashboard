@@ -1,6 +1,6 @@
 import re
 
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
@@ -50,6 +50,14 @@ class BaseFactory(object):
         self.user = self.get_user()
         self.main_attribute = self.request.registry.settings.get(
             'saml2.user_main_attribute', 'mail')
+        if self.workmode != 'personal' and self.user is not None:
+            # Verify that session loa is iqual or bigger than the edited user
+            max_user_loa = self.user.get('maxReachedLoa', 1)
+            session_loa = self.request.session.get('loa', 1)
+
+            if session_loa < max_user_loa:
+                raise HTTPForbidden('You have not sufficient AL to edit this user')
+
         self.__acl__ = self.acls[self.workmode]
 
     def get_user(self):
