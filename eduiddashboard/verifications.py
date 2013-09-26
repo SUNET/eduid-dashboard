@@ -1,5 +1,14 @@
 from eduiddashboard.utils import get_unique_hash
 
+from eduiddashboard import log
+
+
+def dummy_message(request, message):
+    """
+    This function is only for debugging propposing
+    """
+    log.debug('[DUMMY_MESSAGE]: {0}'.format(message))
+
 
 def get_verification_code(db, model_name, obj_id):
     results = db.verifications.find({'obj_id': obj_id, 'model_name': model_name})

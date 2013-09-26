@@ -32,6 +32,10 @@ MOCKED_USER_STANDARD = {
         'active': False,
     }, {
         'norEduPersonNIN': '123456789012',
+        'verified': False,
+        'active': False,
+    }, {
+        'norEduPersonNIN': '123456789013',
         'verified': True,
         'active': True,
     }],
@@ -152,8 +156,9 @@ class LoggedInReguestTests(unittest.TestCase):
                 context_route_url = eduiddashboard.filters:context_route_url
                 safe_context_route_url = eduiddashboard.filters:safe_context_route_url
             """,
-            'jinja2.i18n.domain': 'eduid-dashboard',
-            'jinja2.extensions': ['jinja2.ext.with_'],
+            'proofing_links': """
+                nin = http://another.platform/nins/{nin}/
+            """,
             'available_languages': 'en es',
             'vccs_url': 'http://localhost:8550/',
         }

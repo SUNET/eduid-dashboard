@@ -84,3 +84,22 @@ class EmailExistsValidator(object):
         if not request.userdb.exists_by_field('mailAliases.email', value):
             raise colander.Invalid(node,
                                    _("This email does not exist"))
+
+
+class NINUniqueValidator(object):
+
+    def __call__(self, node, value):
+
+        request = node.bindings.get('request')
+        nin_filter = {
+            'norEduPersonNIN.norEduPersonNIN': value,
+            'norEduPersonNIN.verified': True,
+        }
+        if request.userdb.exists_by_filter(nin_filter):
+            raise colander.Invalid(node,
+                _("This NIN is already registered and was verified by other user"))
+        user = request.context.get_user()
+        nin_exist = len([x for x in user.get('norEduPersonNIN', []) if x['norEduPersonNIN'] == value]) > 0
+        if nin_exist:
+            raise colander.Invalid(node,
+                _("This NIN is already registered in your NIN list"))

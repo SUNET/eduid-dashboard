@@ -1,0 +1,71 @@
+{% extends "templates/baseform.jinja2" %}
+
+{% block form_generic_description %}
+   {% trans %}<p>This list contain all your National Identity Numbers
+   (NIN) registered in the platform.</p>
+   {% endtrans %}
+{% endblock %}
+
+{% block extra_content %}
+
+  {{ safe_actions_url('nins-actions') }}
+
+  {% if nins %}
+  <table class='table table-striped table-thin nins'>
+    <thead>
+      <tr>
+        <th>{{_("NIN")}}</th>
+        <th>{{_("verification status")}}</th>
+        <th>{{_("remove")}}</th>
+      </tr>
+    </thead>
+
+    {% for nin in nins %}
+    <tr class='ninrow' data-identifier="{{ loop.index0 }}">
+        <td class='identifier'>{{ nin.norEduPersonNIN }}</td>
+
+      {% if nin.verified %}
+        <td><i class="icon-ok"
+               title='{{_("Already verified")}}'></i></td>
+        <td></td>
+      {% else %}
+        <td>
+          {% if loop.last %}
+          <label>
+            <i class='icon-refresh' title='{{_("Verify")}}'></i>
+            <input class='hide' type='radio' name='verify' value='{{loop.index0}}'>
+          </label>
+          {% else %}
+            <i class='icon-remove' title="{{_('Can\'t verify an old NIN')}}"></i>
+          {% endif %}
+        </td>
+        <td>
+          <label>
+            <i class='icon-remove' title='{{_("Remove")}}'></i>
+            <input class='hide' type='radio' name='remove' value='{{loop.index0}}'>
+          </label>
+        </td>
+      {% endif %}
+
+
+    </tr>
+    {% endfor %}
+  </table>
+
+  {% else %}
+    <p>{% trans %}There is no content created. You can add first element by clicking the button below{% endtrans %}</p>
+  {% endif %}
+
+  <button type='button'
+          class='btn add-new' 
+          data-toggle='button'>
+        <i class='icon-plus'></i>
+        {{_('Add a new National Identity Number')}}</button>
+{% endblock %}
+
+
+{% block form_generic_form %}
+  <div class='form-content hide'>
+    {{ form|safe }}
+  </div>
+{% endblock %}

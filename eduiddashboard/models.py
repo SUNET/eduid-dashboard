@@ -8,7 +8,8 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        EmailExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
-                                       PermissionsValidator)
+                                       PermissionsValidator,
+                                       NINUniqueValidator)
 
 from eduiddashboard.widgets import permissions_widget
 
@@ -46,19 +47,14 @@ class NIN(colander.MappingSchema):
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),
         title=_('personal identity number (NIN)'),
-        validator=colander.Regex(
-            regex=re.compile('[0-9]{12}'),
-            msg=_('The personal identity number consists of 12 digits')
+        validator=colander.All(
+            colander.Regex(
+                regex=re.compile('[0-9]{12}'),
+                msg=_('The personal identity number consists of 12 digits')
+            ),
+            NINUniqueValidator()
         )
     )
-    verified = colander.SchemaNode(BooleanMongo(), missing=False,
-                                   title=_('verified'))
-    active = colander.SchemaNode(BooleanMongo(), missing=False,
-                                 title=_('active'))
-
-
-class NINs(colander.SequenceSchema):
-    NINs = NIN(title=_('personal identity numbers'))
 
 
 @colander.deferred
@@ -89,8 +85,6 @@ class Person(colander.MappingSchema):
                                             title=_('preferred language'),
                                             missing='',
                                             widget=preferred_language_widget)
-
-    norEduPersonNIN = NINs(title=_('personal identity numbers'))
 
 
 class Passwords(colander.MappingSchema):

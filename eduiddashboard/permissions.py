@@ -41,6 +41,8 @@ class BaseFactory(object):
         ],
     }
 
+    _user = None
+
     def __init__(self, request):
         self.request = request
         settings = self.request.registry.settings
@@ -51,6 +53,10 @@ class BaseFactory(object):
         self.__acl__ = self.acls[self.workmode]
 
     def get_user(self):
+
+        # Cache user until the request is completed
+        if self._user is not None:
+            return self._user
 
         user = None
         if self.workmode == 'personal':
@@ -63,6 +69,7 @@ class BaseFactory(object):
                 user = self.request.userdb.get_user_by_oid(userid)
             if not user and userid:
                 raise HTTPNotFound()
+        self._user = user
         return user
 
     def route_url(self, route, **kw):
@@ -170,4 +177,8 @@ class VerificationsFactory(BaseFactory):
 
 
 class StatusFactory(BaseFactory):
+    pass
+
+
+class ProofingFactory(BaseFactory):
     pass
