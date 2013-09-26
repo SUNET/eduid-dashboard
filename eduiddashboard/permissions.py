@@ -97,7 +97,7 @@ class BaseFactory(object):
             if user_session == newuser[self.main_attribute]:
                 self.request.session['user'] = newuser
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
     def get_groups(self, userid=None, request=None):
         user = self.request.session.get('user')

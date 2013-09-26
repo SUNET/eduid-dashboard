@@ -6,7 +6,7 @@ def get_verification_codes(db, model_name, obj_id):
     return [obj['code'] for obj in results]
 
 
-def new_verification_code(db, model_name, obj_id, hasher=None):
+def new_verification_code(db, model_name, obj_id, user, hasher=None):
     if hasher is None:
         hasher = get_unique_hash
     code = hasher()
@@ -14,6 +14,7 @@ def new_verification_code(db, model_name, obj_id, hasher=None):
         "model_name": model_name,
         "obj_id": obj_id,
         "verified": False,
+        "user_oid": user['_id'],
     }
     db.verifications.find_and_modify(
         obj,
@@ -50,11 +51,16 @@ def verificate_code(request, model_name, code):
         return None
     obj_id = result['obj_id']
     if obj_id:
-        verifiers[model_name](request, request.context, obj_id)
+        user = request.userdb.get_user_by_oid(result['user_oid'])
+        # Callback to a function which marks as verificated the proper user attribute
+        verifiers[model_name](request, user, obj_id)
+        # Do the save staff
+        request.db.profiles.save(user, safe=True)
+        request.context.propagate_user_changes(user)
     return obj_id
 
 
 def generate_verification_link(request, db, model, obj_id):
-    code = new_verification_code(db, model, obj_id)
+    code = new_verification_code(db, model, obj_id, request.context.user)
     link = request.route_url("verifications", model=model, code=code)
     return link

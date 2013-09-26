@@ -47,17 +47,12 @@ def get_tab():
     }
 
 
-def mark_as_verified_mobile(request, context, verified_mobile):
-    user = context.get_user()
+def mark_as_verified_mobile(request, user, verified_mobile):
     mobiles = user['mobile']
 
     for mobile in mobiles:
         if mobile['mobile'] == verified_mobile:
             mobile['verified'] = True
-
-    # Do the save staff
-    request.db.profiles.save(user, safe=True)
-    request.context.propagate_user_changes(user)
 
 
 @view_config(route_name='mobiles-actions', permission='edit')
@@ -165,7 +160,7 @@ class MobilesView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        code = new_verification_code(self.request.db, 'mobile', mobile_number, hasher=get_short_hash)
+        code = new_verification_code(self.request.db, 'mobile', mobile_number, self.user, hasher=get_short_hash)
         msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
             'mobile_number': mobile_number,
             'code': code,
