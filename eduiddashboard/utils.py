@@ -8,8 +8,8 @@ from eduiddashboard.compat import text_type
 
 MAX_LOA_ROL = {
     'user': 3,
-    'helpdesk': 2,
-    'admin': 2,
+    'helpdesk': 3,
+    'admin': 3,
 }
 
 
@@ -31,8 +31,9 @@ def filter_tabs(tabs, remove_tabs):
 
 
 def get_available_tabs(context):
-    from eduiddashboard.views import (emails, personal, postal_address, mobiles,
-                                      nins, permissions, get_dummy_status)
+    from eduiddashboard.views import (emails, personal, postal_address,
+                                      mobiles, nins, permissions,
+                                      get_dummy_status)
     default_tabs = [
         personal.get_tab(),
         nins.get_tab(),

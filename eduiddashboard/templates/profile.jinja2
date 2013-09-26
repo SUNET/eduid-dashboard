@@ -2,11 +2,7 @@
 
 {% block nav_class_home %}active{% endblock %}
 
-
 {% block contents %}
-  <div class='loa-big'>
-    <div>{{ _("Level") }} <span class="level">{{ request.session.get('loa', 5) }}</span></div>
-  </div>
 
   {% if context.workmode == 'personal' %}
   <h3>{{ _("Your profile") }}</h3>
@@ -14,50 +10,55 @@
   <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
   {% endif %}
 
+  {% with loa=request.session.get('loa', 1) %}
+    <div class='loa-big'>
+      <div>{% trans loa=loa %}level <span class="level">{{ loa }}</span>{% endtrans %}</div>
+    </div>
+  {% endwith %}
+
   <div class='clearfix'></div>
 
   <div class='row'>
     <div class='span6'>
         {% if context.workmode == 'personal' %}
-          <h4>{{ _("Level of assurance") }}</h4>
-          {% with loa = request.session.get('loa') %}
-          <ul class='circles-widget-labels'>
-            <li><a href='#' title="{{ _('Level 5') }}" data-toggle='popover'
-                  data-content='{{_("This is the lower level you can reach With this loa you can edit some attributes of your profile")}}'>
-                {{ _('Level 5') }}</a></li>
-            {% if max_loa <= 4 %}
-            <li><a href='#' title="{{ _('Level 4') }}" data-toggle='popover'
-                  data-content='{{ _("With this loa you can edit some attributes of your profile")}}'>
-                {{ _('Level 4') }}</a></li>
-            {% endif %}{% if max_loa <= 3 %}
-            <li><a href='#' title="{{ _('Level 3') }}" data-toggle='popover'
-                  data-content='{{ _("With this loa you can edit some attributes of your profile")}}'>
-                {{ _('Level 3') }}</a></li>
-            {% endif %}{% if max_loa <= 2 %}
-            <li><a href='#' title="{{ _('Level 2') }}" data-toggle='popover'
-                  data-content='{{_("With this loa you can edit all attributes of your profile")}}'>
-                {{ _('Level 2') }}</a></li>
-            {% endif %}
-          </ul>
-
-          <div class='circles-widget level-{{ request.session.get('loa', 5) }} max-level-{{ max_loa }}'>
-            <div class='img'></div>
-            <div class='bar'></div>
-          </div>
-
-          <div class='popover-container'>
-          </div>
-
-          <div class='level-assurance-description'>
-             {{_("You are in ") }}<span class="level">{{ loa }}</span> {{_("level")}}
-             {% if loa == max_loa %}
-               {% trans %}<p>This is the highest level of assurance available for your profile</p>{% endtrans %}
-             {% else %}
-               {% trans %}<p>If you want to increase this level to get
-               more permissions you need to resolve the pending actions</p>{% endtrans %}
+          {% with loa=request.session.get('loa', 1) %}
+           <h4>{{ _("Level of assurance") }}</h4>
+           <ul class='circles-widget-labels'>
+             <li><a href='#' title="{{ _('Level 1') }}" data-toggle='popover'
+                   data-content='{{_("On level 1 you can do something")}}'>
+                 {{ _('Level 1') }}</a></li>
+             {% if max_loa >= 2 %}
+             <li><a href='#' title="{{ _('Level 2') }}" data-toggle='popover'
+                   data-content='{{ _("On level 2 you can do something")}}'>
+                 {{ _('Level 2') }}</a></li>
+             {% endif %}{% if max_loa >= 3 %}
+             <li><a href='#' title="{{ _('Level 3') }}" data-toggle='popover'
+                   data-content='{{ _("On level 3 you can do something")}}'>
+                 {{ _('Level 3') }}</a></li>
+             {% endif %}{% if max_loa >= 4 %}
+             <li><a href='#' title="{{ _('Level 4') }}" data-toggle='popover'
+                   data-content='{{_("On level 4 you can do something")}}'>
+                 {{ _('Level 4') }}</a></li>
              {% endif %}
-          </div>
+           </ul>
 
+           <div class='circles-widget level-{{ loa }} max-level-{{ max_loa }}'>
+             <div class='img'></div>
+             <div class='bar'></div>
+           </div>
+
+           <div class='popover-container'>
+           </div>
+
+           <div class='level-assurance-description'>
+             {% trans loa=loa %}You are in level <span class="level">{{ loa }}</span>{% endtrans %}
+              {% if loa == max_loa %}
+                {% trans %}<p>This is the highest level of assurance available for your profile</p>{% endtrans %}
+              {% else %}
+                {% trans %}<p>If you need to increase this level to get more permissions
+                you must login with another authentication method</p>{% endtrans %}
+              {% endif %}
+           </div>
           {% endwith %}
         {% endif %}
 
@@ -89,6 +90,7 @@
           {% with status = tab.status %}
             {% if status and 'icon' in status %}
               <a href='#{{tab.id}}'
+                 data-toggle='tooltip'
                  title='{{_(status.pending_actions)}}'>
                     <i class='{{status.icon}}'></i>
                 {{_(tab.label)}}
@@ -141,7 +143,15 @@
 var loa_popovers = function () {
   $('.circles-widget-labels a').popover({
     placement: 'bottom',
-    trigger: 'hover'
+    trigger: 'hover',
+    delay: {
+      show: 250,
+      hide: 500
+    }
+  });
+
+  $('.circles-widget-labels a').click(function (e) {
+      e.preventDefault();
   });
 };
 

@@ -129,11 +129,11 @@ body {
 }
 
 
-.circles-widget.level-5 .bar {
+.circles-widget.level-1 .bar {
   width: 19px;
 }
 
-.circles-widget.level-4 .bar {
+.circles-widget.level-2 .bar {
   width: 90px;
 }
 
@@ -141,15 +141,15 @@ body {
   width: 175px;
 }
 
-.circles-widget.level-2 .bar {
+.circles-widget.level-4 .bar {
   width: 237px;
 }
 
-.circles-widget.max-level-5 div.img {
+.circles-widget.max-level-1 div.img {
   width: 10px;
 }
 
-.circles-widget.max-level-4 div.img {
+.circles-widget.max-level-2 div.img {
   width: 90px;
 }
 
