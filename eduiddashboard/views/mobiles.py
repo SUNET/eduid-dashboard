@@ -7,7 +7,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
 from eduiddashboard.sms import send_sms
 from eduiddashboard.utils import get_icon_string, get_short_hash
-from eduiddashboard.verifications import get_verification_codes, new_verification_code, verificate_code
+from eduiddashboard.verifications import get_verification_code, new_verification_code, verificate_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
@@ -89,8 +89,8 @@ class MobilesActionsView(BaseActionsView):
         mobile_number = mobile_to_verify['mobile']
         if 'code' in post_data:
             code_sent = post_data['code']
-            codes = get_verification_codes(self.request.db, 'mobile', mobile_number)
-            if code_sent in codes:
+            code = get_verification_code(self.request.db, 'mobile', mobile_number)
+            if code_sent == code:
                 verificate_code(self.request, 'mobile', code_sent)
 
                 return {

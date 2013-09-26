@@ -6,6 +6,7 @@ from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 
 from eduid_am.tasks import update_attributes
+from eduiddashboard.verifications import get_verification_code
 
 
 EMAIL_RE = re.compile(r'[^@]+@[^@]+')
@@ -148,7 +149,11 @@ class PermissionsFactory(BaseFactory):
 
 
 class VerificationsFactory(BaseFactory):
-    pass
+
+    def get_user(self):
+        verification_code = get_verification_code(self.request.matchdict['code'])
+        return self.request.userdb.get_user_by_oid(verification_code['user_oid'])
+
 
 
 class StatusFactory(BaseFactory):

@@ -1,9 +1,9 @@
 from eduiddashboard.utils import get_unique_hash
 
 
-def get_verification_codes(db, model_name, obj_id):
+def get_verification_code(db, model_name, obj_id):
     results = db.verifications.find({'obj_id': obj_id})
-    return [obj['code'] for obj in results]
+    return results[0]
 
 
 def new_verification_code(db, model_name, obj_id, user, hasher=None):
