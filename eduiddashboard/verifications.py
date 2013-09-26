@@ -62,5 +62,5 @@ def verificate_code(request, model_name, code):
 
 def generate_verification_link(request, db, model, obj_id):
     code = new_verification_code(db, model, obj_id, request.context.user)
-    link = request.route_url("verifications", model=model, code=code)
+    link = request.context.safe_route_url("verifications", model=model, code=code)
     return link

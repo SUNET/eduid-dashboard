@@ -76,6 +76,10 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             return self.request.route_url(route, **kw)
         else:
+            site_base_url = self.request.registry.settings.get(
+            'site_base_url', None)
+            if site_base_url:
+                kw['_app_url'] = site_base_url
             userid = self.user['_id']
             return self.request.route_url(route, userid=userid, **kw)
 
@@ -109,6 +113,12 @@ class BaseFactory(object):
         elif required_urn in user.get('eduPersonEntitlement', []):
             return [self.workmode]
         return []
+
+
+class ForbiddenFactory(RootFactory):
+    __acl__ = [
+        (Deny, Everyone, ALL_PERMISSIONS),
+    ]
 
 
 class PersonFactory(BaseFactory):
