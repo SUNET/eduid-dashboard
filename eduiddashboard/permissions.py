@@ -150,11 +150,10 @@ class PermissionsFactory(BaseFactory):
 class VerificationsFactory(BaseFactory):
 
     def get_user(self):
-        try:
-            verification_code = self.request.db.verifications.find({
-                'code': self.request.matchdict['code'],
-            })[0]
-        except IndexError:
+        verification_code = self.request.db.verifications.find_one({
+            'code': self.request.matchdict['code'],
+        })
+        if verification_code is None:
             raise HTTPNotFound()
         return self.request.userdb.get_user_by_oid(verification_code['user_oid'])
 
