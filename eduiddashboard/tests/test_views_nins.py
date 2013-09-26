@@ -72,9 +72,9 @@ class NinsFormTests(LoggedInReguestTests):
 
         form['norEduPersonNIN'].value = '123456789012'
 
-        with patch.object(UserDB, 'exists_by_field', clear=True):
+        with patch.object(UserDB, 'exists_by_filter', clear=True):
 
-            UserDB.exists_by_field.return_value = True
+            UserDB.exists_by_filter.return_value = True
 
             response = form.submit('add')
 
