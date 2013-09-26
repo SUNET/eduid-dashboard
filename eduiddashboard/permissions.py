@@ -76,10 +76,10 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             return self.request.route_url(route, **kw)
         else:
-            site_base_url = self.request.registry.settings.get(
-            'site_base_url', None)
-            if site_base_url:
-                kw['_app_url'] = site_base_url
+            app_url = self.request.registry.settings.get(
+            'personal_dashboard_base_url', None)
+            if app_url:
+                kw['_app_url'] = app_url
             userid = self.user['_id']
             return self.request.route_url(route, userid=userid, **kw)
 
