@@ -168,9 +168,13 @@ def includeme(config):
         config.include(profile_urls, route_prefix='/users/{userid}/')
 
     config.add_route('token-login', '/tokenlogin/')
-    config.add_route('verifications',
-                     '/verificate/{model}/{code}/',
-                     factory=VerificationsFactory)
+    if settings['workmode'] == 'personal':
+        config.add_route('verifications',
+                         '/verificate/{model}/{code}/',
+                         factory=VerificationsFactory)
+        config.add_view('eduiddashboard.views.verifications.verifications',
+                        route_name='verifications',
+                        permission='edit')
     config.add_route('help', '/help/')
     config.add_route('session-reload', '/session-reload/')
 
