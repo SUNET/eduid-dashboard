@@ -6,9 +6,9 @@ from eduiddashboard.saml2.auth import get_loa, authenticate, login
 class AuthTests(Saml2RequestTests):
 
     def test_get_loa(self):
-        self.assertEqual(get_loa({}), 5)
-        self.assertEqual(get_loa(None), 5)
-        self.assertEqual(get_loa({'LoA': 3}), 3)
+        self.assertEqual(get_loa({}), 1)
+        self.assertEqual(get_loa(None), 1)
+        self.assertEqual(get_loa({'loa': 3}), 3)
 
     def test_authenticate(self):
         request = self.dummy_request()

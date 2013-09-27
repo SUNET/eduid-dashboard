@@ -45,7 +45,10 @@ log = logging.getLogger('eduiddashboard')
 
 
 def groups_callback(userid, request):
-    return request.context.get_groups(userid, request)
+    if getattr(request, 'context', None) is not None:
+        return request.context.get_groups(userid, request)
+    else:
+        return []
 
 
 def read_setting_from_env(settings, key, default=None):

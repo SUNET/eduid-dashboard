@@ -146,7 +146,7 @@ def token_login(context, request):
         user = request.userdb.get_user(email)
         request.session['mail'] = email
         request.session['user'] = user
-        request.session['loa'] = 5
+        request.session['loa'] = 1
         remember_headers = remember(request, email)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:

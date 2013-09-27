@@ -27,10 +27,11 @@ logger = logging.getLogger(__name__)
 
 def get_loa(session_info):
     # TODO Take loa from session_info from IDP
+    # if there aren't loa info, then set to minimun, 1
     if not session_info:
-        return 5
+        return 1
     else:
-        return session_info.get('LoA', 4)
+        return session_info.get('loa', 1)
 
 
 def authenticate(request, session_info, attribute_mapping):

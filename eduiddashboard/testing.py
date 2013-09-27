@@ -44,6 +44,7 @@ MOCKED_USER_STANDARD = {
     'eduPersonEntitlement': [
         'urn:mace:eduid.se:role:student',
     ],
+    'maxReachedLoa': 3,
     'mobile': [{
         'mobile': '609609609',
         'verified': True
@@ -187,15 +188,20 @@ class LoggedInReguestTests(unittest.TestCase):
         self.userdb = self.MockedUserDB(self.users)
 
         self.db.profiles.drop()
+        self.db.verifications.drop()
         self.amdb.attributes.drop()
 
+        users = []
         for user in self.userdb.all_users():
-            self.db.profiles.insert(user)
-            self.amdb.attributes.insert(user)
+            users.append(user)
+
+        self.db.profiles.insert(users)
+        self.amdb.attributes.insert(users)
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
         self.db.profiles.drop()
+        self.db.verifications.drop()
         self.amdb.attributes.drop()
         self.testapp.reset()
 
@@ -214,10 +220,12 @@ class LoggedInReguestTests(unittest.TestCase):
         request.registry.settings = self.settings
         return request
 
-    def set_logged(self, user='johnsmith@example.com'):
+    def set_logged(self, user='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(user)
         user_obj = self.userdb.get_user(user)
-        request = self.add_to_session({'user': user_obj})
+        session_data = {'user': user_obj, 'loa': 3}
+        session_data.update(extra_session_data)
+        request = self.add_to_session(session_data)
         return request
 
     def set_user_cookie(self, user_id):
