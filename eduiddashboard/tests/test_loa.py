@@ -67,7 +67,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                         extra_session_data={'loa': 1})
 
         self.testapp.get('/profile/',
-                         status=200)
+                         status=401)
 
     def test_edit_with_bigger_loa(self):
         self.set_logged(user='johnsmith@example.com',
