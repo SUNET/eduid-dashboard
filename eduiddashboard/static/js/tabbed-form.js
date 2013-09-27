@@ -29,8 +29,12 @@ var TabbedForm = function (container) {
                 container.find("button[data-toggle=tooltip]").tooltip();
                 container.find("label[data-toggle=tooltip]").tooltip();
 
-            }, 'html').fail(function () {
-                $('body').trigger('communication-error');
+            }, 'html').fail(function (xhr) {
+                if (xhr.status == 401) {
+                    $('body').trigger('communication-error-permissions');
+                } else {
+                    $('body').trigger('communication-error');
+                }
             });
         },
 
