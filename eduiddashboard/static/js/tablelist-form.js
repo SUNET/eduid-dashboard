@@ -9,7 +9,7 @@
             var messageHTML = '<div class="alert alert-' + cls +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
-            container.find('.tab-content').prepend(messageHTML);
+            container.find('.info-container').prepend(messageHTML);
         },
 
         initialize = function (container, url) {
@@ -20,6 +20,23 @@
             container.find('.add-new').click(function (e) {
                 container.find('.form-content').toggleClass('hide');
                 container.find('.add-new').toggleClass('active');
+            });
+
+            container.find('.resend-code').click(function(e) {
+                var actions_url = $(this).attr('href'),
+                    value = $(this).attr('data-identifier'),
+                    dialog = $(this).parents('#askDialog');
+
+                e.preventDefault();
+
+                $.post(actions_url, {
+                    action: 'resend_code',
+                    identifier: value
+                },
+                function(data, statusText, xhr) {
+                    sendInfo(dialog, data.result, data.message);
+                },
+                'json');
             });
 
             container.find('table.table input[type=radio]').click(function (e) {
@@ -36,7 +53,7 @@
                 },
                 function(data, statusText, xhr) {
                     if (data.result == 'getcode') {
-                        askDialog(data.message, '', data.placeholder, function(code) {
+                        askDialog(value, data.message, '', data.placeholder, function(code) {
                             $.post(actions_url, {
                                 action: action,
                                 identifier: value,

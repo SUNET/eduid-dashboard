@@ -63,7 +63,9 @@
     </div>
     <div class="modal-body">
       <div class="divDialogElements">
+        <div class="info-container"></div>
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
+        <p><a href="{{ context.safe_route_url('mobiles-actions') }}" class="resend-code">{{ _('Resend code') }}</a></p>
       </div>
     </div>
     <div class="modal-footer">
@@ -85,12 +87,13 @@
       input.askcallback(input.value);
       closeAskDialog();
     };
-    function askDialog(prompt, defaultvalue, placeholder, askcallback) {
+    function askDialog(identifier, prompt, defaultvalue, placeholder, askcallback) {
       var input = document.getElementById("askDialogInput");
       input.value = defaultvalue;
       input.placeholder = placeholder;
       input.askcallback = askcallback; // radical
       document.getElementById("askDialogPrompt").innerHTML = prompt;
+      $("#askDialog .resend-code").attr('data-identifier', identifier);
       $("#askDialog").modal("show");
     };
   </script>

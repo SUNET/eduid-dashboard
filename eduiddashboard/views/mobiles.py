@@ -47,6 +47,16 @@ def get_tab():
     }
 
 
+def send_verification_code(request, user, mobile_number):
+    code = new_verification_code(request.db, 'mobile', mobile_number, user, hasher=get_short_hash)
+    msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
+        'mobile_number': mobile_number,
+        'code': code,
+    })
+    msg = get_localizer(request).translate(msg)
+    send_sms(request, mobile_number, msg)
+
+
 def mark_as_verified_mobile(request, user, verified_mobile):
     mobiles = user['mobile']
 
@@ -83,6 +93,22 @@ class MobilesActionsView(BaseActionsView):
                          'through all applications'),
         }
 
+    def resend_code_action(self, index, post_data):
+        mobiles = self.user.get('mobile', [])
+        mobile_to_resend = mobiles[index]
+        mobile_number = mobile_to_resend['mobile']
+
+        send_verification_code(self.request, self.user, mobile_number)
+
+        msg = _('A new verification code has been sent to your ${number} mobile number', mapping={
+          'number': mobile_number,
+        })
+        msg = get_localizer(self.request).translate(msg)
+
+        return {
+            'result': 'ok',
+            'message': msg,
+        }
 
     def verify_action(self, index, post_data):
         mobile_to_verify = self.user.get('mobile', [])[index]
@@ -105,9 +131,7 @@ class MobilesActionsView(BaseActionsView):
         else:
             return {
                 'result': 'getcode',
-                'message': _('A new verification message has been sent '
-                             'to your mobile phone. Please revise your '
-                             'SMS inbox and fill below with the given code'),
+                'message': _('Please revise your SMS inbox and fill below with the given code'),
                 'placeholder': _('Mobile phone code'),
             }
 
@@ -160,13 +184,7 @@ class MobilesView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        code = new_verification_code(self.request.db, 'mobile', mobile_number, self.user, hasher=get_short_hash)
-        msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
-            'mobile_number': mobile_number,
-            'code': code,
-        })
-        msg = get_localizer(self.request).translate(msg)
-        send_sms(self.request, mobile_number, msg)
+        send_verification_code(self.request, self.user, mobile_number)
 
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
