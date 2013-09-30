@@ -14,14 +14,14 @@ class AuthTests(Saml2RequestTests):
         request = self.dummy_request()
 
         attribute_mapping = {
-            'mail': 'email',
+            'mail': 'mail',
         }
         session_info = self.get_fake_session_info()
 
         user = authenticate(request, session_info, attribute_mapping)
 
         # The user provide exists
-        self.assertEqual([user['email']], session_info['ava']['mail'])
+        self.assertEqual([user['mail']], session_info['ava']['mail'])
 
         user = authenticate(request,
                             self.get_fake_session_info('notexists@example.com'),
@@ -40,7 +40,7 @@ class AuthTests(Saml2RequestTests):
         request = self.get_request_with_session()
 
         attribute_mapping = {
-            'mail': 'email',
+            'mail': 'mail',
         }
 
         user = authenticate(request, session_info, attribute_mapping)
