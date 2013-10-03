@@ -78,7 +78,7 @@ def auth_response(session_id, uid):
                 <saml:AttributeValue xsi:nil="true" xsi:type="xs:string">{uid}</saml:AttributeValue>
             </saml:Attribute>
             <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
-                            Name="urn:oid:1.3.6.1.4.1.1466.115.121.1.26"
+                            Name="urn:oid:0.9.2342.19200300.100.1.3"
                             FriendlyName="mail">
                 <saml:AttributeValue xsi:nil="true" xsi:type="xs:string">{uid}</saml:AttributeValue>
             </saml:Attribute>

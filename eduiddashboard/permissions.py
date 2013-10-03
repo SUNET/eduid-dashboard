@@ -50,6 +50,7 @@ class BaseFactory(object):
         self.user = self.get_user()
         self.main_attribute = self.request.registry.settings.get(
             'saml2.user_main_attribute', 'mail')
+
         if self.user is not None:
             # Verify that session loa is iqual or bigger than the edited user
             max_user_loa = self.user.get('maxReachedLoa', 1)
@@ -59,6 +60,14 @@ class BaseFactory(object):
                 raise HTTPForbidden('You have not sufficient AL to edit this user')
 
         self.__acl__ = self.acls[self.workmode]
+
+    def authorize(self):
+        """You must overwrite this method is you want to get another
+           authorization access method no based in the ACLs.
+           If you want to unauthorized the acces to this resource you must
+           raise a HTTPForbidden exception
+        """
+        pass
 
     def get_user(self):
 
@@ -136,11 +145,28 @@ class ForbiddenFactory(RootFactory):
     ]
 
 
+class BaseCredentialsFactory(BaseFactory):
+
+    def authorize(self):
+
+        if self.user is None:
+                raise HTTPForbidden("You can't access to this resource")
+        else:
+            # Verify that session loa is iqual or bigger than the max reached
+            # loa
+            max_user_loa = self.user.get('maxReachedLoa', 1)
+            session_loa = self.request.session.get('loa', 1)
+
+            if session_loa != max_user_loa:
+                raise HTTPForbidden('You have not sufficient AL to edit your'
+                                    ' credentials')
+
+
 class PersonFactory(BaseFactory):
     pass
 
 
-class PasswordsFactory(BaseFactory):
+class PasswordsFactory(BaseCredentialsFactory):
     pass
 
 
@@ -185,8 +211,4 @@ class VerificationsFactory(BaseFactory):
 
 
 class StatusFactory(BaseFactory):
-    pass
-
-
-class ProofingFactory(BaseFactory):
     pass
