@@ -42,7 +42,8 @@
             container.find('table.table input[type=radio]').click(function (e) {
                 var action = $(e.target).attr('name'),
                     value = $(e.target).val(),
-                    actions_url = $('.actions-url').attr('data-url');
+                    actions_url = $('.actions-url').attr('data-url'),
+                    body = $('body');
 
                 container.find('.form-content').addClass('hide');
                 container.find('.add-new').removeClass('active');
@@ -61,6 +62,7 @@
                             },
                             function(data, statusText, xhr) {
                                 sendInfo(container, data.result, data.message);
+                                body.trigger('action-executed');
                             },
                             'json')});
                     } else {
@@ -69,8 +71,8 @@
                             // special case of removing rows
                             container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
                         }
+                        body.trigger('action-executed');
                     }
-                    $('body').trigger('action-executed');
                 },
                 'json');
             });

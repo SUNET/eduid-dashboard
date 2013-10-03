@@ -77,16 +77,23 @@
   <script>
     $(document).ready(function() {
       $("#askDialog").bind('show', function () {
-        });
       });
+
+      $("#askDialog").bind('shown', function () {
+        $(this).find("#askDialogInput").focus();
+      });
+    });
+
     function closeAskDialog() {
       $("#askDialog").modal('hide'); 
     };
+
     function okAskDialog() {
       var input = document.getElementById("askDialogInput");
       input.askcallback(input.value);
       closeAskDialog();
     };
+
     function askDialog(identifier, prompt, defaultvalue, placeholder, askcallback) {
       var input = document.getElementById("askDialogInput");
       input.value = defaultvalue;
