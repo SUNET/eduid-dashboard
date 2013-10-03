@@ -31,7 +31,7 @@
       {% else %}
         <td>
           <label>
-            <i class='icon-refresh' title='{{_("Resend verification")}}'></i>
+            <i class='icon-question-sign' title='{{_("Verify code")}}'></i>
             <input class='hide' type='radio' name='verify' value='{{ loop.index0 }}'>
           </label>
         </td>
@@ -65,7 +65,7 @@
       <div class="info-container"></div>
       <div class="divDialogElements">
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
-        <p><a href="{{ context.safe_route_url('mobiles-actions') }}" class="resend-code">{{ _('Resend code') }}</a></p>
+        <p>{{ _('Lost the code?')}} <a href="{{ context.safe_route_url('mobiles-actions') }}" class="resend-code">{{ _('Resend me the verification code') }}</a></p>
       </div>
     </div>
     <div class="modal-footer">

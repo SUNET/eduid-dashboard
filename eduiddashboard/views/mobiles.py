@@ -170,6 +170,7 @@ class MobilesView(BaseFormView):
 
         # update the session data
         self.user['mobile'] = mobiles
+        mobile_identifier = len(mobiles) - 1
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
@@ -188,4 +189,11 @@ class MobilesView(BaseFormView):
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
                                      'through all applications'),
+                                   queue='forms')
+        msg = _('A verification number has been sent to your mobile. '
+                'Please revise your SMS inbox and '
+                '<a href="#" class="verifycode" data-identifier="${identifier}">fill here</a>'
+                ' with the given code', mapping={'identifier': mobile_identifier})
+        msg = get_localizer(self.request).translate(msg)
+        self.request.session.flash(msg,
                                    queue='forms')

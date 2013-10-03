@@ -12,6 +12,25 @@
             container.find('.info-container').prepend(messageHTML);
         },
 
+        askCode = function(actions_url, action, container, value, title, placeholder) {
+            askDialog(value, title, '', placeholder, function(code) {
+                $.post(actions_url, {
+                    action: action,
+                    identifier: value,
+                    code: code
+                },
+                function(data, statusText, xhr) {
+                    sendInfo(container.find('#askDialog'), data.result, data.message);
+                    if (data.result == 'ok') {
+                        container.find('.btn').hide();
+                        container.find('.btn').hide();
+                        container.find('.divDialogElements').hide();
+                        container.find('.finish-button').show();
+                    }
+                },
+                'json')});
+        },
+
         initialize = function (container, url) {
             if (container.find('.form-content .alert-error').length > 0){
                 container.find('.form-content').show();
@@ -39,6 +58,12 @@
                 'json');
             });
 
+            container.find('a.verifycode').click(function (e) {
+                var identifier = $(e.target).attr('data-identifier');
+                e.preventDefault();
+                container.find('table.table .mobile-row[data-identifier=' + identifier + '] input[name=verify]').click();
+            });
+
             container.find('table.table input[type=radio]').click(function (e) {
                 var action = $(e.target).attr('name'),
                     value = $(e.target).val(),
@@ -53,22 +78,7 @@
                 },
                 function(data, statusText, xhr) {
                     if (data.result == 'getcode') {
-                        askDialog(value, data.message, '', data.placeholder, function(code) {
-                            $.post(actions_url, {
-                                action: action,
-                                identifier: value,
-                                code: code
-                            },
-                            function(data, statusText, xhr) {
-                                sendInfo(container.find('#askDialog'), data.result, data.message);
-                                if (data.result == 'ok') {
-                                    container.find('.btn').hide();
-                                    container.find('.btn').hide();
-                                    container.find('.divDialogElements').hide();
-                                    container.find('.finish-button').show();
-                                }
-                            },
-                            'json')});
+                        askCode(actions_url, action, container, value, data.message, data.placeholder);
                     } else {
                         sendInfo(container, data.result, data.message);
                         if(data.action == 'remove' && data.result == 'ok') {
