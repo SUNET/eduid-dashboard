@@ -20,12 +20,13 @@
                     code: code
                 },
                 function(data, statusText, xhr) {
-                    sendInfo(container.find('#askDialog'), data.result, data.message);
+                    var dialog = container.find('#askDialog');
+                    sendInfo(dialog, data.result, data.message);
                     if (data.result == 'ok') {
-                        container.find('.btn').hide();
-                        container.find('.btn').hide();
-                        container.find('.divDialogElements').hide();
-                        container.find('.finish-button').show();
+                        dialog.find('.btn').hide();
+                        dialog.find('.btn').hide();
+                        dialog.find('.divDialogElements').hide();
+                        dialog.find('.finish-button').show();
                     }
                 },
                 'json')});
