@@ -115,10 +115,9 @@ class MobilesActionsView(BaseActionsView):
         mobile_number = mobile_to_verify['mobile']
         if 'code' in post_data:
             code_sent = post_data['code']
-            code = get_verification_code(self.request.db, 'mobile', mobile_number)
-            if code_sent == code:
+            verification_code = get_verification_code(self.request.db, 'mobile', mobile_number)
+            if code_sent == verification_code['code']:
                 verificate_code(self.request, 'mobile', code_sent)
-
                 return {
                     'result': 'ok',
                     'message': _('The mobile phone has been verified'),
