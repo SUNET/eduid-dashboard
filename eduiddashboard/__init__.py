@@ -32,10 +32,16 @@ REQUIRED_GROUP_PER_WORKMODE = {
 }
 
 REQUIRED_LOA_PER_WORKMODE = {
-    'personal': '',
-    'helpdesk': 'urn:mace:eduid.se:role:ra',
-    'admin': 'urn:mace:eduid.se:role:admin',
+    'personal': 'http://www.swamid.se/assurance/al1',
+    'helpdesk': 'http://www.swamid.se/assurance/al2',
+    'admin': 'http://www.swamid.se/assurance/al3',
 }
+
+AVAILABLE_LOA_LEVEL = [
+    'http://www.swamid.se/assurance/al1',
+    'http://www.swamid.se/assurance/al2',
+    'http://www.swamid.se/assurance/al3',
+]
 
 
 AVAILABLE_PERMISSIONS = (
@@ -282,6 +288,18 @@ def main(global_config, **settings):
         settings,
         'available_permissions',
         default=AVAILABLE_PERMISSIONS)
+
+    settings['required_loa'] = read_mapping(
+        settings,
+        'required_loa',
+        AVAILABLE_LOA_LEVEL,
+        AVAILABLE_WORK_MODES,
+    )
+
+    settings['available_loa'] = read_list(
+        settings,
+        'available_loa',
+        default=AVAILABLE_LOA_LEVEL)
 
     settings['proofing_links'] = read_mapping(
         settings,
