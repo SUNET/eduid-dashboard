@@ -62,13 +62,14 @@
       <h3 id="askDialogPrompt"></h3>
     </div>
     <div class="modal-body">
+      <div class="info-container"></div>
       <div class="divDialogElements">
-        <div class="info-container"></div>
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
         <p><a href="{{ context.safe_route_url('mobiles-actions') }}" class="resend-code">{{ _('Resend code') }}</a></p>
       </div>
     </div>
     <div class="modal-footer">
+      <a href="#" class="finish-button btn hide" onclick="closeAskDialog();">{{ _('Finish') }}</a>
       <a href="#" class="btn" onclick="closeAskDialog();">Cancel</a>
       <a href="#" class="btn btn-primary" onclick="okAskDialog();">OK</a>
     </div>
@@ -86,12 +87,12 @@
 
     function closeAskDialog() {
       $("#askDialog").modal('hide'); 
+      $("body").trigger('action-executed');
     };
 
     function okAskDialog() {
       var input = document.getElementById("askDialogInput");
       input.askcallback(input.value);
-      closeAskDialog();
     };
 
     function askDialog(identifier, prompt, defaultvalue, placeholder, askcallback) {

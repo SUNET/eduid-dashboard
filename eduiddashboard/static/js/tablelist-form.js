@@ -42,8 +42,7 @@
             container.find('table.table input[type=radio]').click(function (e) {
                 var action = $(e.target).attr('name'),
                     value = $(e.target).val(),
-                    actions_url = $('.actions-url').attr('data-url'),
-                    body = $('body');
+                    actions_url = $('.actions-url').attr('data-url');
 
                 container.find('.form-content').addClass('hide');
                 container.find('.add-new').removeClass('active');
@@ -61,8 +60,13 @@
                                 code: code
                             },
                             function(data, statusText, xhr) {
-                                sendInfo(container, data.result, data.message);
-                                body.trigger('action-executed');
+                                sendInfo(container.find('#askDialog'), data.result, data.message);
+                                if (data.result == 'ok') {
+                                    container.find('.btn').hide();
+                                    container.find('.btn').hide();
+                                    container.find('.divDialogElements').hide();
+                                    container.find('.finish-button').show();
+                                }
                             },
                             'json')});
                     } else {
@@ -71,7 +75,7 @@
                             // special case of removing rows
                             container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
                         }
-                        body.trigger('action-executed');
+                        $('body').trigger('action-executed');
                     }
                 },
                 'json');

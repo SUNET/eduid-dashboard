@@ -169,13 +169,20 @@ $(document).ready(function () {
 
     function showStatus() {
       userstatus.renderStatus('{{ context.safe_route_url('userstatus') }}');
-      // reload active tab to update the HTML
+    }
+
+    function reloadTab() {
+      // reload active tab in order to refresh the HTML
       $('.nav-tabs li.active a').click();
     }
 
     {% if context.workmode == 'personal' %}
       $('body').on('form-submitted action-executed', function() {
         showStatus();
+      });
+
+      $('body').on('action-executed', function() {
+        reloadTab();
       });
     {% else %}
       function statusPolling() {
