@@ -122,31 +122,6 @@ def jinja2_settings(settings):
     """)
 
 
-# def read_proofing_links(settings):
-#
-#     raw_proofing_links = read_setting_from_env(settings, 'proofing_links', '')
-#
-#     proofing_links = {}
-#     added_links = []
-#     if raw_proofing_links is not None:
-#         for line in raw_proofing_links.split('\n'):
-#             if not line.strip():
-#                 continue
-#             (proofing_component, url) = line.split('=')
-#             proofing_component = proofing_component.strip()
-#
-#             url = url.strip()
-#             if (proofing_component in REQUIRED_PROOFING_LINKS and
-#                     proofing_component not in added_links):
-#                 proofing_links[proofing_component] = url
-#                 added_links.append(proofing_component)
-#
-#     if len(added_links) != len(REQUIRED_PROOFING_LINKS) and not 'testing' in settings:
-#         raise ConfigurationError('The proofing_links configuration is not OK')
-#
-#     return proofing_links
-
-
 def add_custom_deform_templates_path():
     templates_path = 'templates/form-widgets'
     try:
@@ -316,8 +291,6 @@ def main(global_config, **settings):
     )
     if settings['proofing_links'] is None:
         raise ConfigurationError('The proofing_links configuration is not OK')
-
-    # settings['proofing_links'] = read_proofing_links(settings)
 
     settings['groups_callback'] = read_setting_from_env(settings,
                                                         'groups_callback',
