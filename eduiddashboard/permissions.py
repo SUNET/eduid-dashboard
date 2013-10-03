@@ -1,7 +1,7 @@
 import re
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
-
+from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 
@@ -78,8 +78,12 @@ class BaseFactory(object):
         user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
+            userid = user.get('mail', '')
         else:
             userid = self.request.matchdict.get('userid', '')
+        cache_user_in_session = asbool(self.request.registry.settings.get(
+            'cache_user_in_session', True))
+        if not cache_user_in_session or self.workmode == 'admin':
             if EMAIL_RE.match(userid):
                 user = self.request.userdb.get_user(userid)
             elif OID_RE.match(userid):
