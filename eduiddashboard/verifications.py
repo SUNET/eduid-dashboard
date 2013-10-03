@@ -22,12 +22,11 @@ def new_verification_code(db, model_name, obj_id, user, hasher=None):
     obj = {
         "model_name": model_name,
         "obj_id": obj_id,
-        "verified": False,
         "user_oid": user['_id'],
     }
     db.verifications.find_and_modify(
         obj,
-        {"$set": {"code": code}},
+        {"$set": {"code": code, "verified": False}},
         upsert=True,
         safe=True,
     )
@@ -47,7 +46,6 @@ def verificate_code(request, model_name, code):
         {
             "model_name": model_name,
             "code": code,
-            "verified": False
         }, {
             "$set": {
                 "verified": True
