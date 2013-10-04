@@ -17,7 +17,6 @@ def get_status(user):
 
     return msg and icon
     """
-
     mobiles = user.get('mobile', [])
     pending_actions = None
 

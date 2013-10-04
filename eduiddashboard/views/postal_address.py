@@ -22,7 +22,6 @@ def get_status(user):
 
     return msg and icon
     """
-
     pending_actions = None
     postalAddress = user.get('postalAddress', [])
     if not postalAddress:
