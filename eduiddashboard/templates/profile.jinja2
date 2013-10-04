@@ -118,6 +118,7 @@
       <div class="divDialogElements">
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
         <p>{{ _('Lost the code?')}} <a href="#" class="resend-code">{{ _('Resend me the verification code') }}</a></p>
+        <p class="extra-info"></p>
       </div>
     </div>
     <div class="modal-footer">
@@ -253,6 +254,7 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
   $("#askDialog .resend-code").attr('href', actionsURL);
+  $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");
 };
 
