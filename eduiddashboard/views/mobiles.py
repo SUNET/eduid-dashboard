@@ -47,8 +47,9 @@ def get_tab():
     }
 
 
-def send_verification_code(request, user, mobile_number):
-    code = new_verification_code(request.db, 'mobile', mobile_number, user, hasher=get_short_hash)
+def send_verification_code(request, user, mobile_number, code=None):
+    if code is None:
+        code = new_verification_code(request.db, 'mobile', mobile_number, user, hasher=get_short_hash)
     msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
         'mobile_number': mobile_number,
         'code': code,
@@ -73,9 +74,10 @@ class MobilesActionsView(BaseActionsView):
         'error': _('The confirmation code is not the one have been sent to your mobile phone'),
         'request': _('Please revise your SMS inbox and fill below with the given code'),
         'placeholder': _('Mobile phone code'),
+        'new_code_sent': _('A new verification code has been sent to your mobile number'),
     }
 
-    def get_verification_data_code(self, data_to_verify):
+    def get_verification_data_id(self, data_to_verify):
         return data_to_verify['mobile']
 
     def remove_action(self, index, post_data):
@@ -103,22 +105,8 @@ class MobilesActionsView(BaseActionsView):
                          'through all applications'),
         }
 
-    def resend_code_action(self, index, post_data):
-        mobiles = self.user.get('mobile', [])
-        mobile_to_resend = mobiles[index]
-        mobile_number = mobile_to_resend['mobile']
-
-        send_verification_code(self.request, self.user, mobile_number)
-
-        msg = _('A new verification code has been sent to your ${number} mobile number', mapping={
-          'number': mobile_number,
-        })
-        msg = get_localizer(self.request).translate(msg)
-
-        return {
-            'result': 'ok',
-            'message': msg,
-        }
+    def send_verification_code(self, data_id, code):
+        send_verification_code(self.request, self.user, data_id, code)
 
 
 @view_config(route_name='mobiles', permission='edit',

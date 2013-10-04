@@ -1,13 +1,15 @@
 import json
 
 from pyramid.httpexceptions import HTTPOk
+from pyramid.i18n import get_localizer
 from pyramid.response import Response
 
 from pyramid_deform import FormView
 
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.verifications import get_verification_code, verificate_code
+from eduiddashboard.utils import get_short_hash
+from eduiddashboard.verifications import get_verification_code, verificate_code, new_verification_code
 
 
 def get_dummy_status(user):
@@ -80,6 +82,7 @@ class BaseActionsView(object):
         'error': _('The confirmation code is not the one have been sent to your mobile phone'),
         'request': _('Please revise your inbox and fill below with the given code'),
         'placeholder': _('Verification code'),
+        'new_code_sent': _('A new verification code has been sent'),
     }
 
     def __init__(self, context, request):
@@ -97,16 +100,16 @@ class BaseActionsView(object):
         result['identifier'] = index
         return Response(json.dumps(result))
 
-    def get_verification_data_code(self, data_to_verify):
+    def get_verification_data_id(self, data_to_verify):
         raise NotImplementedError()
 
     def verify_action(self, index, post_data):
         """ Common action to verificate some given data. You can override in subclasses """
         data_to_verify = self.user.get(self.data_attribute, [])[index]
-        data_code = self.get_verification_data_code(data_to_verify)
+        data_id = self.get_verification_data_id(data_to_verify)
         if 'code' in post_data:
             code_sent = post_data['code']
-            verification_code = get_verification_code(self.request.db, self.data_attribute, data_code)
+            verification_code = get_verification_code(self.request.db, self.data_attribute, data_id)
             if code_sent == verification_code['code']:
                 verificate_code(self.request, self.data_attribute, code_sent)
                 return {
@@ -124,6 +127,27 @@ class BaseActionsView(object):
                 'message': self.verify_messages['request'],
                 'placeholder': self.verify_messages['placeholder'],
             }
+
+    def resend_code_action(self, index, post_data):
+        data = self.user.get(self.data_attribute, [])
+        data_to_resend = data[index]
+        data_id = self.get_verification_data_id(data_to_resend)
+        code = new_verification_code(
+            self.request.db, self.data_attribute, data_id,
+            self.user, hasher=get_short_hash,
+        )
+        self.send_verification_code(data_id, code)
+
+        msg = self.verify_messages['new_code_sent']
+        msg = get_localizer(self.request).translate(msg)
+
+        return {
+            'result': 'ok',
+            'message': msg,
+        }
+
+    def send_verification_code(self, data_id, code):
+        raise NotImplementedError()
 
 
 class HTTPXRelocate(HTTPOk):

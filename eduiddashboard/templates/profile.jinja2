@@ -117,7 +117,7 @@
       <div class="info-container"></div>
       <div class="divDialogElements">
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
-        <p>{{ _('Lost the code?')}} <a href="{{ context.safe_route_url('mobiles-actions') }}" class="resend-code">{{ _('Resend me the verification code') }}</a></p>
+        <p>{{ _('Lost the code?')}} <a href="#" class="resend-code">{{ _('Resend me the verification code') }}</a></p>
       </div>
     </div>
     <div class="modal-footer">
@@ -245,13 +245,14 @@ function okAskDialog() {
   input.askcallback(input.value);
 };
 
-function askDialog(identifier, prompt, defaultvalue, placeholder, askcallback) {
+function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, askcallback) {
   var input = document.getElementById("askDialogInput");
   input.value = defaultvalue;
   input.placeholder = placeholder;
   input.askcallback = askcallback; // radical
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
+  $("#askDialog .resend-code").attr('href', actionsURL);
   $("#askDialog").modal("show");
 };
 
