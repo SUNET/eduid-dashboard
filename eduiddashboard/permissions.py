@@ -78,7 +78,7 @@ class BaseFactory(object):
         user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
-            userid = user.get('mail', '')
+            userid = user and user.get('mail', '') or ''
         else:
             userid = self.request.matchdict.get('userid', '')
         cache_user_in_session = asbool(self.request.registry.settings.get(
