@@ -67,6 +67,13 @@ def mark_as_verified_mobile(request, user, verified_mobile):
 
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
+    data_attribute = 'mobile'
+    verify_messages = {
+        'ok': _('The mobile phone has been verified'),
+        'error': _('The confirmation code is not the one have been sent to your mobile phone'),
+        'request': _('Please revise your SMS inbox and fill below with the given code'),
+        'placeholder': _('Mobile phone code'),
+    }
 
     def remove_action(self, index, post_data):
         mobiles = self.user.get('mobile', [])
@@ -109,30 +116,6 @@ class MobilesActionsView(BaseActionsView):
             'result': 'ok',
             'message': msg,
         }
-
-    def verify_action(self, index, post_data):
-        mobile_to_verify = self.user.get('mobile', [])[index]
-        mobile_number = mobile_to_verify['mobile']
-        if 'code' in post_data:
-            code_sent = post_data['code']
-            verification_code = get_verification_code(self.request.db, 'mobile', mobile_number)
-            if code_sent == verification_code['code']:
-                verificate_code(self.request, 'mobile', code_sent)
-                return {
-                    'result': 'ok',
-                    'message': _('The mobile phone has been verified'),
-                }
-            else:
-                return {
-                    'result': 'error',
-                    'message': _('The confirmation code is not the one have been sent to your mobile phone')
-                }
-        else:
-            return {
-                'result': 'getcode',
-                'message': _('Please revise your SMS inbox and fill below with the given code'),
-                'placeholder': _('Mobile phone code'),
-            }
 
 
 @view_config(route_name='mobiles', permission='edit',

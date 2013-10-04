@@ -6,6 +6,8 @@ from pyramid.response import Response
 from pyramid_deform import FormView
 
 from eduiddashboard.forms import BaseForm
+from eduiddashboard.i18n import TranslationString as _
+from eduiddashboard.verifications import get_verification_code, verificate_code
 
 
 def get_dummy_status(user):
@@ -72,6 +74,13 @@ class BaseFormView(FormView):
 
 
 class BaseActionsView(object):
+    data_attribute = None
+    verify_messages = {
+        'ok': _('The data has been verified'),
+        'error': _('The confirmation code is not the one have been sent to your mobile phone'),
+        'request': _('Please revise your inbox and fill below with the given code'),
+        'placeholder': _('Verification code'),
+    }
 
     def __init__(self, context, request):
         self.request = request
@@ -87,6 +96,32 @@ class BaseActionsView(object):
         result['action'] = action
         result['identifier'] = index
         return Response(json.dumps(result))
+
+
+    def verify_action(self, index, post_data):
+        """ Common action to verificate some given data. You can override in subclasses """
+        data_to_verify = self.user.get(self.data_attribute, [])[index]
+        data_code = data_to_verify[self.data_attribute]
+        if 'code' in post_data:
+            code_sent = post_data['code']
+            verification_code = get_verification_code(self.request.db, self.data_attribute, data_code)
+            if code_sent == verification_code['code']:
+                verificate_code(self.request, self.data_attribute, code_sent)
+                return {
+                    'result': 'ok',
+                    'message': self.verify_messages['ok'],
+                }
+            else:
+                return {
+                    'result': 'error',
+                    'message': self.verify_messages['error'],
+                }
+        else:
+            return {
+                'result': 'getcode',
+                'message': self.verify_messages['request'],
+                'placeholder': self.verify_messages['placeholder'],
+            }
 
 
 class HTTPXRelocate(HTTPOk):
