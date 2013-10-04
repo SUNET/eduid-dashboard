@@ -162,10 +162,10 @@ class BaseCredentialsFactory(BaseFactory):
         if self.user is None:
                 raise HTTPForbidden("You can't access to this resource")
         else:
-            # Verify that session loa is iqual or bigger than the max reached
+            # Verify that session loa is equal than the max reached
             # loa
-            max_user_loa = self.user.get('maxReachedLoa', 1)
-            session_loa = self.request.session.get('loa', 1)
+            max_user_loa = self.get_max_loa()
+            session_loa = self.get_loa()
 
             if session_loa != max_user_loa:
                 raise HTTPForbidden('You have not sufficient AL to edit your'
