@@ -6,9 +6,19 @@ from eduiddashboard.saml2.auth import get_loa, authenticate, login
 class AuthTests(Saml2RequestTests):
 
     def test_get_loa(self):
-        self.assertEqual(get_loa({}), 1)
-        self.assertEqual(get_loa(None), 1)
-        self.assertEqual(get_loa({'loa': 3}), 3)
+        self.assertEqual(
+            get_loa({'eduPersonAssurance': 'http://www.swamid.se/assurance/al1'}),
+            'http://www.swamid.se/assurance/al1'
+        )
+        self.assertEqual(
+            get_loa(None),
+            'http://www.swamid.se/assurance/al1'
+        )
+        self.assertEqual(
+            get_loa({'eduPersonAssurance': 'http://www.swamid.se/assurance/al2'}),
+            'http://www.swamid.se/assurance/al2'
+
+        )
 
     def test_authenticate(self):
         request = self.dummy_request()

@@ -39,6 +39,7 @@
        </div>
 
         <div>
+          {% block loasquare %}
           {% with loa=request.context.get_loa() %}
             <div class='loa-big'>
               <div>
@@ -47,6 +48,7 @@
               </div>
             </div>
           {% endwith %}
+          {% endblock %}
 
           {% block title %}
           {% endblock %}
