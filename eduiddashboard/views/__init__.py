@@ -97,11 +97,13 @@ class BaseActionsView(object):
         result['identifier'] = index
         return Response(json.dumps(result))
 
+    def get_verification_data_code(self, data_to_verify):
+        raise NotImplementedError()
 
     def verify_action(self, index, post_data):
         """ Common action to verificate some given data. You can override in subclasses """
         data_to_verify = self.user.get(self.data_attribute, [])[index]
-        data_code = data_to_verify[self.data_attribute]
+        data_code = self.get_verification_data_code(data_to_verify)
         if 'code' in post_data:
             code_sent = post_data['code']
             verification_code = get_verification_code(self.request.db, self.data_attribute, data_code)

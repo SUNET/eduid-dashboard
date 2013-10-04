@@ -20,7 +20,7 @@
                     code: code
                 },
                 function(data, statusText, xhr) {
-                    var dialog = container.find('#askDialog');
+                    var dialog = $('#askDialog');
                     sendInfo(dialog, data.result, data.message);
                     if (data.result == 'ok') {
                         dialog.find('.btn').hide();
@@ -42,7 +42,7 @@
                 container.find('.add-new').toggleClass('active');
             });
 
-            container.find('.resend-code').click(function(e) {
+            $('.resend-code').click(function(e) {
                 var actions_url = $(this).attr('href'),
                     value = $(this).attr('data-identifier'),
                     dialog = $(this).parents('#askDialog');

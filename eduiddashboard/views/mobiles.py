@@ -75,6 +75,9 @@ class MobilesActionsView(BaseActionsView):
         'placeholder': _('Mobile phone code'),
     }
 
+    def get_verification_data_code(self, data_to_verify):
+        return data_to_verify['mobile']
+
     def remove_action(self, index, post_data):
         mobiles = self.user.get('mobile', [])
         mobile_to_remove = mobiles[index]
