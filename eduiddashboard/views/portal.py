@@ -32,6 +32,9 @@ def profile_editor(context, request):
 
     pending_actions = get_pending_actions(context.user, tabs)
 
+    max_loa = get_max_available_loa(context.get_groups())
+    max_loa = context.loa_to_int(loa=max_loa)
+
     view_context = {
         'tabs': tabs,
         'userid': context.user.get(context.main_attribute),
@@ -39,7 +42,7 @@ def profile_editor(context, request):
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,
-        'max_loa': get_max_available_loa(context.get_groups()),
+        'max_loa': max_loa,
         'polling_timeout_for_admin': request.registry.settings.get('polling_timeout_for_admin', 2000),
     }
 

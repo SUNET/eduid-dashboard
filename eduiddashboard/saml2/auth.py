@@ -25,13 +25,15 @@ from pyramid.security import remember
 logger = logging.getLogger(__name__)
 
 
+from eduiddashboard import AVAILABLE_LOA_LEVEL
+
+
 def get_loa(session_info):
-    # TODO Take loa from session_info from IDP
-    # if there aren't loa info, then set to minimun, 1
+    default_loa = AVAILABLE_LOA_LEVEL[0]
     if not session_info:
-        return 1
+        return default_loa
     else:
-        return session_info.get('loa', 1)
+        return session_info.get('eduPersonAssurance', default_loa)
 
 
 def authenticate(request, session_info, attribute_mapping):

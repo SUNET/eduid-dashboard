@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-09-13 08:32+0200\n"
+"POT-Creation-Date: 2013-10-03 14:56+0200\n"
 "PO-Revision-Date: 2013-09-11 11:44+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -22,105 +22,160 @@ msgstr ""
 msgid "{site_name} verification email"
 msgstr ""
 
-#: eduiddashboard/models.py:11 eduiddashboard/models.py:31
-#: eduiddashboard/templates/emails-form.jinja2:17
+#: eduiddashboard/models.py:18 eduiddashboard/models.py:43
+#: eduiddashboard/templates/emails-form.jinja2:21
 msgid "email"
 msgstr ""
 
-#: eduiddashboard/models.py:12
+#: eduiddashboard/models.py:19
 msgid "phone mobile number"
 msgstr ""
 
-#: eduiddashboard/models.py:13 eduiddashboard/templates/home.jinja2:26
+#: eduiddashboard/models.py:20 eduiddashboard/templates/home.jinja2:30
+#: eduiddashboard/templates/nins-form.jinja2:17
 msgid "NIN"
 msgstr ""
 
-#: eduiddashboard/models.py:37
+#: eduiddashboard/models.py:24
+msgid "Home address"
+msgstr ""
+
+#: eduiddashboard/models.py:25
+msgid "Work address"
+msgstr ""
+
+#: eduiddashboard/models.py:49
 msgid "personal identity number (NIN)"
 msgstr ""
 
-#: eduiddashboard/models.py:40
+#: eduiddashboard/models.py:53
 msgid "The personal identity number consists of 12 digits"
 msgstr ""
 
-#: eduiddashboard/models.py:44
-msgid "verified"
-msgstr ""
-
-#: eduiddashboard/models.py:46
-msgid "active"
-msgstr ""
-
-#: eduiddashboard/models.py:50 eduiddashboard/models.py:82
-msgid "personal identity numbers"
-msgstr ""
-
-#: eduiddashboard/models.py:67
+#: eduiddashboard/models.py:74
 msgid "given name"
 msgstr ""
 
-#: eduiddashboard/models.py:69 eduiddashboard/templates/home.jinja2:24
+#: eduiddashboard/models.py:76 eduiddashboard/templates/home.jinja2:28
 msgid "surname"
 msgstr ""
 
-#: eduiddashboard/models.py:71
+#: eduiddashboard/models.py:78
 msgid "display name"
 msgstr ""
 
-#: eduiddashboard/models.py:73
+#: eduiddashboard/models.py:80
 msgid "photo"
 msgstr ""
 
-#: eduiddashboard/models.py:74
+#: eduiddashboard/models.py:81
 msgid "A url link to your personal avatar"
 msgstr ""
 
-#: eduiddashboard/models.py:78
+#: eduiddashboard/models.py:85
 msgid "preferred language"
 msgstr ""
 
-#: eduiddashboard/models.py:99
+#: eduiddashboard/models.py:104 eduiddashboard/models.py:127
 msgid "Both passwords don't match"
 msgstr ""
 
-#: eduiddashboard/models.py:105
+#: eduiddashboard/models.py:114
+msgid "Enter your email address"
+msgstr ""
+
+#: eduiddashboard/models.py:132
+#: eduiddashboard/templates/postaladdress-form.jinja2:20
+msgid "type"
+msgstr ""
+
+#: eduiddashboard/models.py:136
+#: eduiddashboard/templates/postaladdress-form.jinja2:21
+msgid "address"
+msgstr ""
+
+#: eduiddashboard/models.py:137
+#: eduiddashboard/templates/postaladdress-form.jinja2:22
+msgid "locality"
+msgstr ""
+
+#: eduiddashboard/models.py:138
+msgid "postal code"
+msgstr ""
+
+#: eduiddashboard/models.py:140
+#: eduiddashboard/templates/postaladdress-form.jinja2:23
+msgid "country"
+msgstr ""
+
+#: eduiddashboard/models.py:147
+msgid ""
+"Invalid telephone number. It must be written using international "
+"notation, starting with \"+\"."
+msgstr ""
+
+#: eduiddashboard/models.py:149
+msgid "mobile"
+msgstr ""
+
+#: eduiddashboard/models.py:164
 msgid "text"
 msgstr ""
 
-#: eduiddashboard/models.py:106
+#: eduiddashboard/models.py:165
 msgid "the exact match text for the attribute type selected for search"
 msgstr ""
 
-#: eduiddashboard/models.py:113
+#: eduiddashboard/models.py:172
 msgid "attribute type"
 msgstr ""
 
-#: eduiddashboard/models.py:114
+#: eduiddashboard/models.py:173
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/validators.py:19
+#: eduiddashboard/utils.py:44
+msgid "Passwords"
+msgstr ""
+
+#: eduiddashboard/validators.py:20
 msgid "Old password do not match"
 msgstr ""
 
-#: eduiddashboard/validators.py:28
+#: eduiddashboard/validators.py:29
 msgid "\"${val}\" has to be more than ${len} characters length"
 msgstr ""
 
-#: eduiddashboard/validators.py:42
+#: eduiddashboard/validators.py:43
+msgid "The permission selected is not available"
+msgstr ""
+
+#: eduiddashboard/validators.py:56
 msgid "This email is already registered"
 msgstr ""
 
-#: eduiddashboard/validators.py:47
+#: eduiddashboard/validators.py:61
 msgid "This email is not registered already"
 msgstr ""
 
-#: eduiddashboard/validators.py:58
+#: eduiddashboard/validators.py:72
 msgid "The email can't be found"
 msgstr ""
 
-#: eduiddashboard/validators.py:62
+#: eduiddashboard/validators.py:76
 msgid "At least one email is required"
+msgstr ""
+
+#: eduiddashboard/validators.py:86
+msgid "This email does not exist"
+msgstr ""
+
+#: eduiddashboard/validators.py:100
+msgid "This NIN is already registered and was verified by other user"
+msgstr ""
+
+#: eduiddashboard/validators.py:105
+msgid "This NIN is already registered in your NIN list"
 msgstr ""
 
 #: eduiddashboard/templates/base.jinja2:6
@@ -146,79 +201,173 @@ msgid ""
 "   "
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:16
+#: eduiddashboard/templates/emails-form.jinja2:20
+#: eduiddashboard/templates/postaladdress-form.jinja2:19
 msgid "preferred"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:18
+#: eduiddashboard/templates/emails-form.jinja2:22
+#: eduiddashboard/templates/mobiles-form.jinja2:19
+#: eduiddashboard/templates/nins-form.jinja2:18
+#: eduiddashboard/templates/postaladdress-form.jinja2:24
 msgid "verification status"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:19
+#: eduiddashboard/templates/emails-form.jinja2:23
+#: eduiddashboard/templates/mobiles-form.jinja2:20
+#: eduiddashboard/templates/nins-form.jinja2:19
+#: eduiddashboard/templates/postaladdress-form.jinja2:25
 msgid "remove"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:26
+#: eduiddashboard/templates/emails-form.jinja2:31
 msgid "Set this email as your primary email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:33
+#: eduiddashboard/templates/emails-form.jinja2:38
+#: eduiddashboard/templates/mobiles-form.jinja2:30
+#: eduiddashboard/templates/nins-form.jinja2:29
+#: eduiddashboard/templates/postaladdress-form.jinja2:46
 msgid "Already verified"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:37
+#: eduiddashboard/templates/emails-form.jinja2:42
 msgid "Resend verification email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:45
+#: eduiddashboard/templates/emails-form.jinja2:50
 msgid "Remove this email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:56
+#: eduiddashboard/templates/emails-form.jinja2:59
+#: eduiddashboard/templates/mobiles-form.jinja2:50
+#: eduiddashboard/templates/nins-form.jinja2:56
+#: eduiddashboard/templates/postaladdress-form.jinja2:66
+msgid ""
+"There is no content created. You can add first element by clicking the "
+"button below"
+msgstr ""
+
+#: eduiddashboard/templates/emails-form.jinja2:66
 msgid "Add a new email"
 msgstr ""
 
 #: eduiddashboard/templates/home.jinja2:7
-msgid "eduID dashboard."
+#, python-format
+msgid "Dashboard %(mode)s mode"
 msgstr ""
 
 #: eduiddashboard/templates/home.jinja2:10
-#: eduiddashboard/templates/profile.jinja2:10
 #, python-format
 msgid "Level %(level)s"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:16
+#: eduiddashboard/templates/home.jinja2:15
+msgid "<p>Please, fill the follow form to search the user</p>"
+msgstr ""
+
+#: eduiddashboard/templates/home.jinja2:20
 msgid "Results"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:18
+#: eduiddashboard/templates/home.jinja2:22
 #, python-format
 msgid "%(number)d users was found"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:23
+#: eduiddashboard/templates/home.jinja2:27
 msgid "first name"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:25
+#: eduiddashboard/templates/home.jinja2:29
 msgid "preferred email"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:47
+#: eduiddashboard/templates/home.jinja2:51
 msgid "Any user match with the filter"
+msgstr ""
+
+#: eduiddashboard/templates/mobiles-form.jinja2:4
+msgid ""
+"\n"
+"   <p>These list contain all your mobile phones registered in the\n"
+"   platform.</p>\n"
+"   "
+msgstr ""
+
+#: eduiddashboard/templates/mobiles-form.jinja2:18
+msgid "phone"
+msgstr ""
+
+#: eduiddashboard/templates/mobiles-form.jinja2:34
+#: eduiddashboard/templates/postaladdress-form.jinja2:50
+msgid "Resend verification"
+msgstr ""
+
+#: eduiddashboard/templates/mobiles-form.jinja2:41
+#: eduiddashboard/templates/postaladdress-form.jinja2:57
+msgid "Remove this postal address"
+msgstr ""
+
+#: eduiddashboard/templates/mobiles-form.jinja2:57
+msgid "Add a new mobile phone"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:4
+msgid ""
+"<p>This list contain all your National Identity Numbers\n"
+"   (NIN) registered in the platform.</p>\n"
+"   "
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:35
+msgid "Verify"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:39
+msgid "Can't verify an old NIN"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:44
+msgid "Remove"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:63
+msgid "Add a new National Identity Number"
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
 msgid "Change your password"
 msgstr ""
 
+#: eduiddashboard/templates/permissions-form.jinja2:8
+msgid "Available permissions for this user"
+msgstr ""
+
+#: eduiddashboard/templates/permissions-form.jinja2:16
+msgid "Your are editing your own permissions, Are you sure about your changes?"
+msgstr ""
+
 #: eduiddashboard/templates/personaldata-form.jinja2:4
 msgid "This is your personal info"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:7
-msgid "eduID dashboard"
+#: eduiddashboard/templates/postaladdress-form.jinja2:4
+msgid ""
+"\n"
+"   <p>These list contain all your postal addresses registered in the\n"
+"   platform. You can change your preferred address by clicking in the "
+"radio\n"
+"   buttons.</p>\n"
+"   "
+msgstr ""
+
+#: eduiddashboard/templates/postaladdress-form.jinja2:33
+msgid "Set this address as your primary postal address"
+msgstr ""
+
+#: eduiddashboard/templates/postaladdress-form.jinja2:73
+msgid "Add a new postal address"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:14
@@ -230,59 +379,59 @@ msgstr ""
 msgid "Editing %(email)s user"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:24
+#: eduiddashboard/templates/profile.jinja2:26
 msgid "Level of assurance"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:27
-#: eduiddashboard/templates/profile.jinja2:29
-msgid "Level 5"
-msgstr ""
-
 #: eduiddashboard/templates/profile.jinja2:28
-msgid ""
-"This is the lower level you can reach With this loa you can edit some "
-"attributes of your profile"
+#: eduiddashboard/templates/profile.jinja2:30
+msgid "Level 1"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:31
-#: eduiddashboard/templates/profile.jinja2:33
-msgid "Level 4"
+#: eduiddashboard/templates/profile.jinja2:29
+msgid "On level 1 you can do something"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:32
-#: eduiddashboard/templates/profile.jinja2:36
-msgid "With this loa you can edit some attributes of your profile"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:35
-#: eduiddashboard/templates/profile.jinja2:37
-msgid "Level 3"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:39
-#: eduiddashboard/templates/profile.jinja2:41
+#: eduiddashboard/templates/profile.jinja2:34
 msgid "Level 2"
 msgstr ""
 
+#: eduiddashboard/templates/profile.jinja2:33
+msgid "On level 2 you can do something"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:36
+#: eduiddashboard/templates/profile.jinja2:38
+msgid "Level 3"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:37
+msgid "On level 3 you can do something"
+msgstr ""
+
 #: eduiddashboard/templates/profile.jinja2:40
-msgid "With this loa you can edit all attributes of your profile"
+#: eduiddashboard/templates/profile.jinja2:42
+msgid "Level 4"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:54
+#: eduiddashboard/templates/profile.jinja2:41
+msgid "On level 4 you can do something"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:55
 #, python-format
-msgid "You are in %(loa)s level"
+msgid "You are in level <span class=\"level\">%(loa)s</span>"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:56
+#: eduiddashboard/templates/profile.jinja2:57
 msgid "<p>This is the highest level of assurance available for your profile</p>"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:58
+#: eduiddashboard/templates/profile.jinja2:59
 msgid ""
-"<p>If you want to increase this level to get\n"
-"               more permissions you need to resolve the pending "
-"actions</p>"
+"<p>If you need to increase this level to get more permissions\n"
+"                you must login with another authentication method</p>"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:67
@@ -291,6 +440,66 @@ msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:78
 msgid "Profile filled"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:138
+msgid "Warning!"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:138
+msgid "Something goes wrong. Please, try it later."
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:145
+msgid "Error!"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:145
+msgid "You haven't permissions to access that resource."
+msgstr ""
+
+#: eduiddashboard/templates/reset-password-email.html.jinja2:1
+#, python-format
+msgid ""
+"\n"
+"<h2>Forgot your password, %(given_name)s?</h2>\n"
+"\n"
+"<p><a href=\"%(site_url)s\">%(site_name)s</a> received a request for "
+"reseting your password for your %(email)s account.</p>\n"
+"\n"
+"<p>To reset your password, click in the following link:</p>\n"
+"\n"
+"<a href=\"%(reset_password_link)s\">%(reset_password_link)s</a>\n"
+"\n"
+"<p>If you still remember your password or you didn't request its reset, "
+"you can safely delete this email.</p>\n"
+"\n"
+msgstr ""
+
+#: eduiddashboard/templates/reset-password-email.txt.jinja2:1
+#, python-format
+msgid ""
+"\n"
+"Forgot your password, %(given_name)s\n"
+"\n"
+"We send you an email with a verification link because you has\n"
+"registered at %(site_name)s %(site_url)s.\n"
+"\n"
+"Please, click on the follow link to verificate your email account.\n"
+"\n"
+"%(reset_password_link)s\n"
+msgstr ""
+
+#: eduiddashboard/templates/translate-messages.jinja2:1
+msgid "http://www.swamid.se/assurance/al1"
+msgstr ""
+
+#: eduiddashboard/templates/translate-messages.jinja2:2
+msgid "http://www.swamid.se/assurance/al2"
+msgstr ""
+
+#: eduiddashboard/templates/translate-messages.jinja2:3
+msgid "http://www.swamid.se/assurance/al3"
 msgstr ""
 
 #: eduiddashboard/templates/verification_email.html.jinja2:1
@@ -332,79 +541,167 @@ msgid ""
 "list:"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:25 eduiddashboard/views/emails.py:38
+#: eduiddashboard/views/emails.py:22 eduiddashboard/views/emails.py:26
 msgid "You have to verificate some emails"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:53
+#: eduiddashboard/views/emails.py:40
 msgid "Emails"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:75
+#: eduiddashboard/views/emails.py:62
 msgid "Your email {email} was verified"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:137 eduiddashboard/views/password.py:37
-#: eduiddashboard/views/personal.py:85
-msgid ""
-"Your changes was saved, please, wait before your changes are distributed "
-"through all applications"
+#: eduiddashboard/views/emails.py:84
+msgid "Your primary email was changed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:144
-msgid ""
-"A verification email has been sent to your new account. Please revise "
-"your inbox and click on the provided link"
-msgstr ""
-
-#: eduiddashboard/views/emails.py:179
-msgid ""
-"One email has been removed, please, wait before your changes are "
-"distributed through all applications"
-msgstr ""
-
-#: eduiddashboard/views/emails.py:189
+#: eduiddashboard/views/emails.py:93
 msgid ""
 "A new verification email has been sent to your account. Please revise "
 "your inbox and click on the provided link"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:211
-msgid "Your primary email was changed"
+#: eduiddashboard/views/emails.py:103
+msgid "Error: You only have one email and this cannot be deleted"
 msgstr ""
 
-#: eduiddashboard/views/password.py:42
+#: eduiddashboard/views/emails.py:129
+msgid ""
+"One email has been removed, please, wait before your changes are "
+"distributed through all applications"
+msgstr ""
+
+#: eduiddashboard/views/emails.py:190 eduiddashboard/views/mobiles.py:123
+#: eduiddashboard/views/nins.py:202 eduiddashboard/views/password.py:101
+#: eduiddashboard/views/permissions.py:52 eduiddashboard/views/personal.py:79
+#: eduiddashboard/views/postal_address.py:159
+msgid ""
+"Your changes was saved, please, wait before your changes are distributed "
+"through all applications"
+msgstr ""
+
+#: eduiddashboard/views/emails.py:197
+msgid ""
+"A verification email has been sent to your new account. Please revise "
+"your inbox and click on the provided link"
+msgstr ""
+
+#: eduiddashboard/views/mobiles.py:22
+msgid "You have to add a mobile phone"
+msgstr ""
+
+#: eduiddashboard/views/mobiles.py:26
+msgid "You have to verificate some mobile phone"
+msgstr ""
+
+#: eduiddashboard/views/mobiles.py:42
+msgid "Mobiles"
+msgstr ""
+
+#: eduiddashboard/views/mobiles.py:70
+msgid ""
+"One mobile has been removed, please, wait before your changes are "
+"distributed through all applications"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:55
+msgid "You must validate your NIN number"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:57
+msgid "You have to add your NIN number"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:76
+msgid "National identity number"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:97
+msgid ""
+"This norEduPersonNIN has been verified by someone else in his profile, so"
+" then, you can't verify it as yours. Please, contact with technical "
+"support"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:107 eduiddashboard/views/nins.py:209
+msgid ""
+"A verification message has been sent to your Govt Inbox. Please revise "
+"your inbox and return to this page to enter the provided verification "
+"number"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:143
+msgid ""
+"The nin has been removed, please, wait before your changes are "
+"distributed through all applications"
+msgstr ""
+
+#: eduiddashboard/views/password.py:59
+msgid "Reset your password in {site_name}"
+msgstr ""
+
+#: eduiddashboard/views/password.py:106 eduiddashboard/views/password.py:191
 msgid ""
 "Credentials has not been added for some reason. Please contact with the "
 "system administrator."
 msgstr ""
 
-#: eduiddashboard/views/personal.py:32
-msgid "You have to add your NIN number"
+#: eduiddashboard/views/password.py:148
+msgid "Forgot your password?"
 msgstr ""
 
-#: eduiddashboard/views/personal.py:34
-msgid "You must validate your NIN number"
+#: eduiddashboard/views/password.py:154
+msgid ""
+"An email has been sent to you with the instructions to reset your "
+"password."
 msgstr ""
 
-#: eduiddashboard/views/personal.py:52
+#: eduiddashboard/views/password.py:157
+msgid "Now you can follow the email instructions and close this window safely."
+msgstr ""
+
+#: eduiddashboard/views/password.py:171
+msgid "Finish your password reset"
+msgstr ""
+
+#: eduiddashboard/views/password.py:189
+msgid "Password has been reset successfully"
+msgstr ""
+
+#: eduiddashboard/views/password.py:194
+msgid "You can log in the <a href=\"${homelink}\">home page</a>"
+msgstr ""
+
+#: eduiddashboard/views/permissions.py:14
+msgid "Permissions"
+msgstr ""
+
+#: eduiddashboard/views/personal.py:42
 msgid "Personal info"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:33
-msgid "Authorization"
+#: eduiddashboard/views/postal_address.py:23
+msgid "You have to add a postal address"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:37
-msgid "Passwords"
+#: eduiddashboard/views/postal_address.py:27
+msgid "You have to verificate some postal address"
 msgstr ""
 
-#: eduiddashboard/views/portal.py:41
-msgid "Phones"
-msgstr ""
-
-#: eduiddashboard/views/portal.py:45
+#: eduiddashboard/views/postal_address.py:43
 msgid "Postal Address"
+msgstr ""
+
+#: eduiddashboard/views/postal_address.py:71
+msgid "Your preferred address was changed"
+msgstr ""
+
+#: eduiddashboard/views/postal_address.py:93
+msgid ""
+"One address has been removed, please, wait before your changes are "
+"distributed through all applications"
 msgstr ""
 
 #~ msgid "Level %(level)d"
@@ -414,5 +711,50 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "You to add your NIN number"
+#~ msgstr ""
+
+#~ msgid "verified"
+#~ msgstr ""
+
+#~ msgid "active"
+#~ msgstr ""
+
+#~ msgid "personal identity numbers"
+#~ msgstr ""
+
+#~ msgid "eduID dashboard."
+#~ msgstr ""
+
+#~ msgid "eduID dashboard"
+#~ msgstr ""
+
+#~ msgid "Level 5"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This is the lower level you can"
+#~ " reach With this loa you can "
+#~ "edit some attributes of your profile"
+#~ msgstr ""
+
+#~ msgid "With this loa you can edit some attributes of your profile"
+#~ msgstr ""
+
+#~ msgid "With this loa you can edit all attributes of your profile"
+#~ msgstr ""
+
+#~ msgid "You are in %(loa)s level"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<p>If you want to increase this level to get\n"
+#~ "               more permissions you need "
+#~ "to resolve the pending actions</p>"
+#~ msgstr ""
+
+#~ msgid "Authorization"
+#~ msgstr ""
+
+#~ msgid "Phones"
 #~ msgstr ""
 

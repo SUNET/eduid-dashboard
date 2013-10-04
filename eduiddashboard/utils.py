@@ -5,11 +5,12 @@ from pyramid.i18n import TranslationString as _
 
 from eduiddashboard.compat import text_type
 
+from eduiddashboard import AVAILABLE_LOA_LEVEL
 
 MAX_LOA_ROL = {
-    'user': 3,
-    'helpdesk': 3,
-    'admin': 3,
+    'user': AVAILABLE_LOA_LEVEL[0],
+    'helpdesk': AVAILABLE_LOA_LEVEL[1],
+    'admin': AVAILABLE_LOA_LEVEL[2],
 }
 
 

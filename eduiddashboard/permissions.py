@@ -134,6 +134,26 @@ class BaseFactory(object):
             return [self.workmode]
         return []
 
+    def get_loa(self):
+        available_loa = self.request.registry.settings.get('available_loa')
+        return self.request.session.get('eduPersonAssurance',
+                                        available_loa[0])
+
+    def get_max_loa(self):
+        available_loa = self.request.registry.settings.get('available_loa')
+        return self.request.session.get('eduPersonIdentityVetting',
+                                        available_loa[0])
+
+    def loa_to_int(self, loa=None):
+        available_loa = self.request.registry.settings.get('available_loa')
+
+        if loa is None:
+            loa = self.get_loa()
+        try:
+            return available_loa.index(loa) + 1
+        except ValueError:
+            return 1
+
 
 class BaseCredentialsFactory(BaseFactory):
 
