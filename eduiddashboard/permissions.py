@@ -55,6 +55,16 @@ class BaseFactory(object):
             raise HTTPForbidden('You have not sufficient permissions to access this user')
 
 
+
+        self.__acl__ = self.acls[self.workmode]
+
+    def authorize(self):
+        """You must overwrite this method is you want to get another
+           authorization access method no based in the ACLs.
+           If you want to unauthorized the acces to this resource you must
+           raise a HTTPForbidden exception
+        """
+
         ### This block enable the requirent of the user must have more loa
         # # that the loa from edited user
         # if self.user is not None:
@@ -65,14 +75,18 @@ class BaseFactory(object):
         #     if session_loa < max_user_loa:
         #         raise HTTPForbidden('You have not sufficient AL to edit this user')
 
-        self.__acl__ = self.acls[self.workmode]
+        ## Test if loa is the minimum required to active workmode
 
-    def authorize(self):
-        """You must overwrite this method is you want to get another
-           authorization access method no based in the ACLs.
-           If you want to unauthorized the acces to this resource you must
-           raise a HTTPForbidden exception
-        """
+        required_loa = self.request.registry.settings.get('required_loa', {})
+        required_loa = required_loa.get(self.workmode, '')
+
+        user_loa_int = self.loa_to_int()
+        required_loa_int = self.loa_to_int(loa=required_loa)
+
+        if user_loa_int < required_loa_int:
+            raise HTTPForbidden('You have not sufficient AL to access to this '
+                                'workmode')
+
         return True
 
     def get_user(self):
@@ -164,6 +178,7 @@ class BaseFactory(object):
 class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
+        is_authorized = super(BaseCredentialsFactory, self).authorize()
 
         # Verify that session loa is equal than the max reached
         # loa
@@ -173,7 +188,7 @@ class BaseCredentialsFactory(BaseFactory):
         if session_loa != max_user_loa:
             raise HTTPForbidden('You have not sufficient AL to edit your'
                                 ' credentials')
-        return True
+        return is_authorized
 
 
 class HomeFactory(BaseFactory):

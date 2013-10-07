@@ -293,7 +293,7 @@ def main(global_config, **settings):
         settings,
         'required_loa',
         AVAILABLE_LOA_LEVEL,
-        AVAILABLE_WORK_MODES,
+        REQUIRED_LOA_PER_WORKMODE,
     )
 
     settings['available_loa'] = read_list(
