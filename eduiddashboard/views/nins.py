@@ -8,7 +8,7 @@ from eduiddashboard.models import NIN
 from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
-from eduiddashboard.verifications import dummy_message, get_verification_code
+from eduiddashboard.verifications import dummy_message, new_verification_code
 
 
 def send_verification_message(request, nin):
@@ -17,7 +17,7 @@ def send_verification_message(request, nin):
     message api
     """
 
-    code = get_verification_code(request.db, 'nins', nin)
+    code = new_verification_code(request.db, 'nins', nin, request.context.user)
     verification_message = _(
         'This is a message from %(site)s. The code for validate '
         'your NIN %(nin)s is %(code)s ' % {

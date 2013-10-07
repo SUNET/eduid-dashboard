@@ -17,7 +17,9 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PasswordsFactory, ResetPasswordFactory,
                                         PostalAddressFactory, MobilesFactory,
                                         PermissionsFactory, VerificationsFactory,
-                                        StatusFactory, HomeFactory)
+                                        StatusFactory, HomeFactory,
+                                        ForbiddenFactory)
+
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -212,9 +214,14 @@ def includeme(config):
         config.include(profile_urls, route_prefix='/users/{userid}/')
 
     config.add_route('token-login', '/tokenlogin/')
-    config.add_route('verifications',
-                     '/verificate/{model}/{code}/',
-                     factory=VerificationsFactory)
+    if settings['workmode'] == 'personal':
+        config.add_route('verifications',
+                         '/verificate/{model}/{code}/',
+                         factory=VerificationsFactory)
+    else:
+        config.add_route('verifications',
+                         '/verificate/{model}/{code}/',
+                         factory=ForbiddenFactory)
     config.add_route('help', '/help/')
     config.add_route('session-reload', '/session-reload/')
 

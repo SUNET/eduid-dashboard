@@ -42,8 +42,7 @@ def get_tab():
     }
 
 
-def mark_as_verified_email(request, context, verified_email):
-    user = context.get_user()
+def mark_as_verified_email(request, user, verified_email):
     emails = user['mailAliases']
 
     new_emails = []
@@ -53,14 +52,8 @@ def mark_as_verified_email(request, context, verified_email):
         new_emails.append(email)
 
     user.update(new_emails)
-
-    # Do the save staff
-    request.db.profiles.save(user, safe=True)
-
-    request.context.propagate_user_changes(user)
-
-    request.session.flash(_('Your email {email} was verified'
-                            ).format(email=verified_email),
+    request.session.flash(_('The email {email} was verified'
+                          ).format(email=verified_email),
                           queue='forms')
 
 

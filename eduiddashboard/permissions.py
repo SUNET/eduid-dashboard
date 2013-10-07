@@ -1,7 +1,7 @@
 import re
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
-
+from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 
@@ -98,8 +98,12 @@ class BaseFactory(object):
         user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
+            userid = user and user.get('mail', '') or ''
         else:
             userid = self.request.matchdict.get('userid', '')
+        cache_user_in_session = asbool(self.request.registry.settings.get(
+            'cache_user_in_session', True))
+        if not cache_user_in_session or self.workmode == 'admin':
             if EMAIL_RE.match(userid):
                 user = self.request.userdb.get_user(userid)
             elif OID_RE.match(userid):
@@ -120,6 +124,10 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             return self.request.route_url(route, **kw)
         else:
+            app_url = self.request.registry.settings.get(
+            'personal_dashboard_base_url', None)
+            if app_url:
+                kw['_app_url'] = app_url
             userid = self.user['_id']
             return self.request.route_url(route, userid=userid, **kw)
 
@@ -141,7 +149,7 @@ class BaseFactory(object):
             if user_session == newuser[self.main_attribute]:
                 self.request.session['user'] = newuser
 
-        update_attributes.delay('eduid_dashboard', str(self.user['_id']))
+        update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
     def get_groups(self, userid=None, request=None):
         user = self.request.session.get('user')
@@ -173,6 +181,12 @@ class BaseFactory(object):
             return available_loa.index(loa) + 1
         except ValueError:
             return 1
+
+
+class ForbiddenFactory(RootFactory):
+    __acl__ = [
+        (Deny, Everyone, ALL_PERMISSIONS),
+    ]
 
 
 class BaseCredentialsFactory(BaseFactory):
@@ -234,7 +248,15 @@ class PermissionsFactory(BaseFactory):
 
 
 class VerificationsFactory(BaseFactory):
-    pass
+
+    def get_user(self):
+        verification_code = self.request.db.verifications.find_one({
+            'code': self.request.matchdict['code'],
+        })
+        if verification_code is None:
+            raise HTTPNotFound()
+        return self.request.userdb.get_user_by_oid(verification_code['user_oid'])
+
 
 
 class StatusFactory(BaseFactory):

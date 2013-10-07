@@ -1,10 +1,13 @@
 ## Mobile phones forms
 
+from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
-from eduiddashboard.utils import get_icon_string
+from eduiddashboard.sms import send_sms
+from eduiddashboard.utils import get_icon_string, get_short_hash
+from eduiddashboard.verifications import get_verification_code, new_verification_code, verificate_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
@@ -44,6 +47,24 @@ def get_tab():
     }
 
 
+def send_verification_code(request, user, mobile_number):
+    code = new_verification_code(request.db, 'mobile', mobile_number, user, hasher=get_short_hash)
+    msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
+        'mobile_number': mobile_number,
+        'code': code,
+    })
+    msg = get_localizer(request).translate(msg)
+    send_sms(request, mobile_number, msg)
+
+
+def mark_as_verified_mobile(request, user, verified_mobile):
+    mobiles = user['mobile']
+
+    for mobile in mobiles:
+        if mobile['mobile'] == verified_mobile:
+            mobile['verified'] = True
+
+
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
 
@@ -71,6 +92,47 @@ class MobilesActionsView(BaseActionsView):
                          ' before your changes are distributed '
                          'through all applications'),
         }
+
+    def resend_code_action(self, index, post_data):
+        mobiles = self.user.get('mobile', [])
+        mobile_to_resend = mobiles[index]
+        mobile_number = mobile_to_resend['mobile']
+
+        send_verification_code(self.request, self.user, mobile_number)
+
+        msg = _('A new verification code has been sent to your ${number} mobile number', mapping={
+          'number': mobile_number,
+        })
+        msg = get_localizer(self.request).translate(msg)
+
+        return {
+            'result': 'ok',
+            'message': msg,
+        }
+
+    def verify_action(self, index, post_data):
+        mobile_to_verify = self.user.get('mobile', [])[index]
+        mobile_number = mobile_to_verify['mobile']
+        if 'code' in post_data:
+            code_sent = post_data['code']
+            verification_code = get_verification_code(self.request.db, 'mobile', mobile_number)
+            if code_sent == verification_code['code']:
+                verificate_code(self.request, 'mobile', code_sent)
+                return {
+                    'result': 'ok',
+                    'message': _('The mobile phone has been verified'),
+                }
+            else:
+                return {
+                    'result': 'error',
+                    'message': _('The confirmation code is not the one have been sent to your mobile phone')
+                }
+        else:
+            return {
+                'result': 'getcode',
+                'message': _('Please revise your SMS inbox and fill below with the given code'),
+                'placeholder': _('Mobile phone code'),
+            }
 
 
 @view_config(route_name='mobiles', permission='edit',
@@ -100,6 +162,7 @@ class MobilesView(BaseFormView):
 
     def add_success(self, mobileform):
         mobile = self.schema.serialize(mobileform)
+        mobile_number = mobile['mobile']
         mobile['verified'] = False
 
         mobiles = self.user.get('mobile', [])
@@ -107,6 +170,7 @@ class MobilesView(BaseFormView):
 
         # update the session data
         self.user['mobile'] = mobiles
+        mobile_identifier = len(mobiles) - 1
 
         # do the save staff
         self.request.db.profiles.find_and_modify({
@@ -120,7 +184,16 @@ class MobilesView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
+        send_verification_code(self.request, self.user, mobile_number)
+
         self.request.session.flash(_('Your changes was saved, please, wait '
                                      'before your changes are distributed '
                                      'through all applications'),
+                                   queue='forms')
+        msg = _('A verification number has been sent to your mobile. '
+                'Please revise your SMS inbox and '
+                '<a href="#" class="verifycode" data-identifier="${identifier}">fill here</a>'
+                ' with the given code', mapping={'identifier': mobile_identifier})
+        msg = get_localizer(self.request).translate(msg)
+        self.request.session.flash(msg,
                                    queue='forms')

@@ -17,7 +17,7 @@ def send_verification_mail(request, email):
     context = {
         "email": email,
         "verification_link": verification_link,
-        "site_url": request.route_url("home"),
+        "site_url": request.context.safe_route_url("home"),
         "site_name": site_name,
     }
 
