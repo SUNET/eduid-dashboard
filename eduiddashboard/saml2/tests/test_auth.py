@@ -2,20 +2,24 @@ from eduiddashboard.saml2.testing import Saml2RequestTests
 
 from eduiddashboard.saml2.auth import get_loa, authenticate, login
 
+from eduiddashboard import AVAILABLE_LOA_LEVEL
 
 class AuthTests(Saml2RequestTests):
 
     def test_get_loa(self):
+        request = self.dummy_request()
         self.assertEqual(
-            get_loa({'eduPersonAssurance': 'http://www.swamid.se/assurance/al1'}),
+            get_loa(AVAILABLE_LOA_LEVEL,
+                    {'eduPersonAssurance': 'http://www.swamid.se/assurance/al1'}),
             'http://www.swamid.se/assurance/al1'
         )
         self.assertEqual(
-            get_loa(None),
+            get_loa(AVAILABLE_LOA_LEVEL, None),
             'http://www.swamid.se/assurance/al1'
         )
         self.assertEqual(
-            get_loa({'eduPersonAssurance': 'http://www.swamid.se/assurance/al2'}),
+            get_loa(AVAILABLE_LOA_LEVEL,
+                    {'eduPersonAssurance': 'http://www.swamid.se/assurance/al2'}),
             'http://www.swamid.se/assurance/al2'
 
         )
