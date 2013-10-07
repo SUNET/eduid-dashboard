@@ -16,7 +16,9 @@ from pyramid import testing
 
 from eduiddashboard.db import MongoDB
 from eduiddashboard import main as eduiddashboard_main
+from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.userdb import IUserDB
+
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
 MONGO_URI_AM_TEST = 'mongodb://localhost:27017/eduid_am_test'
@@ -42,6 +44,7 @@ MOCKED_USER_STANDARD = {
     'photo': 'https://pointing.to/your/photo',
     'preferredLanguage': 'en',
     'eduPersonEntitlement': [
+        'urn:mace:eduid.se:role:admin',
         'urn:mace:eduid.se:role:student',
     ],
     'maxReachedLoa': 3,
@@ -101,6 +104,10 @@ class MockedUserDB(IUserDB):
         for userid, user in self.test_users.items():
             yield deepcopy(user)
 
+
+
+def loa(index):
+    return AVAILABLE_LOA_LEVEL[index-1]
 
 def dummy_groups_callback(userid, request):
     return [request.context.workmode]
@@ -213,7 +220,11 @@ class LoggedInReguestTests(unittest.TestCase):
     def set_logged(self, user='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(user)
         user_obj = self.userdb.get_user(user)
-        session_data = {'user': user_obj, 'loa': 3}
+        session_data = {
+            'user': user_obj,
+            'eduPersonAssurance': loa(3),
+            'eduPersonIdentityProofing': loa(3),
+        }
         session_data.update(extra_session_data)
         request = self.add_to_session(session_data)
         return request

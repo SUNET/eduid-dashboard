@@ -17,7 +17,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PasswordsFactory, ResetPasswordFactory,
                                         PostalAddressFactory, MobilesFactory,
                                         PermissionsFactory, VerificationsFactory,
-                                        StatusFactory)
+                                        StatusFactory, HomeFactory)
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 
@@ -205,7 +205,7 @@ def includeme(config):
     config.registry.settings['userdb'] = userdb
     config.add_request_method(get_userdb, 'userdb', reify=True)
 
-    config.add_route('home', '/', factory=PersonFactory)
+    config.add_route('home', '/', factory=HomeFactory)
     if settings['workmode'] == 'personal':
         config.include(profile_urls, route_prefix='/profile/')
     else:
@@ -307,6 +307,7 @@ def main(global_config, **settings):
         REQUIRED_PROOFING_LINKS,
         required=True
     )
+
     if settings['proofing_links'] is None:
         raise ConfigurationError('The proofing_links configuration is not OK')
 

@@ -51,13 +51,19 @@ class BaseFactory(object):
         self.main_attribute = self.request.registry.settings.get(
             'saml2.user_main_attribute', 'mail')
 
-        if self.user is not None:
-            # Verify that session loa is iqual or bigger than the edited user
-            max_user_loa = self.user.get('maxReachedLoa', 1)
-            session_loa = self.request.session.get('loa', 1)
+        if not self.authorize():
+            raise HTTPForbidden('You have not sufficient permissions to access this user')
 
-            if session_loa < max_user_loa:
-                raise HTTPForbidden('You have not sufficient AL to edit this user')
+
+        ### This block enable the requirent of the user must have more loa
+        # # that the loa from edited user
+        # if self.user is not None:
+        #     # Verify that session loa is iqual or bigger than the edited user
+        #     max_user_loa = self.get_max_loa()
+        #     max_user_loa = self.loa_to_int(loa=max_user_loa)
+        #     session_loa = self.loa_to_int()
+        #     if session_loa < max_user_loa:
+        #         raise HTTPForbidden('You have not sufficient AL to edit this user')
 
         self.__acl__ = self.acls[self.workmode]
 
@@ -67,7 +73,7 @@ class BaseFactory(object):
            If you want to unauthorized the acces to this resource you must
            raise a HTTPForbidden exception
         """
-        pass
+        return True
 
     def get_user(self):
 
@@ -84,7 +90,7 @@ class BaseFactory(object):
                 user = self.request.userdb.get_user(userid)
             elif OID_RE.match(userid):
                 user = self.request.userdb.get_user_by_oid(userid)
-            if not user and userid:
+            if not user:
                 raise HTTPNotFound()
         self._user = user
         return user
@@ -141,7 +147,7 @@ class BaseFactory(object):
 
     def get_max_loa(self):
         available_loa = self.request.registry.settings.get('available_loa')
-        return self.request.session.get('eduPersonIdentityVetting',
+        return self.request.session.get('eduPersonIdentityProofing',
                                         available_loa[0])
 
     def loa_to_int(self, loa=None):
@@ -159,17 +165,21 @@ class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
 
-        if self.user is None:
-                raise HTTPForbidden("You can't access to this resource")
-        else:
-            # Verify that session loa is equal than the max reached
-            # loa
-            max_user_loa = self.get_max_loa()
-            session_loa = self.get_loa()
+        # Verify that session loa is equal than the max reached
+        # loa
+        max_user_loa = self.get_max_loa()
+        session_loa = self.get_loa()
 
-            if session_loa != max_user_loa:
-                raise HTTPForbidden('You have not sufficient AL to edit your'
-                                    ' credentials')
+        if session_loa != max_user_loa:
+            raise HTTPForbidden('You have not sufficient AL to edit your'
+                                ' credentials')
+        return True
+
+
+class HomeFactory(BaseFactory):
+
+    def get_user(self):
+        return self.request.session.get('user', None)
 
 
 class PersonFactory(BaseFactory):
