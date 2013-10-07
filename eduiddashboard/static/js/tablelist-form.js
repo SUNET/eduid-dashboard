@@ -24,7 +24,6 @@
                     sendInfo(dialog, data.result, data.message);
                     if (data.result == 'ok') {
                         dialog.find('.btn').hide();
-                        dialog.find('.btn').hide();
                         dialog.find('.divDialogElements').hide();
                         dialog.find('.finish-button').show();
                     }

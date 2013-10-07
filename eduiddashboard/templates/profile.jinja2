@@ -122,9 +122,9 @@
       </div>
     </div>
     <div class="modal-footer">
-      <a href="#" class="finish-button btn hide" onclick="closeAskDialog();">{{ _('Finish') }}</a>
-      <a href="#" class="btn" onclick="closeAskDialog();">Cancel</a>
-      <a href="#" class="btn btn-primary" onclick="okAskDialog();">OK</a>
+      <a href="#" class="finish-button btn hide">{{ _('Finish') }}</a>
+      <a href="#" class="cancel-button btn">Cancel</a>
+      <a href="#" class="ok-button btn btn-primary">OK</a>
     </div>
   </div>
 
@@ -234,10 +234,20 @@ $(document).ready(function () {
     $("#askDialog").bind('shown', function () {
       $(this).find("#askDialogInput").focus();
     });
+
+    $("#askDialog .cancel-button, #askDialog .finish-button").click( function (e) {
+      e.preventDefault();
+      closeAskDialog();
+    });
+
+    $("#askDialog .ok-button").click( function (e) {
+      e.preventDefault();
+      okAskDialog();
+    });
 });
 
 function closeAskDialog() {
-  $("#askDialog").modal('hide'); 
+  $("#askDialog").modal('hide');
   $("body").trigger('action-executed');
 };
 
@@ -251,13 +261,16 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   input.value = defaultvalue;
   input.placeholder = placeholder;
   input.askcallback = askcallback; // radical
+  $("#askDialog .info-container").empty();
+  $("#askDialog").find('.btn').show();
+  $("#askDialog").find('.divDialogElements').show();
+  $("#askDialog").find('.finish-button').hide();
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
   $("#askDialog .resend-code").attr('href', actionsURL);
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");
 };
-
 </script>
 
 {% endblock %}
