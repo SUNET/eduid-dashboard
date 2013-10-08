@@ -89,7 +89,7 @@ class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInReguestTests):
               self).setUp(settings=settings)
 
     def test_logged_get(self):
-        self.set_logged()
+        self.set_logged(user='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.com/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))

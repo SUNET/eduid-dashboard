@@ -73,8 +73,6 @@ class BaseFactory(object):
         #     if session_loa < max_user_loa:
         #         raise HTTPForbidden('You have not sufficient AL to edit this user')
 
-        ## Test if loa is the minimum required to active workmode
-
         required_loa = self.request.registry.settings.get('required_loa', {})
         required_loa = required_loa.get(self.workmode, '')
 
@@ -101,7 +99,7 @@ class BaseFactory(object):
             userid = self.request.matchdict.get('userid', '')
         cache_user_in_session = asbool(self.request.registry.settings.get(
             'cache_user_in_session', True))
-        if not cache_user_in_session or self.workmode == 'admin':
+        if not cache_user_in_session or self.workmode != 'personal':
             if EMAIL_RE.match(userid):
                 user = self.request.userdb.get_user(userid)
             elif OID_RE.match(userid):
@@ -123,7 +121,7 @@ class BaseFactory(object):
             return self.request.route_url(route, **kw)
         else:
             app_url = self.request.registry.settings.get(
-            'personal_dashboard_base_url', None)
+                'personal_dashboard_base_url', None)
             if app_url:
                 kw['_app_url'] = app_url
             userid = self.user['_id']
