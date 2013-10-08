@@ -1,13 +1,19 @@
 ## Postal address forms
 
+import logging
+
 from deform import widget
 import pycountry
+
+from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
 from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
+
+logger = logging.getLogger(__name__)
 
 
 def get_status(user):
@@ -16,7 +22,6 @@ def get_status(user):
 
     return msg and icon
     """
-
     pending_actions = None
     postalAddress = user.get('postalAddress', [])
     if not postalAddress:
@@ -45,8 +50,41 @@ def get_tab():
     }
 
 
+def get_address_id(address):
+    return u'%s, %s %s, %s' % (address['address'],
+                               address['postalCode'],
+                               address['locality'],
+                               address['country'])
+
+
+def mark_as_verified_postal_address(request, user, address_id):
+    addresses = user['postalAddress']
+
+    for address in addresses:
+        if get_address_id(address) == address_id:
+            address['verified'] = True
+
+
 @view_config(route_name='postaladdress-actions', permission='edit')
 class PostalAddressActionsView(BaseActionsView):
+    data_attribute = 'postalAddress'
+    verify_messages = {
+        'ok': _('The postal address has been verified'),
+        'error': _('The confirmation code is not the one have been sent to your postal mailbox'),
+        'request': _('Please revise your postal mailbox and fill below with the given code'),
+        'placeholder': _('Postal address verification code'),
+        'new_code_sent': _('A new verification code has been sent to your postal mailbox'),
+    }
+
+    def get_verification_data_id(self, data_to_verify):
+        return get_address_id(data_to_verify)
+
+    def send_verification_code(self, data_id, code):
+        msg = _('The confirmation code for your postal address is ${code}', mapping={
+            'code': code,
+        })
+        msg = get_localizer(self.request).translate(msg)
+        logger.info(u"Postal mail to %s: %s" % (data_id, msg))
 
     def setpreferred_action(self, index, post_data):
         addresses = self.user.get('postalAddress', [])

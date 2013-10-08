@@ -36,10 +36,12 @@ def new_verification_code(db, model_name, obj_id, user, hasher=None):
 def verificate_code(request, model_name, code):
     from eduiddashboard.views.emails import mark_as_verified_email
     from eduiddashboard.views.mobiles import mark_as_verified_mobile
+    from eduiddashboard.views.postal_address import mark_as_verified_postal_address
 
     verifiers = {
         'email': mark_as_verified_email,
         'mobile': mark_as_verified_mobile,
+        'postalAddress': mark_as_verified_postal_address,
     }
 
     result = request.db.verifications.find_and_modify(

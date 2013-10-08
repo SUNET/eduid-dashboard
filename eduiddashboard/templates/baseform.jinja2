@@ -26,6 +26,10 @@
    {{ form|safe }}
    {% endblock %}
 
+   <div class="askdialog-extra-info">
+   {% block askdialog_extra_info %}
+   {% endblock %}
+   </div>
 
    {% block extrajs %}
    <script>
@@ -33,3 +37,5 @@
    </script>
    {% endblock %}
 </div>
+
+

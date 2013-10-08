@@ -55,61 +55,11 @@
           data-toggle='button'>
         <i class='icon-plus'></i>
         {{_('Add a new mobile phone')}}</button>
-
-  <div id="askDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="windowTitleLabel" aria-hidden="true">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="askDialogPrompt"></h3>
-    </div>
-    <div class="modal-body">
-      <div class="info-container"></div>
-      <div class="divDialogElements">
-        <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
-        <p>{{ _('Lost the code?')}} <a href="{{ context.safe_route_url('mobiles-actions') }}" class="resend-code">{{ _('Resend me the verification code') }}</a></p>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="finish-button btn hide" onclick="closeAskDialog();">{{ _('Finish') }}</a>
-      <a href="#" class="btn" onclick="closeAskDialog();">Cancel</a>
-      <a href="#" class="btn btn-primary" onclick="okAskDialog();">OK</a>
-    </div>
-  </div>
-
-  <script>
-    $(document).ready(function() {
-      $("#askDialog").bind('show', function () {
-      });
-
-      $("#askDialog").bind('shown', function () {
-        $(this).find("#askDialogInput").focus();
-      });
-    });
-
-    function closeAskDialog() {
-      $("#askDialog").modal('hide'); 
-      $("body").trigger('action-executed');
-    };
-
-    function okAskDialog() {
-      var input = document.getElementById("askDialogInput");
-      input.askcallback(input.value);
-    };
-
-    function askDialog(identifier, prompt, defaultvalue, placeholder, askcallback) {
-      var input = document.getElementById("askDialogInput");
-      input.value = defaultvalue;
-      input.placeholder = placeholder;
-      input.askcallback = askcallback; // radical
-      document.getElementById("askDialogPrompt").innerHTML = prompt;
-      $("#askDialog .resend-code").attr('data-identifier', identifier);
-      $("#askDialog").modal("show");
-    };
-  </script>
-
 {% endblock %}
 
 {% block form_generic_form %}
   <div class='form-content hide'>
   {{ form|safe }}
   </div>
+
 {% endblock %}

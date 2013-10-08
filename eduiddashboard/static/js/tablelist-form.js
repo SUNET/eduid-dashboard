@@ -13,14 +13,14 @@
         },
 
         askCode = function(actions_url, action, container, value, title, placeholder) {
-            askDialog(value, title, '', placeholder, function(code) {
+            askDialog(value, actions_url, title, '', placeholder, function(code) {
                 $.post(actions_url, {
                     action: action,
                     identifier: value,
                     code: code
                 },
                 function(data, statusText, xhr) {
-                    var dialog = container.find('#askDialog');
+                    var dialog = $('#askDialog');
                     sendInfo(dialog, data.result, data.message);
                     if (data.result == 'ok') {
                         dialog.find('.btn').hide();
@@ -42,7 +42,9 @@
                 container.find('.add-new').toggleClass('active');
             });
 
-            container.find('.resend-code').click(function(e) {
+            $('.resend-code').unbind('click');
+
+            $('.resend-code').click(function(e) {
                 var actions_url = $(this).attr('href'),
                     value = $(this).attr('data-identifier'),
                     dialog = $(this).parents('#askDialog');
@@ -62,7 +64,7 @@
             container.find('a.verifycode').click(function (e) {
                 var identifier = $(e.target).attr('data-identifier');
                 e.preventDefault();
-                container.find('table.table .mobile-row[data-identifier=' + identifier + '] input[name=verify]').click();
+                container.find('table.table tr[data-identifier=' + identifier + '] input[name=verify]').click();
             });
 
             container.find('table.table input[type=radio]').click(function (e) {
