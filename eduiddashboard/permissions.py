@@ -54,8 +54,6 @@ class BaseFactory(object):
         if not self.authorize():
             raise HTTPForbidden('You have not sufficient permissions to access this user')
 
-
-
         self.__acl__ = self.acls[self.workmode]
 
     def authorize(self):

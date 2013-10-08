@@ -36,7 +36,12 @@ def get_loa(available_loa, session_info):
     if not session_info:
         return default_loa
     else:
-        return session_info.get('eduPersonAssurance', default_loa)
+        loa = session_info.get('ava', {}).get('eduPersonAssurance', [])
+        if len(loa) > 0:
+            loa = loa[0]
+            if loa in available_loa:
+                return loa
+    return default_loa
 
 
 def authenticate(request, session_info, attribute_mapping):
@@ -85,7 +90,7 @@ def login(request, session_info, user):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     request.session[main_attribute] = user[main_attribute]
     request.session['user'] = user
-    request.session['loa'] = get_loa(
+    request.session['eduPersonAssurance'] = get_loa(
         request.registry.settings.get('available_loa'),
         session_info
     )

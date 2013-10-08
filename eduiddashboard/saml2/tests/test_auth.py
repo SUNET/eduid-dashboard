@@ -4,13 +4,15 @@ from eduiddashboard.saml2.auth import get_loa, authenticate, login
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 
+
 class AuthTests(Saml2RequestTests):
 
     def test_get_loa(self):
-        request = self.dummy_request()
         self.assertEqual(
-            get_loa(AVAILABLE_LOA_LEVEL,
-                    {'eduPersonAssurance': 'http://www.swamid.se/assurance/al1'}),
+            get_loa(
+                AVAILABLE_LOA_LEVEL,
+                {'ava': {'eduPersonAssurance': ['http://www.swamid.se/assurance/al1']}}
+            ),
             'http://www.swamid.se/assurance/al1'
         )
         self.assertEqual(
@@ -19,9 +21,18 @@ class AuthTests(Saml2RequestTests):
         )
         self.assertEqual(
             get_loa(AVAILABLE_LOA_LEVEL,
-                    {'eduPersonAssurance': 'http://www.swamid.se/assurance/al2'}),
+                    {'ava': {'eduPersonAssurance': ['http://www.swamid.se/assurance/al2']}}),
             'http://www.swamid.se/assurance/al2'
-
+        )
+        self.assertEqual(
+            get_loa(AVAILABLE_LOA_LEVEL,
+                    {'ava': {'eduPersonAssurance': 'potatoes'}}),
+            'http://www.swamid.se/assurance/al1'
+        )
+        self.assertEqual(
+            get_loa(AVAILABLE_LOA_LEVEL,
+                    {'ava': {'nokey': 'potatoes'}}),
+            'http://www.swamid.se/assurance/al1'
         )
 
     def test_authenticate(self):
