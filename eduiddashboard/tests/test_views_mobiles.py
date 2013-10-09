@@ -100,7 +100,7 @@ class MailsFormTests(LoggedInReguestTests):
         verified_list_after = [m['verified'] for m in userdb_after['mobile']]
         self.assertEqual(verified_list, verified_list_after)
 
-    def test_verify_not_existing_mobile(self):
+    def test_verify_not_existing_code(self):
         self.set_logged()
         userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
         verified_mobile = userdb['mobile'][1]
@@ -113,7 +113,7 @@ class MailsFormTests(LoggedInReguestTests):
         verified_mobile = userdb_after['mobile'][1]
         self.assertEqual(verified_mobile['verified'], False)
 
-    def test_verify_not_existing_mobile(self):
+    def test_verify_existing_mobile(self):
         self.set_logged()
         userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
         verified_mobile = userdb['mobile'][1]
