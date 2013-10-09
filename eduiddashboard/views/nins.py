@@ -201,8 +201,11 @@ class NinsView(BaseFormView):
 
     def get_template_context(self):
         context = super(NinsView, self).get_template_context()
+        proofing_links = self.request.registry.settings.get('proofing_links', {})
+        proofing_link = proofing_links.get('nin')
         context.update({
             'nins': self.user['norEduPersonNIN'],
+            'proofing_link': proofing_link,
         })
 
         return context
@@ -241,11 +244,17 @@ class NinsView(BaseFormView):
 
         send_verification_code(self.request, self.user, newnin)
 
+        proofing_links = self.request.registry.settings.get('proofing_links', {})
+        nin_proofing_link = proofing_links.get('nin')
+
         msg = _('A verification message has been sent to your Govt Inbox. '
-                'Please revise your inbox, return to this page and '
-                '<a href="#" class="verifycode" data-identifier="${id}">'
-                'fill here</a> the provided verification number',
-                {'id': nin_identifier})
+                'Please revise your <a href=${nin_link}> nin inbox</a>, return'
+                ' to .this page and <a href="#" class="verifycode" '
+                'data-identifier="${id}">fill here</a> the provided'
+                'verification number', {
+                    'id': nin_identifier,
+                    'nin_link': nin_proofing_link
+                })
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')

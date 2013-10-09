@@ -32,7 +32,7 @@
         <td>
           {% if loop.last %}
           <label>
-            <i class='icon-refresh' title='{{_("Verify")}}'></i>
+            <i class='icon-question-sign' title='{{_("Verify code")}}'></i>
             <input class='hide' type='radio' name='verify' value='{{loop.index0}}'>
           </label>
           {% else %}
@@ -53,7 +53,7 @@
   </table>
 
   {% else %}
-    <p>{% trans %}There is no content created. You can add first element by clicking the button below{% endtrans %}</p>
+    <p>{% trans %}There is no nin registered. You can add the first item by clicking the button below{% endtrans %}</p>
   {% endif %}
 
   <button type='button'
@@ -68,4 +68,10 @@
   <div class='form-content hide'>
     {{ form|safe }}
   </div>
+{% endblock %}
+
+{% block askdialog_extra_info %}
+  {% if proofing_link %}
+     {% trans nin=proofing_link %}You can access to your associated inbox nin by clicking this <a href="{{nin}}">link</a>{% endtrans %}
+  {% endfi %}
 {% endblock %}
