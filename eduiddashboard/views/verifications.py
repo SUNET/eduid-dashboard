@@ -3,7 +3,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
-from eduiddashboard.verifications import verificate_code
+from eduiddashboard.verifications import verificate_code, get_verification_code
 
 
 @view_config(route_name='verifications', permission='edit')

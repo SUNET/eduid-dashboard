@@ -1,3 +1,4 @@
+from datetime import datetime
 from os import path
 from copy import deepcopy
 
@@ -86,6 +87,7 @@ INITIAL_VERIFICATIONS = [{
         'model_name' : 'mobile',
         'obj_id' : '+34 6096096096',
         'user_oid' : ObjectId("012345678901234567890123"),
+        'timestamp': datetime.utcnow(),
         'verified': False,
 }]
 
