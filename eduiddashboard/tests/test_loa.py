@@ -1,15 +1,7 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInReguestTests, loa
 
 
 class LoaTestsAdminMode(LoggedInReguestTests):
-
-    users = [{
-        'mail': 'johnsmith@example.com',
-        'maxReachedLoa': 3,
-    }, {
-        'mail': 'johnsmith@example.org',
-        'maxReachedLoa': 1,
-    }]
 
     def setUp(self, settings={}):
         settings.update({
@@ -17,44 +9,64 @@ class LoaTestsAdminMode(LoggedInReguestTests):
         })
         super(LoaTestsAdminMode, self).setUp(settings=settings)
 
+    def test_edit_with_lower_than_the_required_loa(self):
+        self.set_logged(
+            user='johnsmith@example.com',
+            extra_session_data={
+                'eduPersonAssurance': loa(1),
+                'eduPersonIdentityProofing': loa(3),
+            }
+        )
+
+        self.testapp.get('/', status=401)
+
+    def test_edit_with_lower_than_the_required_loa_2(self):
+        self.set_logged(
+            user='johnsmith@example.com',
+            extra_session_data={
+                'eduPersonAssurance': loa(2),
+                'eduPersonIdentityProofing': loa(3),
+            }
+        )
+
+        self.testapp.get('/', status=401)
+
+    def test_edit_with_the_required_loa(self):
+        self.set_logged(
+            user='johnsmith@example.com',
+            extra_session_data={
+                'eduPersonAssurance': loa(3),
+                'eduPersonIdentityProofing': loa(3),
+            }
+        )
+
+        self.testapp.get('/', status=200)
+
     def test_edit_with_lower_loa(self):
-        self.set_logged(user='johnsmith@example.org',
-                        extra_session_data={'loa': 1})
+        self.set_logged(
+            user='johnsmith@example.com',
+            extra_session_data={
+                'eduPersonAssurance': loa(1),
+                'eduPersonIdentityProofing': loa(3),
+            }
+        )
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
 
-    def test_edit_with_bigger_loa(self):
-        self.set_logged(user='johnsmith@example.com',
-                        extra_session_data={'loa': 3})
-
-        self.testapp.get('/users/johnsmith@example.org/permissions/',
-                         status=200)
-
-    def test_edit_selfprofile_with_lower_loa(self):
-        self.set_logged(user='johnsmith@example.com',
-                        extra_session_data={'loa': 1})
-
-        self.testapp.get('/users/johnsmith@example.com/permissions/',
-                         status=401)
-
-    def test_edit_selfprofile_with_bigger_loa(self):
-        self.set_logged(user='johnsmith@example.com',
-                        extra_session_data={'loa': 3})
-
+    def test_edit_with_required_loa(self):
+        self.set_logged(
+            user='johnsmith@example.com',
+            extra_session_data={
+                'eduPersonAssurance': loa(3),
+                'eduPersonIdentityProofing': loa(3),
+            }
+        )
         self.testapp.get('/users/johnsmith@example.org/permissions/',
                          status=200)
 
 
 class LoaTestsPersonalMode(LoggedInReguestTests):
-
-    users = [{
-        'mail': 'johnsmith@example.com',
-        'maxReachedLoa': 3,
-    }, {
-        'mail': 'johnsmith@example.org',
-        'maxReachedLoa': 1,
-    }]
 
     def setUp(self, settings={}):
         settings.update({
@@ -64,14 +76,40 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
 
     def test_edit_with_lower_loa(self):
         self.set_logged(user='johnsmith@example.com',
-                        extra_session_data={'loa': 1})
+                        extra_session_data={
+                            'eduPersonAssurance': loa(1),
+                            'eduPersonIdentityProofing': loa(2),
+                        })
 
         self.testapp.get('/profile/',
+                         status=200)
+
+    def test_edit_with_max_loa(self):
+        self.set_logged(user='johnsmith@example.com',
+                        extra_session_data={
+                            'eduPersonAssurance': loa(2),
+                            'eduPersonIdentityProofing': loa(2),
+                        })
+
+        self.testapp.get('/profile/',
+                         status=200)
+
+    def test_edit_with_lower_loa_credentials(self):
+        self.set_logged(user='johnsmith@example.com',
+                        extra_session_data={
+                            'eduPersonAssurance': loa(1),
+                            'eduPersonIdentityProofing': loa(2),
+                        })
+
+        self.testapp.get('/profile/passwords/',
                          status=401)
 
-    def test_edit_with_bigger_loa(self):
+    def test_edit_with_max_loa_credentials(self):
         self.set_logged(user='johnsmith@example.com',
-                        extra_session_data={'loa': 3})
+                        extra_session_data={
+                            'eduPersonAssurance': loa(2),
+                            'eduPersonIdentityProofing': loa(2),
+                        })
 
-        self.testapp.get('/profile/',
+        self.testapp.get('/profile/passwords/',
                          status=200)

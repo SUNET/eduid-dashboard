@@ -21,17 +21,27 @@ import logging
 
 from pyramid.security import remember
 
+from eduiddashboard import AVAILABLE_LOA_LEVEL
+
 
 logger = logging.getLogger(__name__)
 
 
-def get_loa(session_info):
-    # TODO Take loa from session_info from IDP
-    # if there aren't loa info, then set to minimun, 1
-    if not session_info:
-        return 1
+def get_loa(available_loa, session_info):
+    if available_loa:
+        default_loa = available_loa[0]
     else:
-        return session_info.get('loa', 1)
+        default_loa = AVAILABLE_LOA_LEVEL[0]
+
+    if not session_info:
+        return default_loa
+    else:
+        loa = session_info.get('ava', {}).get('eduPersonAssurance', [])
+        if len(loa) > 0:
+            loa = loa[0]
+            if loa in available_loa:
+                return loa
+    return default_loa
 
 
 def authenticate(request, session_info, attribute_mapping):
@@ -80,6 +90,9 @@ def login(request, session_info, user):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     request.session[main_attribute] = user[main_attribute]
     request.session['user'] = user
-    request.session['loa'] = get_loa(session_info)
+    request.session['eduPersonAssurance'] = get_loa(
+        request.registry.settings.get('available_loa'),
+        session_info
+    )
     remember_headers = remember(request, user[main_attribute])
     return remember_headers

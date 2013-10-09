@@ -28,14 +28,33 @@
           </ul>
           <h3 class="muted"><a href="{{ request.route_path('home') }}">eduID</a></h3>
         </div>
-        <div class="messages">
-        {% for message in request.session.pop_flash() %}
-          <div class="alert alert-{{ message|get_flash_message_type }}">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message|get_flash_message_text }}
-          </div>
-        {% endfor %}
+
+       <div class="messages">
+       {% for message in request.session.pop_flash() %}
+         <div class="alert alert-{{ message|get_flash_message_type }}">
+           <button type="button" class="close" data-dismiss="alert">&times;</button>
+           {{ message|get_flash_message_text }}
+         </div>
+       {% endfor %}
+       </div>
+
+        <div>
+          {% block loasquare %}
+          {% with loa=request.context.get_loa() %}
+            <div class='loa-big'>
+              <div>
+                <a href='#'
+                  title='{{_("Assurance level identifier:")}} {{ loa }}'>{{_(loa)}}</a>
+              </div>
+            </div>
+          {% endwith %}
+          {% endblock %}
+
+          {% block title %}
+          {% endblock %}
         </div>
+        <div class='clearfix'></div>
+
         {% block contents %}
 
         {% endblock %}
