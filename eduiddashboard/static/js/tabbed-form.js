@@ -78,7 +78,7 @@ var TabbedForm = function (container) {
                 initialize_pending_actions();
             });
 
-            if (opentab === undefined) {
+            if (opentab === undefined || opentab === "") {
                 container.find('.nav-tabs a').first().click();
             } else {
                 container.find('.nav-tabs a[href=#' + opentab + ']').click();
