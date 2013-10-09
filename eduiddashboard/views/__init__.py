@@ -77,18 +77,23 @@ class BaseFormView(FormView):
 
 class BaseActionsView(object):
     data_attribute = None
-    verify_messages = {
+    verify_messages = {}
+    default_verify_messages = {
         'ok': _('The data has been verified'),
         'error': _('The confirmation code is not the one have been sent to your mobile phone'),
         'request': _('Please revise your inbox and fill below with the given code'),
         'placeholder': _('Verification code'),
         'new_code_sent': _('A new verification code has been sent'),
+        'expired': _('The filled code has been expired. Please click in "Resend me the verification code" to get a new one'),
     }
 
     def __init__(self, context, request):
         self.request = request
         self.context = context
         self.user = context.user
+        for msgid, msg in self.default_verify_messages.items():
+            if msgid not in self.verify_messages:
+                self.verify_messages[msgid] = msg
 
     def __call__(self):
         action = self.request.POST['action']
@@ -109,13 +114,19 @@ class BaseActionsView(object):
         data_id = self.get_verification_data_id(data_to_verify)
         if 'code' in post_data:
             code_sent = post_data['code']
-            verification_code = get_verification_code(self.request.db, self.data_attribute, data_id)
+            verification_code = get_verification_code(self.request, self.data_attribute, data_id)
             if code_sent == verification_code['code']:
-                verificate_code(self.request, self.data_attribute, code_sent)
-                return {
-                    'result': 'ok',
-                    'message': self.verify_messages['ok'],
-                }
+                if verification_code['expired']:
+                    return {
+                        'result': 'error',
+                        'message': self.verify_messages['expired'],
+                    }
+                else:
+                    verificate_code(self.request, self.data_attribute, code_sent)
+                    return {
+                        'result': 'ok',
+                        'message': self.verify_messages['ok'],
+                    }
             else:
                 return {
                     'result': 'error',
@@ -133,7 +144,7 @@ class BaseActionsView(object):
         data_to_resend = data[index]
         data_id = self.get_verification_data_id(data_to_resend)
         code = new_verification_code(
-            self.request.db, self.data_attribute, data_id,
+            self.request, self.data_attribute, data_id,
             self.user, hasher=get_short_hash,
         )
         self.send_verification_code(data_id, code)

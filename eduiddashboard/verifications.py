@@ -1,5 +1,8 @@
-from eduiddashboard.utils import get_unique_hash
+from datetime import datetime, timedelta
 
+from bson.tz_util import utc
+
+from eduiddashboard.utils import get_unique_hash
 from eduiddashboard import log
 
 
@@ -10,12 +13,18 @@ def dummy_message(request, message):
     log.debug('[DUMMY_MESSAGE]: {0}'.format(message))
 
 
-def get_verification_code(db, model_name, obj_id):
-    results = db.verifications.find({'obj_id': obj_id, 'model_name': model_name})
-    return results[0]
+def get_verification_code(request, model_name, obj_id):
+    expiration_timeout = request.registry.settings.get('verification_code_timeout')
+    expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
+    result = request.db.verifications.find_one({
+        'obj_id': obj_id,
+        'model_name': model_name,
+    })
+    result['expired'] = result['timestamp'] < expire_limit
+    return result
 
 
-def new_verification_code(db, model_name, obj_id, user, hasher=None):
+def new_verification_code(request, model_name, obj_id, user, hasher=None):
     if hasher is None:
         hasher = get_unique_hash
     code = hasher()
@@ -24,9 +33,13 @@ def new_verification_code(db, model_name, obj_id, user, hasher=None):
         "obj_id": obj_id,
         "user_oid": user['_id'],
     }
-    db.verifications.find_and_modify(
+    request.db.verifications.find_and_modify(
         obj,
-        {"$set": {"code": code, "verified": False}},
+        {"$set": {
+            "code": code,
+            "verified": False,
+            "timestamp": datetime.now(utc),
+        }},
         upsert=True,
         safe=True,
     )
@@ -70,6 +83,6 @@ def verificate_code(request, model_name, code):
 
 
 def generate_verification_link(request, db, model, obj_id):
-    code = new_verification_code(db, model, obj_id, request.context.user)
+    code = new_verification_code(request, model, obj_id, request.context.user)
     link = request.context.safe_route_url("verifications", model=model, code=code)
     return link

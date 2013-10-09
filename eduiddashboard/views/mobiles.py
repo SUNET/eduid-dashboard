@@ -48,7 +48,7 @@ def get_tab():
 
 def send_verification_code(request, user, mobile_number, code=None):
     if code is None:
-        code = new_verification_code(request.db, 'mobile', mobile_number, user, hasher=get_short_hash)
+        code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
     msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
         'mobile_number': mobile_number,
         'code': code,
