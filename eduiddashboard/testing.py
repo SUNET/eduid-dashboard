@@ -53,7 +53,7 @@ MOCKED_USER_STANDARD = {
         'verified': True
     }, {
         'mobile': '+34 6096096096',
-        'verified': True
+        'verified': False
     }],
     'mail': 'johnsmith@example.com',
     'mailAliases': [{
@@ -79,6 +79,15 @@ MOCKED_USER_STANDARD = {
         'verified': False,
     }],
 }
+
+INITIAL_VERIFICATIONS = [{
+        '_id': ObjectId('234567890123456789012301'),
+        'code' : '9d392c',
+        'model_name' : 'mobile',
+        'obj_id' : '+34 6096096096',
+        'user_oid' : ObjectId("012345678901234567890123"),
+        'verified': False,
+}]
 
 
 class MockedUserDB(IUserDB):
@@ -196,6 +205,8 @@ class LoggedInReguestTests(unittest.TestCase):
 
         self.db.profiles.drop()
         self.db.verifications.drop()
+        for verification_data in INITIAL_VERIFICATIONS:
+            self.db.verifications.insert(verification_data)
         self.amdb.attributes.drop()
 
         users = []
