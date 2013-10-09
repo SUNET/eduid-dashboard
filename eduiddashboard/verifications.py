@@ -14,7 +14,7 @@ def dummy_message(request, message):
 
 
 def get_verification_code(request, model_name, obj_id):
-    expiration_timeout = request.registry.settings.get('verification_code_timeout')
+    expiration_timeout = request.registry.settings.get('verification_code_timeout', 30)
     expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
     result = request.db.verifications.find_one({
         'obj_id': obj_id,
