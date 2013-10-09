@@ -92,18 +92,6 @@ class NinsFormTests(LoggedInReguestTests):
             status=200
         )
 
-    def test_verify_existant_nin(self):
-        self.set_logged()
-
-        response = self.testapp.post(
-            '/profile/nins-actions/',
-            {'identifier': 123456789012, 'action': 'verify'}
-        )
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
-
-        self.assertIn('A verification message has been sent',
-                      response_json['message'])
 
     def test_remove_existant_verified_nin(self):
         self.set_logged()
@@ -136,3 +124,35 @@ class NinsFormTests(LoggedInReguestTests):
             {'identifier': 24, 'action': 'remove'},
             status=404
         )
+
+
+class NinsFormTests2(LoggedInReguestTests):
+
+    formname = 'ninsview-form'
+
+    users = [{
+        'mail': 'johnsmith@example.com',
+        'norEduPersonNIN': [{
+            'norEduPersonNIN': '210987654321',
+            'verified': True,
+            'active': False,
+        }, {
+            'norEduPersonNIN': '123456789012',
+            'verified': False,
+            'active': False,
+        }, {
+            'norEduPersonNIN': '123456789013',
+            'verified': False,
+            'active': True,
+        }],
+    }]
+
+    def test_verify_existant_nin(self):
+        self.set_logged()
+
+        response = self.testapp.post(
+            '/profile/nins-actions/',
+            {'identifier': 2, 'action': 'verify'}
+        )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'getcode')
