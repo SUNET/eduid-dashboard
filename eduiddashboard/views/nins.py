@@ -2,10 +2,11 @@
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
+from pyramid.i18n import get_localizer
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN
-from eduiddashboard.utils import get_icon_string
+from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 from eduiddashboard.verifications import dummy_message, new_verification_code
@@ -70,6 +71,40 @@ def get_status(user):
     return status
 
 
+def send_verification_code(request, user, nin, code=None):
+    """
+    You need to replace the call to dummy_message with the govt
+    message api
+    """
+
+    if code is None:
+        code = new_verification_code(request.db, 'norEduPersonNIN', nin, user,
+                                     hasher=get_short_hash)
+
+    msg = _(
+        'This is a message from %(site)s. The code for validate '
+        'your NIN %(nin)s is %(code)s' % {
+            'nin': nin,
+            'code': code,
+            'site': request.registry.settings.get('site.name',
+                                                  'eduID dashboard'),
+        }
+    )
+
+    msg = get_localizer(request).translate(msg)
+
+    ## Replace with the nin msg gateway call
+    dummy_message(request, msg)
+
+
+def mark_as_verified_nin(request, user, verified_nin):
+    nins = user['norEduPersonNIN']
+
+    for nin in nins:
+        if nin['norEduPersonNIN'] == verified_nin:
+            nin['verified'] = True
+
+
 def get_tab():
     return {
         'status': get_status,
@@ -81,34 +116,28 @@ def get_tab():
 @view_config(route_name='nins-actions', permission='edit')
 class NINsActionsView(BaseActionsView):
 
+    data_attribute = 'norEduPersonNIN'
+    verify_messages = {
+        'ok': _('The nin number has been verified'),
+        'error': _('The confirmation code is not the one have been sent to your inbox'),
+        'request': _('Please revise your NIN inbox and fill below with the given code'),
+        'placeholder': _('NIN verification code'),
+        'new_code_sent': _('A new verification code has been sent to your NIN inbox'),
+    }
+
+    def get_verification_data_id(self, data_to_verify):
+        return data_to_verify[self.data_attribute]
+
     def verify_action(self, index, post_data):
         """ Only the active (the last one) NIN can be verified """
-        nin = self.user['norEduPersonNIN'][-1]
-
-        already_verified = self.request.userdb.exists_by_field(
-            'norEduPersonNIN', {
-                'norEduPersonNIN': nin['norEduPersonNIN'],
-                'verified': True,
-            }
-        )
-        if already_verified:
+        nins = self.user.get(self.data_attribute, {})
+        if index != len(nins) - 1:
             return {
                 'result': 'bad',
-                'message': _("This norEduPersonNIN has been verified by "
-                             "someone else in his profile, so then, you "
-                             "can't verify it as yours. Please, contact "
-                             "with technical support")
+                'message': _("The provided nin can't be verified. You only "
+                             'can verify the last one'),
             }
-
-        send_verification_message(self.request, nin['norEduPersonNIN'])
-
-        return {
-            'result': 'ok',
-            'message': _('A verification message has been sent '
-                         'to your Govt Inbox. Please revise your '
-                         'inbox and return to this page to enter '
-                         'the provided verification number'),
-        }
+        return super(NINsActionsView, self).verify_action(index, post_data)
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
@@ -147,6 +176,9 @@ class NINsActionsView(BaseActionsView):
                          'through all applications'),
         }
 
+    def send_verification_code(self, data_id, code):
+        send_verification_code(self.request, self.user, data_id, code)
+
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')
@@ -177,15 +209,16 @@ class NinsView(BaseFormView):
 
     def add_success(self, ninform):
         newnin = self.schema.serialize(ninform)
+        newnin = newnin['norEduPersonNIN']
 
-        # only one nin verified can be actived
         ninsubdoc = {
-            'norEduPersonNIN': newnin['norEduPersonNIN'],
+            'norEduPersonNIN': newnin,
             'verified': False,
             'active': False,
         }
 
         nins = self.user['norEduPersonNIN']
+        nin_identifier = len(nins)
         nins.append(ninsubdoc)
 
         self.user['norEduPersonNIN'] = nins
@@ -206,10 +239,13 @@ class NinsView(BaseFormView):
                                      'through all applications'),
                                    queue='forms')
 
-        send_verification_message(self.request, newnin['norEduPersonNIN'])
+        send_verification_code(self.request, self.user, newnin)
 
-        self.request.session.flash(_('A verification message has been sent '
-                                     'to your Govt Inbox. Please revise your '
-                                     'inbox and return to this page to enter '
-                                     'the provided verification number'),
-                                   queue='forms')
+        msg = _('A verification message has been sent to your Govt Inbox. '
+                'Please revise your inbox, return to this page and '
+                '<a href="#" class="verifycode" data-identifier="${id}">'
+                'fill here</a> the provided verification number',
+                {'id': nin_identifier})
+
+        msg = get_localizer(self.request).translate(msg)
+        self.request.session.flash(msg, queue='forms')
