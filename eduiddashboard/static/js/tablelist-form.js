@@ -83,10 +83,6 @@
                         askCode(actions_url, action, container, value, data.message, data.placeholder);
                     } else {
                         sendInfo(container, data.result, data.message);
-                        if(data.action == 'remove' && data.result == 'ok') {
-                            // special case of removing rows
-                            container.find('table.table tr[data-identifier=' + data.identifier +']').remove();
-                        }
                         $('body').trigger('action-executed');
                     }
                 },
