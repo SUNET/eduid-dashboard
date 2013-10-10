@@ -325,7 +325,12 @@ def main(global_config, **settings):
     settings['available_languages'] = read_setting_from_env(
         settings,
         'available_languages',
-        'en sv es'
+        'en sv es',
+    )
+
+    settings['verification_code_timeout'] = read_setting_from_env(settings,
+        'verification_code_timeout',
+        '30',
     )
 
     jinja2_settings(settings)
