@@ -67,7 +67,6 @@ class UserDB(IUserDB):
         return self._db.get_users(filter, proyection)
 
     def get_identity_proofing(self, user):
-        import ipdb; ipdb.set_trace()
         return self._db.get_identity_proofing(user['_id'])
 
 
