@@ -164,9 +164,13 @@ class BaseFactory(object):
                                         available_loa[0])
 
     def get_max_loa(self):
-        available_loa = self.request.registry.settings.get('available_loa')
-        return self.request.session.get('eduPersonIdentityProofing',
-                                        available_loa[0])
+        max_loa = self.request.session.get('eduPersonIdentityProofing', None)
+        if max_loa is None:
+            max_loa = self.request.userdb.get_identity_proofing(
+                self.request.session.get('user'))
+            self.request.session['eduPersonIdentityProofing'] = max_loa
+
+        return max_loa
 
     def loa_to_int(self, loa=None):
         available_loa = self.request.registry.settings.get('available_loa')
