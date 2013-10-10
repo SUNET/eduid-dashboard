@@ -57,13 +57,17 @@ def verificate_code(request, model_name, code):
     from eduiddashboard.views.emails import mark_as_verified_email
     from eduiddashboard.views.mobiles import mark_as_verified_mobile
     from eduiddashboard.views.postal_address import mark_as_verified_postal_address
-    from eduiddashboard.views.nins import mark_as_verified_nin
+    from eduiddashboard.views.nins import mark_as_verified_nin, post_verified_nin
 
     verifiers = {
         'email': mark_as_verified_email,
         'mobile': mark_as_verified_mobile,
         'postalAddress': mark_as_verified_postal_address,
         'norEduPersonNIN': mark_as_verified_nin,
+    }
+
+    post_verifiers = {
+        'norEduPersonNIN': post_verified_nin,
     }
 
     result = request.db.verifications.find_and_modify(
@@ -86,6 +90,9 @@ def verificate_code(request, model_name, code):
         # Callback to a function which marks as verificated the proper user attribute
         verifiers[model_name](request, user, obj_id)
         # Do the save staff
+        post_verified = post_verifiers.get(model_name, None)
+        if post_verified is not None:
+            post_verified(request, user, obj_id)
         request.db.profiles.save(user, safe=True)
         request.context.propagate_user_changes(user)
     return obj_id

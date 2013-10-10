@@ -8,29 +8,9 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard import log
 
 from eduiddashboard.verifications import dummy_message, new_verification_code
-
-
-def send_verification_message(request, nin):
-    """
-    You need to replace the call to dummy_message with the govt
-    message api
-    """
-
-    code = new_verification_code(request, 'nins', nin, request.context.user)
-    verification_message = _(
-        'This is a message from %(site)s. The code for validate '
-        'your NIN %(nin)s is %(code)s ' % {
-            'nin': nin,
-            'code': code,
-            'site': request.registry.settings.get('site.name',
-                                                  'eduID dashboard'),
-        }
-    )
-
-    ## Replace this call
-    dummy_message(request, verification_message)
 
 
 def get_status(user):
@@ -78,7 +58,7 @@ def send_verification_code(request, user, nin, code=None):
     """
 
     if code is None:
-        code = new_verification_code(request.db, 'norEduPersonNIN', nin, user,
+        code = new_verification_code(request, 'norEduPersonNIN', nin, user,
                                      hasher=get_short_hash)
 
     msg = _(
@@ -103,6 +83,15 @@ def mark_as_verified_nin(request, user, verified_nin):
     for nin in nins:
         if nin['norEduPersonNIN'] == verified_nin:
             nin['verified'] = True
+
+
+def post_verified_nin(request, user, verified_nin):
+    """
+        Function to get the official postal address from
+        the government service
+    """
+    log.debug('Retrieving postal address from NIN service')
+    log.warning('The postal addresss service communication is not implemented')
 
 
 def get_tab():

@@ -21,9 +21,12 @@ SEARCHER_ATTTRIBUTE_TYPES = [
 ]
 
 POSTAL_ADDRESS_TYPES = [
+    (u'official', _('Official address')),
     (u'home', _('Home address')),
     (u'work', _('Work address')),
 ]
+
+POSTAL_ADDRESS_TYPES_WIDGET = POSTAL_ADDRESS_TYPES[1:]
 
 
 class BooleanMongo(colander.Boolean):
@@ -132,12 +135,21 @@ class PostalAddress(colander.MappingSchema):
                                title=_('type'),
                                missing='registered',
                                validator=colander.OneOf([k for k, v in POSTAL_ADDRESS_TYPES]),
-                               widget=deform.widget.SelectWidget(values=POSTAL_ADDRESS_TYPES))
+                               widget=deform.widget.SelectWidget(values=POSTAL_ADDRESS_TYPES_WIDGET))
     address = colander.SchemaNode(colander.String(), title=_('address'))
     locality = colander.SchemaNode(colander.String(), title=_('locality'))
     postalCode = colander.SchemaNode(colander.String(), title=_('postal code'),
                                      validator=colander.Length(min=5, max=6))
     country = colander.SchemaNode(colander.String(), title=_('country'))
+
+    def validator(self, node, data):
+        request = node.bindings['request']
+        if (request.POST and 'add' in request.POST
+                and data.get('type', '') == 'official'
+                and request.context.workmode != 'admin'):
+            raise colander.Invalid(node,
+                                   _("You have not rights to set the official "
+                                     " postal address manually"))
 
 
 class Mobile(colander.MappingSchema):
