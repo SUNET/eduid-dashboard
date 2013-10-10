@@ -89,10 +89,10 @@ def verificate_code(request, model_name, code):
         user = request.userdb.get_user_by_oid(result['user_oid'])
         # Callback to a function which marks as verificated the proper user attribute
         verifiers[model_name](request, user, obj_id)
-        # Do the save staff
         post_verified = post_verifiers.get(model_name, None)
         if post_verified is not None:
             post_verified(request, user, obj_id)
+        # Do the save staff
         request.db.profiles.save(user, safe=True)
         request.context.propagate_user_changes(user)
     return obj_id

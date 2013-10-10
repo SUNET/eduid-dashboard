@@ -83,6 +83,9 @@ def mark_as_verified_nin(request, user, verified_nin):
     for nin in nins:
         if nin['norEduPersonNIN'] == verified_nin:
             nin['verified'] = True
+            nin['active'] = True
+        else:
+            nin['active'] = False
 
 
 def post_verified_nin(request, user, verified_nin):
