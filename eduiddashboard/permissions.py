@@ -192,6 +192,8 @@ class ForbiddenFactory(RootFactory):
 class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
+        if self.request.session.get('user') is None:
+            raise HTTPForbidden()
         is_authorized = super(BaseCredentialsFactory, self).authorize()
 
         # Verify that session loa is equal than the max reached
