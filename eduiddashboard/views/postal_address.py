@@ -15,21 +15,22 @@ from eduiddashboard.views import BaseFormView, BaseActionsView
 logger = logging.getLogger(__name__)
 
 
+def contains_official_postal_address(postal_address):
+    for address in postal_address:
+        if address['type'] == 'official':
+            return True
+    return False
+
+
 def get_status(user):
     """
     Check if all postal addresses are verified already
 
     return msg and icon
     """
-    postalAddress = user.get('postalAddress', [])
+    postal_address = user.get('postalAddress', [])
 
-    exists_official = False
-    for address in postalAddress:
-        if address['type'] == 'official':
-            exists_official = True
-            break
-
-    if not exists_official:
+    if not contains_official_postal_address(postal_address):
         return {
             'completed': (0, 1),
         }
@@ -150,8 +151,10 @@ class PostalAddressView(BaseFormView):
 
     def get_template_context(self):
         context = super(PostalAddressView, self).get_template_context()
+        postal_address = self.user.get('postalAddress', [])
         context.update({
-            'postal_addresses': self.user.get('postalAddress', []),
+            'postal_addresses': postal_address,
+            'contains_official_postal_address': contains_official_postal_address(postal_address),
         })
         return context
 

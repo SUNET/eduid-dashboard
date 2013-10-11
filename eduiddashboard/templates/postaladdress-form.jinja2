@@ -1,10 +1,19 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}
-   <p>These list contain all your postal addresses registered in the
-   platform. You only send mail to your official postal address registered.</p>
-   {% endtrans %}
+  {% if not contains_official_postal_address %}
+    {% trans %}<p>You didn't have a official postal address, yet.
+    Don't worry about that, we are going to retrive it from the Government
+    Service whenever your NIN is verified</p>
+    {% endtrans %}
+  {% endif %}
+
+  {% if postal_addresses %}
+    {% trans %}
+    <p>These list contain all your postal addresses registered in the
+    platform. We use your official postal address to mail you.</p>
+    {% endtrans %}
+  {% endif %}
 {% endblock %}
 
 {% block extra_content %}
@@ -70,7 +79,8 @@
   </table>
 
   {% else %}
-    <p>{% trans %}There is no content created. You can add first element by clicking the button below{% endtrans %}</p>
+    <p>{% trans %}There is no postal address registered. You can add alternatives
+        postal addresses element by clicking the button below.{% endtrans %}</p>
   {% endif %}
 
   <button type='button'
