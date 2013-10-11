@@ -52,13 +52,21 @@ def mark_as_verified_email(request, user, verified_email):
         new_emails.append(email)
 
     user.update(new_emails)
-    request.session.flash(_('The email {email} was verified'
-                          ).format(email=verified_email),
+    request.session.flash(_('The email {email} was verified').format(email=verified_email),
                           queue='forms')
 
 
 @view_config(route_name='emails-actions', permission='edit')
 class EmailsActionsView(BaseActionsView):
+
+    data_attribute = 'mailAliases'
+    verify_messages = {
+        'ok': _('The email has been verified'),
+        'error': _('The confirmation code is not the one have been sent to your inbox'),
+        'request': _('Please revise your inbox and click the provided verification link or fill below with the given code'),
+        'placeholder': _('email verification code'),
+        'new_code_sent': _('A new verification code has been sent to your inbox'),
+    }
 
     def setprimary_action(self, index, post_data):
         primary_email = self.user['mailAliases'][index]['email']
@@ -75,18 +83,6 @@ class EmailsActionsView(BaseActionsView):
 
         self.context.propagate_user_changes(self.user)
         return {'result': 'ok', 'message': _('Your primary email was changed')}
-
-    def verify_action(self, index, post_data):
-        email = self.user['mailAliases'][index]
-
-        send_verification_mail(self.request, email['email'])
-
-        return {
-            'result': 'ok',
-            'message': _('A new verification email has been sent '
-                         'to your account. Please revise your '
-                         'inbox and click on the provided link'),
-        }
 
     def remove_action(self, index, post_data):
         emails = self.user['mailAliases']
@@ -123,6 +119,12 @@ class EmailsActionsView(BaseActionsView):
                          ' before your changes are distributed '
                          'through all applications'),
         }
+
+    def get_verification_data_id(self, data_to_verify):
+        return data_to_verify['email']
+
+    def send_verification_code(self, data_id, code):
+        send_verification_mail(self.request, data_id, code)
 
 
 @view_config(route_name='emails', permission='edit',
@@ -189,5 +191,9 @@ class EmailsView(BaseFormView):
 
         self.request.session.flash(_('A verification email has been sent '
                                      'to your new account. Please revise your '
-                                     'inbox and click on the provided link'),
+                                     'inbox and click on the provided link or '
+                                     'fill the code in the <a href=# '
+                                     'class="verifycode" data-identifier="${id}">'
+                                     'verification form</a>"',
+                                     mapping={'id': len(emails)}),
                                    queue='forms')

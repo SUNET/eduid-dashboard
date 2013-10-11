@@ -12,27 +12,6 @@ from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard.verifications import dummy_message, new_verification_code
 
 
-def send_verification_message(request, nin):
-    """
-    You need to replace the call to dummy_message with the govt
-    message api
-    """
-
-    code = new_verification_code(request, 'nins', nin, request.context.user)
-    verification_message = _(
-        'This is a message from %(site)s. The code for validate '
-        'your NIN %(nin)s is %(code)s ' % {
-            'nin': nin,
-            'code': code,
-            'site': request.registry.settings.get('site.name',
-                                                  'eduID dashboard'),
-        }
-    )
-
-    ## Replace this call
-    dummy_message(request, verification_message)
-
-
 def get_status(user):
     """
     Check if there is one norEduPersonNIN active and verified
