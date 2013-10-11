@@ -38,6 +38,8 @@ def get_status(user):
             pending_actions = _('You have to add your NIN number')
         else:
             completed_fields += 1
+    else:
+        pending_actions = _('You must validate your NIN number')
 
     status = {
         'completed': (completed_fields, len(schema.children) + 1)
@@ -111,10 +113,13 @@ class NINsActionsView(BaseActionsView):
     data_attribute = 'norEduPersonNIN'
     verify_messages = {
         'ok': _('The nin number has been verified'),
-        'error': _('The confirmation code is not the one have been sent to your inbox'),
-        'request': _('Please revise your NIN inbox and fill below with the given code'),
+        'error': _('The confirmation code is not the one have been sent to '
+                   'your inbox'),
+        'request': _('Please revise your NIN inbox and fill below with the '
+                     'given code'),
         'placeholder': _('NIN verification code'),
-        'new_code_sent': _('A new verification code has been sent to your NIN inbox'),
+        'new_code_sent': _('A new verification code has been sent to your '
+                           'NIN inbox'),
     }
 
     def get_verification_data_id(self, data_to_verify):
@@ -149,15 +154,7 @@ class NINsActionsView(BaseActionsView):
         self.user['norEduPersonNIN'] = nins
 
         # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$pull': {
-                'norEduPersonNIN': {
-                    'norEduPersonNIN': remove_nin['norEduPersonNIN'],
-                }
-            }
-        }, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
 
@@ -193,7 +190,8 @@ class NinsView(BaseFormView):
 
     def get_template_context(self):
         context = super(NinsView, self).get_template_context()
-        proofing_links = self.request.registry.settings.get('proofing_links', {})
+        proofing_links = self.request.registry.settings.get('proofing_links',
+                                                            {})
         proofing_link = proofing_links.get('nin')
         context.update({
             'nins': self.user['norEduPersonNIN'],
@@ -219,13 +217,7 @@ class NinsView(BaseFormView):
         self.user['norEduPersonNIN'] = nins
 
         # Do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$push': {
-                'norEduPersonNIN': ninsubdoc
-            }
-        }, safe=True)
+        self.request.db.profiles.find_and_modify(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
 
@@ -236,7 +228,8 @@ class NinsView(BaseFormView):
 
         send_verification_code(self.request, self.user, newnin)
 
-        proofing_links = self.request.registry.settings.get('proofing_links', {})
+        proofing_links = self.request.registry.settings.get('proofing_links',
+                                                            {})
         nin_proofing_link = proofing_links.get('nin')
 
         msg = _('A verification message has been sent to your Govt Inbox. '
