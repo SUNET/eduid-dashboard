@@ -4,13 +4,20 @@ from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.verifications import generate_verification_link
+from eduiddashboard.verifications import (generate_verification_link,
+                                          new_verification_code)
+from eduiddashboard.utils import get_short_hash
 
 
-def send_verification_mail(request, email):
+def send_verification_mail(request, email, code=None):
     mailer = get_mailer(request)
-    verification_link = generate_verification_link(request, request.db,
-                                                   'email', email)
+    if code is None:
+        code = new_verification_code(request, 'mailAliases', email,
+                                     request.context.user,
+                                     hasher=get_short_hash)
+
+    verification_link = generate_verification_link(request, code,
+                                                   'modelAliases')
 
     site_name = request.registry.settings.get("site.name", "eduID")
 
@@ -19,6 +26,7 @@ def send_verification_mail(request, email):
         "verification_link": verification_link,
         "site_url": request.context.safe_route_url("home"),
         "site_name": site_name,
+        "code": code,
     }
 
     message = Message(

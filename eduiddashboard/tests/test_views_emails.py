@@ -100,11 +100,11 @@ class MailsFormTests(LoggedInReguestTests):
             {'identifier': 0, 'action': 'verify'}
         )
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
-        response_form = self.testapp.get('/profile/emails/')
 
-        self.assertIn('A new verification email has been sent to your'
-                      ' account', response_json['message'])
+        self.assertEqual(response_json['result'], 'getcode')
+        self.assertIn('Please revise your inbox and click the provided '
+                      'verification link or fill below with the given code',
+                      response_json['message'])
 
     def test_remove_existant_email(self):
         self.set_logged()

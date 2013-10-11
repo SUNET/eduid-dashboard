@@ -66,6 +66,9 @@ class UserDB(IUserDB):
     def get_users(self, filter, proyection=None):
         return self._db.get_users(filter, proyection)
 
+    def get_identity_proofing(self, user):
+        return self._db.get_identity_proofing(user['_id'])
+
 
 def get_userdb(request):
     return request.registry.settings['userdb']

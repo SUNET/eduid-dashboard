@@ -60,7 +60,7 @@ def verificate_code(request, model_name, code):
     from eduiddashboard.views.nins import mark_as_verified_nin, post_verified_nin
 
     verifiers = {
-        'email': mark_as_verified_email,
+        'mailAliases': mark_as_verified_email,
         'mobile': mark_as_verified_mobile,
         'postalAddress': mark_as_verified_postal_address,
         'norEduPersonNIN': mark_as_verified_nin,
@@ -98,7 +98,6 @@ def verificate_code(request, model_name, code):
     return obj_id
 
 
-def generate_verification_link(request, db, model, obj_id):
-    code = new_verification_code(request, model, obj_id, request.context.user)
+def generate_verification_link(request, code, model):
     link = request.context.safe_route_url("verifications", model=model, code=code)
     return link
