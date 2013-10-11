@@ -48,7 +48,6 @@ def get_status(user):
         status.update({
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
-
         })
     return status
 
@@ -217,7 +216,7 @@ class NinsView(BaseFormView):
         self.user['norEduPersonNIN'] = nins
 
         # Do the save staff
-        self.request.db.profiles.find_and_modify(self.user, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
 
