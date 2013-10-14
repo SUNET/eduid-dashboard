@@ -182,6 +182,19 @@ class BaseFactory(object):
         except ValueError:
             return 1
 
+    def session_user_display(self):
+        user = self.request.session.get('user')
+        display_name = user.get('displayName', False)
+        if display_name:
+            return display_name
+
+        gn = user.get('givenName', '')
+        sn = user.get('sn', '')
+        if gn and sn:
+            return "{0} {1}".format(gn, sn)
+
+        return user.get('mail')
+
 
 class ForbiddenFactory(RootFactory):
     __acl__ = [

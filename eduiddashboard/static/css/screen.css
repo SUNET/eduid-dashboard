@@ -192,17 +192,28 @@ ul.circles-widget-labels li {
 .loa-big {
   float:  right;
   width: 82px;
-  height: 82px;
-  border: solid 1px;
-  font-size: 24px;
+  height: 40px;
+  font-size: 25px;
   font-weight: bold;
 }
 
 .loa-big div {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 7px;
 }
 
+.loa-big a:hover {
+  text-decoration: none;
+}
+
+div.profile-filled {
+  float: right;
+  width: 220px;
+}
+
+div.profile-filled div.title {
+  font-weight: bold;
+}
 
 div.profile-combo {
   margin-top: 40px;

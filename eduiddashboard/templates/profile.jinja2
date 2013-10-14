@@ -3,6 +3,12 @@
 {% block nav_class_home %}active{% endblock %}
 
 {% block title %}
+  <div class='profile-filled'>
+    <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+    <div class="progress progress-striped">
+      <div class="bar" style="width: {{ profile_filled }}%;"></div>
+    </div>
+  </div>
   {% if context.workmode == 'personal' %}
   <h3>{{ _("Your profile") }}</h3>
   {% else %}
@@ -27,12 +33,6 @@
 
     </div>
 
-    <div class='span6 profile-filled'>
-      <h4>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></h4>
-      <div class="progress progress-striped">
-        <div class="bar" style="width: {{ profile_filled }}%;"></div>
-      </div>
-    </div>
   </div>
 
   <div class='clear'></div>
