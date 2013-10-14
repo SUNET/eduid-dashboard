@@ -193,7 +193,7 @@ class NinsView(BaseFormView):
                                                             {})
         proofing_link = proofing_links.get('nin')
         context.update({
-            'nins': self.user['norEduPersonNIN'],
+            'nins': self.user.get('norEduPersonNIN', []),
             'proofing_link': proofing_link,
         })
 
@@ -209,7 +209,7 @@ class NinsView(BaseFormView):
             'active': False,
         }
 
-        nins = self.user['norEduPersonNIN']
+        nins = self.user.get('norEduPersonNIN', [])
         nin_identifier = len(nins)
         nins.append(ninsubdoc)
 
