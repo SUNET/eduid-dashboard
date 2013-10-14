@@ -213,6 +213,10 @@ class HomeFactory(BaseFactory):
         return self.request.session.get('user', None)
 
 
+class HelpFactory(BaseFactory):
+    pass
+
+
 class PersonFactory(BaseFactory):
     pass
 

@@ -18,7 +18,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PostalAddressFactory, MobilesFactory,
                                         PermissionsFactory, VerificationsFactory,
                                         StatusFactory, HomeFactory,
-                                        ForbiddenFactory)
+                                        ForbiddenFactory, HelpFactory)
 
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
@@ -222,8 +222,9 @@ def includeme(config):
         config.add_route('verifications',
                          '/verificate/{model}/{code}/',
                          factory=ForbiddenFactory)
-    config.add_route('help', '/help/')
-    config.add_route('session-reload', '/session-reload/')
+    config.add_route('help', '/help/', factory=HelpFactory)
+    config.add_route('session-reload', '/session-reload/',
+                     factory=PersonFactory)
 
 
 def main(global_config, **settings):
