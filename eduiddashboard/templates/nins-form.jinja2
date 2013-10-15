@@ -1,8 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}<p>This list contain all your National Identity Numbers
-   (NIN) registered in the platform.</p>
+   {% trans %}<p>Registered national identity numbers</p>
    {% endtrans %}
 {% endblock %}
 
@@ -36,7 +35,7 @@
             <input class='hide' type='radio' name='verify' value='{{loop.index0}}'>
           </label>
           {% else %}
-            <i class='icon-remove' title="{{_('Can\'t verify an old NIN')}}"></i>
+            <i class='icon-remove' title="{{_('National identity number not verified')}}"></i>
           {% endif %}
         </td>
         <td>
@@ -53,14 +52,14 @@
   </table>
 
   {% else %}
-    <p>{% trans %}There is no nin registered. You can add the first item by clicking the button below{% endtrans %}</p>
+    <p>{% trans %}Add a Swedish national identity number by clicking the button below{% endtrans %}</p>
   {% endif %}
 
   <button type='button'
           class='btn add-new' 
           data-toggle='button'>
         <i class='icon-plus'></i>
-        {{_('Add a new National Identity Number')}}</button>
+        {{_('Add national identity number')}}</button>
 {% endblock %}
 
 

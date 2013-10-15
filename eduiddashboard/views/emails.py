@@ -61,11 +61,11 @@ class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
     verify_messages = {
-        'ok': _('The email address has been verified'),
+        'ok': _('Email address has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
-        'request': _('Please revise your inbox and click the provided verification link or fill below with the given code'),
-        'placeholder': _('email verification code'),
-        'new_code_sent': _('A new verification code has been sent to your inbox'),
+        'request': _('Check your inbox for further instructions'),
+        'placeholder': _('Email verification code'),
+        'new_code_sent': _('A verification code has been sent to your inbox'),
     }
 
     def setprimary_action(self, index, post_data):
@@ -82,14 +82,14 @@ class EmailsActionsView(BaseActionsView):
         }, safe=True)
 
         self.context.propagate_user_changes(self.user)
-        return {'result': 'ok', 'message': _('Your primary email was changed')}
+        return {'result': 'ok', 'message': _('Your primary email address was successfully changed')}
 
     def remove_action(self, index, post_data):
         emails = self.user['mailAliases']
         if len(emails) == 1:
             return {
                 'result': 'error',
-                'message': _('Error: You only have one email and this cannot be deleted'),
+                'message': _('Error: You only have one email address and it cannot be removed'),
             }
         remove_email = emails[index]['email']
         emails.remove(emails[index])
@@ -115,9 +115,7 @@ class EmailsActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('One email has been removed, please, wait'
-                         ' before your changes are distributed '
-                         'through all applications'),
+            'message': _('Email address was successfully removed'),
         }
 
     def get_verification_data_id(self, data_to_verify):
@@ -182,7 +180,7 @@ class EmailsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved'),
+        self.request.session.flash(_('Your changes was successfully updated'),
                                    queue='forms')
 
         send_verification_mail(self.request, newemail['mail'])

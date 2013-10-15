@@ -9,8 +9,8 @@
 
   {% if postal_addresses %}
     {% trans %}
-    <p>Your registered postal address. Be aware that your postal address from the Swedish population register
-        will be used when sending mail to you.</p>
+    <p>Your registered postal addresses. Be aware that your postal address from the Swedish population register
+        will be used when sending letters by mail to you.</p>
     {% endtrans %}
   {% endif %}
 {% endblock %}
@@ -44,7 +44,7 @@
       {% if address.type != 'official' %}
         <td>
           <label>
-            <i class='icon-remove' title='{{_("Remove this postal address")}}'></i>
+            <i class='icon-remove' title='{{_("Remove postal address")}}'></i>
             <input class='hide' type='radio' name='remove' value='{{ loop.index0 }}'>
           </label>
         </td>
@@ -66,7 +66,7 @@
           class='btn add-new' 
           data-toggle='button'>
         <i class='icon-plus'></i>
-        {{_('Add a new postal address')}}</button>
+        {{_('Add postal address')}}</button>
 {% endblock %}
 
 {% block form_generic_form %}

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-15 14:05+0200\n"
+"POT-Creation-Date: 2013-10-15 16:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgid "phone mobile number"
 msgstr ""
 
 #: eduiddashboard/models.py:20 eduiddashboard/templates/home.jinja2:30
-#: eduiddashboard/templates/nins-form.jinja2:17
+#: eduiddashboard/templates/nins-form.jinja2:16
 msgid "NIN"
 msgstr ""
 
@@ -270,18 +270,18 @@ msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:20
 #: eduiddashboard/templates/mobiles-form.jinja2:19
-#: eduiddashboard/templates/nins-form.jinja2:44
+#: eduiddashboard/templates/nins-form.jinja2:43
 #: eduiddashboard/templates/postaladdress-form.jinja2:30
 msgid "Remove"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:28
-msgid "Set this email address as your primary email"
+msgid "Make this email address your new primary email address"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:35
 #: eduiddashboard/templates/mobiles-form.jinja2:29
-#: eduiddashboard/templates/nins-form.jinja2:29
+#: eduiddashboard/templates/nins-form.jinja2:28
 msgid "Already verified"
 msgstr ""
 
@@ -290,15 +290,15 @@ msgid "Resend verification email"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:47
-msgid "Remove this email"
+msgid "Remove this email address"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:56
-msgid "Please add an email address by clicking on the button below."
+msgid "Add an email address by clicking on the button below."
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:63
-msgid "Add a new email"
+msgid "Add email address"
 msgstr ""
 
 #: eduiddashboard/templates/home.jinja2:7
@@ -352,53 +352,53 @@ msgid "Phone"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:33
-#: eduiddashboard/templates/nins-form.jinja2:35
-msgid "Verify code"
+#: eduiddashboard/views/__init__.py:85
+msgid "Verification code"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:40
-#: eduiddashboard/templates/postaladdress-form.jinja2:47
 msgid "Remove this postal address"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:49
-msgid "Please add a mobile phone number by clicking on the button below."
+msgid "Add a mobile phone number by clicking on the button below."
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:56
-msgid "Add a new mobile phone"
+msgid "Add mobile phone number"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:4
 msgid ""
-"<p>This list contain all your National Identity Numbers\n"
-"   (NIN) registered in the platform.</p>\n"
+"<p>Registered national identity numbers</p>\n"
 "   "
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:18
+#: eduiddashboard/templates/nins-form.jinja2:17
 msgid "verification status"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:19
+#: eduiddashboard/templates/nins-form.jinja2:18
 msgid "remove"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:39
-msgid "Can't verify an old NIN"
+#: eduiddashboard/templates/nins-form.jinja2:34
+msgid "Verify code"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:56
-msgid ""
-"There is no nin registered. You can add the first item by clicking the button"
-" below"
+#: eduiddashboard/templates/nins-form.jinja2:38
+msgid "National identity number not verified"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:63
-msgid "Add a new National Identity Number"
+#: eduiddashboard/templates/nins-form.jinja2:55
+msgid "Add a Swedish national identity number by clicking the button below"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:75
+#: eduiddashboard/templates/nins-form.jinja2:62
+msgid "Add national identity number"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:74
 #, python-format
 msgid ""
 "You can access to your associated inbox nin by clicking this <a "
@@ -414,7 +414,7 @@ msgid "Available permissions for this user"
 msgstr ""
 
 #: eduiddashboard/templates/permissions-form.jinja2:16
-msgid "Your are editing your own permissions, Are you sure about your changes?"
+msgid "Are you sure you want to submit your permission changes?"
 msgstr ""
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
@@ -432,14 +432,18 @@ msgstr ""
 #: eduiddashboard/templates/postaladdress-form.jinja2:11
 msgid ""
 "\n"
-"    <p>Your registered postal address. Be aware that your postal address from"
-" the Swedish population register\n"
-"        will be used when sending mail to you.</p>\n"
+"    <p>Your registered postal addresses. Be aware that your postal address "
+"from the Swedish population register\n"
+"        will be used when sending letters by mail to you.</p>\n"
 "    "
 msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:26
 msgid "Type"
+msgstr ""
+
+#: eduiddashboard/templates/postaladdress-form.jinja2:47
+msgid "Remove postal address"
 msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:60
@@ -451,7 +455,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:69
-msgid "Add a new postal address"
+msgid "Add postal address"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:7
@@ -488,7 +492,9 @@ msgid "Warning!"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:111
-msgid "Something goes wrong. Please, try it later."
+msgid ""
+"An error has occurred, please try again or contact support if the problem "
+"persists."
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:118
@@ -496,7 +502,7 @@ msgid "Error!"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:118
-msgid "You haven't permissions to access that resource."
+msgid "Permission denied"
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-email.html.jinja2:1
@@ -604,12 +610,8 @@ msgstr ""
 msgid "The verification code used is invalid"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:84
-msgid "Please revise your inbox and fill below with the given code"
-msgstr ""
-
-#: eduiddashboard/views/__init__.py:85
-msgid "Verification code"
+#: eduiddashboard/views/__init__.py:84 eduiddashboard/views/emails.py:66
+msgid "Check your inbox for further instructions"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:86
@@ -635,7 +637,7 @@ msgid "The email {email} was verified"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:64
-msgid "The email address has been verified"
+msgid "Email address has been verified"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:65 eduiddashboard/views/mobiles.py:73
@@ -643,39 +645,31 @@ msgstr ""
 msgid "The confirmation code used is invalid, please try again or request a new code"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66
-msgid ""
-"Please revise your inbox and click the provided verification link or fill "
-"below with the given code"
-msgstr ""
-
 #: eduiddashboard/views/emails.py:67
-msgid "email verification code"
+msgid "Email verification code"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:68
-msgid "A new verification code has been sent to your inbox"
+msgid "A verification code has been sent to your inbox"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:85
-msgid "Your primary email was changed"
+msgid "Your primary email address was successfully changed"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:92
-msgid "Error: You only have one email and this cannot be deleted"
+msgid "Error: You only have one email address and it cannot be removed"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:118
-msgid ""
-"One email has been removed, please, wait before your changes are distributed "
-"through all applications"
+msgid "Email address was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:185
-msgid "Your changes was saved"
+#: eduiddashboard/views/emails.py:183
+msgid "Your changes was successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:190
+#: eduiddashboard/views/emails.py:188
 msgid ""
 "A verification email has been sent to you. Please check your inbox for "
 "further instructions."

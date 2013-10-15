@@ -25,7 +25,7 @@
     <tr class='emailrow' data-identifier="{{ loop.index0 }}">
         <td>
           <input type='radio' name='setprimary' value='{{loop.index0}}'
-           title='{{_("Set this email address as your primary email")}}'
+           title='{{_("Make this email address your new primary email address")}}'
            {% if mail.email == primary_email %}checked{% endif %}/></td>
 
         <td class='identifier'>{{ mail.email }}</td>
@@ -44,7 +44,7 @@
 
         <td>
           <label>
-            <i class='icon-remove' title='{{_("Remove this email")}}'></i>
+            <i class='icon-remove' title='{{_("Remove this email address")}}'></i>
             <input class='hide' type='radio' name='remove' value='{{loop.index0}}'>
           </label>
         </td>
@@ -53,14 +53,14 @@
   </table>
 
   {% else %}
-    <p>{% trans %}Please add an email address by clicking on the button below.{% endtrans %}</p>
+    <p>{% trans %}Add an email address by clicking on the button below.{% endtrans %}</p>
   {% endif %}
 
   <button type='button'
           class='btn add-new' 
           data-toggle='button'>
         <i class='icon-plus'></i>
-        {{_('Add a new email')}}</button>
+        {{_('Add email address')}}</button>
 {% endblock %}
 
 

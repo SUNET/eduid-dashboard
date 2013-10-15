@@ -30,7 +30,7 @@
       {% else %}
         <td>
           <label>
-            <i class='icon-question-sign' title='{{_("Verify code")}}'></i>
+            <i class='icon-question-sign' title='{{_("Verification code")}}'></i>
             <input class='hide' type='radio' name='verify' value='{{ loop.index0 }}'>
           </label>
         </td>
@@ -46,14 +46,14 @@
   </table>
 
   {% else %}
-    <p>{% trans %}Please add a mobile phone number by clicking on the button below.{% endtrans %}</p>
+    <p>{% trans %}Add a mobile phone number by clicking on the button below.{% endtrans %}</p>
   {% endif %}
 
   <button type='button'
           class='btn add-new' 
           data-toggle='button'>
         <i class='icon-plus'></i>
-        {{_('Add a new mobile phone')}}</button>
+        {{_('Add mobile phone number')}}</button>
 {% endblock %}
 
 {% block form_generic_form %}
