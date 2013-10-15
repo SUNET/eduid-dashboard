@@ -5,6 +5,7 @@ __pycache__
 *.egg-info
 *.pyc
 build/
+dist/
 sessions/
 nosetests.xml
 coverage.xml
