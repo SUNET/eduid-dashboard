@@ -49,7 +49,7 @@ def send_reset_password_mail(request, email):
 
     context = {
         "email": email,
-        "given_name": user['givenName'],
+        "given_name": user.get('givenName', ''),
         "reset_password_link": reset_password_link,
         "site_url": request.route_url("home"),
         "site_name": site_name,
