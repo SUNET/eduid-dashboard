@@ -61,8 +61,8 @@ class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
     verify_messages = {
-        'ok': _('The email has been verified'),
-        'error': _('The confirmation code is not the one have been sent to your inbox'),
+        'ok': _('The email address has been verified'),
+        'error': _('The confirmation code used is invalid, please try again or request a new code'),
         'request': _('Please revise your inbox and click the provided verification link or fill below with the given code'),
         'placeholder': _('email verification code'),
         'new_code_sent': _('A new verification code has been sent to your inbox'),
@@ -182,18 +182,12 @@ class EmailsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
+        self.request.session.flash(_('Your changes was saved'),
                                    queue='forms')
 
         send_verification_mail(self.request, newemail['mail'])
 
         self.request.session.flash(_('A verification email has been sent '
-                                     'to your new account. Please revise your '
-                                     'inbox and click on the provided link or '
-                                     'fill the code in the <a href=# '
-                                     'class="verifycode" data-identifier="${id}">'
-                                     'verification form</a>"',
+                                     'to you. Please check your inbox for further instructions.',
                                      mapping={'id': len(emails)}),
                                    queue='forms')

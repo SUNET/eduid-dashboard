@@ -49,11 +49,11 @@ class Email(colander.MappingSchema):
 class NIN(colander.MappingSchema):
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),
-        title=_('personal identity number (NIN)'),
+        title=_('Swedish personal identity number'),
         validator=colander.All(
             colander.Regex(
                 regex=re.compile('[0-9]{12}'),
-                msg=_('The personal identity number consists of 12 digits')
+                msg=_('The Swedish personal identity number consists of 12 digits')
             ),
             NINUniqueValidator()
         )
@@ -74,18 +74,17 @@ def preferred_language_widget(node, kw):
 class Person(colander.MappingSchema):
     givenName = colander.SchemaNode(colander.String(),
                                     readonly=True,
-                                    title=_('given name'))
+                                    title=_('Given name'))
     sn = colander.SchemaNode(colander.String(),
-                             title=_('surname'))
+                             title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
-                                      title=_('display name'))
+                                      title=_('Display name'))
     photo = colander.SchemaNode(colander.String(),
-                                title=_('photo'),
-                                description=_('A url link to your personal '
-                                              'avatar'),
+                                title=_('Photo'),
+                                description=_('Personal avatar URL'),
                                 missing='')
     preferredLanguage = colander.SchemaNode(colander.String(),
-                                            title=_('preferred language'),
+                                            title=_('Preferred language'),
                                             missing='',
                                             widget=preferred_language_widget)
 
@@ -104,7 +103,7 @@ class Passwords(colander.MappingSchema):
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
-                                   _("Both passwords don't match"))
+                                   _("Passwords don't match"))
 
 
 class ResetPassword(colander.MappingSchema):
@@ -127,7 +126,7 @@ class ResetPasswordStep2(colander.MappingSchema):
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
-                                   _("Both passwords don't match"))
+                                   _("Passwords don't match"))
 
 
 class PostalAddress(colander.MappingSchema):
@@ -136,11 +135,11 @@ class PostalAddress(colander.MappingSchema):
                                missing='registered',
                                validator=colander.OneOf([k for k, v in POSTAL_ADDRESS_TYPES]),
                                widget=deform.widget.SelectWidget(values=POSTAL_ADDRESS_TYPES_WIDGET))
-    address = colander.SchemaNode(colander.String(), title=_('address'))
-    locality = colander.SchemaNode(colander.String(), title=_('locality'))
-    postalCode = colander.SchemaNode(colander.String(), title=_('postal code'),
+    address = colander.SchemaNode(colander.String(), title=_('Address'))
+    locality = colander.SchemaNode(colander.String(), title=_('City'))
+    postalCode = colander.SchemaNode(colander.String(), title=_('Postal code'),
                                      validator=colander.Length(min=5, max=6))
-    country = colander.SchemaNode(colander.String(), title=_('country'))
+    country = colander.SchemaNode(colander.String(), title=_('Country'))
 
     def validator(self, node, data):
         request = node.bindings['request']

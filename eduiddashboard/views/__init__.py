@@ -80,11 +80,11 @@ class BaseActionsView(object):
     verify_messages = {}
     default_verify_messages = {
         'ok': _('The data has been verified'),
-        'error': _('The confirmation code is not the one have been sent to your mobile phone'),
+        'error': _('The verification code used is invalid'),
         'request': _('Please revise your inbox and fill below with the given code'),
         'placeholder': _('Verification code'),
-        'new_code_sent': _('A new verification code has been sent'),
-        'expired': _('The filled code has been expired. Please click in "Resend me the verification code" to get a new one'),
+        'new_code_sent': _('A new verification code has been sent to you'),
+        'expired': _('The verification code used has expired. Please click on "Resend verification code" to get a new one'),
     }
 
     def __init__(self, context, request):

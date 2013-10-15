@@ -21,11 +21,11 @@ def get_status(user):
     pending_actions = None
 
     if not mobiles:
-        pending_actions = _('You have to add a mobile phone')
+        pending_actions = _('Please add a mobile phone number')
     else:
         for mobile in mobiles:
             if not mobile['verified']:
-                pending_actions = _('You have to verificate some mobile phone')
+                pending_actions = _('Pending verification for mobile phone number')
 
     if pending_actions:
         return {
@@ -49,7 +49,7 @@ def get_tab():
 def send_verification_code(request, user, mobile_number, code=None):
     if code is None:
         code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
-    msg = _('The confirmation code for mobile ${mobile_number} is ${code}', mapping={
+    msg = _('The confirmation code for your mobile phone number ${mobile_number} is ${code}', mapping={
         'mobile_number': mobile_number,
         'code': code,
     })
@@ -69,9 +69,9 @@ def mark_as_verified_mobile(request, user, verified_mobile):
 class MobilesActionsView(BaseActionsView):
     data_attribute = 'mobile'
     verify_messages = {
-        'ok': _('The mobile phone has been verified'),
-        'error': _('The confirmation code is not the one have been sent to your mobile phone'),
-        'request': _('Please revise your SMS inbox and fill below with the given code'),
+        'ok': _('The mobile phone number has been verified'),
+        'error': _('The confirmation code used is invalid, please try again or request a new code'),
+        'request': _('An SMS has been sent to your mobile phone number with containing a verification code'),
         'placeholder': _('Mobile phone code'),
         'new_code_sent': _('A new verification code has been sent to your mobile number'),
     }
@@ -99,9 +99,7 @@ class MobilesActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('One mobile has been removed, please, wait'
-                         ' before your changes are distributed '
-                         'through all applications'),
+            'message': _('Mobile phone number was successfully removed'),
         }
 
     def send_verification_code(self, data_id, code):
@@ -159,14 +157,12 @@ class MobilesView(BaseFormView):
 
         send_verification_code(self.request, self.user, mobile_number)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
+        self.request.session.flash(_('Your changes was successfully saved'),
                                    queue='forms')
-        msg = _('A verification number has been sent to your mobile. '
-                'Please revise your SMS inbox and '
-                '<a href="#" class="verifycode" data-identifier="${identifier}">fill here</a>'
-                ' with the given code', mapping={'identifier': mobile_identifier})
+        msg = _('A verification code has been sent to your mobile phone.'
+                'Please enter your code'
+                '<a href="#" class="verifycode" data-identifier="${identifier}">here</a>',
+                mapping={'identifier': mobile_identifier})
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg,
                                    queue='forms')

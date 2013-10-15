@@ -98,13 +98,11 @@ class PasswordsView(BaseFormView):
 
         ok = change_password(self.request, user, old_password, new_password)
         if ok:
-            self.request.session.flash(_('Your changes was saved, please, wait '
-                                         'before your changes are distributed '
-                                         'through all applications'),
+            self.request.session.flash(_('Your password has been successfully updated'),
                                        queue='forms')
         else:
-            self.request.session.flash(_('Credentials has not been added for some reason.'
-                                         ' Please contact with the system administrator.'),
+            self.request.session.flash(_('An error has occured while updating your password, '
+                                         'please try again or contact support if the problem persists.'),
                                        queue='forms')
 
 
@@ -151,10 +149,11 @@ class ResetPasswordView(BaseResetPasswordView):
         passwords_data = self.schema.serialize(passwordform)
         email = passwords_data['email']
         send_reset_password_mail(self.request, email)
-        flash(self.request, 'info', _('An email has been sent to you with '
-                                      'the instructions to reset your password.'))
+        flash(self.request, 'info', _('An email has been sent to the address you entered.'
+                                      'This email will contain instructions and a link'
+                                      'that will let you reset your password.'))
         return {
-            'message': _('Now you can follow the email instructions and close this window safely.'),
+            'message': _('Please read the email sent to you for further instructions. This window can now safely be closed.'),
         }
 
 
@@ -168,7 +167,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
     schema = ResetPasswordStep2()
     route = 'reset-password-step2'
     buttons = ('reset', )
-    intro_message = _('Finish your password reset')
+    intro_message = _('Complete your password reset')
 
     def __call__(self):
         hash_code = self.request.matchdict['code']
@@ -188,9 +187,9 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:
-            flash(self.request, 'info', _('Credentials has not been added for some reason.'
-                                          ' Please contact with the system administrator.'))
+            flash(self.request, 'info', _('An error has occured while updating your password,'
+                                          'please try again or contact support if the problem persists.'))
         return {
-            'message': _('You can log in the <a href="${homelink}">home page</a>',
+            'message': _('You can now log in by <a href="${homelink}">clicking here</a>',
                          mapping={'homelink': self.request.route_url('profile-editor')}),
         }

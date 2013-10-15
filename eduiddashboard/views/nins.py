@@ -159,9 +159,7 @@ class NINsActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('The nin has been removed, please, wait'
-                         ' before your changes are distributed '
-                         'through all applications'),
+            'message': _('The Swedish national identity number has been removed'),
         }
 
     def send_verification_code(self, data_id, code):
@@ -220,9 +218,7 @@ class NinsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
+        self.request.session.flash(_('Your changes was successfully saved'),
                                    queue='forms')
 
         send_verification_code(self.request, self.user, newnin)
