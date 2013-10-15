@@ -22,6 +22,16 @@
     <div id='wrap'>
       <div class="container">
         <div class="masthead">
+          {% block loasquare %}
+          {% with loa=request.context.get_loa() %}
+            <div class='loa-big'>
+              <div>
+                <a class='null-link' href='#'
+                  title='{{_("Assurance level identifier:")}} {{ loa }}'>{{_(loa)}}</a>
+              </div>
+            </div>
+          {% endwith %}
+          {% endblock %}
           <ul class="nav nav-pills pull-right">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
@@ -38,43 +48,36 @@
        {% endfor %}
        </div>
 
-        <div>
-          {% block loasquare %}
-          {% with loa=request.context.get_loa() %}
-            <div class='loa-big'>
-              <div>
-                <a href='#'
-                  title='{{_("Assurance level identifier:")}} {{ loa }}'>{{_(loa)}}</a>
-              </div>
-            </div>
-          {% endwith %}
-          {% endblock %}
 
+        <div class='clearfix'></div>
           {% block title %}
           {% endblock %}
-        </div>
         <div class='clearfix'></div>
 
         {% block contents %}
 
         {% endblock %}
       </div>
+      <div class='push'></div>
     </div>
 
-    <div class='clearfix'></div>
-
-    <div class='push'></div>
-
-    <div class="footer">
-      <div class='container'>
-        <p>&copy; NORDUnet 2013</p>
-      </div>
+    <div id="footer">
+          <div class='container'>
+            <p>&copy; NORDUnet 2013</p>
+          </div>
     </div>
 
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-2.3.1.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/pwstrength.js'|static_url}}"></script>
+    <script>
+      $(document).ready(function () {
+        $('a.null-link').click(function (e) {
+            e.preventDefault();
+        });
+      });
+    </script>
     {% block extrajs %}
     {% endblock %}
   </body>

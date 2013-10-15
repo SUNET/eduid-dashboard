@@ -32,14 +32,14 @@ def get_status(user):
     nins = user.get('norEduPersonNIN', [])
     if len(nins) > 0:
         active_nin = nins[-1]
-        if not active_nin.get('verified', False):
-            pending_actions = _('You must validate your NIN number')
-        elif not active_nin.get('active', False):
+        if not active_nin.get('active', False):
             pending_actions = _('You have to add your NIN number')
+        elif not active_nin.get('verified', False):
+            pending_actions = _('You must validate your NIN number')
         else:
             completed_fields += 1
     else:
-        pending_actions = _('You must validate your NIN number')
+        pending_actions = _('You have to add your NIN number')
 
     status = {
         'completed': (completed_fields, len(schema.children) + 1)
@@ -191,7 +191,7 @@ class NinsView(BaseFormView):
                                                             {})
         proofing_link = proofing_links.get('nin')
         context.update({
-            'nins': self.user['norEduPersonNIN'],
+            'nins': self.user.get('norEduPersonNIN', []),
             'proofing_link': proofing_link,
         })
 
@@ -207,7 +207,7 @@ class NinsView(BaseFormView):
             'active': False,
         }
 
-        nins = self.user['norEduPersonNIN']
+        nins = self.user.get('norEduPersonNIN', [])
         nin_identifier = len(nins)
         nins.append(ninsubdoc)
 
