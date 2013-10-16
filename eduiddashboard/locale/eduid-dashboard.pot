@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-15 16:04+0200\n"
+"POT-Creation-Date: 2013-10-16 10:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -365,6 +365,7 @@ msgid "Add a mobile phone number by clicking on the button below."
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:56
+#: eduiddashboard/views/mobiles.py:24
 msgid "Add mobile phone number"
 msgstr ""
 
@@ -610,7 +611,7 @@ msgstr ""
 msgid "The verification code used is invalid"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:84 eduiddashboard/views/emails.py:66
+#: eduiddashboard/views/__init__.py:84 eduiddashboard/views/emails.py:65
 msgid "Check your inbox for further instructions"
 msgstr ""
 
@@ -624,63 +625,58 @@ msgid ""
 " code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:22 eduiddashboard/views/emails.py:26
-msgid "You have to verificate some emails"
+#: eduiddashboard/views/emails.py:22
+msgid "An email address is pending verification"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:40
+#: eduiddashboard/views/emails.py:39
 msgid "Emails"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:55
-msgid "The email {email} was verified"
+#: eduiddashboard/views/emails.py:54
+msgid "Email {email} verified"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:64
+#: eduiddashboard/views/emails.py:63
 msgid "Email address has been verified"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:65 eduiddashboard/views/mobiles.py:73
-#: eduiddashboard/views/postal_address.py:70
-msgid "The confirmation code used is invalid, please try again or request a new code"
+#: eduiddashboard/views/emails.py:64
+msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:67
+#: eduiddashboard/views/emails.py:66
 msgid "Email verification code"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:68
+#: eduiddashboard/views/emails.py:67
 msgid "A verification code has been sent to your inbox"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:85
+#: eduiddashboard/views/emails.py:84
 msgid "Your primary email address was successfully changed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:92
+#: eduiddashboard/views/emails.py:91
 msgid "Error: You only have one email address and it cannot be removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:118
+#: eduiddashboard/views/emails.py:117
 msgid "Email address was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:183
+#: eduiddashboard/views/emails.py:182
 msgid "Your changes was successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:188
+#: eduiddashboard/views/emails.py:187
 msgid ""
 "A verification email has been sent to you. Please check your inbox for "
 "further instructions."
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:24
-msgid "Please add a mobile phone number"
-msgstr ""
-
 #: eduiddashboard/views/mobiles.py:28
-msgid "Pending verification for mobile phone number"
+msgid "A mobile phone number is pending verification"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:44
@@ -693,6 +689,10 @@ msgstr ""
 
 #: eduiddashboard/views/mobiles.py:72
 msgid "The mobile phone number has been verified"
+msgstr ""
+
+#: eduiddashboard/views/mobiles.py:73 eduiddashboard/views/postal_address.py:70
+msgid "The confirmation code used is invalid, please try again or request a new code"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:74

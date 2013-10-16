@@ -19,14 +19,13 @@ def get_status(user):
     pending_actions = None
     for email in user.get('mailAliases', []):
         if not email['verified']:
-            pending_actions = _('Pending verification')
+            pending_actions = _('An email address is pending verification')
             break
 
     if pending_actions:
-        msg = _('Pending verification')
         return {
             'icon': get_icon_string('warning-sign'),
-            'pending_actions': msg,
+            'pending_actions': pending_actions,
             'completed': (0, 1),
         }
     return {
@@ -52,7 +51,7 @@ def mark_as_verified_email(request, user, verified_email):
         new_emails.append(email)
 
     user.update(new_emails)
-    request.session.flash(_('The email {email} was verified').format(email=verified_email),
+    request.session.flash(_('Email {email} verified').format(email=verified_email),
                           queue='forms')
 
 
@@ -62,7 +61,7 @@ class EmailsActionsView(BaseActionsView):
     data_attribute = 'mailAliases'
     verify_messages = {
         'ok': _('Email address has been verified'),
-        'error': _('The confirmation code used is invalid, please try again or request a new code'),
+        'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('Check your inbox for further instructions'),
         'placeholder': _('Email verification code'),
         'new_code_sent': _('A verification code has been sent to your inbox'),

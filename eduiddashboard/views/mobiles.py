@@ -21,11 +21,11 @@ def get_status(user):
     pending_actions = None
 
     if not mobiles:
-        pending_actions = _('Please add a mobile phone number')
+        pending_actions = _('Add mobile phone number')
     else:
         for mobile in mobiles:
             if not mobile['verified']:
-                pending_actions = _('Pending verification for mobile phone number')
+                pending_actions = _('A mobile phone number is pending verification')
 
     if pending_actions:
         return {
