@@ -19,11 +19,11 @@ def get_status(user):
     pending_actions = None
     for email in user.get('mailAliases', []):
         if not email['verified']:
-            pending_actions = _('You have to verificate some emails')
+            pending_actions = _('Pending verification')
             break
 
     if pending_actions:
-        msg = _('You have to verificate some emails')
+        msg = _('Pending verification')
         return {
             'icon': get_icon_string('warning-sign'),
             'pending_actions': msg,
