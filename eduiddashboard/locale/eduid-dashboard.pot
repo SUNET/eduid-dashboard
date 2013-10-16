@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-16 14:21+0200\n"
+"POT-Creation-Date: 2013-10-16 15:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 
 #: eduiddashboard/emails.py:33
-msgid "{site_name} verification email"
+msgid "{site_name} confirmation email"
 msgstr ""
 
 #: eduiddashboard/models.py:18 eduiddashboard/models.py:46
@@ -151,16 +151,32 @@ msgstr ""
 msgid "Select the attribute to search"
 msgstr ""
 
+#: eduiddashboard/permissions.py:55
+msgid "You do not have sufficient permissions to access this user"
+msgstr ""
+
+#: eduiddashboard/permissions.py:83
+msgid "You do not have sufficient AL to access to this workmode"
+msgstr ""
+
+#: eduiddashboard/permissions.py:111
+msgid "User unknown"
+msgstr ""
+
+#: eduiddashboard/permissions.py:221
+msgid "You do not have sufficient AL to edit your credentials"
+msgstr ""
+
 #: eduiddashboard/utils.py:79
 msgid "Passwords"
 msgstr ""
 
 #: eduiddashboard/validators.py:20
-msgid "Old password do not match"
+msgid "Current password is incorrect"
 msgstr ""
 
 #: eduiddashboard/validators.py:29
-msgid "\"${val}\" has to be more than ${len} characters length"
+msgid "The password is too short, minimum length is ${len}"
 msgstr ""
 
 #: eduiddashboard/validators.py:43
@@ -298,7 +314,7 @@ msgid "Already verified"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:39
-msgid "Resend verification email"
+msgid "Resend confirmation email"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:47
@@ -362,7 +378,7 @@ msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:31
 #: eduiddashboard/views/__init__.py:85
-msgid "Verification code"
+msgid "Confirmation code"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:38
@@ -380,9 +396,6 @@ msgid "Add mobile phone number"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:4
-msgid "Swedish national identity number"
-msgstr ""
-
 #: eduiddashboard/templates/nins-form.jinja2:15 eduiddashboard/views/nins.py:104
 msgid "National identity number"
 msgstr ""
@@ -396,10 +409,11 @@ msgid "National identity number not verified"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:54
-msgid "Add a Swedish national identity number by clicking the button below"
+msgid "Add a national identity number by clicking the button below"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:61
+#: eduiddashboard/templates/nins-form.jinja2:61 eduiddashboard/views/nins.py:36
+#: eduiddashboard/views/nins.py:42
 msgid "Add national identity number"
 msgstr ""
 
@@ -433,8 +447,8 @@ msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:6
 msgid ""
-"<p>Please enter your Swedish national identity number to automatically "
-"retrieve your place of\n"
+"<p>Please enter your national identity number to automatically retrieve your "
+"place of\n"
 "        residence from the Swedish population register.</p>\n"
 "    "
 msgstr ""
@@ -442,8 +456,7 @@ msgstr ""
 #: eduiddashboard/templates/postaladdress-form.jinja2:12
 msgid ""
 "\n"
-"    <p>Be aware that your postal address from the Swedish population register"
-"\n"
+"    <p>Be aware that your postal address from the population register\n"
 "        will be used when sending letters by mail to you.</p>\n"
 "    "
 msgstr ""
@@ -482,11 +495,11 @@ msgid "Improve profile"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:74
-msgid "Lost the code?"
+msgid "Lost your confirmation code?"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:74
-msgid "Resend verification code"
+msgid "Resend confirmation code"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:79
@@ -568,14 +581,14 @@ msgid ""
 "<p>Thank you for registering with <a "
 "href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
 "\n"
-"<p>To verify that you own this email address, simply click on the following "
+"<p>To confirm that you own this email address, simply click on the following "
 "link:\n"
 "\n"
 "<a href=\"%(verification_link)s\">%(verification_link)s</a></p>\n"
 "\n"
 "<p>If clicking on the link above does not work, go to your profile and emails"
 " section. Click on the\n"
-"verification icon and enter the following code:</p>\n"
+"confirmation icon and enter the following code:</p>\n"
 "\n"
 "<p><strong>%(code)s</strong></p>\n"
 "\n"
@@ -587,14 +600,14 @@ msgid ""
 "\n"
 "Thank you for registering with %(site_name)s.\n"
 "\n"
-"To verify that you own this email address, simply click on the following "
+"To confirm that you own this email address, simply click on the following "
 "link:\n"
 "\n"
 "%(verification_link)s\n"
 "\n"
 "<p>If clicking on the link above does not work, go to your profile and emails"
 " section. Click on the\n"
-"verification icon and enter the following code:</p>\n"
+"confirmation icon and enter the following code:</p>\n"
 "\n"
 "%(code)s\n"
 "\n"
@@ -613,7 +626,7 @@ msgid "The data has been verified"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:83
-msgid "The verification code used is invalid"
+msgid "Confirmation code is invalid"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:84 eduiddashboard/views/emails.py:65
@@ -621,17 +634,17 @@ msgid "Check your email for further instructions"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:86
-msgid "A new verification code has been sent to you"
+msgid "A new confirmation code has been sent to you"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:87
 msgid ""
-"The verification code has expired. Please click on \"Resend verification "
+"The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:22
-msgid "An email address is pending verification"
+msgid "An email address is pending confirmation"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:39
@@ -643,19 +656,19 @@ msgid "Email {email} verified"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:63
-msgid "Email address has been verified"
+msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:64
+#: eduiddashboard/views/emails.py:64 eduiddashboard/views/nins.py:115
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:66
-msgid "Email verification code"
+msgid "Email confirmation code"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:67
-msgid "A verification code has been sent to your inbox"
+msgid "A new confirmation code has been sent to your email"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:84
@@ -676,12 +689,12 @@ msgstr ""
 
 #: eduiddashboard/views/emails.py:187
 msgid ""
-"A verification email has been sent to you. Please check your inbox for "
+"A confirmation email has been sent to you. Please check your inbox for "
 "further instructions."
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:28
-msgid "A mobile phone number is pending verification"
+msgid "A mobile phone number is pending confirmation"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:44
@@ -701,9 +714,7 @@ msgid "The confirmation code used is invalid, please try again or request a new 
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:74
-msgid ""
-"An SMS has been sent to your mobile phone number with containing a "
-"verification code"
+msgid "A confirmation code has been sent your mobile phone number"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:75
@@ -711,65 +722,57 @@ msgid "Mobile phone code"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:76
-msgid "A new verification code has been sent to your mobile number"
+msgid "A new confirmation code has been sent to your mobile number"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:102
 msgid "Mobile phone number was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:160 eduiddashboard/views/nins.py:221
+#: eduiddashboard/views/mobiles.py:160 eduiddashboard/views/nins.py:218
 #: eduiddashboard/views/postal_address.py:194
 msgid "Your changes was successfully saved"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:162
 msgid ""
-"A verification code has been sent to your mobile phone. Please enter your "
-"code <a href=\"#\" class=\"verifycode\" data-"
+"A confirmation code has been sent to your mobile phone. Please enter your "
+"confirmation code <a href=\"#\" class=\"verifycode\" data-"
 "identifier=\"${identifier}\">here</a>"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:36 eduiddashboard/views/nins.py:42
-msgid "You have to add your NIN number"
-msgstr ""
-
 #: eduiddashboard/views/nins.py:38
-msgid "You must validate your NIN number"
+msgid "Validation required for national identity number"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:114
-msgid "The nin number has been verified"
+msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:115
-msgid "The confirmation code is not the one have been sent to your inbox"
+#: eduiddashboard/views/nins.py:116
+msgid "A confirmation code has been sent to your govt mailbox"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:117
-msgid "Please revise your NIN inbox and fill below with the given code"
+msgid "National identity number confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:119
-msgid "NIN verification code"
+#: eduiddashboard/views/nins.py:118
+msgid "A new confirmation code has been sent to your govt mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:120
-msgid "A new verification code has been sent to your NIN inbox"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:133
+#: eduiddashboard/views/nins.py:130
 msgid "The provided nin can't be verified. You only can verify the last one"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:162
-msgid "The Swedish national identity number has been removed"
+#: eduiddashboard/views/nins.py:159
+msgid "National identity number has been removed"
 msgstr ""
 
 #. Default: id
-#: eduiddashboard/views/nins.py:230
+#: eduiddashboard/views/nins.py:227
 msgid ""
-"A verification message has been sent to your Govt Inbox. Please revise your "
+"A confirmation message has been sent to your govt Inbox. Please revise your "
 "<a href=${nin_link}> nin inbox</a>, return to .this page and <a href=\"#\" "
 "class=\"verifycode\" data-identifier=\"${id}\">fill here</a> the "
 "providedverification number"
@@ -827,7 +830,11 @@ msgstr ""
 msgid "Permissions"
 msgstr ""
 
-#: eduiddashboard/views/permissions.py:52 eduiddashboard/views/personal.py:79
+#: eduiddashboard/views/permissions.py:52
+msgid "Changes saved."
+msgstr ""
+
+#: eduiddashboard/views/personal.py:79
 msgid "Your changes was successfully saved."
 msgstr ""
 
@@ -844,11 +851,11 @@ msgid "Please revise your postal mailbox and fill below with the given code"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:72
-msgid "Postal address verification code"
+msgid "Postal address confirmation code"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:73
-msgid "A new verification code has been sent to your postal mailbox"
+msgid "A new confirmation code has been sent to your postal mailbox"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:80

@@ -25,7 +25,7 @@ def get_status(user):
     else:
         for mobile in mobiles:
             if not mobile['verified']:
-                pending_actions = _('A mobile phone number is pending verification')
+                pending_actions = _('A mobile phone number is pending confirmation')
 
     if pending_actions:
         return {
@@ -71,9 +71,9 @@ class MobilesActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
-        'request': _('An SMS has been sent to your mobile phone number with containing a verification code'),
+        'request': _('A confirmation code has been sent your mobile phone number'),
         'placeholder': _('Mobile phone code'),
-        'new_code_sent': _('A new verification code has been sent to your mobile number'),
+        'new_code_sent': _('A new confirmation code has been sent to your mobile number'),
     }
 
     def get_verification_data_id(self, data_to_verify):
@@ -159,8 +159,8 @@ class MobilesView(BaseFormView):
 
         self.request.session.flash(_('Your changes was successfully saved'),
                                    queue='forms')
-        msg = _('A verification code has been sent to your mobile phone. '
-                'Please enter your code <a href="#" class="verifycode" data-identifier="${identifier}">here</a>',
+        msg = _('A confirmation code has been sent to your mobile phone. '
+                'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${identifier}">here</a>',
                 mapping={'identifier': mobile_identifier})
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg,
