@@ -69,8 +69,8 @@ class PostalAddressActionsView(BaseActionsView):
         'ok': _('The postal address has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
         'request': _('Please revise your postal mailbox and fill below with the given code'),
-        'placeholder': _('Postal address verification code'),
-        'new_code_sent': _('A new verification code has been sent to your postal mailbox'),
+        'placeholder': _('Postal address confirmation code'),
+        'new_code_sent': _('A new confirmation code has been sent to your postal mailbox'),
     }
 
     def get_verification_data_id(self, data_to_verify):

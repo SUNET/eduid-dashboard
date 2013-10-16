@@ -1,9 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}
-   <p>Mobile phone numbers.</p>
-   {% endtrans %}
+   <h4>{% trans %}Mobile phone numbers{% endtrans %}</h4>
 {% endblock %}
 
 {% block extra_content %}
@@ -30,7 +28,7 @@
       {% else %}
         <td>
           <label>
-            <i class='icon-question-sign' title='{{_("Verification code")}}'></i>
+            <i class='icon-question-sign' title='{{_("Confirmation code")}}'></i>
             <input class='hide' type='radio' name='verify' value='{{ loop.index0 }}'>
           </label>
         </td>

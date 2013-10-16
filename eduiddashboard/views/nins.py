@@ -33,13 +33,13 @@ def get_status(user):
     if len(nins) > 0:
         active_nin = nins[-1]
         if not active_nin.get('active', False):
-            pending_actions = _('You have to add your NIN number')
+            pending_actions = _('Add national identity number')
         elif not active_nin.get('verified', False):
-            pending_actions = _('You must validate your NIN number')
+            pending_actions = _('Validation required for national identity number')
         else:
             completed_fields += 1
     else:
-        pending_actions = _('You have to add your NIN number')
+        pending_actions = _('Add national identity number')
 
     status = {
         'completed': (completed_fields, len(schema.children) + 1)
@@ -111,14 +111,11 @@ class NINsActionsView(BaseActionsView):
 
     data_attribute = 'norEduPersonNIN'
     verify_messages = {
-        'ok': _('The nin number has been verified'),
-        'error': _('The confirmation code is not the one have been sent to '
-                   'your inbox'),
-        'request': _('Please revise your NIN inbox and fill below with the '
-                     'given code'),
-        'placeholder': _('NIN verification code'),
-        'new_code_sent': _('A new verification code has been sent to your '
-                           'NIN inbox'),
+        'ok': _('National identity number verified'),
+        'error': _('The confirmation code is invalid, please try again or request a new code'),
+        'request': _('A confirmation code has been sent to your govt mailbox'),
+        'placeholder': _('National identity number confirmation code'),
+        'new_code_sent': _('A new confirmation code has been sent to your govt mailbox'),
     }
 
     def get_verification_data_id(self, data_to_verify):
@@ -159,7 +156,7 @@ class NINsActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('The Swedish national identity number has been removed'),
+            'message': _('National identity number has been removed'),
         }
 
     def send_verification_code(self, data_id, code):
@@ -227,7 +224,7 @@ class NinsView(BaseFormView):
                                                             {})
         nin_proofing_link = proofing_links.get('nin')
 
-        msg = _('A verification message has been sent to your Govt Inbox. '
+        msg = _('A confirmation message has been sent to your govt Inbox. '
                 'Please revise your <a href=${nin_link}> nin inbox</a>, return'
                 ' to .this page and <a href="#" class="verifycode" '
                 'data-identifier="${id}">fill here</a> the provided'

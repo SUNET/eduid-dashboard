@@ -19,7 +19,7 @@ def get_status(user):
     pending_actions = None
     for email in user.get('mailAliases', []):
         if not email['verified']:
-            pending_actions = _('An email address is pending verification')
+            pending_actions = _('An email address is pending confirmation')
             break
 
     if pending_actions:
@@ -60,11 +60,11 @@ class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
     verify_messages = {
-        'ok': _('Email address has been verified'),
+        'ok': _('Email address has been confirmed'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('Check your email for further instructions'),
-        'placeholder': _('Email verification code'),
-        'new_code_sent': _('A verification code has been sent to your inbox'),
+        'placeholder': _('Email confirmation code'),
+        'new_code_sent': _('A new confirmation code has been sent to your email'),
     }
 
     def setprimary_action(self, index, post_data):
@@ -184,7 +184,7 @@ class EmailsView(BaseFormView):
 
         send_verification_mail(self.request, newemail['mail'])
 
-        self.request.session.flash(_('A verification email has been sent '
+        self.request.session.flash(_('A confirmation email has been sent '
                                      'to you. Please check your inbox for further instructions.',
                                      mapping={'id': len(emails)}),
                                    queue='forms')

@@ -17,7 +17,7 @@ class OldPasswordValidator(object):
         vccs_url = request.registry.settings.get('vccs_url')
         password = check_password(vccs_url, old_password, user)
         if not password:
-            err = _('Old password do not match')
+            err = _('Current password is incorrect')
             raise colander.Invalid(node, err)
 
 
@@ -26,8 +26,8 @@ class PasswordValidator(object):
 
     def __call__(self, node, value):
         if len(value) < PASSWORD_MIN_LENGTH:
-            err = _('"${val}" has to be more than ${len} characters length',
-                    mapping={'val': value, 'len': PASSWORD_MIN_LENGTH})
+            err = _('The password is too short, minimum length is ${len}',
+                    mapping={'len': PASSWORD_MIN_LENGTH})
             raise colander.Invalid(node, err)
 
 
