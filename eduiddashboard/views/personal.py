@@ -39,7 +39,7 @@ def get_status(user):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('Personal info'),
+        'label': _('Personal information'),
         'id': 'personaldata',
     }
 

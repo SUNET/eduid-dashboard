@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-16 10:12+0200\n"
+"POT-Creation-Date: 2013-10-16 11:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -248,8 +248,7 @@ msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
 msgid ""
-"<p>Your currently registered email addresses. After adding a new address, go "
-"to that account and click the\n"
+"<p>After adding a new address, go to that account and click the\n"
 "   link in the confirmation email. Addresses must be confirmed before they "
 "can become primary.</p>\n"
 "   "
@@ -290,7 +289,7 @@ msgid "Resend verification email"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:47
-msgid "Remove this email address"
+msgid "Remove email address"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:56
@@ -357,7 +356,8 @@ msgid "Verification code"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:40
-msgid "Remove this postal address"
+#: eduiddashboard/templates/postaladdress-form.jinja2:47
+msgid "Remove postal address"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:49
@@ -419,6 +419,7 @@ msgid "Are you sure you want to submit your permission changes?"
 msgstr ""
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
+#: eduiddashboard/views/personal.py:42
 msgid "Personal information"
 msgstr ""
 
@@ -441,10 +442,6 @@ msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:26
 msgid "Type"
-msgstr ""
-
-#: eduiddashboard/templates/postaladdress-form.jinja2:47
-msgid "Remove postal address"
 msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:60
@@ -612,7 +609,7 @@ msgid "The verification code used is invalid"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:84 eduiddashboard/views/emails.py:65
-msgid "Check your inbox for further instructions"
+msgid "Check your email for further instructions"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:86
@@ -621,8 +618,8 @@ msgstr ""
 
 #: eduiddashboard/views/__init__.py:87
 msgid ""
-"The verification code used has expired. Please click on \"Resend verification"
-" code\" to get a new one"
+"The verification code has expired. Please click on \"Resend verification "
+"code\" to get a new one"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:22
@@ -720,8 +717,8 @@ msgstr ""
 
 #: eduiddashboard/views/mobiles.py:162
 msgid ""
-"A verification code has been sent to your mobile phone.Please enter your "
-"code<a href=\"#\" class=\"verifycode\" data-"
+"A verification code has been sent to your mobile phone. Please enter your "
+"code <a href=\"#\" class=\"verifycode\" data-"
 "identifier=\"${identifier}\">here</a>"
 msgstr ""
 
@@ -828,10 +825,6 @@ msgstr ""
 
 #: eduiddashboard/views/permissions.py:52 eduiddashboard/views/personal.py:79
 msgid "Your changes was successfully saved."
-msgstr ""
-
-#: eduiddashboard/views/personal.py:42
-msgid "Personal info"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:45

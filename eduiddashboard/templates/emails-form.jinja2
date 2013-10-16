@@ -1,7 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}<p>Your currently registered email addresses. After adding a new address, go to that account and click the
+   {% trans %}<p>After adding a new address, go to that account and click the
    link in the confirmation email. Addresses must be confirmed before they can become primary.</p>
    {% endtrans %}
 {% endblock %}
@@ -44,7 +44,7 @@
 
         <td>
           <label>
-            <i class='icon-remove' title='{{_("Remove this email address")}}'></i>
+            <i class='icon-remove' title='{{_("Remove email address")}}'></i>
             <input class='hide' type='radio' name='remove' value='{{loop.index0}}'>
           </label>
         </td>
