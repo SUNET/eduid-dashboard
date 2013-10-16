@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-16 11:17+0200\n"
+"POT-Creation-Date: 2013-10-16 13:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,68 +79,80 @@ msgstr ""
 msgid "Preferred language"
 msgstr ""
 
-#: eduiddashboard/models.py:106 eduiddashboard/models.py:129
+#: eduiddashboard/models.py:95
+msgid "Current password"
+msgstr ""
+
+#: eduiddashboard/models.py:99
+msgid "New password"
+msgstr ""
+
+#: eduiddashboard/models.py:103
+msgid "Confirm new password"
+msgstr ""
+
+#: eduiddashboard/models.py:109 eduiddashboard/models.py:132
 msgid "Passwords don't match"
 msgstr ""
 
-#: eduiddashboard/models.py:116
+#: eduiddashboard/models.py:119
 msgid "Enter your email address"
 msgstr ""
 
-#: eduiddashboard/models.py:134
+#: eduiddashboard/models.py:137
 msgid "type"
 msgstr ""
 
-#: eduiddashboard/models.py:138
+#: eduiddashboard/models.py:141
 #: eduiddashboard/templates/postaladdress-form.jinja2:27
 msgid "Address"
 msgstr ""
 
-#: eduiddashboard/models.py:139
+#: eduiddashboard/models.py:142
 #: eduiddashboard/templates/postaladdress-form.jinja2:28
 msgid "City"
 msgstr ""
 
-#: eduiddashboard/models.py:140
+#: eduiddashboard/models.py:143
 msgid "Postal code"
 msgstr ""
 
-#: eduiddashboard/models.py:142
+#: eduiddashboard/models.py:145
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:150
+#: eduiddashboard/models.py:153
 msgid "You have not rights to set the official  postal address manually"
 msgstr ""
 
-#: eduiddashboard/models.py:158
+#: eduiddashboard/models.py:161
 msgid ""
 "Invalid telephone number. It must be written using international notation, "
 "starting with \"+\"."
 msgstr ""
 
-#: eduiddashboard/models.py:160
+#: eduiddashboard/models.py:163
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:175
+#: eduiddashboard/models.py:178
 msgid "text"
 msgstr ""
 
-#: eduiddashboard/models.py:176
+#: eduiddashboard/models.py:179
 msgid "the exact match text for the attribute type selected for search"
 msgstr ""
 
-#: eduiddashboard/models.py:183
+#: eduiddashboard/models.py:186
 msgid "attribute type"
 msgstr ""
 
-#: eduiddashboard/models.py:184
+#: eduiddashboard/models.py:187
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/utils.py:45
+#: eduiddashboard/utils.py:79
 msgid "Passwords"
 msgstr ""
 
