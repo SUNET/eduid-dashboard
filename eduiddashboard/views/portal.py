@@ -140,11 +140,13 @@ def help(request):
 def token_login(context, request):
     email = request.POST.get('email')
     token = request.POST.get('token')
+    nonce = request.POST.get('nonce')
+    timestamp = request.POST.get('ts')
     shared_key = request.registry.settings.get('auth_shared_secret')
 
     next_url = request.POST.get('next_url', '/')
 
-    if verify_auth_token(shared_key, email, token):
+    if verify_auth_token(shared_key, email, token, nonce, timestamp):
         # Do the auth
         user = request.userdb.get_user(email)
         request.session['mail'] = email
