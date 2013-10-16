@@ -35,7 +35,7 @@ requires = [
     'deform==0.9.8',
     'deform_bootstrap==0.2.9',
     'pysaml2>=1.0.3',
-    'pycountry==1.0',
+    'pycountry==1.1',
     'waitress==0.8.2',
     'vccs_client==0.3',
     #'eduid_msg',  # not existing yet
