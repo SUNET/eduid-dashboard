@@ -52,7 +52,7 @@ class BaseFactory(object):
             'saml2.user_main_attribute', 'mail')
 
         if not self.authorize():
-            raise HTTPForbidden('You have not sufficient permissions to access this user')
+            raise HTTPForbidden(_('You do not have sufficient permissions to access this user'))
 
         self.__acl__ = self.acls[self.workmode]
 
@@ -71,7 +71,7 @@ class BaseFactory(object):
         #     max_user_loa = self.loa_to_int(loa=max_user_loa)
         #     session_loa = self.loa_to_int()
         #     if session_loa < max_user_loa:
-        #         raise HTTPForbidden('You have not sufficient AL to edit this user')
+        #         raise HTTPForbidden(_('You do not have sufficient AL to edit this user'))
 
         required_loa = self.request.registry.settings.get('required_loa', {})
         required_loa = required_loa.get(self.workmode, '')
@@ -80,8 +80,8 @@ class BaseFactory(object):
         required_loa_int = self.loa_to_int(loa=required_loa)
 
         if user_loa_int < required_loa_int:
-            raise HTTPForbidden('You have not sufficient AL to access to this '
-                                'workmode')
+            raise HTTPForbidden(_('You do not have sufficient AL to access to this '
+                                'workmode'))
 
         return True
 
@@ -215,8 +215,8 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden('You have not sufficient AL to edit your'
-                                ' credentials')
+            raise HTTPForbidden(_('You do not have sufficient AL to edit your'
+                                ' credentials'))
         return is_authorized
 
 
