@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-10-16 10:58+0200\n"
-"PO-Revision-Date: 2013-10-16 10:03+0000\n"
+"PO-Revision-Date: 2013-10-16 10:42+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -595,7 +595,7 @@ msgstr "Välj <strong>identitetsutfärdare</strong>:"
 
 #: eduiddashboard/views/__init__.py:82
 msgid "The data has been verified"
-msgstr "Data har verifierats"
+msgstr "Information har bekräftats"
 
 #: eduiddashboard/views/__init__.py:83
 msgid "The verification code used is invalid"
@@ -629,7 +629,7 @@ msgstr "E-postadressen {email} bekräftad"
 
 #: eduiddashboard/views/emails.py:63
 msgid "Email address has been verified"
-msgstr "E-postadressen har verifierats"
+msgstr "E-postadressen är bekräftad"
 
 #: eduiddashboard/views/emails.py:64
 msgid ""
@@ -832,7 +832,7 @@ msgstr "Postadress"
 
 #: eduiddashboard/views/postal_address.py:69
 msgid "The postal address has been verified"
-msgstr "Postadressen har verifierats"
+msgstr "Postadressen är bekräftad"
 
 #: eduiddashboard/views/postal_address.py:71
 msgid "Please revise your postal mailbox and fill below with the given code"
