@@ -191,5 +191,4 @@ class PostalAddressView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was successfully saved'),
-                                   queue='forms')
+        self.request.session.flash(_('Changes saved.'), queue='forms')
