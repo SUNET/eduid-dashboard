@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-16 13:43+0200\n"
+"POT-Creation-Date: 2013-10-16 14:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,6 @@ msgid "phone mobile number"
 msgstr ""
 
 #: eduiddashboard/models.py:20 eduiddashboard/templates/home.jinja2:30
-#: eduiddashboard/templates/nins-form.jinja2:16
 msgid "NIN"
 msgstr ""
 
@@ -104,12 +103,12 @@ msgid "type"
 msgstr ""
 
 #: eduiddashboard/models.py:141
-#: eduiddashboard/templates/postaladdress-form.jinja2:27
+#: eduiddashboard/templates/postaladdress-form.jinja2:28
 msgid "Address"
 msgstr ""
 
 #: eduiddashboard/models.py:142
-#: eduiddashboard/templates/postaladdress-form.jinja2:28
+#: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
@@ -118,7 +117,7 @@ msgid "Postal code"
 msgstr ""
 
 #: eduiddashboard/models.py:145
-#: eduiddashboard/templates/postaladdress-form.jinja2:29
+#: eduiddashboard/templates/postaladdress-form.jinja2:30
 msgid "Country"
 msgstr ""
 
@@ -275,14 +274,17 @@ msgid "Email"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:19
-#: eduiddashboard/templates/mobiles-form.jinja2:18
+#: eduiddashboard/templates/mobiles-form.jinja2:16
+#: eduiddashboard/templates/nins-form.jinja2:16
+#: eduiddashboard/templates/nins-form.jinja2:27
 msgid "Verified"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:20
-#: eduiddashboard/templates/mobiles-form.jinja2:19
-#: eduiddashboard/templates/nins-form.jinja2:43
-#: eduiddashboard/templates/postaladdress-form.jinja2:30
+#: eduiddashboard/templates/mobiles-form.jinja2:17
+#: eduiddashboard/templates/nins-form.jinja2:17
+#: eduiddashboard/templates/nins-form.jinja2:42
+#: eduiddashboard/templates/postaladdress-form.jinja2:31
 msgid "Remove"
 msgstr ""
 
@@ -291,8 +293,7 @@ msgid "Make this email address your new primary email address"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:35
-#: eduiddashboard/templates/mobiles-form.jinja2:29
-#: eduiddashboard/templates/nins-form.jinja2:28
+#: eduiddashboard/templates/mobiles-form.jinja2:27
 msgid "Already verified"
 msgstr ""
 
@@ -352,66 +353,57 @@ msgid "Any user match with the filter"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:4
-msgid ""
-"\n"
-"   <p>Mobile phone numbers.</p>\n"
-"   "
+msgid "Mobile phone numbers"
 msgstr ""
 
-#: eduiddashboard/templates/mobiles-form.jinja2:17
+#: eduiddashboard/templates/mobiles-form.jinja2:15
 msgid "Phone"
 msgstr ""
 
-#: eduiddashboard/templates/mobiles-form.jinja2:33
+#: eduiddashboard/templates/mobiles-form.jinja2:31
 #: eduiddashboard/views/__init__.py:85
 msgid "Verification code"
 msgstr ""
 
-#: eduiddashboard/templates/mobiles-form.jinja2:40
-#: eduiddashboard/templates/postaladdress-form.jinja2:47
+#: eduiddashboard/templates/mobiles-form.jinja2:38
+#: eduiddashboard/templates/postaladdress-form.jinja2:48
 msgid "Remove postal address"
 msgstr ""
 
-#: eduiddashboard/templates/mobiles-form.jinja2:49
+#: eduiddashboard/templates/mobiles-form.jinja2:47
 msgid "Add a mobile phone number by clicking on the button below."
 msgstr ""
 
-#: eduiddashboard/templates/mobiles-form.jinja2:56
+#: eduiddashboard/templates/mobiles-form.jinja2:54
 #: eduiddashboard/views/mobiles.py:24
 msgid "Add mobile phone number"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:4
-msgid ""
-"<p>Registered national identity numbers</p>\n"
-"   "
+msgid "Swedish national identity number"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:17
-msgid "verification status"
+#: eduiddashboard/templates/nins-form.jinja2:15 eduiddashboard/views/nins.py:104
+msgid "National identity number"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:18
-msgid "remove"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:34
+#: eduiddashboard/templates/nins-form.jinja2:33
 msgid "Verify code"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:38
+#: eduiddashboard/templates/nins-form.jinja2:37
 msgid "National identity number not verified"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:55
+#: eduiddashboard/templates/nins-form.jinja2:54
 msgid "Add a Swedish national identity number by clicking the button below"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:62
+#: eduiddashboard/templates/nins-form.jinja2:61
 msgid "Add national identity number"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:74
+#: eduiddashboard/templates/nins-form.jinja2:73
 #, python-format
 msgid ""
 "You can access to your associated inbox nin by clicking this <a "
@@ -427,7 +419,7 @@ msgid "Available permissions for this user"
 msgstr ""
 
 #: eduiddashboard/templates/permissions-form.jinja2:16
-msgid "Are you sure you want to submit your permission changes?"
+msgid "Are you sure you want to save your permission changes?"
 msgstr ""
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
@@ -435,7 +427,11 @@ msgstr ""
 msgid "Personal information"
 msgstr ""
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:5
+#: eduiddashboard/templates/postaladdress-form.jinja2:4
+msgid "Postal addresses"
+msgstr ""
+
+#: eduiddashboard/templates/postaladdress-form.jinja2:6
 msgid ""
 "<p>Please enter your Swedish national identity number to automatically "
 "retrieve your place of\n"
@@ -443,20 +439,20 @@ msgid ""
 "    "
 msgstr ""
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:11
+#: eduiddashboard/templates/postaladdress-form.jinja2:12
 msgid ""
 "\n"
-"    <p>Your registered postal addresses. Be aware that your postal address "
-"from the Swedish population register\n"
+"    <p>Be aware that your postal address from the Swedish population register"
+"\n"
 "        will be used when sending letters by mail to you.</p>\n"
 "    "
 msgstr ""
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:26
+#: eduiddashboard/templates/postaladdress-form.jinja2:27
 msgid "Type"
 msgstr ""
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:60
+#: eduiddashboard/templates/postaladdress-form.jinja2:61
 msgid ""
 "Please add your place of residence by clicking on the button below or by "
 "adding your Swedish national\n"
@@ -464,7 +460,7 @@ msgid ""
 "    "
 msgstr ""
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:69
+#: eduiddashboard/templates/postaladdress-form.jinja2:70
 msgid "Add postal address"
 msgstr ""
 
@@ -482,7 +478,7 @@ msgid "Editing %(email)s user"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:26
-msgid "Complete profile"
+msgid "Improve profile"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:74
@@ -740,10 +736,6 @@ msgstr ""
 
 #: eduiddashboard/views/nins.py:38
 msgid "You must validate your NIN number"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:104
-msgid "National identity number"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:114

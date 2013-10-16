@@ -1,6 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
+  <h4>{% trans %}Postal addresses{% endtrans %}</h4>
   {% if not contains_official_postal_address %}
     {% trans %}<p>Please enter your Swedish national identity number to automatically retrieve your place of
         residence from the Swedish population register.</p>
@@ -9,7 +10,7 @@
 
   {% if postal_addresses %}
     {% trans %}
-    <p>Your registered postal addresses. Be aware that your postal address from the Swedish population register
+    <p>Be aware that your postal address from the Swedish population register
         will be used when sending letters by mail to you.</p>
     {% endtrans %}
   {% endif %}
