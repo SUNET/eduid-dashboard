@@ -16,6 +16,9 @@ from eduiddashboard.utils import (verify_auth_token,
 
 from eduiddashboard.models import UserSearcher
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
              request_method='GET', permission='edit')
@@ -155,5 +158,6 @@ def token_login(context, request):
         remember_headers = remember(request, email)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
+        logger.info("Token authentication failed (email: {!r})".format(email))
         # Show and error, the user can't be logged
         return HTTPBadRequest()
