@@ -41,8 +41,12 @@ def forbidden_view(context, request):
     user = authenticated_userid(request)
     if user:
         # Return a plain forbbiden page
+        try:
+            reason = context.explanation
+        except AttributeError:
+            reason = 'unknown'
         logger.debug("User {!r} tripped Forbidden view, request {!r}, reason {!r}".format(
-            user, request, context.explanation))
+            user, request, reason))
         response = Response(render('templates/forbidden.jinja2', {}))
         response.status_int = 401
         return response
