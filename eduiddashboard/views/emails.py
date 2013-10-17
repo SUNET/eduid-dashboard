@@ -184,7 +184,7 @@ class EmailsView(BaseFormView):
 
         send_verification_mail(self.request, newemail['mail'])
 
-        self.request.session.flash(_('A confirmation email has been sent to you. '
-                                     'Please check your inbox for further instructions.',
+        self.request.session.flash(_('A confirmation email has been sent to your email address. '
+                                     'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${id}">here</a>.',
                                      mapping={'id': len(emails)}),
                                    queue='forms')
