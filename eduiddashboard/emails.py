@@ -17,7 +17,7 @@ def send_verification_mail(request, email, code=None):
                                      hasher=get_short_hash)
 
     verification_link = generate_verification_link(request, code,
-                                                   'modelAliases')
+                                                   'mailAliases')
 
     site_name = request.registry.settings.get("site.name", "eduID")
 
