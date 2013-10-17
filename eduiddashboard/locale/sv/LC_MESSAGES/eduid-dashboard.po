@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-17 10:06+0200\n"
-"PO-Revision-Date: 2013-10-17 08:24+0000\n"
+"POT-Creation-Date: 2013-10-17 10:42+0200\n"
+"PO-Revision-Date: 2013-10-17 08:45+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -460,10 +460,10 @@ msgstr "Postadress"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:6
 msgid ""
-"<p>Please enter your national identity number to automatically retrieve your place of\n"
+"<p>Please enter your national identity number for automatic retrieval of your place of\n"
 "        residence from the Swedish population register.</p>\n"
 "    "
-msgstr "<p>Ange ditt personnummer för att automatiskt hämta din bokföringsadress.</p>"
+msgstr "<p>Lägg till ditt personnummer för att automatiskt hämta din folkbokföringsadress.</p>"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:12
 msgid ""
@@ -479,10 +479,10 @@ msgstr "Typ"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:61
 msgid ""
-"Please add your place of residence by clicking on the button below or by adding your Swedish national\n"
-"        identity number to your profile for automated retrieval.\n"
+"Please add your place of residence by clicking on the button below or by adding your national\n"
+"        identity number to your profile for automated retrieval from the Swedish population register.\n"
 "    "
-msgstr "Lägg till din hemadress antingen genom att klicka på knappen nedan eller ange personnummer för att hämta bokföringsadressen automatiskt."
+msgstr "Lägg till dina adressuppgifter genom att klicka på länken nedan eller genom att lägga till ditt personnummer för att automatiskt hämta din folkbokföringsadress."
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:70
 msgid "Add postal address"
@@ -862,7 +862,7 @@ msgstr "En ny bekräftelseskod har skickats till din postadress"
 
 #: eduiddashboard/views/postal_address.py:80
 msgid "The confirmation code for your postal address is ${code}"
-msgstr "Koden för att bekräfta din postadress är ${code}"
+msgstr "Bekräftelsekoden för din postadress är ${code}"
 
 #: eduiddashboard/views/postal_address.py:106
 msgid "Your postal address was successfully updated"

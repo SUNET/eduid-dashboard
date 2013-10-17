@@ -3,7 +3,7 @@
 {% block form_generic_description %}
   <h4>{% trans %}Postal addresses{% endtrans %}</h4>
   {% if not contains_official_postal_address %}
-    {% trans %}<p>Please enter your national identity number to automatically retrieve your place of
+    {% trans %}<p>Please enter your national identity number for automatic retrieval of your place of
         residence from the Swedish population register.</p>
     {% endtrans %}
   {% endif %}
@@ -58,8 +58,8 @@
   </table>
 
   {% else %}
-    <p>{% trans %}Please add your place of residence by clicking on the button below or by adding your Swedish national
-        identity number to your profile for automated retrieval.
+    <p>{% trans %}Please add your place of residence by clicking on the button below or by adding your national
+        identity number to your profile for automated retrieval from the Swedish population register.
     {% endtrans %}</p>
   {% endif %}
 
