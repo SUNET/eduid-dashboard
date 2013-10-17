@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-17 09:31+0200\n"
-"PO-Revision-Date: 2013-10-17 07:37+0000\n"
+"POT-Creation-Date: 2013-10-17 10:06+0200\n"
+"PO-Revision-Date: 2013-10-17 08:24+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -154,19 +154,19 @@ msgstr "attributtyp"
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/permissions.py:55
+#: eduiddashboard/permissions.py:56
 msgid "You do not have sufficient permissions to access this user"
 msgstr ""
 
-#: eduiddashboard/permissions.py:83
+#: eduiddashboard/permissions.py:84
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-#: eduiddashboard/permissions.py:111
+#: eduiddashboard/permissions.py:112
 msgid "User unknown"
 msgstr "Okänd användare"
 
-#: eduiddashboard/permissions.py:221
+#: eduiddashboard/permissions.py:222
 msgid "You do not have sufficient AL to edit your credentials"
 msgstr ""
 
@@ -286,28 +286,29 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
-msgid ""
-"<p>After adding a new address, go to that account and click the\n"
-"   link in the confirmation email. Addresses must be confirmed before they can become primary.</p>\n"
-"   "
-msgstr "<p>När du lagt till en ny e-postadress skickas en bekräftelse till denna e-postadress. För att bekräfta att du äger denna e-postadress klicka på länken i e-postmeddelandet.</p> "
-
-#: eduiddashboard/templates/emails-form.jinja2:17
-msgid "Primary"
-msgstr "Primär"
-
-#: eduiddashboard/templates/emails-form.jinja2:18
+#: eduiddashboard/templates/emails-form.jinja2:19
 msgid "Email"
 msgstr "E-post"
 
-#: eduiddashboard/templates/emails-form.jinja2:19
+#: eduiddashboard/templates/emails-form.jinja2:5
+msgid ""
+"After adding a new address, go to that account and click the\n"
+"   link in the confirmation email. Addresses must be confirmed before they can become primary.\n"
+"   "
+msgstr "När du lagt till en ny e-postadress skickas en bekräftelse till denna e-postadress. För att bekräfta att du äger denna e-postadress klicka på länken i e-postmeddelandet. "
+
+#: eduiddashboard/templates/emails-form.jinja2:18
+msgid "Primary"
+msgstr "Primär"
+
+#: eduiddashboard/templates/emails-form.jinja2:20
 #: eduiddashboard/templates/mobiles-form.jinja2:16
 #: eduiddashboard/templates/nins-form.jinja2:16
 #: eduiddashboard/templates/nins-form.jinja2:27
 msgid "Verified"
 msgstr "Bekräftad"
 
-#: eduiddashboard/templates/emails-form.jinja2:20
+#: eduiddashboard/templates/emails-form.jinja2:21
 #: eduiddashboard/templates/mobiles-form.jinja2:17
 #: eduiddashboard/templates/nins-form.jinja2:17
 #: eduiddashboard/templates/nins-form.jinja2:42
@@ -315,28 +316,28 @@ msgstr "Bekräftad"
 msgid "Remove"
 msgstr "Ta bort"
 
-#: eduiddashboard/templates/emails-form.jinja2:28
+#: eduiddashboard/templates/emails-form.jinja2:29
 msgid "Make this email address your new primary email address"
 msgstr "Välj denna e-postadress som din primära e-postadress"
 
-#: eduiddashboard/templates/emails-form.jinja2:35
+#: eduiddashboard/templates/emails-form.jinja2:36
 #: eduiddashboard/templates/mobiles-form.jinja2:27
 msgid "Already verified"
 msgstr "Redan verifierad"
 
-#: eduiddashboard/templates/emails-form.jinja2:39
+#: eduiddashboard/templates/emails-form.jinja2:40
 msgid "Resend confirmation email"
 msgstr "Skicka e-postbekräftelse igen"
 
-#: eduiddashboard/templates/emails-form.jinja2:47
+#: eduiddashboard/templates/emails-form.jinja2:48
 msgid "Remove email address"
 msgstr "Ta bort e-postadress"
 
-#: eduiddashboard/templates/emails-form.jinja2:56
+#: eduiddashboard/templates/emails-form.jinja2:57
 msgid "Add an email address by clicking on the button below."
 msgstr "Klicka på knappen nedan för att lägga till en e-postadress"
 
-#: eduiddashboard/templates/emails-form.jinja2:63
+#: eduiddashboard/templates/emails-form.jinja2:64
 msgid "Add email address"
 msgstr "Lägg till e-postadress"
 
@@ -550,7 +551,7 @@ msgid ""
 "<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
 "\n"
 "(This is an automated email. Please do not reply.)\n"
-msgstr ""
+msgstr "\n<h2>%(given_name)s,</h2>\n\n<p>Du har fått detta e-postmeddelande eftersom vi mottagit en begäran att återställa ditt lösenord för konto %(email)s i tjänsten <a href=\"%(site_url)s\">%(site_name)s</a>. Om du inte har begärt denna återställning av ditt lösenord ber vi dig bortse från detta e-postmeddelande.\n</p>\n\n<p>För att återställa ditt lösenord klicka på länken nedan:</p>\n\n<p><a href=\"%(reset_password_link)s\">Återställ lösenord</a></p>\n \n<p>(Detta är ett automatiserat meddelande och det går inte att svara på.)</p>\n"
 
 #: eduiddashboard/templates/reset-password-email.txt.jinja2:1
 #, python-format
@@ -567,7 +568,7 @@ msgid ""
 "%(reset_password_link)s\n"
 "\n"
 "(This is an automated email. Please do not reply.)\n"
-msgstr ""
+msgstr "\n%(given_name)s,\n\nDu har fått detta e-postmeddelande eftersom vi mottagit en begäran att återställa ditt lösenord för konto %(email)s i tjänsten %(site_name)s. Om du inte har begärt denna återställning av ditt lösenord ber vi dig bortse från detta e-postmeddelande.\n\nFör att återställa ditt lösenord klicka på länken nedan:\n\n%(reset_password_link)s\n \n(Detta är ett automatiserat meddelande och det går inte att svara på.)\n"
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
 msgid "http://www.swamid.se/assurance/al1"
@@ -596,7 +597,7 @@ msgid ""
 "\n"
 "<p><strong>%(code)s</strong></p>\n"
 "\n"
-msgstr ""
+msgstr "\n<p>Tack för din registrering med <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n\n<p>För att bekräfta att du äger denna e-postadress klicka på länken nedan:</p>\n\n<p><a href=\"%(verification_link)s\">%(verification_link)s</a></p>\n\n<p>Om länken ovan inte fungerar, gå till din profilsida och välj e-post. Klicka på bekräftelsekoden och ange följande bekräftelsekod:</p>\n\n<p><strong>%(code)s</strong></p>\n\n"
 
 #: eduiddashboard/templates/verification_email.txt.jinja2:1
 #, python-format
@@ -613,7 +614,7 @@ msgid ""
 "\n"
 "%(code)s\n"
 "\n"
-msgstr ""
+msgstr "\nTack för din registrering med %(site_name)s.\n\nFör att bekräfta att du äger denna e-postadress klicka på länken nedan:\n\n%(verification_link)s\n\nOm länken ovan inte fungerar, gå till din profilsida och välj e-post. Klicka på bekräftelsekoden och ange följande bekräftelsekod:\n\n%(code)s\n\n\n"
 
 #: eduiddashboard/templates/wayf.jinja2:5
 msgid "Where are you from?"
@@ -688,9 +689,10 @@ msgstr "Fel: Minst en e-postadress krävs, denna kan ej tas bort"
 msgid "Email address was successfully removed"
 msgstr "E-postadress borttagen"
 
-#: eduiddashboard/views/emails.py:182
-msgid "Your changes was successfully updated"
-msgstr "Dina ändringar har sparats"
+#: eduiddashboard/views/emails.py:182 eduiddashboard/views/mobiles.py:160
+#: eduiddashboard/views/nins.py:218 eduiddashboard/views/personal.py:79
+msgid "Changes saved"
+msgstr "Ändringarna har sparats"
 
 #: eduiddashboard/views/emails.py:187
 msgid ""
@@ -738,11 +740,6 @@ msgstr "En ny bekräftelsekod har skickats till ditt mobiltelefonnummer"
 #: eduiddashboard/views/mobiles.py:102
 msgid "Mobile phone number was successfully removed"
 msgstr "Mobiltelefonnumret har tagits bort "
-
-#: eduiddashboard/views/mobiles.py:160 eduiddashboard/views/nins.py:218
-#: eduiddashboard/views/personal.py:79
-msgid "Changes saved"
-msgstr "Ändringarna har sparats"
 
 #: eduiddashboard/views/mobiles.py:162
 msgid ""

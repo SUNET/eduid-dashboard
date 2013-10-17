@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-17 09:31+0200\n"
+"POT-Creation-Date: 2013-10-17 10:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -151,19 +151,19 @@ msgstr ""
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/permissions.py:55
+#: eduiddashboard/permissions.py:56
 msgid "You do not have sufficient permissions to access this user"
 msgstr ""
 
-#: eduiddashboard/permissions.py:83
+#: eduiddashboard/permissions.py:84
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-#: eduiddashboard/permissions.py:111
+#: eduiddashboard/permissions.py:112
 msgid "User unknown"
 msgstr ""
 
-#: eduiddashboard/permissions.py:221
+#: eduiddashboard/permissions.py:222
 msgid "You do not have sufficient AL to edit your credentials"
 msgstr ""
 
@@ -282,29 +282,30 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
-msgid ""
-"<p>After adding a new address, go to that account and click the\n"
-"   link in the confirmation email. Addresses must be confirmed before they "
-"can become primary.</p>\n"
-"   "
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:17
-msgid "Primary"
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:18
+#: eduiddashboard/templates/emails-form.jinja2:19
 msgid "Email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:19
+#: eduiddashboard/templates/emails-form.jinja2:5
+msgid ""
+"After adding a new address, go to that account and click the\n"
+"   link in the confirmation email. Addresses must be confirmed before they "
+"can become primary.\n"
+"   "
+msgstr ""
+
+#: eduiddashboard/templates/emails-form.jinja2:18
+msgid "Primary"
+msgstr ""
+
+#: eduiddashboard/templates/emails-form.jinja2:20
 #: eduiddashboard/templates/mobiles-form.jinja2:16
 #: eduiddashboard/templates/nins-form.jinja2:16
 #: eduiddashboard/templates/nins-form.jinja2:27
 msgid "Verified"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:20
+#: eduiddashboard/templates/emails-form.jinja2:21
 #: eduiddashboard/templates/mobiles-form.jinja2:17
 #: eduiddashboard/templates/nins-form.jinja2:17
 #: eduiddashboard/templates/nins-form.jinja2:42
@@ -312,28 +313,28 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:28
+#: eduiddashboard/templates/emails-form.jinja2:29
 msgid "Make this email address your new primary email address"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:35
+#: eduiddashboard/templates/emails-form.jinja2:36
 #: eduiddashboard/templates/mobiles-form.jinja2:27
 msgid "Already verified"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:39
+#: eduiddashboard/templates/emails-form.jinja2:40
 msgid "Resend confirmation email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:47
+#: eduiddashboard/templates/emails-form.jinja2:48
 msgid "Remove email address"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:56
+#: eduiddashboard/templates/emails-form.jinja2:57
 msgid "Add an email address by clicking on the button below."
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:63
+#: eduiddashboard/templates/emails-form.jinja2:64
 msgid "Add email address"
 msgstr ""
 
@@ -691,8 +692,9 @@ msgstr ""
 msgid "Email address was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:182
-msgid "Your changes was successfully updated"
+#: eduiddashboard/views/emails.py:182 eduiddashboard/views/mobiles.py:160
+#: eduiddashboard/views/nins.py:218 eduiddashboard/views/personal.py:79
+msgid "Changes saved"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:187
@@ -735,11 +737,6 @@ msgstr ""
 
 #: eduiddashboard/views/mobiles.py:102
 msgid "Mobile phone number was successfully removed"
-msgstr ""
-
-#: eduiddashboard/views/mobiles.py:160 eduiddashboard/views/nins.py:218
-#: eduiddashboard/views/personal.py:79
-msgid "Changes saved"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:162
