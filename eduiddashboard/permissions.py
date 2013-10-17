@@ -210,7 +210,7 @@ class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
         if self.request.session.get('user') is None:
-            raise HTTPForbidden()
+            raise HTTPForbidden(_('Not logged in'))
         is_authorized = super(BaseCredentialsFactory, self).authorize()
 
         # Verify that session loa is equal than the max reached
@@ -219,8 +219,8 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden(_('You do not have sufficient AL to edit your'
-                                ' credentials'))
+            raise HTTPForbidden(_('You must be logged in with %(user_AL) '
+                                  'to manage your credentials'), user_AL=max_user_loa)
         return is_authorized
 
 
