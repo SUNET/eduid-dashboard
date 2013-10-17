@@ -105,11 +105,8 @@ class BaseFactory(object):
                 user = self.request.userdb.get_user(userid)
             elif OID_RE.match(userid):
                 user = self.request.userdb.get_user_by_oid(userid)
-        # this 'if not user' used to have one more level of indentation -
-        # don't know for sure if it is the right thing to move it, but I
-        # have reason to suspect it is... - ft 2013-10-16
-        if not user:
-            raise HTTPForbidden(_('User unknown'))
+            if not user:
+                raise HTTPNotFound()
         self._user = user
         return user
 
