@@ -157,7 +157,7 @@ class MobilesView(BaseFormView):
 
         send_verification_code(self.request, self.user, mobile_number)
 
-        self.request.session.flash(_('Your changes was successfully saved'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
         msg = _('A confirmation code has been sent to your mobile phone. '
                 'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${identifier}">here</a>',

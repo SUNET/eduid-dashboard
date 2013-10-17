@@ -215,7 +215,7 @@ class NinsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was successfully saved'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
         send_verification_code(self.request, self.user, newnin)
@@ -224,14 +224,9 @@ class NinsView(BaseFormView):
                                                             {})
         nin_proofing_link = proofing_links.get('nin')
 
-        msg = _('A confirmation message has been sent to your govt Inbox. '
-                'Please revise your <a href=${nin_link}> nin inbox</a>, return'
-                ' to .this page and <a href="#" class="verifycode" '
-                'data-identifier="${id}">fill here</a> the provided'
-                'verification number', {
-                    'id': nin_identifier,
-                    'nin_link': nin_proofing_link
-                })
+        msg = _('A confirmation code has been sent to your govt inbox. '
+                'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${id}">here</a>.',
+                mapping={'id': nin_identifier})
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')

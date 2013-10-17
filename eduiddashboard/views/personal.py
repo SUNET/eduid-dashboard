@@ -76,7 +76,7 @@ class PersonalDataView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was successfully saved.'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
         if new_preferred_language != old_preferred_language:

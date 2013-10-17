@@ -4,13 +4,14 @@
 # project.
 # 
 # Translators:
+# ft, 2013
 # Ratler <swold@sunet.se>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-16 15:46+0200\n"
-"PO-Revision-Date: 2013-10-16 13:51+0000\n"
+"POT-Creation-Date: 2013-10-17 09:31+0200\n"
+"PO-Revision-Date: 2013-10-17 07:37+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -169,7 +170,15 @@ msgstr "Okänd användare"
 msgid "You do not have sufficient AL to edit your credentials"
 msgstr ""
 
-#: eduiddashboard/utils.py:79
+#: eduiddashboard/utils.py:48
+msgid "Login token expired, please await confirmation e-mail to log in."
+msgstr ""
+
+#: eduiddashboard/utils.py:52 eduiddashboard/utils.py:60
+msgid "Login token invalid"
+msgstr ""
+
+#: eduiddashboard/utils.py:90
 msgid "Passwords"
 msgstr "Lösenord"
 
@@ -453,7 +462,7 @@ msgid ""
 "<p>Please enter your national identity number to automatically retrieve your place of\n"
 "        residence from the Swedish population register.</p>\n"
 "    "
-msgstr ""
+msgstr "<p>Ange ditt personnummer för att automatiskt hämta din bokföringsadress.</p>"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:12
 msgid ""
@@ -461,7 +470,7 @@ msgid ""
 "    <p>Be aware that your postal address from the population register\n"
 "        will be used when sending letters by mail to you.</p>\n"
 "    "
-msgstr ""
+msgstr "\n<p>Notera att vid brevförsändelser används din folkbokföringsadress.</p>"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:27
 msgid "Type"
@@ -523,7 +532,7 @@ msgstr "Fel!"
 
 #: eduiddashboard/templates/profile.jinja2:118
 msgid "Permission denied"
-msgstr "Tillträde nekat"
+msgstr "Åtkomst nekad"
 
 #: eduiddashboard/templates/reset-password-email.html.jinja2:1
 #, python-format
@@ -599,8 +608,8 @@ msgid ""
 "\n"
 "%(verification_link)s\n"
 "\n"
-"<p>If clicking on the link above does not work, go to your profile and emails section. Click on the\n"
-"confirmation icon and enter the following code:</p>\n"
+"If clicking on the link above does not work, go to your profile and emails section. Click on the\n"
+"verification icon and enter the following code:\n"
 "\n"
 "%(code)s\n"
 "\n"
@@ -636,7 +645,7 @@ msgstr "En ny bekräftelsekod har skickats till dig"
 msgid ""
 "The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
-msgstr ""
+msgstr "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en ny."
 
 #: eduiddashboard/views/emails.py:22
 msgid "An email address is pending confirmation"
@@ -731,9 +740,9 @@ msgid "Mobile phone number was successfully removed"
 msgstr "Mobiltelefonnumret har tagits bort "
 
 #: eduiddashboard/views/mobiles.py:160 eduiddashboard/views/nins.py:218
-#: eduiddashboard/views/postal_address.py:194
-msgid "Your changes was successfully saved"
-msgstr "Dina ändringar har uppdaterats"
+#: eduiddashboard/views/personal.py:79
+msgid "Changes saved"
+msgstr "Ändringarna har sparats"
 
 #: eduiddashboard/views/mobiles.py:162
 msgid ""
@@ -770,14 +779,12 @@ msgstr ""
 msgid "National identity number has been removed"
 msgstr "Personnumret har tagits bort"
 
-#. Default: id
 #: eduiddashboard/views/nins.py:227
 msgid ""
-"A confirmation message has been sent to your govt Inbox. Please revise your "
-"<a href=${nin_link}> nin inbox</a>, return to .this page and <a href=\"#\" "
-"class=\"verifycode\" data-identifier=\"${id}\">fill here</a> the "
-"providedverification number"
-msgstr ""
+"A confirmation code has been sent to your govt inbox. Please enter your "
+"confirmation code <a href=\"#\" class=\"verifycode\" data-"
+"identifier=\"${id}\">here</a>."
+msgstr "En bekräftelseskod har skickats till din inkort hos \"Mina Meddelanden\". Vänligen ange din bekräftelsekod <a href=\"#\" class=\"verifycode\" data-identifier=\"${id}\">här</a>."
 
 #: eduiddashboard/views/password.py:59
 msgid "Reset your password in {site_name}"
@@ -832,12 +839,9 @@ msgid "Permissions"
 msgstr "Rättigheter"
 
 #: eduiddashboard/views/permissions.py:52
+#: eduiddashboard/views/postal_address.py:194
 msgid "Changes saved."
 msgstr "Ändringarna har sparats."
-
-#: eduiddashboard/views/personal.py:79
-msgid "Your changes was successfully saved."
-msgstr "Dina ändringar har sparats"
 
 #: eduiddashboard/views/postal_address.py:45
 msgid "Postal Address"
