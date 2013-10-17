@@ -22,6 +22,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
 
 from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
+from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -207,6 +208,10 @@ def includeme(config):
     config.registry.settings['userdb'] = userdb
     config.add_request_method(get_userdb, 'userdb', reify=True)
 
+    msgrelay = MsgRelay(config.registry.settings)
+    config.registry.settings['msgrelay'] = msgrelay
+    config.add_request_method(get_msgrelay, 'msgrelay', reify=True)
+
     config.add_route('home', '/', factory=HomeFactory)
     if settings['workmode'] == 'personal':
         config.include(profile_urls, route_prefix='/profile/')
@@ -259,6 +264,7 @@ def main(global_config, **settings):
         'site.name',
         'auth_shared_secret',
         'mongo_uri_am',
+        'personal_dashboard_base_url',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -275,6 +281,10 @@ def main(global_config, **settings):
     celery.conf.update(BROKER_URL=broker_url)
     settings['celery'] = celery
     settings['broker_url'] = broker_url
+
+    settings['msg_broker_url'] = read_setting_from_env(settings,
+                                                       'msg_broker_url',
+                                                       'amqp://eduid_msg')
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')
