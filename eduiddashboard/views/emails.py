@@ -194,6 +194,6 @@ class EmailsView(BaseFormView):
                                      'inbox and click on the provided link or '
                                      'fill the code in the <a href=# '
                                      'class="verifycode" data-identifier="${id}">'
-                                     'verification form</a>"',
+                                     'verification form</a>',
                                      mapping={'id': len(emails)}),
                                    queue='forms')
