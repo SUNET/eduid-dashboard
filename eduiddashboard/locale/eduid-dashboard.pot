@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-16 15:46+0200\n"
+"POT-Creation-Date: 2013-10-17 10:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -151,23 +151,31 @@ msgstr ""
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/permissions.py:55
+#: eduiddashboard/permissions.py:56
 msgid "You do not have sufficient permissions to access this user"
 msgstr ""
 
-#: eduiddashboard/permissions.py:83
+#: eduiddashboard/permissions.py:84
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-#: eduiddashboard/permissions.py:111
+#: eduiddashboard/permissions.py:112
 msgid "User unknown"
 msgstr ""
 
-#: eduiddashboard/permissions.py:221
+#: eduiddashboard/permissions.py:222
 msgid "You do not have sufficient AL to edit your credentials"
 msgstr ""
 
-#: eduiddashboard/utils.py:79
+#: eduiddashboard/utils.py:48
+msgid "Login token expired, please await confirmation e-mail to log in."
+msgstr ""
+
+#: eduiddashboard/utils.py:52 eduiddashboard/utils.py:60
+msgid "Login token invalid"
+msgstr ""
+
+#: eduiddashboard/utils.py:90
 msgid "Passwords"
 msgstr ""
 
@@ -274,29 +282,30 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
-msgid ""
-"<p>After adding a new address, go to that account and click the\n"
-"   link in the confirmation email. Addresses must be confirmed before they "
-"can become primary.</p>\n"
-"   "
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:17
-msgid "Primary"
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:18
+#: eduiddashboard/templates/emails-form.jinja2:19
 msgid "Email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:19
+#: eduiddashboard/templates/emails-form.jinja2:5
+msgid ""
+"After adding a new address, go to that account and click the\n"
+"   link in the confirmation email. Addresses must be confirmed before they "
+"can become primary.\n"
+"   "
+msgstr ""
+
+#: eduiddashboard/templates/emails-form.jinja2:18
+msgid "Primary"
+msgstr ""
+
+#: eduiddashboard/templates/emails-form.jinja2:20
 #: eduiddashboard/templates/mobiles-form.jinja2:16
 #: eduiddashboard/templates/nins-form.jinja2:16
 #: eduiddashboard/templates/nins-form.jinja2:27
 msgid "Verified"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:20
+#: eduiddashboard/templates/emails-form.jinja2:21
 #: eduiddashboard/templates/mobiles-form.jinja2:17
 #: eduiddashboard/templates/nins-form.jinja2:17
 #: eduiddashboard/templates/nins-form.jinja2:42
@@ -304,28 +313,28 @@ msgstr ""
 msgid "Remove"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:28
+#: eduiddashboard/templates/emails-form.jinja2:29
 msgid "Make this email address your new primary email address"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:35
+#: eduiddashboard/templates/emails-form.jinja2:36
 #: eduiddashboard/templates/mobiles-form.jinja2:27
 msgid "Already verified"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:39
+#: eduiddashboard/templates/emails-form.jinja2:40
 msgid "Resend confirmation email"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:47
+#: eduiddashboard/templates/emails-form.jinja2:48
 msgid "Remove email address"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:56
+#: eduiddashboard/templates/emails-form.jinja2:57
 msgid "Add an email address by clicking on the button below."
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:63
+#: eduiddashboard/templates/emails-form.jinja2:64
 msgid "Add email address"
 msgstr ""
 
@@ -447,8 +456,8 @@ msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:6
 msgid ""
-"<p>Please enter your national identity number to automatically retrieve your "
-"place of\n"
+"<p>Please enter your national identity number for automatic retrieval of your"
+" place of\n"
 "        residence from the Swedish population register.</p>\n"
 "    "
 msgstr ""
@@ -468,8 +477,9 @@ msgstr ""
 #: eduiddashboard/templates/postaladdress-form.jinja2:61
 msgid ""
 "Please add your place of residence by clicking on the button below or by "
-"adding your Swedish national\n"
-"        identity number to your profile for automated retrieval.\n"
+"adding your national\n"
+"        identity number to your profile for automated retrieval from the "
+"Swedish population register.\n"
 "    "
 msgstr ""
 
@@ -605,9 +615,9 @@ msgid ""
 "\n"
 "%(verification_link)s\n"
 "\n"
-"<p>If clicking on the link above does not work, go to your profile and emails"
-" section. Click on the\n"
-"confirmation icon and enter the following code:</p>\n"
+"If clicking on the link above does not work, go to your profile and emails "
+"section. Click on the\n"
+"verification icon and enter the following code:\n"
 "\n"
 "%(code)s\n"
 "\n"
@@ -683,8 +693,9 @@ msgstr ""
 msgid "Email address was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:182
-msgid "Your changes was successfully updated"
+#: eduiddashboard/views/emails.py:182 eduiddashboard/views/mobiles.py:160
+#: eduiddashboard/views/nins.py:218 eduiddashboard/views/personal.py:79
+msgid "Changes saved"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:187
@@ -729,11 +740,6 @@ msgstr ""
 msgid "Mobile phone number was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:160 eduiddashboard/views/nins.py:218
-#: eduiddashboard/views/postal_address.py:194
-msgid "Your changes was successfully saved"
-msgstr ""
-
 #: eduiddashboard/views/mobiles.py:162
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please enter your "
@@ -769,13 +775,11 @@ msgstr ""
 msgid "National identity number has been removed"
 msgstr ""
 
-#. Default: id
 #: eduiddashboard/views/nins.py:227
 msgid ""
-"A confirmation message has been sent to your govt Inbox. Please revise your "
-"<a href=${nin_link}> nin inbox</a>, return to .this page and <a href=\"#\" "
-"class=\"verifycode\" data-identifier=\"${id}\">fill here</a> the "
-"providedverification number"
+"A confirmation code has been sent to your govt inbox. Please enter your "
+"confirmation code <a href=\"#\" class=\"verifycode\" data-"
+"identifier=\"${id}\">here</a>."
 msgstr ""
 
 #: eduiddashboard/views/password.py:59
@@ -831,11 +835,8 @@ msgid "Permissions"
 msgstr ""
 
 #: eduiddashboard/views/permissions.py:52
+#: eduiddashboard/views/postal_address.py:194
 msgid "Changes saved."
-msgstr ""
-
-#: eduiddashboard/views/personal.py:79
-msgid "Your changes was successfully saved."
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:45

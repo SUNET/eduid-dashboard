@@ -179,12 +179,12 @@ class EmailsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was successfully updated'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
         send_verification_mail(self.request, newemail['mail'])
 
-        self.request.session.flash(_('A confirmation email has been sent '
-                                     'to you. Please check your inbox for further instructions.',
+        self.request.session.flash(_('A confirmation email has been sent to you. '
+                                     'Please check your inbox for further instructions.',
                                      mapping={'id': len(emails)}),
                                    queue='forms')

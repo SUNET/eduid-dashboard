@@ -1,9 +1,10 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}<p>After adding a new address, go to that account and click the
-   link in the confirmation email. Addresses must be confirmed before they can become primary.</p>
-   {% endtrans %}
+   <h4>{% trans %}Email{% endtrans %}</h4>
+   <p>{% trans %}After adding a new address, go to that account and click the
+   link in the confirmation email. Addresses must be confirmed before they can become primary.
+   {% endtrans %}</p>
 {% endblock %}
 
 {% block extra_content %}
