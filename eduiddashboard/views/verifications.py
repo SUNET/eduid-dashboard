@@ -11,6 +11,10 @@ def verifications(context, request):
     model_name = request.matchdict['model']
     code = request.matchdict['code']
 
+    verification = get_verification_code(request, model_name, code=code)
+    if verification and verification['expired']:
+        return HTTPNotFound()  # the code is expired
+
     obj_id = verificate_code(request, model_name, code)
 
     if obj_id is not None:
