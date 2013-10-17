@@ -28,33 +28,51 @@ class UserDB(IUserDB):
                                                 'mail')
 
     def get_user(self, userid):
-        try:
-            logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
-                    self._db, self.user_main_attribute, userid))
-            user = self._db.get_user_by_field(self.user_main_attribute, userid)
-            logger.debug("Found user {!r}".format(user))
-            return user
-        except UserDoesNotExist:
-            logger.error("UserDoesNotExist")
-            raise self.UserDoesNotExist()
-        except MultipleUsersReturned:
-            logger.error("MultipleUsersReturned")
-            raise self.MultipleUsersReturned()
+        """
+        Locate a user in the userdb using the main attribute (typically 'mail').
+        The name of the main attribute can be influenced in __init__().
+
+        :param userid: string
+        :return: user as dict
+        :raise self.UserDoesNotExist: No user match the search criteria
+        :raise self.MultipleUsersReturned: More than one user matches the search criteria
+        """
+        return self.get_user_by_attr(self.user_main_attribute, userid)
 
     def get_user_by_oid(self, oid):
+        """
+        Locate a user in the userdb given the user's _id.
+
+        :param oid: ObjectId() or string
+        :return: user as dict
+        :raise self.UserDoesNotExist: No user match the search criteria
+        :raise self.MultipleUsersReturned: More than one user matches the search criteria
+        """
         if not isinstance(oid, ObjectId):
             oid = ObjectId(oid)
+        return self.get_user_by_attr('_id', oid)
+
+    def get_user_by_attr(self, attr, value):
+        """
+        Locate a user in the userdb using any attribute and value.
+
+        :param attr: The attribute to match on
+        :param value: The value to match on
+        :return: user as dict
+        :raise self.UserDoesNotExist: No user match the search criteria
+        :raise self.MultipleUsersReturned: More than one user matches the search criteria
+        """
+        logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
+            self._db, attr, value))
         try:
-            logger.debug("Looking in {!r} for user with {!r} = {!r}".format(
-                    self._db, '_id', oid))
-            user = self._db.get_user_by_field('_id', oid)
+            user = self._db.get_user_by_field(attr, value)
             logger.debug("Found user {!r}".format(user))
             return user
         except UserDoesNotExist:
-            logger.error("UserDoesNotExist")
+            logger.error("UserDoesNotExist, {!r} = {!r}".format(attr, value))
             raise self.UserDoesNotExist()
         except MultipleUsersReturned:
-            logger.error("MultipleUsersReturned")
+            logger.error("MultipleUsersReturned, {!r} = {!r}".format(attr, value))
             raise self.MultipleUsersReturned()
 
     def exists_by_field(self, field, value):
