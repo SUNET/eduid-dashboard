@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
-from pyramid.i18n import TranslationString as _
+from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
 
@@ -105,11 +105,8 @@ class BaseFactory(object):
                 user = self.request.userdb.get_user(userid)
             elif OID_RE.match(userid):
                 user = self.request.userdb.get_user_by_oid(userid)
-        # this 'if not user' used to have one more level of indentation -
-        # don't know for sure if it is the right thing to move it, but I
-        # have reason to suspect it is... - ft 2013-10-16
-        if not user:
-            raise HTTPForbidden(_('User unknown'))
+            if not user:
+                raise HTTPNotFound()
         self._user = user
         return user
 
@@ -210,7 +207,7 @@ class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
         if self.request.session.get('user') is None:
-            raise HTTPForbidden()
+            raise HTTPForbidden(_('Not logged in'))
         is_authorized = super(BaseCredentialsFactory, self).authorize()
 
         # Verify that session loa is equal than the max reached
@@ -219,8 +216,8 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden(_('You do not have sufficient AL to edit your'
-                                ' credentials'))
+            raise HTTPForbidden(_('You must be logged in with %(user_AL) '
+                                  'to manage your credentials'), user_AL=max_user_loa)
         return is_authorized
 
 
