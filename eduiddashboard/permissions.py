@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
+from pyramid.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
 
