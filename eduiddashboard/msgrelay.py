@@ -1,7 +1,6 @@
 from bson import ObjectId
 
 from eduid_msg.celery import celery, get_message_relay
-from eduid_msg.exceptions import UserDoesNotExist, MultipleUsersReturned
 import eduid_msg.tasks  # flake8: noqa
 from eduid_msg.tasks import send_message
 
@@ -15,7 +14,7 @@ TEMPLATES_RELATION = {
 }
 
 
-class MsgRelay(Object):
+class MsgRelay(object):
 
     def __init__(self, settings):
 
