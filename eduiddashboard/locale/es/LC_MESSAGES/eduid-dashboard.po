@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-17 10:28+0200\n"
+"POT-Creation-Date: 2013-10-17 11:27+0200\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -18,11 +18,12 @@ msgstr ""
 "Generated-By: Babel 1.3\n"
 
 #: eduiddashboard/emails.py:33
-msgid "{site_name} verification email"
+#, fuzzy
+#| msgid "{site_name} verification email"
+msgid "{site_name} confirmation email"
 msgstr "correo de verificación de {site_name}"
 
 #: eduiddashboard/models.py:18 eduiddashboard/models.py:46
-#: eduiddashboard/templates/emails-form.jinja2:21
 msgid "email"
 msgstr "e-mail"
 
@@ -31,13 +32,11 @@ msgid "phone mobile number"
 msgstr "número de teléfono móvil"
 
 #: eduiddashboard/models.py:20 eduiddashboard/templates/home.jinja2:30
-#: eduiddashboard/templates/nins-form.jinja2:17
 msgid "NIN"
 msgstr "NIN"
 
 #: eduiddashboard/models.py:24
 #, fuzzy
-#| msgid "Postal Address"
 msgid "Official address"
 msgstr "Dirección Postal"
 
@@ -52,114 +51,170 @@ msgid "Work address"
 msgstr "Dirección Postal"
 
 #: eduiddashboard/models.py:52
-msgid "personal identity number (NIN)"
+#, fuzzy
+#| msgid "personal identity number (NIN)"
+msgid "Swedish personal identity number"
 msgstr "Número de identificación personal (NIN)"
 
 #: eduiddashboard/models.py:56
-msgid "The personal identity number consists of 12 digits"
+#, fuzzy
+#| msgid "The personal identity number consists of 12 digits"
+msgid "The Swedish personal identity number consists of 12 digits"
 msgstr "El número de identificación personal está formado por 12 dígitos"
 
 #: eduiddashboard/models.py:77
-msgid "given name"
+#, fuzzy
+#| msgid "given name"
+msgid "Given name"
 msgstr "nombre"
 
-#: eduiddashboard/models.py:79 eduiddashboard/templates/home.jinja2:28
-msgid "surname"
+#: eduiddashboard/models.py:79
+#, fuzzy
+#| msgid "surname"
+msgid "Surname"
 msgstr "apellidos"
 
 #: eduiddashboard/models.py:81
-msgid "display name"
+#, fuzzy
+#| msgid "display name"
+msgid "Display name"
 msgstr "nombre a mostrar"
 
 #: eduiddashboard/models.py:83
-msgid "photo"
+#, fuzzy
+#| msgid "photo"
+msgid "Photo"
 msgstr "foto"
 
 #: eduiddashboard/models.py:84
-msgid "A url link to your personal avatar"
-msgstr "Un enlace a tu avatar"
+msgid "Personal avatar URL"
+msgstr ""
 
-#: eduiddashboard/models.py:88
-msgid "preferred language"
+#: eduiddashboard/models.py:87
+#, fuzzy
+#| msgid "preferred language"
+msgid "Preferred language"
 msgstr "Idioma preferido"
 
-#: eduiddashboard/models.py:107 eduiddashboard/models.py:130
-msgid "Both passwords don't match"
+#: eduiddashboard/models.py:95
+#, fuzzy
+#| msgid "Change your password"
+msgid "Current password"
+msgstr "Cambia tu contraseña"
+
+#: eduiddashboard/models.py:99
+#, fuzzy
+#| msgid "Change your password"
+msgid "New password"
+msgstr "Cambia tu contraseña"
+
+#: eduiddashboard/models.py:103
+msgid "Confirm new password"
+msgstr ""
+
+#: eduiddashboard/models.py:109 eduiddashboard/models.py:132
+#, fuzzy
+#| msgid "Both passwords don't match"
+msgid "Passwords don't match"
 msgstr "Las contraseñas no coinciden"
 
-#: eduiddashboard/models.py:117
+#: eduiddashboard/models.py:119
 msgid "Enter your email address"
 msgstr ""
 
-#: eduiddashboard/models.py:135
-#: eduiddashboard/templates/postaladdress-form.jinja2:27
+#: eduiddashboard/models.py:137
 msgid "type"
 msgstr ""
 
-#: eduiddashboard/models.py:139
+#: eduiddashboard/models.py:141
 #: eduiddashboard/templates/postaladdress-form.jinja2:28
 #, fuzzy
-msgid "address"
+#| msgid "address"
+msgid "Address"
 msgstr "Dirección Postal"
 
-#: eduiddashboard/models.py:140
+#: eduiddashboard/models.py:142
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
-msgid "locality"
+msgid "City"
 msgstr ""
-
-#: eduiddashboard/models.py:141
-#, fuzzy
-msgid "postal code"
-msgstr "Dirección Postal"
 
 #: eduiddashboard/models.py:143
+#, fuzzy
+#| msgid "postal code"
+msgid "Postal code"
+msgstr "Dirección Postal"
+
+#: eduiddashboard/models.py:145
 #: eduiddashboard/templates/postaladdress-form.jinja2:30
-msgid "country"
+msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:151
+#: eduiddashboard/models.py:153
 #, fuzzy
-#| msgid "You have to verificate some postal address"
 msgid "You have not rights to set the official  postal address manually"
 msgstr "Tienes que verificar algunas direcciones de email"
 
-#: eduiddashboard/models.py:159
+#: eduiddashboard/models.py:161
 msgid ""
 "Invalid telephone number. It must be written using international "
 "notation, starting with \"+\"."
 msgstr ""
 
-#: eduiddashboard/models.py:161
+#: eduiddashboard/models.py:163
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:176
+#: eduiddashboard/models.py:178
 msgid "text"
 msgstr "texto"
 
-#: eduiddashboard/models.py:177
+#: eduiddashboard/models.py:179
 msgid "the exact match text for the attribute type selected for search"
 msgstr "el texto exacto a buscar con el tipo de atributo seleccionado"
 
-#: eduiddashboard/models.py:184
+#: eduiddashboard/models.py:186
 msgid "attribute type"
 msgstr "tipo de attributo"
 
-#: eduiddashboard/models.py:185
+#: eduiddashboard/models.py:187
 msgid "Select the attribute to search"
 msgstr "Seleccionar atributo para buscar"
 
-#: eduiddashboard/utils.py:45
+#: eduiddashboard/permissions.py:56
+msgid "You do not have sufficient permissions to access this user"
+msgstr ""
+
+#: eduiddashboard/permissions.py:84
+msgid "You do not have sufficient AL to access to this workmode"
+msgstr ""
+
+#: eduiddashboard/permissions.py:112
+msgid "User unknown"
+msgstr ""
+
+#: eduiddashboard/permissions.py:222
+msgid "You do not have sufficient AL to edit your credentials"
+msgstr ""
+
+#: eduiddashboard/utils.py:48
+msgid "Login token expired, please await confirmation e-mail to log in."
+msgstr ""
+
+#: eduiddashboard/utils.py:52 eduiddashboard/utils.py:60
+msgid "Login token invalid"
+msgstr ""
+
+#: eduiddashboard/utils.py:90
 msgid "Passwords"
 msgstr "Contraseñas"
 
 #: eduiddashboard/validators.py:20
-msgid "Old password do not match"
-msgstr "El password actual no coincide"
+msgid "Current password is incorrect"
+msgstr ""
 
 #: eduiddashboard/validators.py:29
-msgid "\"${val}\" has to be more than ${len} characters length"
-msgstr "\"${val}\" debe tener más de ${len} caracteres"
+msgid "The password is too short, minimum length is ${len}"
+msgstr ""
 
 #: eduiddashboard/validators.py:43
 msgid "The permission selected is not available"
@@ -196,7 +251,7 @@ msgid "This NIN is already registered in your NIN list"
 msgstr "Este email ya se está registrado"
 
 #: eduiddashboard/templates/base.jinja2:6
-msgid "eduID Dashboard"
+msgid "Dashboard"
 msgstr ""
 
 #: eduiddashboard/templates/base.jinja2:30
@@ -248,13 +303,14 @@ msgid "You are in assurance level %(loa)s"
 msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:32
-msgid "<p>This is the highest level of assurance available for your profile</p>"
+#, fuzzy
+#| msgid "<p>This is the highest level of assurance available for your
+#| profile</p>"
+msgid "<p>You have reached max level of assurance available for your profile</p>"
 msgstr "<p>Este es el nivel de confianza más alto que puede alcanzar tu perfil</p>"
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:34
 #, fuzzy
-#| msgid "" "<p>If you need to increase this level to get more permissions\n" "
-#| you must login with another authentication method</p>"
 msgid ""
 "<p>If you need to increase this level to get more permissions\n"
 "          you must login with another authentication method</p>"
@@ -263,69 +319,74 @@ msgstr ""
 "   tienes que resolver lass siguientes acciones pendientes</p>"
 
 #: eduiddashboard/templates/emails-form.jinja2:4
+#: eduiddashboard/templates/emails-form.jinja2:19
+#, fuzzy
+#| msgid "email"
+msgid "Email"
+msgstr "e-mail"
+
+#: eduiddashboard/templates/emails-form.jinja2:5
 msgid ""
-"<p>These list contain all your emails registered in the\n"
-"   platform. You can change your preferred email by clicking in the radio"
-"\n"
-"   buttons.</p>\n"
-"   <p>Remember, if you select a not verified email as your primary\n"
-"   email, your level of assurance must be decreased.</p>\n"
+"After adding a new address, go to that account and click the\n"
+"   link in the confirmation email. Addresses must be confirmed before "
+"they can become primary.\n"
 "   "
 msgstr ""
-"<p>Esta lista contiene todos tus emails registrados in la \n"
-"   plataforma. Puedes cambiar tu correo preferido seleccionando en el "
-"botón\n"
-" circular</p>\n"
-"   <p>Recuerdia, si seleccionas un email no verificado como email "
-"preferido,\n"
-"   el nivel de confianza de la plataforma puede bajar.</p>\n"
-"   "
+
+#: eduiddashboard/templates/emails-form.jinja2:18
+msgid "Primary"
+msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:20
-msgid "preferred"
-msgstr "preferido"
+#: eduiddashboard/templates/mobiles-form.jinja2:16
+#: eduiddashboard/templates/nins-form.jinja2:16
+#: eduiddashboard/templates/nins-form.jinja2:27
+#, fuzzy
+#| msgid "Already verified"
+msgid "Verified"
+msgstr "Ya verificado"
 
-#: eduiddashboard/templates/emails-form.jinja2:22
-#: eduiddashboard/templates/mobiles-form.jinja2:19
-#: eduiddashboard/templates/nins-form.jinja2:18
-msgid "verification status"
-msgstr "estado de verificación"
-
-#: eduiddashboard/templates/emails-form.jinja2:23
-#: eduiddashboard/templates/mobiles-form.jinja2:20
-#: eduiddashboard/templates/nins-form.jinja2:19
+#: eduiddashboard/templates/emails-form.jinja2:21
+#: eduiddashboard/templates/mobiles-form.jinja2:17
+#: eduiddashboard/templates/nins-form.jinja2:17
+#: eduiddashboard/templates/nins-form.jinja2:42
 #: eduiddashboard/templates/postaladdress-form.jinja2:31
-msgid "remove"
+#, fuzzy
+msgid "Remove"
 msgstr "eliminar"
 
-#: eduiddashboard/templates/emails-form.jinja2:31
-msgid "Set this email as your primary email"
+#: eduiddashboard/templates/emails-form.jinja2:29
+#, fuzzy
+#| msgid "Set this email as your primary email"
+msgid "Make this email address your new primary email address"
 msgstr "Convertir este email como tu email preferido"
 
-#: eduiddashboard/templates/emails-form.jinja2:38
-#: eduiddashboard/templates/mobiles-form.jinja2:30
-#: eduiddashboard/templates/nins-form.jinja2:29
+#: eduiddashboard/templates/emails-form.jinja2:36
+#: eduiddashboard/templates/mobiles-form.jinja2:27
 msgid "Already verified"
 msgstr "Ya verificado"
 
-#: eduiddashboard/templates/emails-form.jinja2:42
-msgid "Resend verification email"
+#: eduiddashboard/templates/emails-form.jinja2:40
+#, fuzzy
+#| msgid "Resend verification email"
+msgid "Resend confirmation email"
 msgstr "Reenviar el email de verificación"
 
-#: eduiddashboard/templates/emails-form.jinja2:50
-msgid "Remove this email"
-msgstr "Eliminar este email"
+#: eduiddashboard/templates/emails-form.jinja2:48
+#, fuzzy
+#| msgid "Remove this postal address"
+msgid "Remove email address"
+msgstr "Dirección Postal"
 
-#: eduiddashboard/templates/emails-form.jinja2:59
-#: eduiddashboard/templates/mobiles-form.jinja2:50
-msgid ""
-"There is no content created. You can add first element by clicking the "
-"button below"
+#: eduiddashboard/templates/emails-form.jinja2:57
+msgid "Add an email address by clicking on the button below."
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:66
-msgid "Add a new email"
-msgstr "Añadir un nuevo email"
+#: eduiddashboard/templates/emails-form.jinja2:64
+#, fuzzy
+#| msgid "Add a new postal address"
+msgid "Add email address"
+msgstr "Dirección Postal"
 
 #: eduiddashboard/templates/home.jinja2:7
 #, python-format
@@ -354,6 +415,10 @@ msgstr "%(number)d usuarios encontrados"
 msgid "first name"
 msgstr "Nombre"
 
+#: eduiddashboard/templates/home.jinja2:28
+msgid "surname"
+msgstr "apellidos"
+
 #: eduiddashboard/templates/home.jinja2:29
 msgid "preferred email"
 msgstr "email preferido"
@@ -363,62 +428,71 @@ msgid "Any user match with the filter"
 msgstr "Cualquier usuario que coincida con el filtro"
 
 #: eduiddashboard/templates/mobiles-form.jinja2:4
-msgid ""
-"\n"
-"   <p>These list contain all your mobile phones registered in the\n"
-"   platform.</p>\n"
-"   "
-msgstr ""
-
-#: eduiddashboard/templates/mobiles-form.jinja2:18
 #, fuzzy
-msgid "phone"
+#| msgid "Mobile phone code"
+msgid "Mobile phone numbers"
+msgstr "Añadir un nuevo email"
+
+#: eduiddashboard/templates/mobiles-form.jinja2:15
+#, fuzzy
+#| msgid "phone"
+msgid "Phone"
 msgstr "Teléfonos"
 
-#: eduiddashboard/templates/mobiles-form.jinja2:34
-#: eduiddashboard/templates/nins-form.jinja2:35
+#: eduiddashboard/templates/mobiles-form.jinja2:31
+#: eduiddashboard/views/__init__.py:85
+#, fuzzy
+#| msgid "Verification code"
+msgid "Confirmation code"
+msgstr "estado de verificación"
+
+#: eduiddashboard/templates/mobiles-form.jinja2:38
+#: eduiddashboard/templates/postaladdress-form.jinja2:48
+#, fuzzy
+#| msgid "Remove this postal address"
+msgid "Remove postal address"
+msgstr "Dirección Postal"
+
+#: eduiddashboard/templates/mobiles-form.jinja2:47
+msgid "Add a mobile phone number by clicking on the button below."
+msgstr ""
+
+#: eduiddashboard/templates/mobiles-form.jinja2:54
+#: eduiddashboard/views/mobiles.py:24
+#, fuzzy
+#| msgid "phone mobile number"
+msgid "Add mobile phone number"
+msgstr "número de teléfono móvil"
+
+#: eduiddashboard/templates/nins-form.jinja2:4
+#: eduiddashboard/templates/nins-form.jinja2:15
+#: eduiddashboard/views/nins.py:104
+#, fuzzy
+msgid "National identity number"
+msgstr "números de identificación personal"
+
+#: eduiddashboard/templates/nins-form.jinja2:33
 msgid "Verify code"
 msgstr ""
 
-#: eduiddashboard/templates/mobiles-form.jinja2:41
-#: eduiddashboard/templates/postaladdress-form.jinja2:48
+#: eduiddashboard/templates/nins-form.jinja2:37
 #, fuzzy
-msgid "Remove this postal address"
-msgstr "Dirección Postal"
-
-#: eduiddashboard/templates/mobiles-form.jinja2:57
-#, fuzzy
-msgid "Add a new mobile phone"
-msgstr "Añadir un nuevo email"
-
-#: eduiddashboard/templates/nins-form.jinja2:4
-msgid ""
-"<p>This list contain all your National Identity Numbers\n"
-"   (NIN) registered in the platform.</p>\n"
-"   "
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:39
-msgid "Can't verify an old NIN"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:44
-#, fuzzy
-msgid "Remove"
-msgstr "eliminar"
-
-#: eduiddashboard/templates/nins-form.jinja2:56
-msgid ""
-"There is no nin registered. You can add the first item by clicking the "
-"button below"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:63
-#, fuzzy
-msgid "Add a new National Identity Number"
+#| msgid "National identity number"
+msgid "National identity number not verified"
 msgstr "números de identificación personal"
 
-#: eduiddashboard/templates/nins-form.jinja2:75
+#: eduiddashboard/templates/nins-form.jinja2:54
+msgid "Add a national identity number by clicking the button below"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:61 eduiddashboard/views/nins.py:36
+#: eduiddashboard/views/nins.py:42
+#, fuzzy
+#| msgid "National identity number"
+msgid "Add national identity number"
+msgstr "números de identificación personal"
+
+#: eduiddashboard/templates/nins-form.jinja2:73
 #, python-format
 msgid ""
 "You can access to your associated inbox nin by clicking this <a "
@@ -426,7 +500,9 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
-msgid "Change your password"
+#, fuzzy
+#| msgid "Change your password"
+msgid "Change password"
 msgstr "Cambia tu contraseña"
 
 #: eduiddashboard/templates/permissions-form.jinja2:8
@@ -434,51 +510,55 @@ msgid "Available permissions for this user"
 msgstr ""
 
 #: eduiddashboard/templates/permissions-form.jinja2:16
-msgid "Your are editing your own permissions, Are you sure about your changes?"
+msgid "Are you sure you want to save your permission changes?"
 msgstr ""
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
-msgid "This is your personal info"
-msgstr "Esta es tu información personal"
+#: eduiddashboard/views/personal.py:42
+#, fuzzy
+#| msgid "Personal info"
+msgid "Personal information"
+msgstr "Información pesonal"
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:5
+#: eduiddashboard/templates/postaladdress-form.jinja2:4
+#, fuzzy
+#| msgid "Postal Address"
+msgid "Postal addresses"
+msgstr "Dirección Postal"
+
+#: eduiddashboard/templates/postaladdress-form.jinja2:6
 msgid ""
-"<p>You didn't have a official postal address, yet.\n"
-"    Don't worry about that, we are going to retrive it from the "
-"Government\n"
-"    Service whenever your NIN is verified</p>\n"
+"<p>Please enter your national identity number for automatic retrieval of "
+"your place of\n"
+"        residence from the Swedish population register.</p>\n"
 "    "
 msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:12
-#, fuzzy
-#| msgid "" "\n" "   <p>These list contain all your postal addresses registered
-#| in the\n" "   platform. You can change your preferred address by clicking in
-#| the " "radio\n" "   buttons.</p>\n" "   "
 msgid ""
 "\n"
-"    <p>These list contain all your postal addresses registered in the\n"
-"    platform. We use your official postal address to mail you.</p>\n"
+"    <p>Be aware that your postal address from the population register\n"
+"        will be used when sending letters by mail to you.</p>\n"
 "    "
 msgstr ""
-"<p>Esta lista contiene todos tus emails registrados in la \n"
-"   plataforma. Puedes cambiar tu correo preferido seleccionando en el "
-"botón\n"
-" circular</p>\n"
-"   <p>Recuerdia, si seleccionas un email no verificado como email "
-"preferido,\n"
-"   el nivel de confianza de la plataforma puede bajar.</p>\n"
-"   "
+
+#: eduiddashboard/templates/postaladdress-form.jinja2:27
+msgid "Type"
+msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:61
 msgid ""
-"There is no postal address registered. You can add alternatives\n"
-"        postal addresses element by clicking the button below."
+"Please add your place of residence by clicking on the button below or by "
+"adding your national\n"
+"        identity number to your profile for automated retrieval from the "
+"Swedish population register.\n"
+"    "
 msgstr ""
 
-#: eduiddashboard/templates/postaladdress-form.jinja2:69
+#: eduiddashboard/templates/postaladdress-form.jinja2:70
 #, fuzzy
-msgid "Add a new postal address"
+#| msgid "Add a new postal address"
+msgid "Add postal address"
 msgstr "Dirección Postal"
 
 #: eduiddashboard/templates/profile.jinja2:7
@@ -486,7 +566,9 @@ msgid "Profile filled"
 msgstr "Perfil completado"
 
 #: eduiddashboard/templates/profile.jinja2:13
-msgid "Your profile"
+#, fuzzy
+#| msgid "Your profile"
+msgid "Profile"
 msgstr "Su perfil de usuario"
 
 #: eduiddashboard/templates/profile.jinja2:15
@@ -495,19 +577,19 @@ msgid "Editing %(email)s user"
 msgstr "Editando el usuario %(email)s"
 
 #: eduiddashboard/templates/profile.jinja2:26
-msgid "Pending Actions"
-msgstr "Acciones Pendientes"
+#, fuzzy
+#| msgid "Your profile"
+msgid "Improve profile"
+msgstr "Su perfil de usuario"
+
+#: eduiddashboard/templates/profile.jinja2:74
+msgid "Lost your confirmation code?"
+msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:74
 #, fuzzy
-#| msgid "postal code"
-msgid "Lost the code?"
-msgstr "Dirección Postal"
-
-#: eduiddashboard/templates/profile.jinja2:74
-#, fuzzy
-#| msgid "Resend verification"
-msgid "Resend me the verification code"
+#| msgid "Resend me the verification code"
+msgid "Resend confirmation code"
 msgstr "Reenviar el email de verificación"
 
 #: eduiddashboard/templates/profile.jinja2:79
@@ -519,7 +601,9 @@ msgid "Warning!"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:111
-msgid "Something goes wrong. Please, try it later."
+msgid ""
+"An error has occurred, please try again or contact support if the problem"
+" persists."
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:118
@@ -527,49 +611,46 @@ msgid "Error!"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:118
-msgid "You haven't permissions to access that resource."
+msgid "Permission denied"
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-email.html.jinja2:1
 #, python-format
 msgid ""
 "\n"
-"<h2>Forgot your password, %(given_name)s?</h2>\n"
+"<h2>Dear %(given_name)s,</h2>\n"
 "\n"
-"<p><a href=\"%(site_url)s\">%(site_name)s</a> received a request for "
-"reseting your password for your %(email)s account.</p>\n"
+"<p>We are sending this email because we have received a request to reset "
+"the password for your\n"
+"<a href=\"%(site_url)s\">%(site_name)s</a> account %(email)s. If you did "
+"not initiate this request,\n"
+"you may simply disregard this email.\n"
+"</p>\n"
 "\n"
-"<p>To reset your password, click in the following link:</p>\n"
+"<p>Click on the following link to create a new password.</p>\n"
 "\n"
-"<a href=\"%(reset_password_link)s\">%(reset_password_link)s</a>\n"
+"<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
 "\n"
-"<p>If you still remember your password or you didn't request its reset, "
-"you can safely delete this email.</p>\n"
-"\n"
+"(This is an automated email. Please do not reply.)\n"
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-email.txt.jinja2:1
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "\n"
-"Forgot your password, %(given_name)s\n"
+"Dear %(given_name)s,\n"
 "\n"
-"We send you an email with a verification link because you has\n"
-"registered at %(site_name)s %(site_url)s.\n"
+"We are sending this email because we have received a request to reset the"
+" password for your\n"
+"%(site_name)s account %(email)s. If you did not initiate this request,\n"
+"you may simply disregard this email.\n"
 "\n"
-"Please, click on the follow link to verificate your email account.\n"
+"Click on the following link to create a new password.\n"
 "\n"
 "%(reset_password_link)s\n"
+"\n"
+"(This is an automated email. Please do not reply.)\n"
 msgstr ""
-"\n"
-"Bienvenido a %(site_name)s,\n"
-"\n"
-"Te enviamos este email de verificación porque te has \n"
-"registrado en %(site_name)s %(site_url)s.\n"
-"\n"
-"Por favor, haz click en el siguiente enlace para verificar tu email\n"
-"\n"
-"%(verification_link)s\n"
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
 msgid "http://www.swamid.se/assurance/al1"
@@ -584,79 +665,43 @@ msgid "http://www.swamid.se/assurance/al3"
 msgstr "AL 3"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
-#, fuzzy, python-format
-#| msgid "" "\n" "<h2>Welcome to %(site_name)s,</h2>\n" "\n" "<p>We send you an
-#| email with a verification link because you has\n" "registered at <a
-#| href=\"%(site_url)s\">%(site_name)s</a>.</p>\n" "\n" "<p>Please, click on
-#| the follow link to verificate your email account.</p>" "\n" "\n" "<a
-#| href=\"%(verification_link)s\">%(verification_link)s</a>\n"
+#, python-format
 msgid ""
 "\n"
-"<h2>Welcome to %(site_name)s,</h2>\n"
+"<p>Thank you for registering with <a "
+"href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
 "\n"
-"<p>We send you an email with a verification link because you has\n"
-"registered at <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"<p>To confirm that you own this email address, simply click on the "
+"following link:\n"
 "\n"
-"<p>Please, click on the follow link to verificate your email account.</p>"
+"<a href=\"%(verification_link)s\">%(verification_link)s</a></p>\n"
 "\n"
-"\n"
-"<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
-"\n"
-"<p>If the link doesn't, maybe your mail client has cut it. Then, you "
-"should\n"
-"go to your profile, go to the emails section, click on the verification "
-"icon\n"
-"next to the email you want to validate and insert the follow code:</code>"
-"\n"
+"<p>If clicking on the link above does not work, go to your profile and "
+"emails section. Click on the\n"
+"confirmation icon and enter the following code:</p>\n"
 "\n"
 "<p><strong>%(code)s</strong></p>\n"
 "\n"
 msgstr ""
-"\n"
-"<h2>Bienvenido a %(site_name)s,</h2>\n"
-"\n"
-"<p>Te enviamos este email de verificación porque te has \n"
-"registrado en <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
-"\n"
-"<p>Por favor, haz click en el siguiente enlace para verificar tu "
-"email</p>\n"
-"\n"
-"<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
 
 #: eduiddashboard/templates/verification_email.txt.jinja2:1
-#, fuzzy, python-format
-#| msgid "" "\n" "Welcome to %(site_name)s,\n" "\n" "We send you an email with
-#| a verification link because you has\n" "registered at %(site_name)s
-#| %(site_url)s.\n" "\n" "Please, click on the follow link to verificate your
-#| email account.\n" "\n" "%(verification_link)s\n"
+#, python-format
 msgid ""
 "\n"
-"Welcome to %(site_name)s,\n"
+"Thank you for registering with %(site_name)s.\n"
 "\n"
-"We send you an email with a verification link because you has\n"
-"registered at %(site_name)s %(site_url)s.\n"
-"\n"
-"Please, click on the follow link to verificate your email account.\n"
+"To confirm that you own this email address, simply click on the following"
+" link:\n"
 "\n"
 "%(verification_link)s\n"
 "\n"
-"If the link doesn't, maybe your mail client has cut it. Then, you should\n"
-"go to your profile, go to the emails section, click on the verification "
-"icon\n"
-"next to the email you want to validate and insert the follow code:\n"
+"If clicking on the link above does not work, go to your profile and "
+"emails section. Click on the\n"
+"verification icon and enter the following code:\n"
 "\n"
 "%(code)s\n"
 "\n"
 msgstr ""
-"\n"
-"Bienvenido a %(site_name)s,\n"
-"\n"
-"Te enviamos este email de verificación porque te has \n"
-"registrado en %(site_name)s %(site_url)s.\n"
-"\n"
-"Por favor, haz click en el siguiente enlace para verificar tu email\n"
-"\n"
-"%(verification_link)s\n"
 
 #: eduiddashboard/templates/wayf.jinja2:5
 msgid "Where are you from?"
@@ -674,112 +719,85 @@ msgstr ""
 msgid "The data has been verified"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:83 eduiddashboard/views/mobiles.py:73
-msgid "The confirmation code is not the one have been sent to your mobile phone"
+#: eduiddashboard/views/__init__.py:83
+msgid "Confirmation code is invalid"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:84
-msgid "Please revise your inbox and fill below with the given code"
+#: eduiddashboard/views/__init__.py:84 eduiddashboard/views/emails.py:65
+msgid "Check your email for further instructions"
 msgstr ""
-
-#: eduiddashboard/views/__init__.py:85
-#, fuzzy
-#| msgid "verification status"
-msgid "Verification code"
-msgstr "estado de verificación"
 
 #: eduiddashboard/views/__init__.py:86
-msgid "A new verification code has been sent"
+msgid "A new confirmation code has been sent to you"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:87
 msgid ""
-"The filled code has been expired. Please click in \"Resend me the "
-"verification code\" to get a new one"
+"The confirmation code has expired. Please click on \"Resend confirmation "
+"code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:22 eduiddashboard/views/emails.py:26
-msgid "You have to verificate some emails"
-msgstr "Tienes que verificar algunas direcciones de email"
+#: eduiddashboard/views/emails.py:22
+msgid "An email address is pending confirmation"
+msgstr ""
 
-#: eduiddashboard/views/emails.py:40
+#: eduiddashboard/views/emails.py:39
 msgid "Emails"
 msgstr "Emails"
 
-#: eduiddashboard/views/emails.py:55
+#: eduiddashboard/views/emails.py:54
 #, fuzzy
-#| msgid "Your email {email} was verified"
-msgid "The email {email} was verified"
+#| msgid "The email {email} was verified"
+msgid "Email {email} verified"
 msgstr "Tu email {email} fue verificado"
 
-#: eduiddashboard/views/emails.py:64
+#: eduiddashboard/views/emails.py:63
 #, fuzzy
-#| msgid "The email can't be found"
-msgid "The email has been verified"
+#| msgid "The email has been verified"
+msgid "Email address has been confirmed"
 msgstr "No se puede encontrar este email"
 
-#: eduiddashboard/views/emails.py:65 eduiddashboard/views/nins.py:115
-msgid "The confirmation code is not the one have been sent to your inbox"
+#: eduiddashboard/views/emails.py:64 eduiddashboard/views/nins.py:115
+msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:66
-msgid ""
-"Please revise your inbox and click the provided verification link or fill"
-" below with the given code"
-msgstr ""
-
-#: eduiddashboard/views/emails.py:67
 #, fuzzy
-#| msgid "Resend verification email"
-msgid "email verification code"
+#| msgid "email verification code"
+msgid "Email confirmation code"
 msgstr "Reenviar el email de verificación"
 
-#: eduiddashboard/views/emails.py:68
-msgid "A new verification code has been sent to your inbox"
+#: eduiddashboard/views/emails.py:67
+msgid "A new confirmation code has been sent to your email"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:85
-msgid "Your primary email was changed"
+#: eduiddashboard/views/emails.py:84
+msgid "Your primary email address was successfully changed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:92
-msgid "Error: You only have one email and this cannot be deleted"
+#: eduiddashboard/views/emails.py:91
+msgid "Error: You only have one email address and it cannot be removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:118
+#: eduiddashboard/views/emails.py:117
+msgid "Email address was successfully removed"
+msgstr ""
+
+#: eduiddashboard/views/emails.py:182 eduiddashboard/views/mobiles.py:160
+#: eduiddashboard/views/nins.py:218 eduiddashboard/views/personal.py:79
+msgid "Changes saved"
+msgstr ""
+
+#: eduiddashboard/views/emails.py:187
 msgid ""
-"One email has been removed, please, wait before your changes are "
-"distributed through all applications"
+"A confirmation email has been sent to your email address. Please enter "
+"your confirmation code <a href=\"#\" class=\"verifycode\" data-"
+"identifier=\"${id}\">here</a>."
 msgstr ""
-
-#: eduiddashboard/views/emails.py:185 eduiddashboard/views/mobiles.py:162
-#: eduiddashboard/views/nins.py:223 eduiddashboard/views/password.py:101
-#: eduiddashboard/views/permissions.py:52 eduiddashboard/views/personal.py:79
-#: eduiddashboard/views/postal_address.py:196
-msgid ""
-"Your changes was saved, please, wait before your changes are distributed "
-"through all applications"
-msgstr ""
-"Tus cambios han sido guardados. Por favor, espera a que se distribuyan a "
-"todaslas aplicaciones"
-
-#: eduiddashboard/views/emails.py:192
-msgid ""
-"A verification email has been sent to your new account. Please revise "
-"your inbox and click on the provided link or fill the code in the <a "
-"href=# class=\"verifycode\" data-identifier=\"${id}\">verification "
-"form</a>"
-msgstr ""
-
-#: eduiddashboard/views/mobiles.py:24
-#, fuzzy
-msgid "You have to add a mobile phone"
-msgstr "Tienes que añadir tu número de identificación personal"
 
 #: eduiddashboard/views/mobiles.py:28
-#, fuzzy
-msgid "You have to verificate some mobile phone"
-msgstr "Tienes que verificar algunas direcciones de email"
+msgid "A mobile phone number is pending confirmation"
+msgstr ""
 
 #: eduiddashboard/views/mobiles.py:44
 #, fuzzy
@@ -787,141 +805,149 @@ msgid "Mobiles"
 msgstr "Emails"
 
 #: eduiddashboard/views/mobiles.py:52
-msgid "The confirmation code for mobile ${mobile_number} is ${code}"
+msgid ""
+"The confirmation code for your mobile phone number ${mobile_number} is "
+"${code}"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:72
-msgid "The mobile phone has been verified"
+#, fuzzy
+#| msgid "The email has been verified"
+msgid "The mobile phone number has been verified"
+msgstr "No se puede encontrar este email"
+
+#: eduiddashboard/views/mobiles.py:73 eduiddashboard/views/postal_address.py:70
+msgid ""
+"The confirmation code used is invalid, please try again or request a new "
+"code"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:74
-msgid "Please revise your SMS inbox and fill below with the given code"
+msgid "A confirmation code has been sent your mobile phone number"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:75
 #, fuzzy
-#| msgid "Add a new mobile phone"
 msgid "Mobile phone code"
 msgstr "Añadir un nuevo email"
 
 #: eduiddashboard/views/mobiles.py:76
-msgid "A new verification code has been sent to your mobile number"
+msgid "A new confirmation code has been sent to your mobile number"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:102
-#, fuzzy
-msgid ""
-"One mobile has been removed, please, wait before your changes are "
-"distributed through all applications"
-msgstr ""
-"Tus cambios han sido guardados. Por favor, espera a que se distribuyan a "
-"todaslas aplicaciones"
-
-#: eduiddashboard/views/mobiles.py:166
-msgid ""
-"A verification number has been sent to your mobile. Please revise your "
-"SMS inbox and <a href=\"#\" class=\"verifycode\" data-"
-"identifier=\"${identifier}\">fill here</a> with the given code"
+msgid "Mobile phone number was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:36 eduiddashboard/views/nins.py:42
-msgid "You have to add your NIN number"
-msgstr "Tienes que añadir tu número de identificación personal"
+#: eduiddashboard/views/mobiles.py:162
+msgid ""
+"A confirmation code has been sent to your mobile phone. Please enter your"
+" confirmation code <a href=\"#\" class=\"verifycode\" data-"
+"identifier=\"${identifier}\">here</a>"
+msgstr ""
 
 #: eduiddashboard/views/nins.py:38
-msgid "You must validate your NIN number"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:104
 #, fuzzy
-msgid "National identity number"
+#| msgid "National identity number"
+msgid "Validation required for national identity number"
 msgstr "números de identificación personal"
 
 #: eduiddashboard/views/nins.py:114
-msgid "The nin number has been verified"
+#, fuzzy
+#| msgid "National identity number"
+msgid "National identity number verified"
+msgstr "números de identificación personal"
+
+#: eduiddashboard/views/nins.py:116
+msgid "A confirmation code has been sent to your govt mailbox"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:117
-msgid "Please revise your NIN inbox and fill below with the given code"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:119
 #, fuzzy
-#| msgid "Resend verification"
-msgid "NIN verification code"
-msgstr "Reenviar el email de verificación"
+#| msgid "National identity number"
+msgid "National identity number confirmation code"
+msgstr "números de identificación personal"
 
-#: eduiddashboard/views/nins.py:120
-msgid "A new verification code has been sent to your NIN inbox"
+#: eduiddashboard/views/nins.py:118
+msgid "A new confirmation code has been sent to your govt mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:133
+#: eduiddashboard/views/nins.py:130
 msgid "The provided nin can't be verified. You only can verify the last one"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:162
+#: eduiddashboard/views/nins.py:159
 #, fuzzy
-msgid ""
-"The nin has been removed, please, wait before your changes are "
-"distributed through all applications"
-msgstr ""
-"Tus cambios han sido guardados. Por favor, espera a que se distribuyan a "
-"todaslas aplicaciones"
+#| msgid "National identity number"
+msgid "National identity number has been removed"
+msgstr "números de identificación personal"
 
-#. Default: id
-#: eduiddashboard/views/nins.py:234
+#: eduiddashboard/views/nins.py:227
 msgid ""
-"A verification message has been sent to your Govt Inbox. Please revise "
-"your <a href=${nin_link}> nin inbox</a>, return to .this page and <a "
-"href=\"#\" class=\"verifycode\" data-identifier=\"${id}\">fill here</a> "
-"the providedverification number"
+"A confirmation code has been sent to your govt inbox. Please enter your "
+"confirmation code <a href=\"#\" class=\"verifycode\" data-"
+"identifier=\"${id}\">here</a>."
 msgstr ""
 
 #: eduiddashboard/views/password.py:59
 msgid "Reset your password in {site_name}"
 msgstr ""
 
-#: eduiddashboard/views/password.py:106 eduiddashboard/views/password.py:191
-msgid ""
-"Credentials has not been added for some reason. Please contact with the "
-"system administrator."
+#: eduiddashboard/views/password.py:101
+msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/password.py:148
+#: eduiddashboard/views/password.py:104
+msgid ""
+"An error has occured while updating your password, please try again or "
+"contact support if the problem persists."
+msgstr ""
+
+#: eduiddashboard/views/password.py:146
 #, fuzzy
 msgid "Forgot your password?"
 msgstr "Cambia tu contraseña"
 
-#: eduiddashboard/views/password.py:154
+#: eduiddashboard/views/password.py:152
 msgid ""
-"An email has been sent to you with the instructions to reset your "
-"password."
+"An email has been sent to the address you entered.This email will contain"
+" instructions and a linkthat will let you reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:157
-msgid "Now you can follow the email instructions and close this window safely."
+#: eduiddashboard/views/password.py:156
+msgid ""
+"Please read the email sent to you for further instructions. This window "
+"can now safely be closed."
 msgstr ""
 
-#: eduiddashboard/views/password.py:171
+#: eduiddashboard/views/password.py:170
 #, fuzzy
-msgid "Finish your password reset"
+#| msgid "Finish your password reset"
+msgid "Complete your password reset"
 msgstr "Cambia tu contraseña"
 
-#: eduiddashboard/views/password.py:189
+#: eduiddashboard/views/password.py:188
 msgid "Password has been reset successfully"
 msgstr ""
 
-#: eduiddashboard/views/password.py:194
-msgid "You can log in the <a href=\"${homelink}\">home page</a>"
+#: eduiddashboard/views/password.py:190
+msgid ""
+"An error has occured while updating your password,please try again or "
+"contact support if the problem persists."
+msgstr ""
+
+#: eduiddashboard/views/password.py:193
+msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr ""
 
 #: eduiddashboard/views/permissions.py:14
 msgid "Permissions"
 msgstr ""
 
-#: eduiddashboard/views/personal.py:42
-msgid "Personal info"
-msgstr "Información pesonal"
+#: eduiddashboard/views/permissions.py:52
+#: eduiddashboard/views/postal_address.py:194
+msgid "Changes saved."
+msgstr ""
 
 #: eduiddashboard/views/postal_address.py:45
 msgid "Postal Address"
@@ -931,20 +957,16 @@ msgstr "Dirección Postal"
 msgid "The postal address has been verified"
 msgstr ""
 
-#: eduiddashboard/views/postal_address.py:70
-msgid "The confirmation code is not the one have been sent to your postal mailbox"
-msgstr ""
-
 #: eduiddashboard/views/postal_address.py:71
 msgid "Please revise your postal mailbox and fill below with the given code"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:72
-msgid "Postal address verification code"
+msgid "Postal address confirmation code"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:73
-msgid "A new verification code has been sent to your postal mailbox"
+msgid "A new confirmation code has been sent to your postal mailbox"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:80
@@ -952,17 +974,12 @@ msgid "The confirmation code for your postal address is ${code}"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:106
-msgid "Your preferred address was changed"
+msgid "Your postal address was successfully updated"
 msgstr ""
 
 #: eduiddashboard/views/postal_address.py:128
-#, fuzzy
-msgid ""
-"One address has been removed, please, wait before your changes are "
-"distributed through all applications"
+msgid "Postal address was successfully removed."
 msgstr ""
-"Tus cambios han sido guardados. Por favor, espera a que se distribuyan a "
-"todaslas aplicaciones"
 
 #~ msgid "active"
 #~ msgstr "activo"
@@ -1024,36 +1041,449 @@ msgstr ""
 #~ msgid "You are in level <span class=\"level\">%(loa)s</span>"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "A new verification email has been "
-#~ "sent to your account. Please revise "
-#~ "your inbox and click on the "
-#~ "provided link"
+#~ msgid "You have to add a postal address"
 #~ msgstr ""
+
+#~ msgid "A url link to your personal avatar"
+#~ msgstr "Un enlace a tu avatar"
+
+#~ msgid "locality"
+#~ msgstr ""
+
+#~ msgid "country"
+#~ msgstr ""
+
+#~ msgid "Old password do not match"
+#~ msgstr "El password actual no coincide"
+
+#~ msgid "\"${val}\" has to be more than ${len} characters length"
+#~ msgstr "\"${val}\" debe tener más de ${len} caracteres"
+
+#~ msgid "eduID Dashboard"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<p>These list contain all your emails registered in the\n"
+#~ "   platform. You can change your "
+#~ "preferred email by clicking in the "
+#~ "radio\n"
+#~ "   buttons.</p>\n"
+#~ "   <p>Remember, if you select a not verified email as your primary\n"
+#~ "   email, your level of assurance must be decreased.</p>\n"
+#~ "   "
+#~ msgstr ""
+#~ "<p>Esta lista contiene todos tus emails registrados in la \n"
+#~ "   plataforma. Puedes cambiar tu correo"
+#~ " preferido seleccionando en el botón\n"
+#~ ""
+#~ " circular</p>\n"
+#~ "   <p>Recuerdia, si seleccionas un email"
+#~ " no verificado como email preferido,\n"
+#~ ""
+#~ "   el nivel de confianza de la plataforma puede bajar.</p>\n"
+#~ "   "
+
+#~ msgid "preferred"
+#~ msgstr "preferido"
+
+#~ msgid "verification status"
+#~ msgstr "estado de verificación"
+
+#~ msgid "remove"
+#~ msgstr "eliminar"
+
+#~ msgid "Remove this email"
+#~ msgstr "Eliminar este email"
+
+#~ msgid ""
+#~ "There is no content created. You "
+#~ "can add first element by clicking "
+#~ "the button below"
+#~ msgstr ""
+
+#~ msgid "Add a new email"
+#~ msgstr "Añadir un nuevo email"
+
+#~ msgid ""
+#~ "\n"
+#~ "   <p>These list contain all your mobile phones registered in the\n"
+#~ "   platform.</p>\n"
+#~ "   "
+#~ msgstr ""
+
+#~ msgid "Add a new mobile phone"
+#~ msgstr "Añadir un nuevo email"
+
+#~ msgid ""
+#~ "<p>This list contain all your National Identity Numbers\n"
+#~ "   (NIN) registered in the platform.</p>\n"
+#~ "   "
+#~ msgstr ""
+
+#~ msgid "Can't verify an old NIN"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "There is no nin registered. You "
+#~ "can add the first item by clicking"
+#~ " the button below"
+#~ msgstr ""
+
+#~ msgid "Add a new National Identity Number"
+#~ msgstr "números de identificación personal"
+
+#~ msgid "Your are editing your own permissions, Are you sure about your changes?"
+#~ msgstr ""
+
+#~ msgid "This is your personal info"
+#~ msgstr "Esta es tu información personal"
+
+#~ msgid ""
+#~ "<p>You didn't have a official postal address, yet.\n"
+#~ "    Don't worry about that, we are"
+#~ " going to retrive it from the "
+#~ "Government\n"
+#~ "    Service whenever your NIN is verified</p>\n"
+#~ "    "
+#~ msgstr ""
+
+# | msgid "" "\n" "   <p>These list contain all your postal addresses
+# registered
+# | in the\n" "   platform. You can change your preferred address by clicking
+# in
+# | the " "radio\n" "   buttons.</p>\n" "   "
+#~ msgid ""
+#~ "\n"
+#~ "    <p>These list contain all your postal addresses registered in the\n"
+#~ "    platform. We use your official postal address to mail you.</p>\n"
+#~ "    "
+#~ msgstr ""
+#~ "<p>Esta lista contiene todos tus emails registrados in la \n"
+#~ "   plataforma. Puedes cambiar tu correo"
+#~ " preferido seleccionando en el botón\n"
+#~ ""
+#~ " circular</p>\n"
+#~ "   <p>Recuerdia, si seleccionas un email"
+#~ " no verificado como email preferido,\n"
+#~ ""
+#~ "   el nivel de confianza de la plataforma puede bajar.</p>\n"
+#~ "   "
+
+#~ msgid ""
+#~ "There is no postal address registered. You can add alternatives\n"
+#~ "        postal addresses element by clicking the button below."
+#~ msgstr ""
+
+#~ msgid "Pending Actions"
+#~ msgstr "Acciones Pendientes"
+
+# | msgid "postal code"
+#~ msgid "Lost the code?"
+#~ msgstr "Dirección Postal"
+
+#~ msgid "Something goes wrong. Please, try it later."
+#~ msgstr ""
+
+#~ msgid "You haven't permissions to access that resource."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "<h2>Forgot your password, %(given_name)s?</h2>\n"
+#~ "\n"
+#~ "<p><a href=\"%(site_url)s\">%(site_name)s</a> received "
+#~ "a request for reseting your password "
+#~ "for your %(email)s account.</p>\n"
+#~ "\n"
+#~ "<p>To reset your password, click in the following link:</p>\n"
+#~ "\n"
+#~ "<a href=\"%(reset_password_link)s\">%(reset_password_link)s</a>\n"
+#~ "\n"
+#~ "<p>If you still remember your password"
+#~ " or you didn't request its reset, "
+#~ "you can safely delete this email.</p>"
+#~ "\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "Forgot your password, %(given_name)s\n"
+#~ "\n"
+#~ "We send you an email with a verification link because you has\n"
+#~ "registered at %(site_name)s %(site_url)s.\n"
+#~ "\n"
+#~ "Please, click on the follow link to verificate your email account.\n"
+#~ "\n"
+#~ "%(reset_password_link)s\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Bienvenido a %(site_name)s,\n"
+#~ "\n"
+#~ "Te enviamos este email de verificación porque te has \n"
+#~ "registrado en %(site_name)s %(site_url)s.\n"
+#~ "\n"
+#~ "Por favor, haz click en el siguiente enlace para verificar tu email\n"
+#~ "\n"
+#~ "%(verification_link)s\n"
+
+# | msgid "" "\n" "<h2>Welcome to %(site_name)s,</h2>\n" "\n" "<p>We send you
+# an
+# | email with a verification link because you has\n" "registered at <a
+# | href=\"%(site_url)s\">%(site_name)s</a>.</p>\n" "\n" "<p>Please, click on
+# | the follow link to verificate your email account.</p>" "\n" "\n" "<a
+# | href=\"%(verification_link)s\">%(verification_link)s</a>\n"
+#~ msgid ""
+#~ "\n"
+#~ "<h2>Welcome to %(site_name)s,</h2>\n"
+#~ "\n"
+#~ "<p>We send you an email with a verification link because you has\n"
+#~ "registered at <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+#~ "\n"
+#~ "<p>Please, click on the follow link "
+#~ "to verificate your email account.</p>\n"
+#~ "\n"
+#~ "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
+#~ "\n"
+#~ "<p>If the link doesn't, maybe your "
+#~ "mail client has cut it. Then, you"
+#~ " should\n"
+#~ "go to your profile, go to the "
+#~ "emails section, click on the "
+#~ "verification icon\n"
+#~ "next to the email you want to "
+#~ "validate and insert the follow "
+#~ "code:</code>\n"
+#~ "\n"
+#~ "<p><strong>%(code)s</strong></p>\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "<h2>Bienvenido a %(site_name)s,</h2>\n"
+#~ "\n"
+#~ "<p>Te enviamos este email de verificación porque te has \n"
+#~ "registrado en <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+#~ "\n"
+#~ "<p>Por favor, haz click en el "
+#~ "siguiente enlace para verificar tu "
+#~ "email</p>\n"
+#~ "\n"
+#~ "<a href=\"%(verification_link)s\">%(verification_link)s</a>\n"
+
+# | msgid "" "\n" "Welcome to %(site_name)s,\n" "\n" "We send you an email
+# with
+# | a verification link because you has\n" "registered at %(site_name)s
+# | %(site_url)s.\n" "\n" "Please, click on the follow link to verificate your
+# | email account.\n" "\n" "%(verification_link)s\n"
+#~ msgid ""
+#~ "\n"
+#~ "Welcome to %(site_name)s,\n"
+#~ "\n"
+#~ "We send you an email with a verification link because you has\n"
+#~ "registered at %(site_name)s %(site_url)s.\n"
+#~ "\n"
+#~ "Please, click on the follow link to verificate your email account.\n"
+#~ "\n"
+#~ "%(verification_link)s\n"
+#~ "\n"
+#~ "If the link doesn't, maybe your "
+#~ "mail client has cut it. Then, you"
+#~ " should\n"
+#~ "go to your profile, go to the "
+#~ "emails section, click on the "
+#~ "verification icon\n"
+#~ "next to the email you want to validate and insert the follow code:\n"
+#~ "\n"
+#~ "%(code)s\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Bienvenido a %(site_name)s,\n"
+#~ "\n"
+#~ "Te enviamos este email de verificación porque te has \n"
+#~ "registrado en %(site_name)s %(site_url)s.\n"
+#~ "\n"
+#~ "Por favor, haz click en el siguiente enlace para verificar tu email\n"
+#~ "\n"
+#~ "%(verification_link)s\n"
+
+#~ msgid ""
+#~ "The confirmation code is not the "
+#~ "one have been sent to your mobile"
+#~ " phone"
+#~ msgstr ""
+
+#~ msgid "Please revise your inbox and fill below with the given code"
+#~ msgstr ""
+
+#~ msgid "A new verification code has been sent"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The filled code has been expired. "
+#~ "Please click in \"Resend me the "
+#~ "verification code\" to get a new "
+#~ "one"
+#~ msgstr ""
+
+#~ msgid "You have to verificate some emails"
+#~ msgstr "Tienes que verificar algunas direcciones de email"
+
+#~ msgid "The confirmation code is not the one have been sent to your inbox"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Please revise your inbox and click "
+#~ "the provided verification link or fill"
+#~ " below with the given code"
+#~ msgstr ""
+
+#~ msgid "A new verification code has been sent to your inbox"
+#~ msgstr ""
+
+#~ msgid "Your primary email was changed"
+#~ msgstr ""
+
+#~ msgid "Error: You only have one email and this cannot be deleted"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "One email has been removed, please, "
+#~ "wait before your changes are distributed"
+#~ " through all applications"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Your changes was saved, please, wait "
+#~ "before your changes are distributed "
+#~ "through all applications"
+#~ msgstr ""
+#~ "Tus cambios han sido guardados. Por "
+#~ "favor, espera a que se distribuyan "
+#~ "a todaslas aplicaciones"
 
 #~ msgid ""
 #~ "A verification email has been sent "
 #~ "to your new account. Please revise "
 #~ "your inbox and click on the "
-#~ "provided link"
+#~ "provided link or fill the code in"
+#~ " the <a href=# class=\"verifycode\" "
+#~ "data-identifier=\"${id}\">verification form</a>"
+#~ msgstr ""
+
+#~ msgid "You have to add a mobile phone"
+#~ msgstr "Tienes que añadir tu número de identificación personal"
+
+#~ msgid "You have to verificate some mobile phone"
+#~ msgstr "Tienes que verificar algunas direcciones de email"
+
+#~ msgid "The confirmation code for mobile ${mobile_number} is ${code}"
+#~ msgstr ""
+
+#~ msgid "The mobile phone has been verified"
+#~ msgstr ""
+
+#~ msgid "Please revise your SMS inbox and fill below with the given code"
+#~ msgstr ""
+
+#~ msgid "A new verification code has been sent to your mobile number"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "This norEduPersonNIN has been verified "
-#~ "by someone else in his profile, so"
-#~ " then, you can't verify it as "
-#~ "yours. Please, contact with technical "
-#~ "support"
+#~ "One mobile has been removed, please, "
+#~ "wait before your changes are distributed"
+#~ " through all applications"
 #~ msgstr ""
+#~ "Tus cambios han sido guardados. Por "
+#~ "favor, espera a que se distribuyan "
+#~ "a todaslas aplicaciones"
+
+#~ msgid ""
+#~ "A verification number has been sent "
+#~ "to your mobile. Please revise your "
+#~ "SMS inbox and <a href=\"#\" "
+#~ "class=\"verifycode\" data-"
+#~ "identifier=\"${identifier}\">fill here</a> with the"
+#~ " given code"
+#~ msgstr ""
+
+#~ msgid "You have to add your NIN number"
+#~ msgstr "Tienes que añadir tu número de identificación personal"
+
+#~ msgid "You must validate your NIN number"
+#~ msgstr ""
+
+#~ msgid "The nin number has been verified"
+#~ msgstr ""
+
+#~ msgid "Please revise your NIN inbox and fill below with the given code"
+#~ msgstr ""
+
+# | msgid "Resend verification"
+#~ msgid "NIN verification code"
+#~ msgstr "Reenviar el email de verificación"
+
+#~ msgid "A new verification code has been sent to your NIN inbox"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The nin has been removed, please, "
+#~ "wait before your changes are distributed"
+#~ " through all applications"
+#~ msgstr ""
+#~ "Tus cambios han sido guardados. Por "
+#~ "favor, espera a que se distribuyan "
+#~ "a todaslas aplicaciones"
 
 #~ msgid ""
 #~ "A verification message has been sent "
 #~ "to your Govt Inbox. Please revise "
-#~ "your inbox and return to this page"
-#~ " to enter the provided verification "
-#~ "number"
+#~ "your <a href=${nin_link}> nin inbox</a>, "
+#~ "return to .this page and <a "
+#~ "href=\"#\" class=\"verifycode\" data-"
+#~ "identifier=\"${id}\">fill here</a> the "
+#~ "providedverification number"
 #~ msgstr ""
 
-#~ msgid "You have to add a postal address"
+#~ msgid ""
+#~ "Credentials has not been added for "
+#~ "some reason. Please contact with the "
+#~ "system administrator."
 #~ msgstr ""
+
+#~ msgid ""
+#~ "An email has been sent to you "
+#~ "with the instructions to reset your "
+#~ "password."
+#~ msgstr ""
+
+#~ msgid "Now you can follow the email instructions and close this window safely."
+#~ msgstr ""
+
+#~ msgid "You can log in the <a href=\"${homelink}\">home page</a>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The confirmation code is not the "
+#~ "one have been sent to your postal"
+#~ " mailbox"
+#~ msgstr ""
+
+#~ msgid "Postal address verification code"
+#~ msgstr ""
+
+#~ msgid "A new verification code has been sent to your postal mailbox"
+#~ msgstr ""
+
+#~ msgid "Your preferred address was changed"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "One address has been removed, please,"
+#~ " wait before your changes are "
+#~ "distributed through all applications"
+#~ msgstr ""
+#~ "Tus cambios han sido guardados. Por "
+#~ "favor, espera a que se distribuyan "
+#~ "a todaslas aplicaciones"
 
