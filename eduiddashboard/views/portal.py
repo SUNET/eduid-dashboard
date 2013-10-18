@@ -16,6 +16,9 @@ from eduiddashboard.utils import (verify_auth_token,
 
 from eduiddashboard.models import UserSearcher
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 @view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
              request_method='GET', permission='edit')
@@ -140,11 +143,13 @@ def help(request):
 def token_login(context, request):
     email = request.POST.get('email')
     token = request.POST.get('token')
+    nonce = request.POST.get('nonce')
+    timestamp = request.POST.get('ts')
     shared_key = request.registry.settings.get('auth_shared_secret')
 
     next_url = request.POST.get('next_url', '/')
 
-    if verify_auth_token(shared_key, email, token):
+    if verify_auth_token(shared_key, email, token, nonce, timestamp):
         # Do the auth
         user = request.userdb.get_user(email)
         request.session['mail'] = email
@@ -153,5 +158,6 @@ def token_login(context, request):
         remember_headers = remember(request, email)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
+        logger.info("Token authentication failed (email: {!r})".format(email))
         # Show and error, the user can't be logged
         return HTTPBadRequest()

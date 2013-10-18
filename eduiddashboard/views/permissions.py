@@ -49,7 +49,4 @@ class PermissionsView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
-                                   queue='forms')
+        self.request.session.flash(_('Changes saved.'), queue='forms')

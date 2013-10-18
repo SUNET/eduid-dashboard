@@ -19,14 +19,13 @@ def get_status(user):
     pending_actions = None
     for email in user.get('mailAliases', []):
         if not email['verified']:
-            pending_actions = _('You have to verificate some emails')
+            pending_actions = _('An email address is pending confirmation')
             break
 
     if pending_actions:
-        msg = _('You have to verificate some emails')
         return {
             'icon': get_icon_string('warning-sign'),
-            'pending_actions': msg,
+            'pending_actions': pending_actions,
             'completed': (0, 1),
         }
     return {
@@ -52,7 +51,7 @@ def mark_as_verified_email(request, user, verified_email):
         new_emails.append(email)
 
     user.update(new_emails)
-    request.session.flash(_('The email {email} was verified').format(email=verified_email),
+    request.session.flash(_('Email {email} verified').format(email=verified_email),
                           queue='forms')
 
 
@@ -61,11 +60,11 @@ class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
     verify_messages = {
-        'ok': _('The email has been verified'),
-        'error': _('The confirmation code is not the one have been sent to your inbox'),
-        'request': _('Please revise your inbox and click the provided verification link or fill below with the given code'),
-        'placeholder': _('email verification code'),
-        'new_code_sent': _('A new verification code has been sent to your inbox'),
+        'ok': _('Email address has been confirmed'),
+        'error': _('The confirmation code is invalid, please try again or request a new code'),
+        'request': _('Check your email for further instructions'),
+        'placeholder': _('Email confirmation code'),
+        'new_code_sent': _('A new confirmation code has been sent to your email'),
     }
 
     def setprimary_action(self, index, post_data):
@@ -82,14 +81,14 @@ class EmailsActionsView(BaseActionsView):
         }, safe=True)
 
         self.context.propagate_user_changes(self.user)
-        return {'result': 'ok', 'message': _('Your primary email was changed')}
+        return {'result': 'ok', 'message': _('Your primary email address was successfully changed')}
 
     def remove_action(self, index, post_data):
         emails = self.user['mailAliases']
         if len(emails) == 1:
             return {
                 'result': 'error',
-                'message': _('Error: You only have one email and this cannot be deleted'),
+                'message': _('Error: You only have one email address and it cannot be removed'),
             }
         remove_email = emails[index]['email']
         emails.remove(emails[index])
@@ -115,9 +114,7 @@ class EmailsActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('One email has been removed, please, wait'
-                         ' before your changes are distributed '
-                         'through all applications'),
+            'message': _('Email address was successfully removed'),
         }
 
     def get_verification_data_id(self, data_to_verify):
@@ -182,18 +179,12 @@ class EmailsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
         send_verification_mail(self.request, newemail['mail'])
 
-        self.request.session.flash(_('A verification email has been sent '
-                                     'to your new account. Please revise your '
-                                     'inbox and click on the provided link or '
-                                     'fill the code in the <a href=# '
-                                     'class="verifycode" data-identifier="${id}">'
-                                     'verification form</a>',
+        self.request.session.flash(_('A confirmation email has been sent to your email address. '
+                                     'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${id}">here</a>.',
                                      mapping={'id': len(emails)}),
                                    queue='forms')

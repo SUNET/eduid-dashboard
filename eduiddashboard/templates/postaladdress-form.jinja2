@@ -1,17 +1,17 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
+  <h4>{% trans %}Postal addresses{% endtrans %}</h4>
   {% if not contains_official_postal_address %}
-    {% trans %}<p>You didn't have a official postal address, yet.
-    Don't worry about that, we are going to retrive it from the Government
-    Service whenever your NIN is verified</p>
+    {% trans %}<p>Please enter your national identity number for automatic retrieval of your place of
+        residence from the Swedish population register.</p>
     {% endtrans %}
   {% endif %}
 
   {% if postal_addresses %}
     {% trans %}
-    <p>These list contain all your postal addresses registered in the
-    platform. We use your official postal address to mail you.</p>
+    <p>Be aware that your postal address from the population register
+        will be used when sending letters by mail to you.</p>
     {% endtrans %}
   {% endif %}
 {% endblock %}
@@ -24,11 +24,11 @@
   <table class='table table-striped table-thin postal-addresses'>
     <thead>
       <tr>
-        <th>{{_("type")}}</th>
-        <th>{{_("address")}}</th>
-        <th>{{_("locality")}}</th>
-        <th>{{_("country")}}</th>
-        <th>{{_("remove")}}</th>
+        <th>{{_("Type")}}</th>
+        <th>{{_("Address")}}</th>
+        <th>{{_("City")}}</th>
+        <th>{{_("Country")}}</th>
+        <th>{{_("Remove")}}</th>
       </tr>
     </thead>
 
@@ -45,7 +45,7 @@
       {% if address.type != 'official' %}
         <td>
           <label>
-            <i class='icon-remove' title='{{_("Remove this postal address")}}'></i>
+            <i class='icon-remove' title='{{_("Remove postal address")}}'></i>
             <input class='hide' type='radio' name='remove' value='{{ loop.index0 }}'>
           </label>
         </td>
@@ -58,15 +58,16 @@
   </table>
 
   {% else %}
-    <p>{% trans %}There is no postal address registered. You can add alternatives
-        postal addresses element by clicking the button below.{% endtrans %}</p>
+    <p>{% trans %}Please add your place of residence by clicking on the button below or by adding your national
+        identity number to your profile for automated retrieval from the Swedish population register.
+    {% endtrans %}</p>
   {% endif %}
 
   <button type='button'
           class='btn add-new' 
           data-toggle='button'>
         <i class='icon-plus'></i>
-        {{_('Add a new postal address')}}</button>
+        {{_('Add postal address')}}</button>
 {% endblock %}
 
 {% block form_generic_form %}

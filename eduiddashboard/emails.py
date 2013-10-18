@@ -30,7 +30,7 @@ def send_verification_mail(request, email, code=None):
     }
 
     message = Message(
-        subject=_("{site_name} verification email").format(
+        subject=_("{site_name} confirmation email").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
         recipients=[email],

@@ -1,10 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   {% trans %}
-   <p>These list contain all your mobile phones registered in the
-   platform.</p>
-   {% endtrans %}
+   <h4>{% trans %}Mobile phone numbers{% endtrans %}</h4>
 {% endblock %}
 
 {% block extra_content %}
@@ -15,9 +12,9 @@
   <table class='table table-striped table-thin mobiles'>
     <thead>
       <tr>
-        <th>{{_("phone")}}</th>
-        <th>{{_("verification status")}}</th>
-        <th>{{_("remove")}}</th>
+        <th>{{_("Phone")}}</th>
+        <th>{{_("Verified")}}</th>
+        <th>{{_("Remove")}}</th>
       </tr>
     </thead>
 
@@ -31,14 +28,14 @@
       {% else %}
         <td>
           <label>
-            <i class='icon-question-sign' title='{{_("Verify code")}}'></i>
+            <i class='icon-question-sign' title='{{_("Confirmation code")}}'></i>
             <input class='hide' type='radio' name='verify' value='{{ loop.index0 }}'>
           </label>
         </td>
       {% endif %}
         <td>
           <label>
-            <i class='icon-remove' title='{{_("Remove this postal address")}}'></i>
+            <i class='icon-remove' title='{{_("Remove postal address")}}'></i>
             <input class='hide' type='radio' name='remove' value='{{ loop.index0 }}'>
           </label>
         </td>
@@ -47,14 +44,14 @@
   </table>
 
   {% else %}
-    <p>{% trans %}There is no content created. You can add first element by clicking the button below{% endtrans %}</p>
+    <p>{% trans %}Add a mobile phone number by clicking on the button below.{% endtrans %}</p>
   {% endif %}
 
   <button type='button'
           class='btn add-new' 
           data-toggle='button'>
         <i class='icon-plus'></i>
-        {{_('Add a new mobile phone')}}</button>
+        {{_('Add mobile phone number')}}</button>
 {% endblock %}
 
 {% block form_generic_form %}

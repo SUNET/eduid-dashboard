@@ -39,7 +39,7 @@ def get_status(user):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('Personal info'),
+        'label': _('Personal information'),
         'id': 'personaldata',
     }
 
@@ -76,9 +76,7 @@ class PersonalDataView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
         if new_preferred_language != old_preferred_language:

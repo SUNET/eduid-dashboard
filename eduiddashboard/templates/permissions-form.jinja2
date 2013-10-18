@@ -13,7 +13,7 @@
 <script>
   if ($('#{{ formname }}-form').length > 0) {
       window.beforeSubmit = function (arr, $form, options) {
-          var q=confirm("{{_('Your are editing your own permissions, Are you sure about your changes?')}}");
+          var q=confirm("{{_('Are you sure you want to save your permission changes?')}}");
           if (!q) {
             return false
           }

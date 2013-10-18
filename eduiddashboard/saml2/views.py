@@ -1,5 +1,3 @@
-import logging
-
 from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
@@ -15,6 +13,7 @@ from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login
 from eduiddashboard.saml2.cache import IdentityCache, OutstandingQueriesCache
 
+import logging
 logger = logging.getLogger(__name__)
 
 
@@ -28,10 +27,26 @@ def _get_subject_id(session):
 
 @forbidden_view_config()
 @view_config(route_name='saml2-forbidden-view')
-def forbidden_view(request):
-    # do not allow a user to login if they are already logged in
-    if authenticated_userid(request):
+def forbidden_view(context, request):
+    """
+    View to trap all Forbidden errors and redirect any not logged in users to the login page.
+
+    For logged in users, a template is rendered - this template probably won't be seen
+    by the user though since there is Javascript handling 401 errors from form posts
+    showing a small pop-up error message instead.
+    :param context: Some object like HTTPForbidden()
+    :param request: Request() object
+    :return:
+    """
+    user = authenticated_userid(request)
+    if user:
         # Return a plain forbbiden page
+        try:
+            reason = context.explanation
+        except AttributeError:
+            reason = 'unknown'
+        logger.debug("User {!r} tripped Forbidden view, request {!r}, reason {!r}".format(
+            user, request, reason))
         response = Response(render('templates/forbidden.jinja2', {}))
         response.status_int = 401
         return response

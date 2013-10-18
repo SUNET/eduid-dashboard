@@ -3,18 +3,14 @@
 </head>
 <body>
 {% trans verification_link=verification_link, site_url=site_url, site_name=site_name %}
-<h2>Welcome to {{ site_name }},</h2>
+<p>Thank you for registering with <a href="{{ site_url }}">{{ site_name }}</a>.</p>
 
-<p>We send you an email with a verification link because you has
-registered at <a href="{{ site_url }}">{{ site_name }}</a>.</p>
+<p>To confirm that you own this email address, simply click on the following link:
 
-<p>Please, click on the follow link to verificate your email account.</p>
+<a href="{{ verification_link }}">{{ verification_link }}</a></p>
 
-<a href="{{ verification_link }}">{{ verification_link }}</a>
-
-<p>If the link doesn't, maybe your mail client has cut it. Then, you should
-go to your profile, go to the emails section, click on the verification icon
-next to the email you want to validate and insert the follow code:</code>
+<p>If clicking on the link above does not work, go to your profile and emails section. Click on the
+confirmation icon and enter the following code:</p>
 
 <p><strong>{{ code }}</strong></p>
 

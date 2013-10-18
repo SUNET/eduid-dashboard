@@ -67,10 +67,10 @@ class PostalAddressActionsView(BaseActionsView):
     data_attribute = 'postalAddress'
     verify_messages = {
         'ok': _('The postal address has been verified'),
-        'error': _('The confirmation code is not the one have been sent to your postal mailbox'),
+        'error': _('The confirmation code used is invalid, please try again or request a new code'),
         'request': _('Please revise your postal mailbox and fill below with the given code'),
-        'placeholder': _('Postal address verification code'),
-        'new_code_sent': _('A new verification code has been sent to your postal mailbox'),
+        'placeholder': _('Postal address confirmation code'),
+        'new_code_sent': _('A new confirmation code has been sent to your postal mailbox'),
     }
 
     def get_verification_data_id(self, data_to_verify):
@@ -103,7 +103,7 @@ class PostalAddressActionsView(BaseActionsView):
         }, safe=True)
 
         self.context.propagate_user_changes(self.user)
-        return {'result': 'ok', 'message': _('Your preferred address was changed')}
+        return {'result': 'ok', 'message': _('Your postal address was successfully updated')}
 
     def remove_action(self, index, post_data):
         addresses = self.user['postalAddress']
@@ -125,9 +125,7 @@ class PostalAddressActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('One address has been removed, please, wait'
-                         ' before your changes are distributed '
-                         'through all applications'),
+            'message': _('Postal address was successfully removed.'),
         }
 
 
@@ -193,7 +191,4 @@ class PostalAddressView(BaseFormView):
         # update the session data
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
-                                   queue='forms')
+        self.request.session.flash(_('Changes saved.'), queue='forms')

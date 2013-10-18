@@ -10,7 +10,7 @@
     </div>
   </div>
   {% if context.workmode == 'personal' %}
-  <h3>{{ _("Your profile") }}</h3>
+  <h3>{{ _("Profile") }}</h3>
   {% else %}
   <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
   {% endif %}
@@ -23,7 +23,7 @@
     <div class='span6'>
 
         {% if pending_actions %}
-          <h4>{{_("Pending Actions")}}</h4>
+          <h4>{{_("Improve profile")}}</h4>
           <ul class='unstyled pending-actions'>
           {% for formid, msg in pending_actions %}
             <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
@@ -37,7 +37,7 @@
 
   <div class='clearfix'></div>
 
-  <div class='profile-combo tabbable tabs-left'>
+  <div class='profile-combo tabbable tabs-left well'>
     <ul class='nav nav-tabs'>
       {% for tab in tabs %}
         <li>
@@ -71,7 +71,7 @@
       <div class="info-container"></div>
       <div class="divDialogElements">
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
-        <p>{{ _('Lost the code?')}} <a href="#" class="resend-code">{{ _('Resend me the verification code') }}</a></p>
+        <p>{{ _('Lost your confirmation code?')}} <a href="#" class="resend-code">{{ _('Resend confirmation code') }}</a></p>
         <p class="extra-info"></p>
       </div>
     </div>
@@ -108,14 +108,14 @@
 <script id='communication-error-template' language='text/template'>
   <div class='alert communication-error'>
     <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>{{_('Warning!')}}</strong> {{_('Something goes wrong. Please, try it later.')}}
+    <strong>{{_('Warning!')}}</strong> {{_('An error has occurred, please try again or contact support if the problem persists.')}}
   </div>
 </script>
 
 <script id='communication-error-permissions-template' language='text/template'>
   <div class='alert communication-error-permissions'>
     <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>{{_('Error!')}}</strong> {{_("You haven't permissions to access that resource.")}}
+    <strong>{{_('Error!')}}</strong> {{_("Permission denied")}}
   </div>
 </script>
 

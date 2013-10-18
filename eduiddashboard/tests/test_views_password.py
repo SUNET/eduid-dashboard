@@ -97,7 +97,8 @@ class PasswordFormTests(LoggedInReguestTests):
         response = form.submit('save')
 
         self.assertEqual(response.status, '200 OK')
-        self.assertIn('Your changes was saved', response.body)
+        self.assertIn('Your password has been successfully updated',
+                      response.body)
         self.assertNotIn('Old password do not match', response.body)
         self.assertNotIn("Both passwords don't match", response.body)
 
@@ -119,7 +120,7 @@ class PasswordFormTests(LoggedInReguestTests):
             })
             response = form.submit('save')
             self.assertEqual(response.status, '200 OK')
-            self.assertIn('Old password do not match', response.body)
+            self.assertIn('Current password is incorrect', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_not_valid_repeated_password(self):
@@ -134,7 +135,7 @@ class PasswordFormTests(LoggedInReguestTests):
         response = form.submit('save')
 
         self.assertEqual(response.status, '200 OK')
-        self.assertIn("Both passwords don't match", response.body)
+        self.assertIn("Passwords don't match", response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_reset_password(self):
@@ -155,7 +156,9 @@ class PasswordFormTests(LoggedInReguestTests):
         for email in self.user['mailAliases']:
             form['email'].value = email['email']
             response = form.submit('reset')
-            self.assertIn("An email has been sent to you with the instructions to reset your password", response.body)
+            self.assertIn("Please read the email sent to you for further "
+                          "instructions. This window can now safely be "
+                          "closed.", response.body)
         reset_passwords_after = list(self.db.reset_passwords.find())
         self.assertNotEqual(len(reset_passwords), len(reset_passwords_after))
 

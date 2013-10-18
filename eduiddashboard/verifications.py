@@ -13,13 +13,6 @@ def dummy_message(request, message):
     log.debug('[DUMMY_MESSAGE]: {0}'.format(message))
 
 
-def dummy_message(request, message):
-    """
-    This function is only for debugging propposing
-    """
-    log.debug('[DUMMY_MESSAGE]: {0}'.format(message))
-
-
 def get_verification_code(request, model_name, obj_id=None, code=None):
     filters = {
         'model_name': model_name,

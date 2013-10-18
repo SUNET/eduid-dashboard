@@ -33,13 +33,13 @@ def get_status(user):
     if len(nins) > 0:
         active_nin = nins[-1]
         if not active_nin.get('active', False):
-            pending_actions = _('You have to add your NIN number')
+            pending_actions = _('Add national identity number')
         elif not active_nin.get('verified', False):
-            pending_actions = _('You must validate your NIN number')
+            pending_actions = _('Validation required for national identity number')
         else:
             completed_fields += 1
     else:
-        pending_actions = _('You have to add your NIN number')
+        pending_actions = _('Add national identity number')
 
     status = {
         'completed': (completed_fields, len(schema.children) + 1)
@@ -62,20 +62,9 @@ def send_verification_code(request, user, nin, code=None):
         code = new_verification_code(request, 'norEduPersonNIN', nin, user,
                                      hasher=get_short_hash)
 
-    msg = _(
-        'This is a message from %(site)s. The code for validate '
-        'your NIN %(nin)s is %(code)s' % {
-            'nin': nin,
-            'code': code,
-            'site': request.registry.settings.get('site.name',
-                                                  'eduID dashboard'),
-        }
-    )
+    language = request.context.get_preferred_language()
 
-    msg = get_localizer(request).translate(msg)
-
-    ## Replace with the nin msg gateway call
-    dummy_message(request, msg)
+    request.msgrelay.nin_validator(nin, code, language)
 
 
 def mark_as_verified_nin(request, user, verified_nin):
@@ -111,14 +100,11 @@ class NINsActionsView(BaseActionsView):
 
     data_attribute = 'norEduPersonNIN'
     verify_messages = {
-        'ok': _('The nin number has been verified'),
-        'error': _('The confirmation code is not the one have been sent to '
-                   'your inbox'),
-        'request': _('Please revise your NIN inbox and fill below with the '
-                     'given code'),
-        'placeholder': _('NIN verification code'),
-        'new_code_sent': _('A new verification code has been sent to your '
-                           'NIN inbox'),
+        'ok': _('National identity number verified'),
+        'error': _('The confirmation code is invalid, please try again or request a new code'),
+        'request': _('A confirmation code has been sent to your govt mailbox'),
+        'placeholder': _('National identity number confirmation code'),
+        'new_code_sent': _('A new confirmation code has been sent to your govt mailbox'),
     }
 
     def get_verification_data_id(self, data_to_verify):
@@ -159,9 +145,7 @@ class NINsActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('The nin has been removed, please, wait'
-                         ' before your changes are distributed '
-                         'through all applications'),
+            'message': _('National identity number has been removed'),
         }
 
     def send_verification_code(self, data_id, code):
@@ -220,9 +204,7 @@ class NinsView(BaseFormView):
 
         self.context.propagate_user_changes(self.user)
 
-        self.request.session.flash(_('Your changes was saved, please, wait '
-                                     'before your changes are distributed '
-                                     'through all applications'),
+        self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
         send_verification_code(self.request, self.user, newnin)
@@ -231,14 +213,9 @@ class NinsView(BaseFormView):
                                                             {})
         nin_proofing_link = proofing_links.get('nin')
 
-        msg = _('A verification message has been sent to your Govt Inbox. '
-                'Please revise your <a href=${nin_link}> nin inbox</a>, return'
-                ' to .this page and <a href="#" class="verifycode" '
-                'data-identifier="${id}">fill here</a> the provided'
-                'verification number', {
-                    'id': nin_identifier,
-                    'nin_link': nin_proofing_link
-                })
+        msg = _('A confirmation code has been sent to your govt inbox. '
+                'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${id}">here</a>.',
+                mapping={'id': nin_identifier})
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')

@@ -4,6 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
 from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
+from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
 
@@ -52,7 +53,7 @@ class BaseFactory(object):
             'saml2.user_main_attribute', 'mail')
 
         if not self.authorize():
-            raise HTTPForbidden('You have not sufficient permissions to access this user')
+            raise HTTPForbidden(_('You do not have sufficient permissions to access this user'))
 
         self.__acl__ = self.acls[self.workmode]
 
@@ -71,7 +72,7 @@ class BaseFactory(object):
         #     max_user_loa = self.loa_to_int(loa=max_user_loa)
         #     session_loa = self.loa_to_int()
         #     if session_loa < max_user_loa:
-        #         raise HTTPForbidden('You have not sufficient AL to edit this user')
+        #         raise HTTPForbidden(_('You do not have sufficient AL to edit this user'))
 
         required_loa = self.request.registry.settings.get('required_loa', {})
         required_loa = required_loa.get(self.workmode, '')
@@ -80,8 +81,8 @@ class BaseFactory(object):
         required_loa_int = self.loa_to_int(loa=required_loa)
 
         if user_loa_int < required_loa_int:
-            raise HTTPForbidden('You have not sufficient AL to access to this '
-                                'workmode')
+            raise HTTPForbidden(_('You do not have sufficient AL to access to this '
+                                'workmode'))
 
         return True
 
@@ -195,6 +196,11 @@ class BaseFactory(object):
 
         return user.get('mail')
 
+    def get_preferred_language(self):
+        lang = self.user.get('preferredLanguage', None)
+        if lang is None:
+            return self.request.registry.settings.get('available_languages')
+
 
 class ForbiddenFactory(RootFactory):
     __acl__ = [
@@ -206,7 +212,7 @@ class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
         if self.request.session.get('user') is None:
-            raise HTTPForbidden()
+            raise HTTPForbidden(_('Not logged in'))
         is_authorized = super(BaseCredentialsFactory, self).authorize()
 
         # Verify that session loa is equal than the max reached
@@ -215,8 +221,9 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden('You have not sufficient AL to edit your'
-                                ' credentials')
+            raise HTTPForbidden(_('You must be logged in with {user_AL} '
+                                  'to manage your credentials',
+                                  mapping={'user_AL': max_user_loa}))
         return is_authorized
 
 

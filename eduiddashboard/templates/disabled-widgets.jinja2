@@ -29,7 +29,7 @@
      <div class='level-assurance-description'>
        {% trans loa=loa %}You are in assurance level {{ loa }}{% endtrans %}
         {% if loa == max_loa %}
-          {% trans %}<p>This is the highest level of assurance available for your profile</p>{% endtrans %}
+          {% trans %}<p>You have reached max level of assurance available for your profile</p>{% endtrans %}
         {% else %}
           {% trans %}<p>If you need to increase this level to get more permissions
           you must login with another authentication method</p>{% endtrans %}
