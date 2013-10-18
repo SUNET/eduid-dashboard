@@ -196,6 +196,12 @@ class BaseFactory(object):
 
         return user.get('mail')
 
+    def get_preferred_language(self):
+        lang = self.user.get('preferredLanguage', None)
+        if lang is None:
+            return self.request.registry.settings.get('available_languages')
+
+
 
 class ForbiddenFactory(RootFactory):
     __acl__ = [

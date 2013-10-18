@@ -48,13 +48,12 @@ def get_tab():
 
 def send_verification_code(request, user, mobile_number, code=None):
     if code is None:
-        code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
-    msg = _('The confirmation code for your mobile phone number ${mobile_number} is ${code}', mapping={
-        'mobile_number': mobile_number,
-        'code': code,
-    })
-    msg = get_localizer(request).translate(msg)
-    send_sms(request, mobile_number, msg)
+        code = new_verification_code(request, 'mobile', mobile_number, user,
+                                     hasher=get_short_hash)
+
+    user_language = request.context.get_preferred_language()
+
+    request.msgrelay.mobile_validator(mobile_number, code, user_language)
 
 
 def mark_as_verified_mobile(request, user, verified_mobile):
