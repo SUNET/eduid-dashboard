@@ -1,5 +1,7 @@
 ## Passwords form
 
+from deform import Button
+
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.renderers import render
 from pyramid.view import view_config
@@ -125,7 +127,6 @@ class PasswordsView(BaseFormView):
 
 
 class BaseResetPasswordView(FormView):
-    buttons = ('reset', )
     intro_message = None  # to override in subclasses
 
     def __init__(self, context, request):
@@ -162,6 +163,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
     schema = EmailResetPassword()
     route = 'reset-password-email'
     intro_message = _('Forgot your password?')
+    buttons = (Button('reset', title=_('Reset password'), css_class='btn-danger'), )
 
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
@@ -185,6 +187,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
     schema = NINResetPassword()
     route = 'reset-password-nin'
     intro_message = _('Forgot your password?')
+    buttons = (Button('reset', title=_('Reset password'), css_class='btn-success'), )
 
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
