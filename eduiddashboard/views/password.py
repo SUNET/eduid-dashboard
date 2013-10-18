@@ -209,9 +209,9 @@ class ResetPasswordEnterCodeView(BaseResetPasswordView):
     schema = ResetPasswordEnterCode()
     route = 'reset-password-enter-code'
     intro_message = _('Enter the confirmation code')
-    buttons = (Button('reset', title=_('Reset password'), css_class='btn-success'), )
+    buttons = (Button('entercode', title=_('Enter code')), )
 
-    def reset_success(self, passwordform):
+    def entercode_success(self, passwordform):
         reset_password_link = self.request.route_url(
             "reset-password-step2",
             code=passwordform['code'],
