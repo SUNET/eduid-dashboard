@@ -7,11 +7,16 @@ from eduid_msg.tasks import send_message
 import logging
 logger = logging.getLogger(__name__)
 
-
 TEMPLATES_RELATION = {
     'phone-validator': 'dummy',
     'nin-validator': 'dummy',
     'nin-reset-password': 'dummy',
+}
+
+
+LANGUAGE_MAPPING = {
+    'en': 'en_US',
+    'sv': 'sv_SE',
 }
 
 
@@ -31,23 +36,29 @@ class MsgRelay(object):
         self._relay = get_message_relay(celery)
         self.settings = settings
 
+    def get_language(self, lang):
+        return LANGUAGE_MAPPING.get(lang, 'en_US')
+
     def get_content(self):
         return {
             'sitename': self.settings.get('site.name'),
             'sitelink': self.settings.get('personal_dashboard_base_url'),
         }
 
-    def phone_validator(self, targetphone, code, language):
+    def mobile_validator(self, targetphone, code, language):
         content = self.get_content()
         content = {
             'code': code,
             'phonenumber': targetphone,
 
         }
+        lang = self.get_language(language)
 
+        logger.debug('SENT mobile validator message code: {0} phone number: {1}'.format(
+                     code, targetphone))
         send_message.delay('sms', content, targetphone,
                            TEMPLATES_RELATION.get('phone-validator'),
-                           language)
+                           lang)
 
     def nin_validator(self, nin, code, language):
         content = self.get_content()
@@ -55,8 +66,11 @@ class MsgRelay(object):
         content.update({
             'code': code,
         })
+        lang = self.get_language(language)
+        logger.debug('SENT nin message code: {0} NIN: {1}'.format(
+                     code, nin))
         send_message.delay('mm', content, nin,
-                           TEMPLATES_RELATION.get('nin-validator'), language)
+                           TEMPLATES_RELATION.get('nin-validator'), lang)
 
     def nin_reset_password(self, nin, code, link, language):
         content = self.get_content()
@@ -64,9 +78,12 @@ class MsgRelay(object):
             'code': code,
             'link': link,
         })
+        lang = self.get_language(language)
+        logger.debug('SENT nin reset password message code: {0} NIN: {1}'.format(
+                     code, nin))
         send_message.delay('mm', content, nin,
                            TEMPLATES_RELATION.get('nin-reset-password'),
-                           language)
+                           lang)
 
 
 def get_msgrelay(request):
