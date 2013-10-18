@@ -161,3 +161,16 @@ def token_login(context, request):
         logger.info("Token authentication failed (email: {!r})".format(email))
         # Show and error, the user can't be logged
         return HTTPBadRequest()
+
+
+@view_config(route_name='error500test')
+def error500view(context, request):
+    raise Exception()
+
+
+@view_config(route_name='error500', renderer='templates/error500.jinja2')
+@view_config(context=Exception, renderer='templates/error500.jinja2')
+def exception_view(context, request):
+    logger.error("The error was: %s" % context, exc_info=(context))
+    message = getattr(context, 'message', '')
+    return {'msg': message}
