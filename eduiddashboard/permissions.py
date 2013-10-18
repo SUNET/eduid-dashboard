@@ -196,6 +196,11 @@ class BaseFactory(object):
 
         return user.get('mail')
 
+    def get_preferred_language(self):
+        lang = self.user.get('preferredLanguage', None)
+        if lang is None:
+            return self.request.registry.settings.get('available_languages')
+
 
 class ForbiddenFactory(RootFactory):
     __acl__ = [
@@ -216,8 +221,9 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden(_('You must be logged in with %(user_AL) '
-                                  'to manage your credentials'), user_AL=max_user_loa)
+            raise HTTPForbidden(_('You must be logged in with {user_AL} '
+                                  'to manage your credentials',
+                                  mapping={'user_AL': max_user_loa}))
         return is_authorized
 
 

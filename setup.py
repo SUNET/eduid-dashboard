@@ -38,7 +38,8 @@ requires = [
     'pycountry==1.1',
     'waitress==0.8.2',
     'vccs_client==0.3',
-    #'eduid_msg',  # not existing yet
+    # Fix eduid_msg version
+    'eduid_msg==0.6.1',
 ]
 
 if sys.version_info[0] < 3:

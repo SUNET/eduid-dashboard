@@ -5,7 +5,6 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
-from eduiddashboard.sms import send_sms
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
@@ -48,13 +47,12 @@ def get_tab():
 
 def send_verification_code(request, user, mobile_number, code=None):
     if code is None:
-        code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
-    msg = _('The confirmation code for your mobile phone number ${mobile_number} is ${code}', mapping={
-        'mobile_number': mobile_number,
-        'code': code,
-    })
-    msg = get_localizer(request).translate(msg)
-    send_sms(request, mobile_number, msg)
+        code = new_verification_code(request, 'mobile', mobile_number, user,
+                                     hasher=get_short_hash)
+
+    user_language = request.context.get_preferred_language()
+
+    request.msgrelay.mobile_validator(mobile_number, code, user_language)
 
 
 def mark_as_verified_mobile(request, user, verified_mobile):

@@ -57,8 +57,8 @@ class NinsFormTests(LoggedInReguestTests):
             self.assertEqual(response.status, '200 OK')
             self.assertIn('123 123 123', response.body)
             self.assertIn('alert-error', response.body)
-            self.assertIn('The personal identity number consists of 12 digits',
-                          response.body)
+            self.assertIn('The Swedish personal identity number consists of '
+                          '12 digits', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_existant_nin(self):

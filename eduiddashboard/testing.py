@@ -175,6 +175,7 @@ class LoggedInReguestTests(unittest.TestCase):
                 context_route_url = eduiddashboard.filters:context_route_url
                 safe_context_route_url = eduiddashboard.filters:safe_context_route_url
             """,
+            'personal_dashboard_base_url': 'http://localhost/',
             'proofing_links': """
                 nin = http://another.platform/nins/{nin}/
             """,
