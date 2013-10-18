@@ -1,3 +1,4 @@
+import os
 from bson import ObjectId
 
 from eduid_msg.celery import celery, get_message_relay
@@ -20,6 +21,11 @@ LANGUAGE_MAPPING = {
 }
 
 
+class DummyMessages:
+    def delay(self, *args, **kwargs):
+        pass
+
+
 class MsgRelay(object):
 
     def __init__(self, settings):
@@ -35,6 +41,11 @@ class MsgRelay(object):
 
         self._relay = get_message_relay(celery)
         self.settings = settings
+        if self.settings.get('testing', False):
+            self.send_message = DummyMessages()
+        else:
+            self.send_message = send_message
+
 
     def get_language(self, lang):
         return LANGUAGE_MAPPING.get(lang, 'en_US')
@@ -56,9 +67,9 @@ class MsgRelay(object):
 
         logger.debug('SENT mobile validator message code: {0} phone number: {1}'.format(
                      code, targetphone))
-        send_message.delay('sms', content, targetphone,
-                           TEMPLATES_RELATION.get('phone-validator'),
-                           lang)
+        self.send_message.delay('sms', content, targetphone,
+                                TEMPLATES_RELATION.get('phone-validator'),
+                                lang)
 
     def nin_validator(self, nin, code, language):
         content = self.get_content()
@@ -69,8 +80,8 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin message code: {0} NIN: {1}'.format(
                      code, nin))
-        send_message.delay('mm', content, nin,
-                           TEMPLATES_RELATION.get('nin-validator'), lang)
+        self.send_message.delay('mm', content, nin,
+                                TEMPLATES_RELATION.get('nin-validator'), lang)
 
     def nin_reset_password(self, nin, code, link, language):
         content = self.get_content()
@@ -81,9 +92,9 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin reset password message code: {0} NIN: {1}'.format(
                      code, nin))
-        send_message.delay('mm', content, nin,
-                           TEMPLATES_RELATION.get('nin-reset-password'),
-                           lang)
+        self.send_message.delay('mm', content, nin,
+                                TEMPLATES_RELATION.get('nin-reset-password'),
+                                lang)
 
 
 def get_msgrelay(request):
