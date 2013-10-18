@@ -117,3 +117,12 @@ class NINUniqueValidator(object):
         if nin_exist:
             raise colander.Invalid(node,
                 _("This NIN is already registered in your NIN list"))
+
+
+class ResetPasswordCodeExistsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        if not request.db.reset_passwords.find_one({'hash_code': value}):
+            raise colander.Invalid(node,
+                                   _("The entered code does not exist"))

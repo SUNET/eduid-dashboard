@@ -7,6 +7,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import (EmailUniqueValidator,
                                        EmailExistsValidator,
                                        NINExistsValidator,
+                                       ResetPasswordCodeExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
@@ -131,6 +132,17 @@ class NINResetPassword(colander.MappingSchema):
                 msg=_('The personal identity number consists of 12 digits')
             ),
             NINExistsValidator(),
+        )
+    )
+
+
+class ResetPasswordEnterCode(colander.MappingSchema):
+
+    code = colander.SchemaNode(
+        colander.String(),
+        title=_('Confirmation code'),
+        validator=colander.All(
+            ResetPasswordCodeExistsValidator(),
         )
     )
 
