@@ -1,5 +1,7 @@
 import colander
 
+from eduiddashboard.userdb import UserDB
+
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 
@@ -81,7 +83,9 @@ class EmailExistsValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        if not request.userdb.exists_by_field('mailAliases.email', value):
+        try:
+            request.userdb.get_user_by_email(value)
+        except UserDB.UserDoesNotExist:
             raise colander.Invalid(node,
                                    _("This email does not exist"))
 

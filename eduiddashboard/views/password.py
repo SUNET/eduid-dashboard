@@ -32,9 +32,7 @@ def change_password(request, user, old_password, new_password):
 def send_reset_password_mail(request, email):
     """ Send an email with the instructions for resetting password """
     mailer = get_mailer(request)
-    user = request.userdb.get_user(email)
-    if not user:
-        raise UserDoesNotExist()
+    user = request.userdb.get_user_by_email(email)
     hash_code = get_unique_hash()
 
     request.db.reset_passwords.insert({
@@ -43,7 +41,7 @@ def send_reset_password_mail(request, email):
         'verified': False,
     }, safe=True)
 
-    reset_password_link = request.route_url("reset-password-step2", code=hash_code)
+    reset_password_link = request.route_url("reset-password-email-step2", code=hash_code)
 
     site_name = request.registry.settings.get("site.name", "eduID")
 
@@ -71,7 +69,6 @@ def send_reset_password_mail(request, email):
             request,
         ),
     )
-
     mailer.send(message)
 
 
@@ -137,14 +134,14 @@ class BaseResetPasswordView(FormView):
         return context
 
 
-@view_config(route_name='reset-password', permission='edit',
-             renderer='templates/reset-password-form.jinja2')
-class ResetPasswordView(BaseResetPasswordView):
+@view_config(route_name='reset-password-email', permission='edit',
+             renderer='templates/reset-password-email-form.jinja2')
+class ResetPasswordEmailView(BaseResetPasswordView):
     """
     Reset user password.
     """
     schema = ResetPassword()
-    route = 'reset-password'
+    route = 'reset-password-email'
     intro_message = _('Forgot your password?')
 
     def reset_success(self, passwordform):
@@ -158,15 +155,15 @@ class ResetPasswordView(BaseResetPasswordView):
         }
 
 
-@view_config(route_name='reset-password-step2', permission='edit',
-             renderer='templates/reset-password-form.jinja2')
-class ResetPasswordStep2View(BaseResetPasswordView):
+@view_config(route_name='reset-password-email-step2', permission='edit',
+             renderer='templates/reset-password-email-form.jinja2')
+class ResetPasswordEmailStep2View(BaseResetPasswordView):
     """
     Form to finish user password reset.
     """
 
     schema = ResetPasswordStep2()
-    route = 'reset-password-step2'
+    route = 'reset-password-email-step2'
     buttons = ('reset', )
     intro_message = _('Finish your password reset')
 
@@ -175,12 +172,12 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
         if reset_passwords.count() == 0:
             return HTTPNotFound()
-        return super(ResetPasswordStep2View, self).__call__()
+        return super(ResetPasswordEmailStep2View, self).__call__()
 
     def reset_success(self, passwordform):
         hash_code = self.request.matchdict['code']
         reset_password = self.request.db.reset_passwords.find({'hash_code': hash_code})[0]
-        user = self.request.userdb.get_user(reset_password['email'])
+        user = self.request.userdb.get_user_by_email(reset_password['email'])
 
         new_password = passwordform['new_password']
         ok = change_password(self.request, user, '', new_password)

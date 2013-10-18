@@ -41,6 +41,14 @@ class UserDB(IUserDB):
             logger.error("MultipleUsersReturned")
             raise self.MultipleUsersReturned()
 
+    def get_user_by_email(self, email):
+        users = self.get_users({'mailAliases.email': email})
+        if users.count() == 0:
+            raise self.UserDoesNotExist()
+        if users.count() > 1:
+            raise self.MultipleUsersReturned()
+        return users[0]
+
     def get_user_by_oid(self, oid):
         if not isinstance(oid, ObjectId):
             oid = ObjectId(oid)
