@@ -138,9 +138,9 @@ class PasswordFormTests(LoggedInReguestTests):
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_reset_password(self):
-        response_form = self.testapp.get('/profile/reset-password/')
+        response_form = self.testapp.get('/profile/reset-password/email/')
 
-        form = response_form.forms['resetpasswordview-form']
+        form = response_form.forms['resetpasswordemailview-form']
 
         form['email'].value = 'notvalidemail'
         response = form.submit('reset')
