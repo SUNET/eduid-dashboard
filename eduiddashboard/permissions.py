@@ -202,7 +202,6 @@ class BaseFactory(object):
             return self.request.registry.settings.get('available_languages')
 
 
-
 class ForbiddenFactory(RootFactory):
     __acl__ = [
         (Deny, Everyone, ALL_PERMISSIONS),
@@ -222,7 +221,7 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden(_('You must be logged in with %(user_AL) '
+            raise HTTPForbidden(_('You must be logged in with %(user_AL)s '
                                   'to manage your credentials'), user_AL=max_user_loa)
         return is_authorized
 
