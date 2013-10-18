@@ -81,13 +81,23 @@ class EmailUniqueValidator(object):
 class EmailExistsValidator(object):
 
     def __call__(self, node, value):
-
         request = node.bindings.get('request')
         try:
             request.userdb.get_user_by_email(value)
         except UserDB.UserDoesNotExist:
             raise colander.Invalid(node,
                                    _("This email does not exist"))
+
+
+class NINExistsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        try:
+            request.userdb.get_user_by_nin(value)
+        except UserDB.UserDoesNotExist:
+            raise colander.Invalid(node,
+                                   _("This NIN does not exist, is not verified or is not active"))
 
 
 class NINUniqueValidator(object):

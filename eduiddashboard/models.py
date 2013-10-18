@@ -6,6 +6,7 @@ import deform
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import (EmailUniqueValidator,
                                        EmailExistsValidator,
+                                       NINExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
@@ -107,7 +108,7 @@ class Passwords(colander.MappingSchema):
                                    _("Both passwords don't match"))
 
 
-class ResetPassword(colander.MappingSchema):
+class EmailResetPassword(colander.MappingSchema):
 
     email = colander.SchemaNode(colander.String(),
                                 validator=colander.All(
@@ -115,6 +116,21 @@ class ResetPassword(colander.MappingSchema):
                                     EmailExistsValidator(),
                                 ),
                                 title=_("Enter your email address"))
+
+
+class NINResetPassword(colander.MappingSchema):
+
+    norEduPersonNIN = colander.SchemaNode(
+        colander.String(),
+        title=_('personal identity number (NIN)'),
+        validator=colander.All(
+            colander.Regex(
+                regex=re.compile('[0-9]{12}'),
+                msg=_('The personal identity number consists of 12 digits')
+            ),
+            NINExistsValidator(),
+        )
+    )
 
 
 class ResetPasswordStep2(colander.MappingSchema):

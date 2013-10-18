@@ -8,11 +8,11 @@ from pyramid_deform import FormView
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
-from eduid_am.exceptions import UserDoesNotExist
 from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.models import Passwords, ResetPassword, ResetPasswordStep2
+from eduiddashboard.models import (Passwords, EmailResetPassword,
+                                   NINResetPassword, ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.utils import flash, get_unique_hash
@@ -29,19 +29,24 @@ def change_password(request, user, old_password, new_password):
     return added
 
 
-def send_reset_password_mail(request, email):
-    """ Send an email with the instructions for resetting password """
-    mailer = get_mailer(request)
-    user = request.userdb.get_user_by_email(email)
+def new_reset_password_code(request, user, mechanism='email'):
     hash_code = get_unique_hash()
-
     request.db.reset_passwords.insert({
-        'email': email,
+        'email': user['mail'],
         'hash_code': hash_code,
+        'mechanism': mechanism,
         'verified': False,
     }, safe=True)
+    reset_password_link = request.route_url(
+        "reset-password-step2",
+        code=hash_code,
+    )
+    return reset_password_link
 
-    reset_password_link = request.route_url("reset-password-email-step2", code=hash_code)
+
+def send_reset_password_mail(request, email, user, reset_password_link):
+    """ Send an email with the instructions for resetting password """
+    mailer = get_mailer(request)
 
     site_name = request.registry.settings.get("site.name", "eduID")
 
@@ -70,6 +75,20 @@ def send_reset_password_mail(request, email):
         ),
     )
     mailer.send(message)
+
+
+def send_reset_password_gov_message(request, nin, user, reset_password_link):
+    """ Send an message to the gov mailbox with the instructions for resetting password """
+    site_name = request.registry.settings.get("site.name", "eduID")
+
+    context = {
+        "nin": nin,
+        "given_name": user.get('givenName', ''),
+        "reset_password_link": reset_password_link,
+        "site_url": request.route_url("home"),
+        "site_name": site_name,
+    }
+    print context  # TODO: Implement the eduid_msg communication
 
 
 @view_config(route_name='passwords', permission='edit',
@@ -135,19 +154,21 @@ class BaseResetPasswordView(FormView):
 
 
 @view_config(route_name='reset-password-email', permission='edit',
-             renderer='templates/reset-password-email-form.jinja2')
+             renderer='templates/reset-password-form.jinja2')
 class ResetPasswordEmailView(BaseResetPasswordView):
     """
     Reset user password.
     """
-    schema = ResetPassword()
+    schema = EmailResetPassword()
     route = 'reset-password-email'
     intro_message = _('Forgot your password?')
 
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         email = passwords_data['email']
-        send_reset_password_mail(self.request, email)
+        user = self.request.userdb.get_user_by_email(email)
+        reset_password_link = new_reset_password_code(self.request, user)
+        send_reset_password_mail(self.request, email, user, reset_password_link)
         flash(self.request, 'info', _('An email has been sent to you with '
                                       'the instructions to reset your password.'))
         return {
@@ -155,15 +176,38 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         }
 
 
-@view_config(route_name='reset-password-email-step2', permission='edit',
-             renderer='templates/reset-password-email-form.jinja2')
-class ResetPasswordEmailStep2View(BaseResetPasswordView):
+@view_config(route_name='reset-password-nin', permission='edit',
+             renderer='templates/reset-password-form.jinja2')
+class ResetPasswordNINView(BaseResetPasswordView):
+    """
+    Reset user password.
+    """
+    schema = NINResetPassword()
+    route = 'reset-password-nin'
+    intro_message = _('Forgot your password?')
+
+    def reset_success(self, passwordform):
+        passwords_data = self.schema.serialize(passwordform)
+        nin = passwords_data['norEduPersonNIN']
+        user = self.request.userdb.get_user_by_nin(nin)
+        reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
+        send_reset_password_gov_message(self.request, nin, user, reset_password_link)
+        flash(self.request, 'info', _('An message has been sent to your government mailbox'
+                                      'with the instructions to reset your password.'))
+        return {
+            'message': _('Now you can follow the instructions and close this window safely.'),
+        }
+
+
+@view_config(route_name='reset-password-step2', permission='edit',
+             renderer='templates/reset-password-form.jinja2')
+class ResetPasswordStep2View(BaseResetPasswordView):
     """
     Form to finish user password reset.
     """
 
     schema = ResetPasswordStep2()
-    route = 'reset-password-email-step2'
+    route = 'reset-password-step2'
     buttons = ('reset', )
     intro_message = _('Finish your password reset')
 
@@ -172,7 +216,7 @@ class ResetPasswordEmailStep2View(BaseResetPasswordView):
         reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
         if reset_passwords.count() == 0:
             return HTTPNotFound()
-        return super(ResetPasswordEmailStep2View, self).__call__()
+        return super(ResetPasswordStep2View, self).__call__()
 
     def reset_success(self, passwordform):
         hash_code = self.request.matchdict['code']
@@ -182,6 +226,8 @@ class ResetPasswordEmailStep2View(BaseResetPasswordView):
         new_password = passwordform['new_password']
         ok = change_password(self.request, user, '', new_password)
         if ok:
+            if reset_password['mechanism'] == 'email':
+                pass  # TODO: reset the user LOA
             self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:

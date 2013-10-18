@@ -49,6 +49,18 @@ class UserDB(IUserDB):
             raise self.MultipleUsersReturned()
         return users[0]
 
+    def get_user_by_nin(self, nin):
+        users = self.get_users({
+            'norEduPersonNIN.norEduPersonNIN': nin,
+            'norEduPersonNIN.verified': True,
+            'norEduPersonNIN.active': True,
+        })
+        if users.count() == 0:
+            raise self.UserDoesNotExist()
+        if users.count() > 1:
+            raise self.MultipleUsersReturned()
+        return users[0]
+
     def get_user_by_oid(self, oid):
         if not isinstance(oid, ObjectId):
             oid = ObjectId(oid)

@@ -170,7 +170,9 @@ def profile_urls(config):
     #                  factory=ResetPasswordFactory)
     config.add_route('reset-password-email', '/reset-password/email/',
                      factory=ResetPasswordFactory)
-    config.add_route('reset-password-email-step2', '/reset-password/{code}/',
+    config.add_route('reset-password-nin', '/reset-password/nin/',
+                     factory=ResetPasswordFactory)
+    config.add_route('reset-password-step2', '/reset-password/{code}/',
                      factory=ResetPasswordFactory)
     config.add_route('postaladdress', '/postaladdress/',
                      factory=PostalAddressFactory)
