@@ -221,8 +221,9 @@ class BaseCredentialsFactory(BaseFactory):
         session_loa = self.get_loa()
 
         if session_loa != max_user_loa:
-            raise HTTPForbidden(_('You must be logged in with %(user_AL)s '
-                                  'to manage your credentials'), user_AL=max_user_loa)
+            raise HTTPForbidden(_('You must be logged in with {user_AL} '
+                                  'to manage your credentials',
+                                  mapping={'user_AL': max_user_loa}))
         return is_authorized
 
 
