@@ -6,7 +6,7 @@ import deform
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import (EmailUniqueValidator,
                                        EmailExistsValidator,
-                                       NINExistsValidator,
+                                       EmailOrUsernameExistsValidator,
                                        ResetPasswordCodeExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
@@ -113,28 +113,35 @@ class Passwords(colander.MappingSchema):
 
 class EmailResetPassword(colander.MappingSchema):
 
-    email = colander.SchemaNode(colander.String(),
-                                validator=colander.All(
-                                    colander.Email(),
-                                    EmailExistsValidator(),
-                                ),
-                                title=_("Enter your email address"))
+    email_or_username = colander.SchemaNode(
+      colander.String(),
+      title=_("Enter your email address or your eduID username"),
+      validator=colander.All(
+        EmailOrUsernameExistsValidator(),
+      )
+    )
 
 
 class NINResetPassword(colander.MappingSchema):
 
-    norEduPersonNIN = colander.SchemaNode(
-        colander.String(),
-        title=_('personal identity number (NIN)'),
-        validator=colander.All(
-            colander.Regex(
-                regex=re.compile('[0-9]{12}'),
-                msg=_('The personal identity number consists of 12 digits')
-            ),
-            NINExistsValidator(),
-        )
+    # norEduPersonNIN = colander.SchemaNode(
+    #     colander.String(),
+    #     title=_('personal identity number (NIN)'),
+    #     validator=colander.All(
+    #         colander.Regex(
+    #             regex=re.compile('[0-9]{12}'),
+    #             msg=_('The personal identity number consists of 12 digits')
+    #         ),
+    #         NINExistsValidator(),
+    #     )
+    # )
+    email_or_username = colander.SchemaNode(
+      colander.String(),
+      title=_("Enter your email address or your eduID username"),
+      validator=colander.All(
+        EmailOrUsernameExistsValidator(),
+      )
     )
-
 
 class ResetPasswordEnterCode(colander.MappingSchema):
 

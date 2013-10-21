@@ -89,6 +89,20 @@ class EmailExistsValidator(object):
                                    _("This email does not exist"))
 
 
+class EmailOrUsernameExistsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        try:
+            request.userdb.get_user_by_username(value)
+        except UserDB.UserDoesNotExist:
+            try:
+                request.userdb.get_user_by_email(value)
+            except UserDB.UserDoesNotExist:
+                raise colander.Invalid(node,
+                                       _("This username or email does not exist"))
+
+
 class NINExistsValidator(object):
 
     def __call__(self, node, value):

@@ -47,6 +47,14 @@ class UserDB(IUserDB):
             raise self.MultipleUsersReturned()
         return users[0]
 
+    def get_user_by_username(self, username):
+        users = self.get_users({'eduPersonPrincipalName': username})
+        if users.count() == 0:
+            raise self.UserDoesNotExist()
+        if users.count() > 1:
+            raise self.MultipleUsersReturned()
+        return users[0]
+
     def get_user_by_nin(self, nin):
         users = self.get_users({
             'norEduPersonNIN.norEduPersonNIN': nin,

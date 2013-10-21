@@ -173,7 +173,7 @@ def profile_urls(config):
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-email', '/reset-password/email/',
                      factory=ResetPasswordFactory)
-    config.add_route('reset-password-nin', '/reset-password/nin/',
+    config.add_route('reset-password-mina', '/reset-password/mina/',
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-step2', '/reset-password/{code}/',
                      factory=ResetPasswordFactory)
