@@ -1,0 +1,17 @@
+{% extends "templates/base.jinja2" %}
+
+{% block loasquare %}
+{% endblock %}
+
+{% block contents %}
+
+<div class="alert">{{ _("An error happened.") }}</div>
+
+{% trans %}
+  <p>Sorry, but the requested page is unavailable due to a server hiccup.</p>
+  <p>Our engineers have been notified, so check back later.</p>
+{% endtrans %}
+
+<p>{{ msg }}</p>
+
+{% endblock %}

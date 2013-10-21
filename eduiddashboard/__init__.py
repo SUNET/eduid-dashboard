@@ -236,6 +236,8 @@ def includeme(config):
     config.add_route('help', '/help/', factory=HelpFactory)
     config.add_route('session-reload', '/session-reload/',
                      factory=PersonFactory)
+    config.add_route('error500test', '/error500test/')
+    config.add_route('error500', '/error500/')
 
 
 def main(global_config, **settings):
