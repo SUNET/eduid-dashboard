@@ -143,22 +143,15 @@ class PasswordFormTests(LoggedInReguestTests):
 
         form = response_form.forms['resetpasswordemailview-form']
 
-        form['email'].value = 'notvalidemail'
+        form['email_or_username'].value = 'notexistingmail@foodomain.com'
         response = form.submit('reset')
-        self.assertEqual(response.status, '200 OK')
-        self.assertIn("Invalid email address", response.body)
-
-        form['email'].value = 'notexistingmail@foodomain.com'
-        response = form.submit('reset')
-        self.assertIn("This email does not exist", response.body)
+        self.assertIn("This username or email does not exist", response.body)
 
         reset_passwords = list(self.db.reset_passwords.find())
         for email in self.user['mailAliases']:
-            form['email'].value = email['email']
+            form['email_or_username'].value = email['email']
             response = form.submit('reset')
-            self.assertIn("Please read the email sent to you for further "
-                          "instructions. This window can now safely be "
-                          "closed.", response.body)
+            self.assertEqual(response.status, '302 Found')
         reset_passwords_after = list(self.db.reset_passwords.find())
         self.assertNotEqual(len(reset_passwords), len(reset_passwords_after))
 

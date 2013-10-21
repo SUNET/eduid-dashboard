@@ -61,7 +61,7 @@ MOCKED_USER_STANDARD = {
         'email': 'johnsmith@example.com',
         'verified': True,
     }, {
-        'email': 'johnsmith@example.org',
+        'email': 'johnsmith2@example.com',
         'verified': True,
     }],
     'postalAddress': [{
@@ -99,6 +99,8 @@ class MockedUserDB(IUserDB):
         'johnsmith@example.org': deepcopy(MOCKED_USER_STANDARD),
     }
     test_users['johnsmith@example.org']['mail'] = 'johnsmith@example.org'
+    test_users['johnsmith@example.org']['mailAliases'][0]['email'] = 'johnsmith@example.org'
+    test_users['johnsmith@example.org']['mailAliases'][1]['email'] = 'johnsmith2@example.org'
     test_users['johnsmith@example.org']['_id'] = ObjectId('901234567890123456789012')
 
     def __init__(self, users=[]):
