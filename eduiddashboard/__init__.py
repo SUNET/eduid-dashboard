@@ -167,8 +167,8 @@ def profile_urls(config):
                      factory=PersonFactory)
     config.add_route('passwords', '/passwords/',
                      factory=PasswordsFactory)
-    # config.add_route('reset-password', '/reset-password/',
-    #                  factory=ResetPasswordFactory)
+    config.add_route('reset-password', '/reset-password/',
+                     factory=ResetPasswordFactory)
     config.add_route('reset-password-enter-code', '/reset-password/enter-code/',
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-email', '/reset-password/email/',

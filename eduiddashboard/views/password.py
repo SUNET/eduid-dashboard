@@ -127,6 +127,14 @@ class PasswordsView(BaseFormView):
                                        queue='forms')
 
 
+@view_config(route_name='reset-password', renderer='templates/reset-password.jinja2',
+             request_method='GET', permission='edit')
+def reset_password(context, request):
+    """ Reset password """
+    return {
+    }
+
+
 class BaseResetPasswordView(FormView):
     intro_message = None  # to override in subclasses
 
