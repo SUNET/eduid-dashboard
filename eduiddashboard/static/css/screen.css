@@ -195,15 +195,8 @@ ul.circles-widget-labels li {
   height: 40px;
   font-size: 25px;
   font-weight: bold;
-}
-
-.loa-big div {
   text-align: center;
   margin-top: 7px;
-}
-
-.loa-big a:hover {
-  text-decoration: none;
 }
 
 div.profile-filled {
@@ -230,6 +223,15 @@ form.form-inline div.alert {
 
 .table-thin {
   width: 50%;
+}
+
+.table-form .btn-link {
+  padding: 0;
+}
+
+#mobilesview-form label,
+#emailsview-form label {
+  display: none;
 }
 
 div.form-content {

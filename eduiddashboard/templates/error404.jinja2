@@ -1,0 +1,15 @@
+{% extends "templates/base.jinja2" %}
+
+{% block loasquare %}
+{% endblock %}
+
+{% block contents %}
+
+<div class="alert">{{ _("The requested page doesn't exists.") }}</div>
+
+{% trans %}
+  <p>Sorry, but the requested page doesn't exists.</p>
+  <p>Error code 404</p>
+{% endtrans %}
+
+{% endblock %}

@@ -233,6 +233,13 @@ def includeme(config):
     config.add_route('error500test', '/error500test/')
     config.add_route('error500', '/error500/')
 
+    config.add_route('error404', '/error404/')
+
+    if not settings.get('testing', False):
+        config.add_view(context=Exception,
+                        view='eduiddashboard.views.portal.exception_view',
+                        renderer='templates/error500.jinja2')
+
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.

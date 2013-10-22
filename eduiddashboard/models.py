@@ -1,5 +1,7 @@
 import re
 
+import pycountry
+
 import colander
 import deform
 
@@ -43,7 +45,8 @@ class Email(colander.MappingSchema):
     mail = colander.SchemaNode(colander.String(),
                                validator=colander.All(colander.Email(),
                                                       EmailUniqueValidator()),
-                               title=_('email'))
+                               title=_('email'),
+                               widget=deform.widget.TextInputWidget(mask=_('Email address')))
 
 
 class NIN(colander.MappingSchema):
@@ -63,12 +66,14 @@ class NIN(colander.MappingSchema):
 @colander.deferred
 def preferred_language_widget(node, kw):
     request = kw.get('request')
-    languages = request.registry.settings.get('available_languages')
-    lang_choices = []
-    for lang in languages:
-        lang_choices.append((lang, _(lang)))
+    available_languages = request.registry.settings.get('available_languages')
 
-    return deform.widget.RadioChoiceWidget(values=lang_choices)
+    lang_choices = []
+    for lang in available_languages:
+        lang_obj = pycountry.languages.get(alpha2=lang)
+        lang_choices.append((lang, lang_obj.name))
+
+    return deform.widget.SelectWidget(values=lang_choices)
 
 
 class Person(colander.MappingSchema):
@@ -79,10 +84,6 @@ class Person(colander.MappingSchema):
                              title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
                                       title=_('Display name'))
-    photo = colander.SchemaNode(colander.String(),
-                                title=_('Photo'),
-                                description=_('Personal avatar URL'),
-                                missing='')
     preferredLanguage = colander.SchemaNode(colander.String(),
                                             title=_('Preferred language'),
                                             missing='',
@@ -160,7 +161,8 @@ class Mobile(colander.MappingSchema):
                                     r'^\+[\d ]+$',
                                     msg=_('Invalid telephone number. It must be written using international notation, starting with "+".'),
                                  ),
-                                 title=_('mobile'))
+                                 title=_('mobile'),
+                                 widget=deform.widget.TextInputWidget(mask=_('Mobile phone number')))
 
 
 class Permissions(colander.Schema):
