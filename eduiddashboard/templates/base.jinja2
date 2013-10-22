@@ -25,10 +25,7 @@
           {% block loasquare %}
           {% with loa=request.context.get_loa() %}
             <div class='loa-big'>
-              <div>
-                <a class='null-link' href='#'
-                  title='{{_("Assurance level identifier:")}} {{ loa }}'>{{_(loa)}}</a>
-              </div>
+              {{_(loa)}}
             </div>
           {% endwith %}
           {% endblock %}
