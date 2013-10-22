@@ -41,18 +41,7 @@
     <ul class='nav nav-tabs'>
       {% for tab in tabs %}
         <li>
-          {% with status = tab.status %}
-            {% if status and 'icon' in status %}
-              <a href='#{{tab.id}}'
-                 data-toggle='tooltip'
-                 title='{{_(status.pending_actions)}}'>
-                    <i class='{{status.icon}}'></i>
-                {{_(tab.label)}}
-              </a>
-            {% else %}
-              <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
-            {% endif %}
-          {% endwith %}
+            <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
         </li>
       {% endfor %}
     </ul>
