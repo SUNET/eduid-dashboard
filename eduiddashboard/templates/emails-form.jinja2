@@ -28,17 +28,14 @@
           <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
                  data-index='{{ loop.index0 }}' name='verify'>
       {% endif %}
-        </td>
-        <td>
+      </td>
+      <td>
           <input type='button' class='btn btn-link' value="{{_('Remove')}}"
                  data-index='{{ loop.index0 }}' name='remove'>
-        </td>
+      </td>
     </tr>
     {% endfor %}
   </table>
-
-  {% else %}
-    <p>{% trans %}Add an email address by clicking on the button below.{% endtrans %}</p>
   {% endif %}
 
 {% endblock %}

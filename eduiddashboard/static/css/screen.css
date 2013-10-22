@@ -229,6 +229,7 @@ form.form-inline div.alert {
   padding: 0;
 }
 
+#mobilesview-form label,
 #emailsview-form label {
   display: none;
 }

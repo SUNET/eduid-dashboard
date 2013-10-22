@@ -70,27 +70,29 @@ class EmailsActionsView(BaseActionsView):
     }
 
     def setprimary_action(self, index, post_data):
-        primary_email = self.user['mailAliases'][index]['email']
-        self.user['mail'] = primary_email
+        mail = self.user['mailAliases'][index]
+        if not mail.get('verified', False):
+            return {
+                'result': 'bad',
+                'message': _("You need to complete the verification process before to be able to mark as primary"),
+            }
+
+        self.user['mail'] = mail['email']
 
         # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'mail': primary_email,
-            }
-        }, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
-        return {'result': 'ok', 'message': _('Your primary email address was successfully changed')}
+        return {'result': 'ok', 'message': _('Your primary email address was '
+                                             'successfully changed')}
 
     def remove_action(self, index, post_data):
         emails = self.user['mailAliases']
         if len(emails) == 1:
             return {
                 'result': 'error',
-                'message': _('Error: You only have one email address and it cannot be removed'),
+                'message': _('Error: You only have one email address and it  '
+                             'can not be removed'),
             }
         remove_email = emails[index]['email']
         emails.remove(emails[index])
@@ -102,15 +104,7 @@ class EmailsActionsView(BaseActionsView):
             self.user['mail'] = emails[0]['email']
 
         # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$pull': {
-                'mailAliases': {
-                    'email': remove_email,
-                }
-            }
-        }, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
 
@@ -171,13 +165,7 @@ class EmailsView(BaseFormView):
         self.user.update(emails)
 
         # Do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$push': {
-                'mailAliases': mailsubdoc
-            }
-        }, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
 

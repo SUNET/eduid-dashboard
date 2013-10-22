@@ -161,7 +161,8 @@ class Mobile(colander.MappingSchema):
                                     r'^\+[\d ]+$',
                                     msg=_('Invalid telephone number. It must be written using international notation, starting with "+".'),
                                  ),
-                                 title=_('mobile'))
+                                 title=_('mobile'),
+                                 widget=deform.widget.TextInputWidget(mask=_('Mobile phone number')))
 
 
 class Permissions(colander.Schema):
