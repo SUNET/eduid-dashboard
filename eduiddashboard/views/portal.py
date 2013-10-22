@@ -174,3 +174,9 @@ def exception_view(context, request):
     message = getattr(context, 'message', '')
     request.response.status = 500
     return {'msg': message}
+
+
+@view_config(route_name='error404', renderer='templates/error404.jinja2')
+def not_found_view(context, request):
+    request.response.status = 404
+    return {}
