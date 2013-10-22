@@ -169,8 +169,8 @@ def error500view(context, request):
 
 
 @view_config(route_name='error500', renderer='templates/error500.jinja2')
-@view_config(context=Exception, renderer='templates/error500.jinja2')
 def exception_view(context, request):
     logger.error("The error was: %s" % context, exc_info=(context))
     message = getattr(context, 'message', '')
+    request.response.status = 500
     return {'msg': message}
