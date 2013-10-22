@@ -225,6 +225,14 @@ form.form-inline div.alert {
   width: 50%;
 }
 
+.table-form .btn-link {
+  padding: 0;
+}
+
+#emailsview-form label {
+  display: none;
+}
+
 div.form-content {
   margin-top: 10px;
 }

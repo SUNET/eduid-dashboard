@@ -1,5 +1,7 @@
 ## Emails form
 
+import deform
+
 from pyramid.view import view_config
 
 from eduiddashboard.emails import send_verification_mail
@@ -36,7 +38,7 @@ def get_status(user):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('Emails'),
+        'label': _('Emails addresses'),
         'id': 'emails',
     }
 
@@ -136,7 +138,7 @@ class EmailsView(BaseFormView):
     schema = Email()
     route = 'emails'
 
-    buttons = ('add', )
+    buttons = (deform.Button(name='add', title=_('Add email address')), )
 
     bootstrap_form_style = 'form-inline'
 

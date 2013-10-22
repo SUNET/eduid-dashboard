@@ -45,7 +45,8 @@ class Email(colander.MappingSchema):
     mail = colander.SchemaNode(colander.String(),
                                validator=colander.All(colander.Email(),
                                                       EmailUniqueValidator()),
-                               title=_('email'))
+                               title=_('email'),
+                               widget=deform.widget.TextInputWidget(mask=_('Email address')))
 
 
 class NIN(colander.MappingSchema):
