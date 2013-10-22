@@ -1,5 +1,7 @@
 import re
 
+import pycountry
+
 import colander
 import deform
 
@@ -63,12 +65,14 @@ class NIN(colander.MappingSchema):
 @colander.deferred
 def preferred_language_widget(node, kw):
     request = kw.get('request')
-    languages = request.registry.settings.get('available_languages')
-    lang_choices = []
-    for lang in languages:
-        lang_choices.append((lang, _(lang)))
+    available_languages = request.registry.settings.get('available_languages')
 
-    return deform.widget.RadioChoiceWidget(values=lang_choices)
+    lang_choices = []
+    for lang in available_languages:
+        lang_obj = pycountry.languages.get(alpha2=lang)
+        lang_choices.append((lang, lang_obj.name))
+
+    return deform.widget.SelectWidget(values=lang_choices)
 
 
 class Person(colander.MappingSchema):
@@ -79,10 +83,6 @@ class Person(colander.MappingSchema):
                              title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
                                       title=_('Display name'))
-    photo = colander.SchemaNode(colander.String(),
-                                title=_('Photo'),
-                                description=_('Personal avatar URL'),
-                                missing='')
     preferredLanguage = colander.SchemaNode(colander.String(),
                                             title=_('Preferred language'),
                                             missing='',
