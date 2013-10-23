@@ -142,17 +142,28 @@ class PostalAddressView(BaseFormView):
     schema = PostalAddress()
     route = 'postaladdress'
 
-    buttons = ('add', )
+    buttons = ('save', )
 
     def appstruct(self):
         return {}
 
     def get_template_context(self):
         context = super(PostalAddressView, self).get_template_context()
-        postal_address = self.user.get('postalAddress', [])
+        postal_addresses = self.user.get('postalAddress', [])
+        postal_address = {}
+        alternative_postal_address = {}
+        if len(postal_addresses) > 0:
+            if postal_addresses[0]['type'] == 'official':
+                postal_address = postal_addresses[0]
+                if len(postal_addresses) > 1:
+                    alternative_postal_address = postal_addresses[1]
+            else:
+                alternative_postal_address = postal_addresses[0]
+
         context.update({
-            'postal_addresses': postal_address,
-            'contains_official_postal_address': contains_official_postal_address(postal_address),
+            'postal_address': postal_address,
+            'alternative_postal_address': alternative_postal_address,
+            'contains_official_postal_address': contains_official_postal_address(postal_addresses),
         })
         return context
 
@@ -165,28 +176,22 @@ class PostalAddressView(BaseFormView):
 
         form['country'].widget = widget.SelectWidget(values=[(code.strip(), country.strip()) for code, country in allowed_countries])
 
-    def add_success(self, addressform):
+    def save_success(self, addressform):
         address = self.schema.serialize(addressform)
         address['verified'] = False
+        address['type'] = 'alternative'
 
         addresses = self.user.get('postalAddress', [])
-        if len(addresses) == 0:
-            address['preferred'] = True
+        if len(addresses) > 1 and addresses[0].get('type') == 'official':
+            addresses[1] = address
         else:
-            address['preferred'] = False
-        addresses.append(address)
+            addresses[0] = address
 
         # update the session data
         self.user['postalAddress'] = addresses
 
         # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'postalAddress': addresses,
-            }
-        }, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         # update the session data
         self.context.propagate_user_changes(self.user)
