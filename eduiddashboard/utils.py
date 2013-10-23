@@ -64,6 +64,7 @@ def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha2
     logger.debug("Auth token match result: {!r}".format(result == 0))
     return result == 0
 
+
 def flash(request, message_type, message):
     request.session.flash("{0}|{1}".format(message_type, message))
 
@@ -86,13 +87,13 @@ def get_available_tabs(context):
         nins.get_tab(),
         emails.get_tab(),
         permissions.get_tab(),
+        mobiles.get_tab(),
+        postal_address.get_tab(),
         {
             'label': _('Passwords'),
             'status': get_dummy_status,
             'id': 'passwords',
         },
-        mobiles.get_tab(),
-        postal_address.get_tab(),
     ]
     if context.workmode == 'personal':
         tabs = filter_tabs(default_tabs, ['permissions'])
