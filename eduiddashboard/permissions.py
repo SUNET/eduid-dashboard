@@ -197,9 +197,15 @@ class BaseFactory(object):
         return user.get('mail')
 
     def get_preferred_language(self):
+        """ Return always a """
         lang = self.user.get('preferredLanguage', None)
-        if lang is None:
-            return self.request.registry.settings.get('available_languages')
+        if lang is not None:
+            return lang
+        available_languages = self.request.registry.settings.get('available_languages', [])
+        if len(available_languages) > 0:
+            return available_languages[0]
+        else:
+            return 'en'
 
 
 class ForbiddenFactory(RootFactory):
