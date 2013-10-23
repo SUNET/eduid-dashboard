@@ -54,81 +54,6 @@ def get_address_id(address):
                                address['country'])
 
 
-def mark_as_verified_postal_address(request, user, address_id):
-    addresses = user['postalAddress']
-
-    for address in addresses:
-        if get_address_id(address) == address_id:
-            address['verified'] = True
-
-
-@view_config(route_name='postaladdress-actions', permission='edit')
-class PostalAddressActionsView(BaseActionsView):
-    data_attribute = 'postalAddress'
-    verify_messages = {
-        'ok': _('The postal address has been verified'),
-        'error': _('The confirmation code used is invalid, please try again or request a new code'),
-        'request': _('Please revise your postal mailbox and fill below with the given code'),
-        'placeholder': _('Postal address confirmation code'),
-        'new_code_sent': _('A new confirmation code has been sent to your postal mailbox'),
-    }
-
-    def get_verification_data_id(self, data_to_verify):
-        return get_address_id(data_to_verify)
-
-    def send_verification_code(self, data_id, code):
-        msg = _('The confirmation code for your postal address is ${code}', mapping={
-            'code': code,
-        })
-        msg = get_localizer(self.request).translate(msg)
-        logger.info(u"Postal mail to %s: %s" % (data_id, msg))
-
-    def setpreferred_action(self, index, post_data):
-        addresses = self.user.get('postalAddress', [])
-        preferred_address = addresses[index]
-        for address in addresses:
-            if address == preferred_address:
-                address['preferred'] = True
-            else:
-                address['preferred'] = False
-
-        self.user['postalAddress'] = addresses
-        # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'postalAddress': addresses,
-            }
-        }, safe=True)
-
-        self.context.propagate_user_changes(self.user)
-        return {'result': 'ok', 'message': _('Your postal address was successfully updated')}
-
-    def remove_action(self, index, post_data):
-        addresses = self.user['postalAddress']
-        address_to_remove = addresses[index]
-        addresses.remove(address_to_remove)
-
-        self.user['postalAddress'] = addresses
-
-        # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'postalAddress': addresses,
-            }
-        }, safe=True)
-
-        self.context.propagate_user_changes(self.user)
-
-        return {
-            'result': 'ok',
-            'message': _('Postal address was successfully removed.'),
-        }
-
-
 @view_config(route_name='postaladdress', permission='edit',
              renderer='templates/postaladdress-form.jinja2')
 class PostalAddressView(BaseFormView):
@@ -144,14 +69,10 @@ class PostalAddressView(BaseFormView):
 
     buttons = ('save', )
 
-    def appstruct(self):
-        return {}
-
-    def get_template_context(self):
-        context = super(PostalAddressView, self).get_template_context()
-        postal_addresses = self.user.get('postalAddress', [])
+    def get_addresses(self):
         postal_address = {}
         alternative_postal_address = {}
+        postal_addresses = self.user.get('postalAddress', [])
         if len(postal_addresses) > 0:
             if postal_addresses[0]['type'] == 'official':
                 postal_address = postal_addresses[0]
@@ -160,10 +81,20 @@ class PostalAddressView(BaseFormView):
             else:
                 alternative_postal_address = postal_addresses[0]
 
+        return (postal_address, alternative_postal_address)
+
+    def appstruct(self):
+        (postal_address, alternative_postal_address) = self.get_addresses()
+        return alternative_postal_address
+
+    def get_template_context(self):
+        context = super(PostalAddressView, self).get_template_context()
+        (postal_address, alternative_postal_address) = self.get_addresses()
+
         context.update({
             'postal_address': postal_address,
             'alternative_postal_address': alternative_postal_address,
-            'contains_official_postal_address': contains_official_postal_address(postal_addresses),
+            'contains_official_postal_address': postal_address is not {},
         })
         return context
 
@@ -182,8 +113,11 @@ class PostalAddressView(BaseFormView):
         address['type'] = 'alternative'
 
         addresses = self.user.get('postalAddress', [])
-        if len(addresses) > 1 and addresses[0].get('type') == 'official':
-            addresses[1] = address
+        if len(addresses) > 0 and addresses[0].get('type') == 'official':
+            if len(addresses) == 1:
+                addresses.append(address)
+            else:
+                addresses[1] = address
         else:
             addresses[0] = address
 
@@ -197,3 +131,10 @@ class PostalAddressView(BaseFormView):
         self.context.propagate_user_changes(self.user)
 
         self.request.session.flash(_('Changes saved.'), queue='forms')
+
+    def failure(self, e):
+        context = super(PostalAddressView, self).failure(e)
+
+        context.update({'form_error', True})
+
+        return context
