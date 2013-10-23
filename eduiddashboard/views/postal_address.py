@@ -135,6 +135,5 @@ class PostalAddressView(BaseFormView):
     def failure(self, e):
         context = super(PostalAddressView, self).failure(e)
 
-        context.update({'form_error', True})
-
+        context.update({'form_error': True})
         return context
