@@ -49,11 +49,12 @@ class NIN(colander.MappingSchema):
         title=_('Swedish personal identity number'),
         validator=colander.All(
             colander.Regex(
-                regex=re.compile('[0-9]{12}'),
+                regex=re.compile('\d{8}-\d{4}'),
                 msg=_('The Swedish personal identity number consists of 12 digits')
             ),
             NINUniqueValidator()
-        )
+        ),
+        widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxx'))
     )
 
 

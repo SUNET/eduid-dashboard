@@ -1,5 +1,7 @@
 # NINS form
 
+import deform
+
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
 from pyramid.i18n import get_localizer
@@ -10,7 +12,7 @@ from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 
-from eduiddashboard.verifications import dummy_message, new_verification_code
+from eduiddashboard.verifications import new_verification_code
 
 
 def get_status(user):
@@ -164,7 +166,7 @@ class NinsView(BaseFormView):
     schema = NIN()
     route = 'nins'
 
-    buttons = ('add', )
+    buttons = (deform.Button(name='add', title=_('Add national identity number')), )
 
     bootstrap_form_style = 'form-inline'
 
@@ -183,7 +185,7 @@ class NinsView(BaseFormView):
 
         return context
 
-    def add_success(self, ninform):
+    def add_success_personal(self, ninform):
         newnin = self.schema.serialize(ninform)
         newnin = newnin['norEduPersonNIN']
 
@@ -209,13 +211,43 @@ class NinsView(BaseFormView):
 
         send_verification_code(self.request, self.user, newnin)
 
-        proofing_links = self.request.registry.settings.get('proofing_links',
-                                                            {})
-        nin_proofing_link = proofing_links.get('nin')
-
         msg = _('A confirmation code has been sent to your govt inbox. '
-                'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${id}">here</a>.',
+                'Please click on "Pending confirmation" link below to enter.'
+                'your confirmation code',
                 mapping={'id': nin_identifier})
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
+
+    def add_success_other(self, ninform):
+        newnin = self.schema.serialize(ninform)
+        newnin = newnin['norEduPersonNIN']
+
+        for nin in nins:
+            nin['active'] = False
+
+        ninsubdoc = {
+            'norEduPersonNIN': newnin,
+            'verified': True,
+            'active': True,
+        }
+
+        nins = self.user.get('norEduPersonNIN', [])
+        nin_identifier = len(nins)
+        nins.append(ninsubdoc)
+
+        self.user['norEduPersonNIN'] = nins
+
+        # Do the save staff
+        self.request.db.profiles.save(self.user, safe=True)
+
+        self.context.propagate_user_changes(self.user)
+
+        self.request.session.flash(_('Changes saved'),
+                                   queue='forms')
+
+    def add_success(self, ninform):
+        if self.context.workmode == 'personal':
+            self.add_success_personal(ninform)
+        else:
+            self.add_success_other(ninform)

@@ -229,6 +229,7 @@ form.form-inline div.alert {
   padding: 0;
 }
 
+#ninsview-form label,
 #mobilesview-form label,
 #emailsview-form label {
   display: none;
@@ -236,12 +237,6 @@ form.form-inline div.alert {
 
 div.form-content {
   margin-top: 10px;
-}
-
-div.form-content button[name=verify],
-div.form-content button[name=remove],
-div.form-content button[name=setprimary] {
-  display: none;
 }
 
 .askdialog-extra-info {
