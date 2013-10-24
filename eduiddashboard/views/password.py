@@ -85,17 +85,8 @@ def send_reset_password_mail(request, email, user, code, reset_password_link):
 
 def send_reset_password_gov_message(request, nin, user, code, reset_password_link):
     """ Send an message to the gov mailbox with the instructions for resetting password """
-    site_name = request.registry.settings.get("site.name", "eduID")
-
-    context = {
-        "nin": nin,
-        "given_name": user.get('givenName', ''),
-        "code": code,
-        "reset_password_link": reset_password_link,
-        "site_url": request.route_url("home"),
-        "site_name": site_name,
-    }
-    print context  # TODO: Implement the eduid_msg communication
+    user_language = user.get('preferredLanguage', 'en')
+    request.msgrelay.nin_reset_password(nin, code, reset_password_link, user_language)
 
 
 @view_config(route_name='passwords', permission='edit',
