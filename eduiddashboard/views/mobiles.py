@@ -1,5 +1,7 @@
 ## Mobile phones forms
 
+import deform
+
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
@@ -40,7 +42,7 @@ def get_status(user):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('Mobiles'),
+        'label': _('Mobile phone numbers'),
         'id': 'mobiles',
     }
 
@@ -85,13 +87,45 @@ class MobilesActionsView(BaseActionsView):
         self.user['mobile'] = mobiles
 
         # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'mobile': mobiles,
+        self.request.db.profiles.save(self.user, safe=True)
+
+        self.context.propagate_user_changes(self.user)
+
+        return {
+            'result': 'ok',
+            'message': _('Mobile phone number was successfully removed'),
+        }
+
+    def setprimary_action(self, index, post_data):
+        mobiles = self.user.get('mobile', [])
+
+        if index > len(mobiles):
+            return {
+                'result': 'bad',
+                'message': _("That mobile phone number doesn't exists"),
             }
-        }, safe=True)
+
+        count = 0
+
+        mobile = mobiles[index]
+        if index > len(mobiles):
+            return {
+                'result': 'bad',
+                'message': _("You need to verify that mobile phone number "
+                             "before be able to set as primary"),
+            }
+
+        for mobile in mobiles:
+            if count == index:
+                mobile['primary'] = True
+            else:
+                mobile['primary'] = False
+            count += 1
+
+        self.user['mobile'] = mobiles
+
+        # do the save staff
+        self.request.db.profiles.save(self.user, safe=True)
 
         self.context.propagate_user_changes(self.user)
 
@@ -117,7 +151,9 @@ class MobilesView(BaseFormView):
     schema = Mobile()
     route = 'mobiles'
 
-    buttons = ('add', )
+    buttons = (deform.Button(name='add', title=_('Add mobile phone number')), )
+
+    bootstrap_form_style = 'form-inline'
 
     def appstruct(self):
         return {}
@@ -142,13 +178,7 @@ class MobilesView(BaseFormView):
         mobile_identifier = len(mobiles) - 1
 
         # do the save staff
-        self.request.db.profiles.find_and_modify({
-            '_id': self.user['_id'],
-        }, {
-            '$set': {
-                'mobile': mobiles,
-            }
-        }, safe=True)
+        self.request.db.profiles.save(self.user, safe=True)
 
         # update the session data
         self.context.propagate_user_changes(self.user)

@@ -169,8 +169,14 @@ def error500view(context, request):
 
 
 @view_config(route_name='error500', renderer='templates/error500.jinja2')
-@view_config(context=Exception, renderer='templates/error500.jinja2')
 def exception_view(context, request):
     logger.error("The error was: %s" % context, exc_info=(context))
     message = getattr(context, 'message', '')
+    request.response.status = 500
     return {'msg': message}
+
+
+@view_config(route_name='error404', renderer='templates/error404.jinja2')
+def not_found_view(context, request):
+    request.response.status = 404
+    return {}

@@ -58,11 +58,11 @@ class MsgRelay(object):
 
     def mobile_validator(self, targetphone, code, language):
         content = self.get_content()
-        content = {
+        content.update({
             'code': code,
             'phonenumber': targetphone,
 
-        }
+        })
         lang = self.get_language(language)
 
         logger.debug('SENT mobile validator message code: {0} phone number: {1}'.format(

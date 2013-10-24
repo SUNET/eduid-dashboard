@@ -1,7 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   <h4>{% trans %}Email{% endtrans %}</h4>
+   <h4>{% trans %}Email addresses{% endtrans %}</h4>
    <p>{% trans %}After adding a new address, go to that account and click the
    link in the confirmation email. Addresses must be confirmed before they can become primary.
    {% endtrans %}</p>
@@ -12,61 +12,37 @@
   {{ safe_actions_url('emails-actions') }}
 
   {% if mails %}
-  <table class='table table-striped table-thin emails'>
-    <thead>
-      <tr>
-        <th>{{_("Primary")}}</th>
-        <th>{{_("Email")}}</th>
-        <th>{{_("Verified")}}</th>
-        <th>{{_("Remove")}}</th>
-      </tr>
-    </thead>
-
+  <table class='table table-striped table-thin table-form emails'>
     {% for mail in mails %}
     <tr class='emailrow' data-identifier="{{ loop.index0 }}">
-        <td>
-          <input type='radio' name='setprimary' value='{{loop.index0}}'
-           title='{{_("Make this email address your new primary email address")}}'
-           {% if mail.email == primary_email %}checked{% endif %}/></td>
-
-        <td class='identifier'>{{ mail.email }}</td>
-
+      <td class='identifier'>{{ mail.email }}</td>
+      <td>
       {% if mail.verified %}
-        <td><i class="icon-ok"
-               title='{{_("Already verified")}}'></i></td>
+        {% if mail.email == primary_email %}
+          <span class="nobutton">{{ _('Primary') }}</span>
+        {% else %}
+          <input type='button' class='btn btn-link' value="{{_('Make primary')}}"
+                 data-index='{{ loop.index0 }}' name='setprimary'>
+        {% endif %}
       {% else %}
-        <td>
-          <label>
-            <i class='icon-question-sign' title='{{_("Resend confirmation email")}}'></i>
-            <input class='hide' type='radio' name='verify' value='{{loop.index0}}'>
-          </label>
-        </td>
+          <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
+                 data-index='{{ loop.index0 }}' name='verify'>
       {% endif %}
-
-        <td>
-          <label>
-            <i class='icon-remove' title='{{_("Remove email address")}}'></i>
-            <input class='hide' type='radio' name='remove' value='{{loop.index0}}'>
-          </label>
-        </td>
+      </td>
+      <td>
+          <input type='button' class='btn btn-link' value="{{_('Remove')}}"
+                 data-index='{{ loop.index0 }}' name='remove'>
+      </td>
     </tr>
     {% endfor %}
   </table>
-
-  {% else %}
-    <p>{% trans %}Add an email address by clicking on the button below.{% endtrans %}</p>
   {% endif %}
 
-  <button type='button'
-          class='btn add-new' 
-          data-toggle='button'>
-        <i class='icon-plus'></i>
-        {{_('Add email address')}}</button>
 {% endblock %}
 
 
 {% block form_generic_form %}
-  <div class='form-content hide'>
+  <div class='form-content'>
     {{ form|safe }}
   </div>
 {% endblock %}

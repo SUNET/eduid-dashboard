@@ -28,17 +28,17 @@ class PostalAddressFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
 
-        form['type'].value = 'home'
         form['address'].value = 'SVEN NILSSON 10'
         form['locality'].value = 'STOCKHOLM'
+        form['postalCode'].value = '12312'
         form['country'].value = 'SE'
         with patch.object(UserDB, 'exists_by_field', clear=True):
             UserDB.exists_by_field.return_value = False
 
-            response = form.submit('add')
+            response = form.submit('save')
 
             self.assertEqual(response.status, '200 OK')
-            self.assertIn('SVEN NILSSON 10', response.body)
+            self.assertEqual(response.form['address'].value, 'SVEN NILSSON 10')
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_not_valid_address(self):
@@ -48,17 +48,17 @@ class PostalAddressFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
         bad_values = [
-            {'type': 'not_existing_type',  # bad type
-             'address': 'Foo',
-             'locality': 'Bar',
-             'country': 'SE',
-             'postalCode': '12345',
+            {
+                'address': '',  # empty address
+                'locality': 'Bar',
+                'country': 'SE',
+                'postalCode': '12345',
             },
-            {'type': 'home',
-             'address': 'Foo',
-             'locality': 'Bar',
-             'country': 'SE',
-             'postalCode': '123456789',  # too long
+            {
+                'address': 'Foo',
+                'locality': 'Bar',
+                'country': 'SE',
+                'postalCode': '123456789',  # too long
             },
         ]
 
@@ -66,41 +66,13 @@ class PostalAddressFormTests(LoggedInReguestTests):
             for key, value in bad_value.items():
                 if hasattr(form[key], 'options'):
                     # we change the options attribute in following sentence
-                    # to check the validation in the post request and not 
+                    # to check the validation in the post request and not
                     # in the form[key] = value sentence
                     form[key].options = [(value, value)]
                 form[key] = value
             with patch.object(UserDB, 'exists_by_field', clear=True):
                 UserDB.exists_by_field.return_value = False
-                response = form.submit('add')
-
+                response = form.submit('save')
                 self.assertEqual(response.status, '200 OK')
-                self.assertIn('alert-error', response.body)
+                self.assertIn('errorMsg', response.body)
                 self.assertIsNotNone(getattr(response, 'form', None))
-
-    def test_remove_existant_address(self):
-        self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-        addresses_number = len(userdb['postalAddress'])
-
-        response = self.testapp.post(
-            '/profile/postaladdress-actions/',
-            {'identifier': 0, 'action': 'remove'}
-        )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
-        self.assertEqual(addresses_number - 1, len(userdb_after['postalAddress']))
-
-    def test_remove_not_existant_address(self):
-        self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-        addresses_number = len(userdb['postalAddress'])
-
-        with self.assertRaises(IndexError):
-            self.testapp.post(
-                '/profile/postaladdress-actions/',
-                {'identifier': 10, 'action': 'remove'}
-            )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
-        self.assertEqual(addresses_number, len(userdb_after['postalAddress']))

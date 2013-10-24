@@ -66,13 +66,10 @@
                 container.find('table.table tr[data-identifier=' + identifier + '] input[name=verify]').click();
             });
 
-            container.find('table.table input[type=radio]').click(function (e) {
+            container.find('table.table-form input[type=button]').click(function (e) {
                 var action = $(e.target).attr('name'),
-                    value = $(e.target).val(),
+                    value = $(e.target).attr('data-index'),
                     actions_url = $('.actions-url').attr('data-url');
-
-                container.find('.form-content').addClass('hide');
-                container.find('.add-new').removeClass('active');
 
                 $.post(actions_url, {
                     action: action,
