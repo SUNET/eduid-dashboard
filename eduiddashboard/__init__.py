@@ -352,6 +352,12 @@ def main(global_config, **settings):
         'en sv es',
     )
 
+    settings['default_country_code'] = read_setting_from_env(
+        settings,
+        'default_country_code',
+        '+46',  # sweden country code
+    )
+
     settings['verification_code_timeout'] = read_setting_from_env(settings,
         'verification_code_timeout',
         '30',
