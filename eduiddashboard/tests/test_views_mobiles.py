@@ -28,18 +28,22 @@ class MailsFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
 
-        form['mobile'].value = '+34678455654'
-        with patch.object(UserDB, 'exists_by_field', clear=True):
-            UserDB.exists_by_field.return_value = False
+        for good_value in ('+34678455654', '0720123456'):
+            form['mobile'].value = good_value
+            with patch.object(UserDB, 'exists_by_field', clear=True):
+                UserDB.exists_by_field.return_value = False
 
-            response = form.submit('add')
+                response = form.submit('add')
 
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn('+34678455654', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
-        self.assertIsNotNone(self.db.verifications.find_one({
-            'obj_id': '+34678455654', 'verified': False},
-        ))
+                self.assertEqual(response.status, '200 OK')
+                self.assertIn(good_value, response.body)
+                self.assertIsNotNone(getattr(response, 'form', None))
+            if not good_value.startswith('+'):
+                country_code = self.settings['default_country_code']
+                good_value = country_code + good_value
+            self.assertIsNotNone(self.db.verifications.find_one({
+                'obj_id': good_value, 'verified': False},
+            ))
 
     def test_add_not_valid_mobile(self):
         self.set_logged()
@@ -48,7 +52,7 @@ class MailsFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
 
-        for bad_value in ('not_a_number', '545455'):
+        for bad_value in ('not_a_number', '545455', '+555555', '0770123456'):
             form['mobile'].value = bad_value
             with patch.object(UserDB, 'exists_by_field', clear=True):
                 UserDB.exists_by_field.return_value = False

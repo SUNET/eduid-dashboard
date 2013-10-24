@@ -182,6 +182,7 @@ class LoggedInReguestTests(unittest.TestCase):
                 nin = http://another.platform/nins/{nin}/
             """,
             'available_languages': 'en es',
+            'default_country_code': '+46',
             'vccs_url': 'http://localhost:8550/',
         }
 
