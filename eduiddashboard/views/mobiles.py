@@ -188,8 +188,7 @@ class MobilesView(BaseFormView):
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')
         msg = _('A confirmation code has been sent to your mobile phone. '
-                'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${identifier}">here</a>',
-                mapping={'identifier': mobile_identifier})
+                'Please click on the "Pending confirmation" link below and enter your confirmation code.')
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg,
                                    queue='forms')
