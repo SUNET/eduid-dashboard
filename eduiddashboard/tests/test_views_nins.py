@@ -63,11 +63,11 @@ class NinsFormTests(LoggedInReguestTests):
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_existant_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged()
 
         response_form = self.testapp.get('/profile/nins/')
 
-        self.assertIn('123456789012', response_form.body)
+        self.assertIn('12345678-9012', response_form.body)
 
         form = response_form.forms[self.formname]
 
@@ -93,9 +93,8 @@ class NinsFormTests(LoggedInReguestTests):
             status=200
         )
 
-
     def test_remove_existant_verified_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged()
 
         self.testapp.post(
             '/profile/nins-actions/',
@@ -103,8 +102,8 @@ class NinsFormTests(LoggedInReguestTests):
             status=409)
 
     def test_remove_existant_notverified_nin(self):
-        self.set_logged(user='johnsmith@example.org')
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
+        self.set_logged()
+        userdb = self.db.profiles.find_one({'_id': self.user['_id']})
         nins_number = len(userdb['norEduPersonNIN'])
 
         response = self.testapp.post(
