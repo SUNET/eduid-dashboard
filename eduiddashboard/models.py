@@ -171,8 +171,8 @@ class PostalAddress(colander.MappingSchema):
 class Mobile(colander.MappingSchema):
     mobile = colander.SchemaNode(colander.String(),
                                  validator=colander.Regex(
-                                    r'^\+[\d ]+$',
-                                    msg=_('Invalid telephone number. It must be written using international notation, starting with "+".'),
+                                    r'^\+\d{10,20}$|^07[0236]\d{7}$',
+                                    msg=_('Invalid telephone number. It must be a valid Swedish number, or written using international notation, starting with "+" and followed by 10-20 digits.'),
                                  ),
                                  title=_('mobile'),
                                  widget=deform.widget.TextInputWidget(mask=_('Mobile phone number')))
