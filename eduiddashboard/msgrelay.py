@@ -57,11 +57,17 @@ class MsgRelay(object):
         }
 
     def mobile_validator(self, targetphone, code, language):
+        """
+            The template keywords are:
+                * sitename: (eduID by default)
+                * sitelink: (the url dashboard in personal workmode)
+                * code: the verification code
+                * phonenumber: the phone number to verificate
+        """
         content = self.get_content()
         content.update({
             'code': code,
             'phonenumber': targetphone,
-
         })
         lang = self.get_language(language)
 
@@ -72,10 +78,18 @@ class MsgRelay(object):
                                 lang)
 
     def nin_validator(self, nin, code, language):
+        """
+            The template keywords are:
+                * sitename: eduID by default
+                * sitelink: the url dashboard in personal workmode
+                * code: the verification code
+                * nin: the nin number to verificate
+        """
         content = self.get_content()
 
         content.update({
             'code': code,
+            'nin': nin,
         })
         lang = self.get_language(language)
         logger.debug('SENT nin message code: {0} NIN: {1}'.format(
@@ -84,8 +98,17 @@ class MsgRelay(object):
                                 TEMPLATES_RELATION.get('nin-validator'), lang)
 
     def nin_reset_password(self, nin, code, link, language):
+        """
+            The template keywords are:
+                * sitename: eduID by default
+                * sitelink: the url dashboard in personal workmode
+                * nin: the inbox nin
+                * code: the verification code
+                * link: a link to verificate the code
+        """
         content = self.get_content()
         content.update({
+            'nin': nin,
             'code': code,
             'link': link,
         })
