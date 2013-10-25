@@ -145,7 +145,7 @@ class PasswordFormTests(LoggedInReguestTests):
 
         form['email_or_username'].value = 'notexistingmail@foodomain.com'
         response = form.submit('reset')
-        self.assertIn("This username or email does not exist", response.body)
+        self.assertIn("Username or email address does not exist", response.body)
 
         reset_passwords = list(self.db.reset_passwords.find())
         for email in self.user['mailAliases']:

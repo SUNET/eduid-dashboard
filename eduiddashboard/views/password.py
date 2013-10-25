@@ -228,7 +228,7 @@ class ResetPasswordEnterCodeView(BaseResetPasswordView):
     """
     schema = ResetPasswordEnterCode()
     route = 'reset-password-enter-code'
-    intro_message = _('Enter the confirmation code')
+    intro_message = _('Enter your confirmation code')
     buttons = (Button('entercode', title=_('Enter code')), )
 
     def entercode_success(self, passwordform):

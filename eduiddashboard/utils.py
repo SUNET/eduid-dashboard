@@ -90,7 +90,7 @@ def get_available_tabs(context):
         mobiles.get_tab(),
         postal_address.get_tab(),
         {
-            'label': _('Passwords'),
+            'label': _('Password'),
             'status': get_dummy_status,
             'id': 'passwords',
         },

@@ -42,7 +42,7 @@ def get_status(user):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('Postal Address'),
+        'label': _('Postal address'),
         'id': 'postaladdress',
     }
 
