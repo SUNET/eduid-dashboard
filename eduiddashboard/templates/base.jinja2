@@ -69,10 +69,18 @@
     <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/pwstrength.js'|static_url}}"></script>
     <script>
+      var messagesTimer = null;
+      var clearMessages = function() {
+        if (messagesTimer) {
+          window.clearTimeout(messagesTimer);
+        }
+        $('.messages .alert').fadeOut();
+      }
       $(document).ready(function () {
         $('a.null-link').click(function (e) {
             e.preventDefault();
         });
+        messagesTimer = window.setTimeout(clearMessages, 5000);
       });
     </script>
     {% block extrajs %}

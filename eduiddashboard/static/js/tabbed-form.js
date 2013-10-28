@@ -66,8 +66,6 @@ var TabbedForm = function (container) {
             initialize_pending_actions();
 
             $('body').bind('formready', function () {
-                // move the form messages to the messages main area
-                $('.alert').appendTo(".messages");
                 // callbacks
                 window.tabbedform.changetabs_calls.forEach(function (func) {
                     if (func !== undefined) {

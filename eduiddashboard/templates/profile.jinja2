@@ -139,6 +139,12 @@ $(document).ready(function () {
       $('.nav-tabs li.active a').click();
     }
 
+    $('body').on('form-submitted action-executed', function() {
+      // move the form messages to the messages main area
+      $('.alert').appendTo(".messages");
+      window.setTimeout(clearMessages, 10000);
+    });
+
     {% if context.workmode == 'personal' %}
       $('body').on('form-submitted action-executed', function() {
         showStatus();
