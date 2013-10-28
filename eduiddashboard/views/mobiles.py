@@ -138,7 +138,7 @@ class MobilesActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('Mobile phone number was successfully removed'),
+            'message': _('Mobile phone number was successfully made primary'),
         }
 
     def send_verification_code(self, data_id, code):
