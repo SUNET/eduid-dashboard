@@ -101,6 +101,8 @@ class PasswordsView(BaseFormView):
 
     schema = Passwords()
     route = 'passwords'
+    buttons = (Button(name='save', title=_('Change password')), )
+
 
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
@@ -138,6 +140,7 @@ class BaseResetPasswordView(FormView):
 
         self.form_options = {
             'formid': "{classname}-form".format(classname=self.classname),
+            'bootstrap_form_style': 'form-inline',
         }
 
     def get_template_context(self):

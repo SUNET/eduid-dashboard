@@ -270,7 +270,8 @@ table.postal-addresses {
 }
 
 .reset-password-form-container .controls {
-  margin-left: 220px;
+  margin-left: 0px;
+  display: block;
 }
 
 .reset-password-form-container .control-label {
