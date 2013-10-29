@@ -8,6 +8,7 @@ from deform import Form
 
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 
 from eduid_am.celery import celery
@@ -243,6 +244,9 @@ def includeme(config):
         config.add_view(context=Exception,
                         view='eduiddashboard.views.portal.exception_view',
                         renderer='templates/error500.jinja2')
+        config.add_view(context=HTTPNotFound,
+                        view='eduiddashboard.views.portal.not_found_view',
+                        renderer='templates/error404.jinja2')
 
 
 def main(global_config, **settings):
