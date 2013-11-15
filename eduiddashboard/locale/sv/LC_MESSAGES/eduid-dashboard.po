@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-15 10:01+0100\n"
+"POT-Creation-Date: 2013-11-15 10:37+0100\n"
 "PO-Revision-Date: 2013-11-15 08:51+0000\n"
 "Last-Translator: ft\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
@@ -88,7 +88,6 @@ msgstr "Lösenorden är olika"
 
 #: eduiddashboard/models.py:112 eduiddashboard/models.py:134
 #, fuzzy
-#| msgid "Enter your email address"
 msgid "Enter your email address or your eduID username"
 msgstr "Ange din e-postadress"
 
@@ -117,8 +116,6 @@ msgstr "Land"
 
 #: eduiddashboard/models.py:176
 #, fuzzy
-#| msgid "" "Invalid telephone number. It must be written using international "
-#| "notation, starting with \"+\"."
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
@@ -179,7 +176,6 @@ msgstr "Ogiltig automatinloggning"
 
 #: eduiddashboard/utils.py:93
 #, fuzzy
-#| msgid "Passwords"
 msgid "Password"
 msgstr "Lösenord"
 
@@ -197,7 +193,6 @@ msgstr "Den valda rättigheten är inte tillgänglig"
 
 #: eduiddashboard/validators.py:58
 #, fuzzy
-#| msgid "This email is already registered"
 msgid "This email address is already in use"
 msgstr "Denna e-post används redan "
 
@@ -207,7 +202,6 @@ msgstr ""
 
 #: eduiddashboard/validators.py:74 eduiddashboard/validators.py:89
 #, fuzzy
-#| msgid "This email does not exist"
 msgid "Email address does not exist"
 msgstr "E-postadressen finns ej"
 
@@ -217,13 +211,11 @@ msgstr "Minst en e-postadress krävs"
 
 #: eduiddashboard/validators.py:103
 #, fuzzy
-#| msgid "This email does not exist"
 msgid "Username or email address does not exist"
 msgstr "E-postadressen finns ej"
 
 #: eduiddashboard/validators.py:114
 #, fuzzy
-#| msgid "National identity number not verified"
 msgid ""
 "This national identity number does not exist, is not verified or is not "
 "active"
@@ -231,19 +223,16 @@ msgstr "Personnummer inte verifierat"
 
 #: eduiddashboard/validators.py:128
 #, fuzzy
-#| msgid "National identity number confirmation code"
 msgid "This national identity number is already in use"
 msgstr "Bekräftelsekod för personnummer"
 
 #: eduiddashboard/validators.py:133
 #, fuzzy
-#| msgid "National identity number has been removed"
 msgid "This national identity number is already registered by you"
 msgstr "Personnumret har tagits bort"
 
 #: eduiddashboard/validators.py:142
 #, fuzzy
-#| msgid "The requested page doesn't exists."
 msgid "The entered code does not exist"
 msgstr "Sidan kunde inte hittas."
 
@@ -462,7 +451,6 @@ msgstr "Personlig information"
 #: eduiddashboard/templates/postaladdress-form.jinja2:4
 #: eduiddashboard/views/postal_address.py:45
 #, fuzzy
-#| msgid "Add postal address"
 msgid "Postal address"
 msgstr "Lägg till postadress"
 
@@ -484,13 +472,11 @@ msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:36
 #, fuzzy
-#| msgid "Postal code"
 msgid "Postal Code"
 msgstr "Postkod"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:60
 #, fuzzy
-#| msgid "Remove postal address"
 msgid "Alternative postal address"
 msgstr "Ta bort postadress"
 
@@ -545,13 +531,6 @@ msgstr "Åtkomst nekad"
 
 #: eduiddashboard/templates/reset-password-email.html.jinja2:1
 #, fuzzy, python-format
-#| msgid "" "\n" "<h2>Dear %(given_name)s,</h2>\n" "\n" "<p>We are sending this
-#| email because we have received a request to reset " "the password for
-#| your\n" "<a href=\"%(site_url)s\">%(site_name)s</a> account %(email)s. If
-#| you did " "not initiate this request,\n" "you may simply disregard this
-#| email.\n" "</p>\n" "\n" "<p>Click on the following link to create a new
-#| password.</p>\n" "\n" "<a href=\"%(reset_password_link)s\">Create a new
-#| password</a>\n" "\n" "(This is an automated email. Please do not reply.)\n"
 msgid ""
 "\n"
 "<h2>Dear %(given_name)s,</h2>\n"
@@ -593,12 +572,6 @@ msgstr ""
 
 #: eduiddashboard/templates/reset-password-email.txt.jinja2:1
 #, fuzzy, python-format
-#| msgid "" "\n" "Dear %(given_name)s,\n" "\n" "We are sending this email
-#| because we have received a request to reset the" " password for your\n"
-#| "%(site_name)s account %(email)s. If you did not initiate this request,\n"
-#| "you may simply disregard this email.\n" "\n" "Click on the following link
-#| to create a new password.\n" "\n" "%(reset_password_link)s\n" "\n" "(This is
-#| an automated email. Please do not reply.)\n"
 msgid ""
 "\n"
 "Dear %(given_name)s,\n"
@@ -656,7 +629,6 @@ msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:19
 #, fuzzy
-#| msgid "Current password"
 msgid "Reset password by e-mail"
 msgstr "Nuvarande lösenord"
 
@@ -856,7 +828,6 @@ msgstr ""
 
 #: eduiddashboard/views/mobiles.py:81
 #, fuzzy
-#| msgid "A confirmation code has been sent your mobile phone number"
 msgid "A confirmation code has been sent to your mobile phone number"
 msgstr "En bekräftelseskod har skickats till ditt mobiltelefonnummer"
 
@@ -884,7 +855,6 @@ msgstr "Du behöver verifiera ditt mobilnummer innan det går att ange som prim�
 
 #: eduiddashboard/views/mobiles.py:141
 #, fuzzy
-#| msgid "Mobile phone number was successfully removed"
 msgid "Mobile phone number was successfully made primary"
 msgstr "Mobiltelefonnumret har tagits bort "
 
@@ -951,14 +921,11 @@ msgstr ""
 
 #: eduiddashboard/views/password.py:171 eduiddashboard/views/password.py:203
 #, fuzzy
-#| msgid "Current password"
 msgid "Reset password"
 msgstr "Nuvarande lösenord"
 
 #: eduiddashboard/views/password.py:183
 #, fuzzy
-#| msgid "" "An email has been sent to the address you entered.This email will
-#| contain" " instructions and a linkthat will let you reset your password."
 msgid ""
 "An email has been sent to your ${email} inbox.This email will contain "
 "instructions and a linkthat will let you reset your password."
@@ -969,8 +936,6 @@ msgstr ""
 
 #: eduiddashboard/views/password.py:221
 #, fuzzy
-#| msgid "" "An email has been sent to the address you entered.This email will
-#| contain" " instructions and a linkthat will let you reset your password."
 msgid ""
 "An message has been sent to your government mailbox with the instructions"
 " to reset your password."
@@ -981,13 +946,11 @@ msgstr ""
 
 #: eduiddashboard/views/password.py:234
 #, fuzzy
-#| msgid "Lost your confirmation code?"
 msgid "Enter your confirmation code"
 msgstr "Tappat bort din bekräftelsekod?"
 
 #: eduiddashboard/views/password.py:235
 #, fuzzy
-#| msgid "Verify code"
 msgid "Enter code"
 msgstr "Verifiera kod"
 
@@ -1054,85 +1017,13 @@ msgstr "Ändringarna har sparats."
 #~ msgstr "Postadress"
 
 #~ msgid ""
-#~ "<p>Please enter your national identity "
-#~ "number for automatic retrieval of your"
-#~ " place of\n"
-#~ "        residence from the Swedish population register.</p>\n"
-#~ "    "
 #~ msgstr ""
-#~ "<p>Lägg till ditt personnummer för att"
-#~ " automatiskt hämta din folkbokföringsadress.</p>"
-
-#~ msgid ""
-#~ "\n"
-#~ "    <p>Be aware that your postal address from the population register\n"
-#~ "        will be used when sending letters by mail to you.</p>\n"
-#~ "    "
-#~ msgstr ""
-#~ "\n"
-#~ "<p>Notera att vid brevförsändelser används "
-#~ "din folkbokföringsadress.</p>"
 
 #~ msgid "Type"
 #~ msgstr "Typ"
 
-#~ msgid ""
-#~ "Please add your place of residence "
-#~ "by clicking on the button below or"
-#~ " by adding your national\n"
-#~ "        identity number to your profile"
-#~ " for automated retrieval from the "
-#~ "Swedish population register.\n"
-#~ "    "
-#~ msgstr ""
-#~ "Lägg till dina adressuppgifter genom att"
-#~ " klicka på länken nedan eller genom"
-#~ " att lägga till ditt personnummer för"
-#~ " att automatiskt hämta din "
-#~ "folkbokföringsadress."
-
 #~ msgid "Emails addresses"
 #~ msgstr "E-postadresser"
-
-#~ msgid ""
-#~ "You need to complete the verification"
-#~ " process before to be able to "
-#~ "mark as primary"
-#~ msgstr ""
-#~ "Du behöver verifiera ditt mobilnummer "
-#~ "innan det går att ange som primärt"
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your mobile phone. Please enter "
-#~ "your confirmation code <a href=\"#\" "
-#~ "class=\"verifycode\" data-"
-#~ "identifier=\"${identifier}\">here</a>"
-#~ msgstr ""
-#~ "En bekräftelseskod har skickats till "
-#~ "ditt mobiltelefonnummer. Vänligen ange din "
-#~ "bekräftelsekod <a href=\"#\" class=\"verifycode\""
-#~ " data-identifier=\"${identifier}\">här</a>"
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your govt inbox. Please enter "
-#~ "your confirmation code <a href=\"#\" "
-#~ "class=\"verifycode\" data-identifier=\"${id}\">here</a>."
-#~ msgstr ""
-#~ "En bekräftelseskod har skickats till din"
-#~ " inkorg hos \"Mina Meddelanden\". Vänligen"
-#~ " ange din bekräftelsekod <a href=\"#\" "
-#~ "class=\"verifycode\" data-identifier=\"${id}\">här</a>."
-
-#~ msgid ""
-#~ "Please read the email sent to you"
-#~ " for further instructions. This window "
-#~ "can now safely be closed."
-#~ msgstr ""
-#~ "E-post med vidare instruktioner har "
-#~ "skickats till dig. Detta fönster kan "
-#~ "nu stängas."
 
 #~ msgid "Postal Address"
 #~ msgstr "Postadress"

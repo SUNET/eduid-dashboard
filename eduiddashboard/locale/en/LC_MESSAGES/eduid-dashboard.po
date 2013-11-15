@@ -8,11 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2013-11-11 15:01+0100\n"
-=======
-"POT-Creation-Date: 2013-10-25 10:45+0200\n"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
+"POT-Creation-Date: 2013-11-15 10:37+0100\n"
 "PO-Revision-Date: 2013-10-04 08:30+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -26,45 +22,6 @@ msgstr ""
 msgid "{site_name} confirmation email"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/models.py:20 eduiddashboard/models.py:48
-msgid "email"
-msgstr ""
-
-#: eduiddashboard/models.py:21
-msgid "phone mobile number"
-msgstr ""
-
-#: eduiddashboard/models.py:22 eduiddashboard/templates/home.jinja2:30
-msgid "NIN"
-msgstr ""
-
-#: eduiddashboard/models.py:26
-msgid "Official address"
-msgstr ""
-
-#: eduiddashboard/models.py:27
-msgid "Home address"
-msgstr ""
-
-#: eduiddashboard/models.py:28
-msgid "Work address"
-msgstr ""
-
-#: eduiddashboard/models.py:49
-msgid "Email address"
-msgstr ""
-
-#: eduiddashboard/models.py:55
-msgid "Swedish personal identity number"
-msgstr ""
-
-#: eduiddashboard/models.py:59
-msgid "The Swedish personal identity number consists of 12 digits"
-msgstr ""
-
-#: eduiddashboard/models.py:82
-=======
 #: eduiddashboard/models.py:22 eduiddashboard/models.py:42
 msgid "email"
 msgstr ""
@@ -94,54 +51,17 @@ msgid "yyyymmdd-xxx"
 msgstr ""
 
 #: eduiddashboard/models.py:77
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid "Given name"
 msgstr ""
 
-#: eduiddashboard/models.py:84
+#: eduiddashboard/models.py:79
 msgid "Surname"
 msgstr ""
 
-#: eduiddashboard/models.py:86
+#: eduiddashboard/models.py:81
 msgid "Display name"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/models.py:88
-msgid "Preferred language"
-msgstr ""
-
-#: eduiddashboard/models.py:96
-msgid "Current password"
-msgstr ""
-
-#: eduiddashboard/models.py:100
-msgid "New password"
-msgstr ""
-
-#: eduiddashboard/models.py:104
-msgid "Confirm new password"
-msgstr ""
-
-#: eduiddashboard/models.py:110 eduiddashboard/models.py:133
-msgid "Passwords don't match"
-msgstr ""
-
-#: eduiddashboard/models.py:120
-msgid "Enter your email address"
-msgstr ""
-
-#: eduiddashboard/models.py:138
-msgid "type"
-msgstr ""
-
-#: eduiddashboard/models.py:142
-#: eduiddashboard/templates/postaladdress-form.jinja2:28
-msgid "Address"
-msgstr ""
-
-#: eduiddashboard/models.py:143
-=======
 #: eduiddashboard/models.py:83
 msgid "Preferred language"
 msgstr ""
@@ -176,27 +96,10 @@ msgid "Address"
 msgstr ""
 
 #: eduiddashboard/models.py:166
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/models.py:144
-msgid "Postal code"
-msgstr ""
-
-#: eduiddashboard/models.py:146
-#: eduiddashboard/templates/postaladdress-form.jinja2:30
-msgid "Country"
-msgstr ""
-
-#: eduiddashboard/models.py:154
-msgid "You have not rights to set the official  postal address manually"
-msgstr ""
-
-#: eduiddashboard/models.py:162
-=======
 #: eduiddashboard/models.py:167
 msgid "Postal code"
 msgstr ""
@@ -207,36 +110,12 @@ msgid "Country"
 msgstr ""
 
 #: eduiddashboard/models.py:176
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/models.py:164
-msgid "mobile"
-msgstr ""
-
-#: eduiddashboard/models.py:165
-msgid "Mobile phone number"
-msgstr ""
-
-#: eduiddashboard/models.py:180
-msgid "text"
-msgstr ""
-
-#: eduiddashboard/models.py:181
-msgid "the exact match text for the attribute type selected for search"
-msgstr ""
-
-#: eduiddashboard/models.py:188
-msgid "attribute type"
-msgstr ""
-
-#: eduiddashboard/models.py:189
-=======
 #: eduiddashboard/models.py:178
 msgid "mobile"
 msgstr ""
@@ -258,31 +137,22 @@ msgid "attribute type"
 msgstr ""
 
 #: eduiddashboard/models.py:203
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/permissions.py:56
+#: eduiddashboard/permissions.py:70
 msgid "You do not have sufficient permissions to access this user"
 msgstr ""
 
-#: eduiddashboard/permissions.py:84
+#: eduiddashboard/permissions.py:98
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/permissions.py:215
+#: eduiddashboard/permissions.py:234
 msgid "Not logged in"
 msgstr ""
 
-#: eduiddashboard/permissions.py:224
-=======
-#: eduiddashboard/permissions.py:221
-msgid "Not logged in"
-msgstr ""
-
-#: eduiddashboard/permissions.py:230
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
+#: eduiddashboard/permissions.py:243
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 
@@ -344,8 +214,6 @@ msgstr ""
 msgid "This national identity number is already registered by you"
 msgstr ""
 
-<<<<<<< HEAD
-=======
 #: eduiddashboard/validators.py:142
 msgid "The entered code does not exist"
 msgstr ""
@@ -354,7 +222,6 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #: eduiddashboard/templates/base.jinja2:33
 msgid "Home"
 msgstr ""
@@ -410,10 +277,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
-<<<<<<< HEAD
-=======
 #: eduiddashboard/views/emails.py:41
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid "Email addresses"
 msgstr ""
 
@@ -433,27 +297,6 @@ msgstr ""
 #: eduiddashboard/templates/emails-form.jinja2:24
 #: eduiddashboard/templates/mobiles-form.jinja2:22
 msgid "Make primary"
-<<<<<<< HEAD
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:28
-#: eduiddashboard/templates/mobiles-form.jinja2:26
-msgid "Pending confirmation"
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:33
-#: eduiddashboard/templates/mobiles-form.jinja2:31
-#: eduiddashboard/templates/nins-form.jinja2:17
-#: eduiddashboard/templates/nins-form.jinja2:42
-#: eduiddashboard/templates/postaladdress-form.jinja2:31
-msgid "Remove"
-msgstr ""
-
-#: eduiddashboard/templates/error404.jinja2:8
-msgid "The requested page doesn't exists."
-msgstr ""
-
-=======
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:28
@@ -472,7 +315,6 @@ msgstr ""
 msgid "The requested page doesn't exists."
 msgstr ""
 
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #: eduiddashboard/templates/error404.jinja2:10
 msgid ""
 "\n"
@@ -541,35 +383,12 @@ msgstr ""
 msgid "Add a mobile phone number by clicking on the button below."
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/templates/nins-form.jinja2:4
-#: eduiddashboard/templates/nins-form.jinja2:15 eduiddashboard/views/nins.py:93
-msgid "National identity number"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:16
-#: eduiddashboard/templates/nins-form.jinja2:27
-msgid "Verified"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:33
-msgid "Verify code"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:37
-msgid "National identity number not verified"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:54
-msgid "Add a national identity number by clicking the button below"
-=======
 #: eduiddashboard/templates/nins-form.jinja2:4 eduiddashboard/views/nins.py:95
 msgid "National identity number"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:18
 msgid "Verified"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:20
@@ -584,6 +403,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
+#: eduiddashboard/views/password.py:104
 msgid "Change password"
 msgstr ""
 
@@ -621,22 +441,8 @@ msgstr ""
 msgid "Swedish population register address"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/templates/postaladdress-form.jinja2:48
-msgid "Remove postal address"
-msgstr ""
-
-#: eduiddashboard/templates/postaladdress-form.jinja2:61
-msgid ""
-"Please add your place of residence by clicking on the button below or by "
-"adding your national\n"
-"        identity number to your profile for automated retrieval from the "
-"Swedish population register.\n"
-"    "
-=======
 #: eduiddashboard/templates/postaladdress-form.jinja2:36
 msgid "Postal Code"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:60
@@ -739,7 +545,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:7
-#: eduiddashboard/views/password.py:167 eduiddashboard/views/password.py:199
+#: eduiddashboard/views/password.py:170 eduiddashboard/views/password.py:202
 msgid "Forgot your password?"
 msgstr ""
 
@@ -836,10 +642,6 @@ msgstr ""
 msgid "Check your email for further instructions"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:85
-msgid "Confirmation code"
-msgstr ""
-
 #: eduiddashboard/views/__init__.py:86
 msgid "A new confirmation code has been sent to you"
 msgstr ""
@@ -854,13 +656,6 @@ msgstr ""
 msgid "An email address is pending confirmation"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/emails.py:41
-msgid "Emails addresses"
-msgstr ""
-
-=======
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #: eduiddashboard/views/emails.py:56
 msgid "Email {email} verified"
 msgstr ""
@@ -869,11 +664,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:104
-=======
 #: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:106
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -886,13 +677,7 @@ msgid "A new confirmation code has been sent to your email"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:77
-<<<<<<< HEAD
-msgid ""
-"You need to complete the verification process before to be able to mark "
-"as primary"
-=======
 msgid "You need to confirm your email address before it can become primary"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgstr ""
 
 #: eduiddashboard/views/emails.py:86
@@ -911,14 +696,9 @@ msgstr ""
 msgid "Add email address"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:188
-#: eduiddashboard/views/nins.py:207 eduiddashboard/views/personal.py:79
-=======
 #: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
 #: eduiddashboard/views/personal.py:79
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid "Changes saved"
 msgstr ""
 
@@ -929,11 +709,7 @@ msgid ""
 "identifier=\"${id}\">here</a>."
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:154
-=======
 #: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:161
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid "Add mobile phone number"
 msgstr ""
 
@@ -963,18 +739,7 @@ msgstr ""
 msgid "A new confirmation code has been sent to your mobile number"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/mobiles.py:96 eduiddashboard/views/mobiles.py:134
-msgid "Mobile phone number was successfully removed"
-msgstr ""
-
-#: eduiddashboard/views/mobiles.py:105
-msgid "That mobile phone number doesn't exists"
-msgstr ""
-
-#: eduiddashboard/views/mobiles.py:114
-=======
-#: eduiddashboard/views/mobiles.py:103 eduiddashboard/views/mobiles.py:141
+#: eduiddashboard/views/mobiles.py:103
 msgid "Mobile phone number was successfully removed"
 msgstr ""
 
@@ -983,17 +748,16 @@ msgid "That mobile phone number doesn't exists"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:121
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid ""
 "You need to verify that mobile phone number before be able to set as "
 "primary"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/mobiles.py:190
-=======
+#: eduiddashboard/views/mobiles.py:141
+msgid "Mobile phone number was successfully made primary"
+msgstr ""
+
 #: eduiddashboard/views/mobiles.py:197
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
@@ -1008,33 +772,6 @@ msgstr ""
 msgid "Validation required for national identity number"
 msgstr ""
 
-<<<<<<< HEAD
-#: eduiddashboard/views/nins.py:103
-msgid "National identity number verified"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:105
-msgid "A confirmation code has been sent to your govt mailbox"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:106
-msgid "National identity number confirmation code"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:107
-msgid "A new confirmation code has been sent to your govt mailbox"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:119
-msgid "The provided nin can't be verified. You only can verify the last one"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:148
-msgid "National identity number has been removed"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:216
-=======
 #: eduiddashboard/views/nins.py:105
 msgid "National identity number verified"
 msgstr ""
@@ -1060,7 +797,6 @@ msgid "National identity number has been removed"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:214
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 msgid ""
 "A confirmation code has been sent to your govt inbox. Please click on "
 "\"Pending confirmation\" link below to enter.your confirmation code"
@@ -1070,55 +806,55 @@ msgstr ""
 msgid "Reset your password in {site_name}"
 msgstr ""
 
-#: eduiddashboard/views/password.py:115
+#: eduiddashboard/views/password.py:117
 msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/password.py:118
+#: eduiddashboard/views/password.py:120
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/password.py:168 eduiddashboard/views/password.py:200
+#: eduiddashboard/views/password.py:171 eduiddashboard/views/password.py:203
 msgid "Reset password"
 msgstr ""
 
-#: eduiddashboard/views/password.py:180
+#: eduiddashboard/views/password.py:183
 msgid ""
 "An email has been sent to your ${email} inbox.This email will contain "
 "instructions and a linkthat will let you reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:218
+#: eduiddashboard/views/password.py:221
 msgid ""
 "An message has been sent to your government mailbox with the instructions"
 " to reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:231
+#: eduiddashboard/views/password.py:234
 msgid "Enter your confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/password.py:232
+#: eduiddashboard/views/password.py:235
 msgid "Enter code"
 msgstr ""
 
-#: eduiddashboard/views/password.py:252
+#: eduiddashboard/views/password.py:255
 msgid "Complete your password reset"
 msgstr ""
 
-#: eduiddashboard/views/password.py:272
+#: eduiddashboard/views/password.py:275
 msgid "Password has been reset successfully"
 msgstr ""
 
-#: eduiddashboard/views/password.py:274
+#: eduiddashboard/views/password.py:277
 msgid ""
 "An error has occured while updating your password,please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/password.py:277
+#: eduiddashboard/views/password.py:280
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr ""
 
@@ -1294,8 +1030,6 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Please revise your inbox and fill below with the given code"
-<<<<<<< HEAD
-=======
 #~ msgstr ""
 
 #~ msgid "Verification code"
@@ -1311,7 +1045,6 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "The email has been verified"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #~ msgstr ""
 
 #~ msgid "The confirmation code is not the one have been sent to your inbox"
@@ -1320,14 +1053,10 @@ msgstr ""
 #~ msgid "email verification code"
 #~ msgstr ""
 
-<<<<<<< HEAD
-#~ msgid "You have to verificate some emails"
-=======
 #~ msgid "A new verification code has been sent to your inbox"
 #~ msgstr ""
 
 #~ msgid "Your primary email was changed"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #~ msgstr ""
 
 #~ msgid "Error: You only have one email and this cannot be deleted"
@@ -1339,14 +1068,10 @@ msgstr ""
 #~ msgid "You have to verificate some mobile phone"
 #~ msgstr ""
 
-<<<<<<< HEAD
-#~ msgid "email verification code"
-=======
 #~ msgid "The confirmation code for mobile ${mobile_number} is ${code}"
 #~ msgstr ""
 
 #~ msgid "The mobile phone has been verified"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #~ msgstr ""
 
 #~ msgid "Please revise your SMS inbox and fill below with the given code"
@@ -1358,9 +1083,6 @@ msgstr ""
 #~ msgid "You have to add your NIN number"
 #~ msgstr ""
 
-<<<<<<< HEAD
-#~ msgid "You have to add a mobile phone"
-=======
 #~ msgid "You must validate your NIN number"
 #~ msgstr ""
 
@@ -1371,7 +1093,6 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "NIN verification code"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #~ msgstr ""
 
 #~ msgid "A new verification code has been sent to your NIN inbox"
@@ -1389,9 +1110,6 @@ msgstr ""
 #~ msgid "Personal info"
 #~ msgstr ""
 
-<<<<<<< HEAD
-#~ msgid "You have to add your NIN number"
-=======
 #~ msgid "Postal address verification code"
 #~ msgstr ""
 
@@ -1399,6 +1117,51 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Your preferred address was changed"
+#~ msgstr ""
+
+#~ msgid "Photo"
+#~ msgstr ""
+
+#~ msgid "Personal avatar URL"
+#~ msgstr ""
+
+#~ msgid "User unknown"
+#~ msgstr ""
+
+#~ msgid "You do not have sufficient AL to edit your credentials"
+#~ msgstr ""
+
+#~ msgid "Assurance level identifier:"
+#~ msgstr ""
+
+#~ msgid "Email"
+#~ msgstr ""
+
+#~ msgid "Make this email address your new primary email address"
+#~ msgstr ""
+
+#~ msgid "Already verified"
+#~ msgstr ""
+
+#~ msgid "Resend confirmation email"
+#~ msgstr ""
+
+#~ msgid "Remove email address"
+#~ msgstr ""
+
+#~ msgid "Add an email address by clicking on the button below."
+#~ msgstr ""
+
+#~ msgid "Phone"
+#~ msgstr ""
+
+#~ msgid "Emails"
+#~ msgstr ""
+
+#~ msgid "Error: You only have one email address and it cannot be removed"
+#~ msgstr ""
+
+#~ msgid "Mobiles"
 #~ msgstr ""
 
 #~ msgid "Official address"
@@ -1410,12 +1173,6 @@ msgstr ""
 #~ msgid "Work address"
 #~ msgstr ""
 
-#~ msgid "Photo"
-#~ msgstr ""
-
-#~ msgid "Personal avatar URL"
-#~ msgstr ""
-
 #~ msgid "Enter your email address"
 #~ msgstr ""
 
@@ -1423,19 +1180,6 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "You have not rights to set the official  postal address manually"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Invalid telephone number. It must be "
-#~ "written using international notation, starting"
-#~ " with \"+\"."
-#~ msgstr ""
-
-#~ msgid "User unknown"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
-#~ msgstr ""
-
-#~ msgid "You do not have sufficient AL to edit your credentials"
 #~ msgstr ""
 
 #~ msgid "Passwords"
@@ -1459,33 +1203,6 @@ msgstr ""
 #~ msgid "This NIN is already registered in your NIN list"
 #~ msgstr ""
 
-#~ msgid "Assurance level identifier:"
-#~ msgstr ""
-
-#~ msgid "Email"
-#~ msgstr ""
-
-#~ msgid "Make this email address your new primary email address"
-#~ msgstr ""
-
-#~ msgid "Already verified"
-#~ msgstr ""
-
-#~ msgid "Resend confirmation email"
-#~ msgstr ""
-
-#~ msgid "Remove email address"
-#~ msgstr ""
-
-#~ msgid "Add an email address by clicking on the button below."
-#~ msgstr ""
-
-#~ msgid "Phone"
-#~ msgstr ""
-
-#~ msgid "Remove postal address"
-#~ msgstr ""
-
 #~ msgid "Verify code"
 #~ msgstr ""
 
@@ -1498,184 +1215,19 @@ msgstr ""
 #~ msgid "Postal addresses"
 #~ msgstr ""
 
-<<<<<<< HEAD
-#~ msgid "Now you can follow the email instructions and close this window safely."
-#~ msgstr ""
-
-#~ msgid "Finish your password reset"
-#~ msgstr ""
-
-#~ msgid "You can log in the <a href=\"${homelink}\">home page</a>"
-#~ msgstr ""
-
-#~ msgid "Personal info"
-#~ msgstr ""
-
-#~ msgid "Postal address verification code"
-#~ msgstr ""
-
-#~ msgid "A new verification code has been sent to your postal mailbox"
-#~ msgstr ""
-
-#~ msgid "Your preferred address was changed"
-#~ msgstr ""
-
-#~ msgid "Photo"
-#~ msgstr ""
-
-#~ msgid "Personal avatar URL"
-#~ msgstr ""
-
-#~ msgid "User unknown"
-#~ msgstr ""
-
-#~ msgid "You do not have sufficient AL to edit your credentials"
-#~ msgstr ""
-
-#~ msgid "Assurance level identifier:"
-#~ msgstr ""
-
-#~ msgid "Email"
-#~ msgstr ""
-
-#~ msgid "Make this email address your new primary email address"
-#~ msgstr ""
-
-#~ msgid "Already verified"
-#~ msgstr ""
-
-#~ msgid "Resend confirmation email"
-#~ msgstr ""
-
-#~ msgid "Remove email address"
-#~ msgstr ""
-
-#~ msgid "Add an email address by clicking on the button below."
-#~ msgstr ""
-
-#~ msgid "Phone"
-#~ msgstr ""
-
-#~ msgid "Emails"
-#~ msgstr ""
-
-#~ msgid "Error: You only have one email address and it cannot be removed"
-#~ msgstr ""
-
-#~ msgid "Mobiles"
-=======
-#~ msgid ""
-#~ "<p>Please enter your national identity "
-#~ "number for automatic retrieval of your"
-#~ " place of\n"
-#~ "        residence from the Swedish population register.</p>\n"
-#~ "    "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "    <p>Be aware that your postal address from the population register\n"
-#~ "        will be used when sending letters by mail to you.</p>\n"
-#~ "    "
-#~ msgstr ""
-
 #~ msgid "Type"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "Please add your place of residence "
-#~ "by clicking on the button below or"
-#~ " by adding your national\n"
-#~ "        identity number to your profile"
-#~ " for automated retrieval from the "
-#~ "Swedish population register.\n"
-#~ "    "
+#~ msgid "Remove postal address"
 #~ msgstr ""
 
 #~ msgid "Add postal address"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "\n"
-#~ "<h2>Dear %(given_name)s,</h2>\n"
-#~ "\n"
-#~ "<p>We are sending this email because "
-#~ "we have received a request to "
-#~ "reset the password for your\n"
-#~ "<a href=\"%(site_url)s\">%(site_name)s</a> account "
-#~ "%(email)s. If you did not initiate "
-#~ "this request,\n"
-#~ "you may simply disregard this email.\n"
-#~ "</p>\n"
-#~ "\n"
-#~ "<p>Click on the following link to create a new password.</p>\n"
-#~ "\n"
-#~ "<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
-#~ "\n"
-#~ "(This is an automated email. Please do not reply.)\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Dear %(given_name)s,\n"
-#~ "\n"
-#~ "We are sending this email because "
-#~ "we have received a request to "
-#~ "reset the password for your\n"
-#~ "%(site_name)s account %(email)s. If you "
-#~ "did not initiate this request,\n"
-#~ "you may simply disregard this email.\n"
-#~ "\n"
-#~ "Click on the following link to create a new password.\n"
-#~ "\n"
-#~ "%(reset_password_link)s\n"
-#~ "\n"
-#~ "(This is an automated email. Please do not reply.)\n"
-#~ msgstr ""
-
-#~ msgid "Emails"
-#~ msgstr ""
-
-#~ msgid "Error: You only have one email address and it cannot be removed"
-#~ msgstr ""
-
-#~ msgid "Mobiles"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The confirmation code for your mobile"
-#~ " phone number ${mobile_number} is ${code}"
+#~ msgid "Emails addresses"
 #~ msgstr ""
 
 #~ msgid "A confirmation code has been sent your mobile phone number"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your mobile phone. Please enter "
-#~ "your confirmation code <a href=\"#\" "
-#~ "class=\"verifycode\" data-"
-#~ "identifier=\"${identifier}\">here</a>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your govt inbox. Please enter "
-#~ "your confirmation code <a href=\"#\" "
-#~ "class=\"verifycode\" data-identifier=\"${id}\">here</a>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "An email has been sent to the "
-#~ "address you entered.This email will "
-#~ "contain instructions and a linkthat will"
-#~ " let you reset your password."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please read the email sent to you"
-#~ " for further instructions. This window "
-#~ "can now safely be closed."
 #~ msgstr ""
 
 #~ msgid "Postal Address"
@@ -1700,6 +1252,5 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Postal address was successfully removed."
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
 #~ msgstr ""
 
