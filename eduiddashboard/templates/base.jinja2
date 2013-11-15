@@ -69,13 +69,29 @@
     <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/pwstrength.js'|static_url}}"></script>
     <script>
+      if (window.messagesTimer === undefined) {
+          window.messagesTimer = null;
+      }
+
+      var clearMessages = function() {
+        if (window.messagesTimer) {
+          window.clearTimeout(window.messagesTimer);
+        }
+        $('.alert').fadeOut();
+      }
       $(document).ready(function () {
         $('a.null-link').click(function (e) {
             e.preventDefault();
         });
+        window.messagesTimer = window.setTimeout(clearMessages, 10000);
       });
     </script>
     {% block extrajs %}
     {% endblock %}
+    <div id="getsat-widget-6824"></div>
+    <script type="text/javascript" src="https://loader.engage.gsfn.us/loader.js"></script>
+    <script type="text/javascript">
+      if (typeof GSFN !== "undefined") { GSFN.loadWidget(6824,{"containerId":"getsat-widget-6824"}); }
+    </script>
   </body>
 </html>

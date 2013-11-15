@@ -57,6 +57,13 @@ def send_verification_code(request, user, mobile_number, code=None):
     request.msgrelay.mobile_validator(mobile_number, code, user_language)
 
 
+def convert_to_e_164(request, mobile):
+    """ convert a mobile to international notation +XX XXXXXXXX """
+    if not mobile['mobile'].startswith(u'+'):
+        country_code = request.registry.settings.get('default_country_code')
+        mobile['mobile'] = country_code + mobile['mobile']
+
+
 def mark_as_verified_mobile(request, user, verified_mobile):
     mobiles = user['mobile']
 
@@ -71,7 +78,7 @@ class MobilesActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
-        'request': _('A confirmation code has been sent your mobile phone number'),
+        'request': _('A confirmation code has been sent to your mobile phone number'),
         'placeholder': _('Mobile phone code'),
         'new_code_sent': _('A new confirmation code has been sent to your mobile number'),
     }
@@ -131,7 +138,7 @@ class MobilesActionsView(BaseActionsView):
 
         return {
             'result': 'ok',
-            'message': _('Mobile phone number was successfully removed'),
+            'message': _('Mobile phone number was successfully made primary'),
         }
 
     def send_verification_code(self, data_id, code):
@@ -167,6 +174,7 @@ class MobilesView(BaseFormView):
 
     def add_success(self, mobileform):
         mobile = self.schema.serialize(mobileform)
+        convert_to_e_164(self.request, mobile)
         mobile_number = mobile['mobile']
         mobile['verified'] = False
 
@@ -175,7 +183,6 @@ class MobilesView(BaseFormView):
 
         # update the session data
         self.user['mobile'] = mobiles
-        mobile_identifier = len(mobiles) - 1
 
         # do the save staff
         self.request.db.profiles.save(self.user, safe=True)
@@ -188,8 +195,7 @@ class MobilesView(BaseFormView):
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')
         msg = _('A confirmation code has been sent to your mobile phone. '
-                'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${identifier}">here</a>',
-                mapping={'identifier': mobile_identifier})
+                'Please click on the "Pending confirmation" link below and enter your confirmation code.')
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg,
                                    queue='forms')

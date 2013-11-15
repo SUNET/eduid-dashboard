@@ -8,6 +8,7 @@ from deform import Form
 
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 
 from eduid_am.celery import celery
@@ -169,11 +170,15 @@ def profile_urls(config):
                      factory=PasswordsFactory)
     config.add_route('reset-password', '/reset-password/',
                      factory=ResetPasswordFactory)
+    config.add_route('reset-password-enter-code', '/reset-password/enter-code/',
+                     factory=ResetPasswordFactory)
+    config.add_route('reset-password-email', '/reset-password/email/',
+                     factory=ResetPasswordFactory)
+    config.add_route('reset-password-mina', '/reset-password/mina/',
+                     factory=ResetPasswordFactory)
     config.add_route('reset-password-step2', '/reset-password/{code}/',
                      factory=ResetPasswordFactory)
     config.add_route('postaladdress', '/postaladdress/',
-                     factory=PostalAddressFactory)
-    config.add_route('postaladdress-actions', '/postaladdress-actions/',
                      factory=PostalAddressFactory)
     config.add_route('mobiles', '/mobiles/',
                      factory=MobilesFactory)
@@ -239,6 +244,9 @@ def includeme(config):
         config.add_view(context=Exception,
                         view='eduiddashboard.views.portal.exception_view',
                         renderer='templates/error500.jinja2')
+        config.add_view(context=HTTPNotFound,
+                        view='eduiddashboard.views.portal.not_found_view',
+                        renderer='templates/error404.jinja2')
 
 
 def main(global_config, **settings):
@@ -346,6 +354,12 @@ def main(global_config, **settings):
         settings,
         'available_languages',
         'en sv es',
+    )
+
+    settings['default_country_code'] = read_setting_from_env(
+        settings,
+        'default_country_code',
+        '+46',  # sweden country code
     )
 
     settings['verification_code_timeout'] = read_setting_from_env(settings,

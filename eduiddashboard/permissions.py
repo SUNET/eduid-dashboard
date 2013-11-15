@@ -1,9 +1,10 @@
 import re
 
-from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden, HTTPFound
 from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
-                              ALL_PERMISSIONS)
+                              ALL_PERMISSIONS, DENY_ALL)
+from pyramid.security import forget
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
@@ -45,6 +46,19 @@ class BaseFactory(object):
     _user = None
 
     def __init__(self, request):
+        try:
+            user = request.session.get('user')
+        except OSError:
+            # If any of the beaker session files is removed, then
+            # a OSError is raised, so we want to relogin the user
+            user = None
+
+        if user is None:
+            headers = forget(request)
+            url = request.route_path('saml2-login')
+            home = request.route_path('home')
+            url += '?next={0}'.format(home)
+            raise HTTPFound(location=url, headers=headers)
         self.request = request
         settings = self.request.registry.settings
         self.workmode = settings.get('workmode')
@@ -92,7 +106,6 @@ class BaseFactory(object):
         if self._user is not None:
             return self._user
 
-        user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
             userid = user and user.get('mail', '') or ''
@@ -108,7 +121,7 @@ class BaseFactory(object):
             if not user:
                 raise HTTPNotFound()
         self._user = user
-        return user
+        return self._user
 
     def route_url(self, route, **kw):
         if self.workmode == 'personal':
@@ -197,9 +210,15 @@ class BaseFactory(object):
         return user.get('mail')
 
     def get_preferred_language(self):
+        """ Return always a """
         lang = self.user.get('preferredLanguage', None)
-        if lang is None:
-            return self.request.registry.settings.get('available_languages')
+        if lang is not None:
+            return lang
+        available_languages = self.request.registry.settings.get('available_languages', [])
+        if len(available_languages) > 0:
+            return available_languages[0]
+        else:
+            return 'en'
 
 
 class ForbiddenFactory(RootFactory):

@@ -8,6 +8,8 @@ import deform
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import (EmailUniqueValidator,
                                        EmailExistsValidator,
+                                       EmailOrUsernameExistsValidator,
+                                       ResetPasswordCodeExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
@@ -21,14 +23,6 @@ SEARCHER_ATTTRIBUTE_TYPES = [
     (u'mobile', _('phone mobile number')),
     (u'norEduPersonNIN', _('NIN')),
 ]
-
-POSTAL_ADDRESS_TYPES = [
-    (u'official', _('Official address')),
-    (u'home', _('Home address')),
-    (u'work', _('Work address')),
-]
-
-POSTAL_ADDRESS_TYPES_WIDGET = POSTAL_ADDRESS_TYPES[1:]
 
 
 class BooleanMongo(colander.Boolean):
@@ -55,11 +49,12 @@ class NIN(colander.MappingSchema):
         title=_('Swedish personal identity number'),
         validator=colander.All(
             colander.Regex(
-                regex=re.compile('[0-9]{12}'),
+                regex=re.compile('\d{8}-\d{4}'),
                 msg=_('The Swedish personal identity number consists of 12 digits')
             ),
             NINUniqueValidator()
-        )
+        ),
+        widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxx'))
     )
 
 
@@ -110,14 +105,47 @@ class Passwords(colander.MappingSchema):
                                    _("Passwords don't match"))
 
 
-class ResetPassword(colander.MappingSchema):
+class EmailResetPassword(colander.MappingSchema):
 
-    email = colander.SchemaNode(colander.String(),
-                                validator=colander.All(
-                                    colander.Email(),
-                                    EmailExistsValidator(),
-                                ),
-                                title=_("Enter your email address"))
+    email_or_username = colander.SchemaNode(
+      colander.String(),
+      title=_("Enter your email address or your eduID username"),
+      validator=colander.All(
+        EmailOrUsernameExistsValidator(),
+      )
+    )
+
+
+class NINResetPassword(colander.MappingSchema):
+
+    # norEduPersonNIN = colander.SchemaNode(
+    #     colander.String(),
+    #     title=_('personal identity number (NIN)'),
+    #     validator=colander.All(
+    #         colander.Regex(
+    #             regex=re.compile('[0-9]{12}'),
+    #             msg=_('The personal identity number consists of 12 digits')
+    #         ),
+    #         NINExistsValidator(),
+    #     )
+    # )
+    email_or_username = colander.SchemaNode(
+      colander.String(),
+      title=_("Enter your email address or your eduID username"),
+      validator=colander.All(
+        EmailOrUsernameExistsValidator(),
+      )
+    )
+
+class ResetPasswordEnterCode(colander.MappingSchema):
+
+    code = colander.SchemaNode(
+        colander.String(),
+        title=_('Confirmation code'),
+        validator=colander.All(
+            ResetPasswordCodeExistsValidator(),
+        )
+    )
 
 
 class ResetPasswordStep2(colander.MappingSchema):
@@ -134,32 +162,18 @@ class ResetPasswordStep2(colander.MappingSchema):
 
 
 class PostalAddress(colander.MappingSchema):
-    type = colander.SchemaNode(colander.String(),
-                               title=_('type'),
-                               missing='registered',
-                               validator=colander.OneOf([k for k, v in POSTAL_ADDRESS_TYPES]),
-                               widget=deform.widget.SelectWidget(values=POSTAL_ADDRESS_TYPES_WIDGET))
     address = colander.SchemaNode(colander.String(), title=_('Address'))
     locality = colander.SchemaNode(colander.String(), title=_('City'))
     postalCode = colander.SchemaNode(colander.String(), title=_('Postal code'),
                                      validator=colander.Length(min=5, max=6))
     country = colander.SchemaNode(colander.String(), title=_('Country'))
 
-    def validator(self, node, data):
-        request = node.bindings['request']
-        if (request.POST and 'add' in request.POST
-                and data.get('type', '') == 'official'
-                and request.context.workmode != 'admin'):
-            raise colander.Invalid(node,
-                                   _("You have not rights to set the official "
-                                     " postal address manually"))
-
 
 class Mobile(colander.MappingSchema):
     mobile = colander.SchemaNode(colander.String(),
                                  validator=colander.Regex(
-                                    r'^\+[\d ]+$',
-                                    msg=_('Invalid telephone number. It must be written using international notation, starting with "+".'),
+                                    r'^\+\d{10,20}$|^07[0236]\d{7}$',
+                                    msg=_('Invalid telephone number. It must be a valid Swedish number, or written using international notation, starting with "+" and followed by 10-20 digits.'),
                                  ),
                                  title=_('mobile'),
                                  widget=deform.widget.TextInputWidget(mask=_('Mobile phone number')))

@@ -30,15 +30,15 @@ MOCKED_USER_STANDARD = {
     'sn': 'Smith',
     'displayName': 'John Smith',
     'norEduPersonNIN': [{
-        'norEduPersonNIN': '210987654321',
+        'norEduPersonNIN': '21098765-4321',
         'verified': True,
         'active': False,
     }, {
-        'norEduPersonNIN': '123456789012',
+        'norEduPersonNIN': '12345678-9012',
         'verified': False,
         'active': False,
     }, {
-        'norEduPersonNIN': '123456789013',
+        'norEduPersonNIN': '12345678-9013',
         'verified': True,
         'active': True,
     }],
@@ -61,7 +61,7 @@ MOCKED_USER_STANDARD = {
         'email': 'johnsmith@example.com',
         'verified': True,
     }, {
-        'email': 'johnsmith@example.org',
+        'email': 'johnsmith2@example.com',
         'verified': True,
     }],
     'postalAddress': [{
@@ -99,7 +99,10 @@ class MockedUserDB(IUserDB):
         'johnsmith@example.org': deepcopy(MOCKED_USER_STANDARD),
     }
     test_users['johnsmith@example.org']['mail'] = 'johnsmith@example.org'
+    test_users['johnsmith@example.org']['mailAliases'][0]['email'] = 'johnsmith@example.org'
+    test_users['johnsmith@example.org']['mailAliases'][1]['email'] = 'johnsmith2@example.org'
     test_users['johnsmith@example.org']['_id'] = ObjectId('901234567890123456789012')
+    test_users['johnsmith@example.org']['norEduPersonNIN'] = []
 
     def __init__(self, users=[]):
         for user in users:
@@ -114,7 +117,6 @@ class MockedUserDB(IUserDB):
     def all_users(self):
         for userid, user in self.test_users.items():
             yield deepcopy(user)
-
 
 
 def loa(index):
@@ -180,6 +182,7 @@ class LoggedInReguestTests(unittest.TestCase):
                 nin = http://another.platform/nins/{nin}/
             """,
             'available_languages': 'en es',
+            'default_country_code': '+46',
             'vccs_url': 'http://localhost:8550/',
         }
 

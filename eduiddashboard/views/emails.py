@@ -38,7 +38,7 @@ def get_status(user):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('Emails addresses'),
+        'label': _('Email addresses'),
         'id': 'emails',
     }
 
@@ -74,7 +74,7 @@ class EmailsActionsView(BaseActionsView):
         if not mail.get('verified', False):
             return {
                 'result': 'bad',
-                'message': _("You need to complete the verification process before to be able to mark as primary"),
+                'message': _("You need to confirm your email address before it can become primary"),
             }
 
         self.user['mail'] = mail['email']

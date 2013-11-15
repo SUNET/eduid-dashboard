@@ -39,6 +39,34 @@ class UserDB(IUserDB):
         """
         return self.get_user_by_attr(self.user_main_attribute, userid)
 
+    def get_user_by_email(self, email):
+        users = self.get_users({'mailAliases.email': email})
+        if users.count() == 0:
+            raise self.UserDoesNotExist()
+        if users.count() > 1:
+            raise self.MultipleUsersReturned()
+        return users[0]
+
+    def get_user_by_username(self, username):
+        users = self.get_users({'eduPersonPrincipalName': username})
+        if users.count() == 0:
+            raise self.UserDoesNotExist()
+        if users.count() > 1:
+            raise self.MultipleUsersReturned()
+        return users[0]
+
+    def get_user_by_nin(self, nin):
+        users = self.get_users({
+            'norEduPersonNIN.norEduPersonNIN': nin,
+            'norEduPersonNIN.verified': True,
+            'norEduPersonNIN.active': True,
+        })
+        if users.count() == 0:
+            raise self.UserDoesNotExist()
+        if users.count() > 1:
+            raise self.MultipleUsersReturned()
+        return users[0]
+
     def get_user_by_oid(self, oid):
         """
         Locate a user in the userdb given the user's _id.

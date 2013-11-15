@@ -66,6 +66,7 @@ var TabbedForm = function (container) {
             initialize_pending_actions();
 
             $('body').bind('formready', function () {
+                // callbacks
                 window.tabbedform.changetabs_calls.forEach(function (func) {
                     if (func !== undefined) {
                         func(container);

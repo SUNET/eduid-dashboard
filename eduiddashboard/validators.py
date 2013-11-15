@@ -1,5 +1,7 @@
 import colander
 
+from eduiddashboard.userdb import UserDB
+
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 
@@ -53,12 +55,12 @@ class EmailUniqueValidator(object):
         if 'add' in request.POST:
             if request.userdb.exists_by_field('mailAliases.email', value):
                 raise colander.Invalid(node,
-                                       _("This email is already registered"))
+                                       _("This email address is already in use"))
 
         elif 'verify' in request.POST or 'setprimary' in request.POST:
             if not request.userdb.exists_by_field('mailAliases.email', value):
                 raise colander.Invalid(node,
-                                       _("This email is not registered already"
+                                       _("This email address is available"
                                          ))
 
         elif 'remove' in request.POST:
@@ -69,7 +71,7 @@ class EmailUniqueValidator(object):
                     break
             if not email_discovered:
                 raise colander.Invalid(node,
-                                       _("The email can't be found"))
+                                       _("Email address does not exist"))
 
             if len(request.session['user']['mailAliases']) <= 1:
                 raise colander.Invalid(node,
@@ -79,11 +81,37 @@ class EmailUniqueValidator(object):
 class EmailExistsValidator(object):
 
     def __call__(self, node, value):
-
         request = node.bindings.get('request')
-        if not request.userdb.exists_by_field('mailAliases.email', value):
+        try:
+            request.userdb.get_user_by_email(value)
+        except UserDB.UserDoesNotExist:
             raise colander.Invalid(node,
-                                   _("This email does not exist"))
+                                   _("Email address does not exist"))
+
+
+class EmailOrUsernameExistsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        try:
+            request.userdb.get_user_by_username(value)
+        except UserDB.UserDoesNotExist:
+            try:
+                request.userdb.get_user_by_email(value)
+            except UserDB.UserDoesNotExist:
+                raise colander.Invalid(node,
+                                       _("Username or email address does not exist"))
+
+
+class NINExistsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        try:
+            request.userdb.get_user_by_nin(value)
+        except UserDB.UserDoesNotExist:
+            raise colander.Invalid(node,
+                                   _("This national identity number does not exist, is not verified or is not active"))
 
 
 class NINUniqueValidator(object):
@@ -97,9 +125,18 @@ class NINUniqueValidator(object):
         }
         if request.userdb.exists_by_filter(nin_filter):
             raise colander.Invalid(node,
-                _("This NIN is already registered and was verified by other user"))
+                _("This national identity number is already in use"))
         user = request.context.get_user()
         nin_exist = len([x for x in user.get('norEduPersonNIN', []) if x['norEduPersonNIN'] == value]) > 0
         if nin_exist:
             raise colander.Invalid(node,
-                _("This NIN is already registered in your NIN list"))
+                _("This national identity number is already registered by you"))
+
+
+class ResetPasswordCodeExistsValidator(object):
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        if not request.db.reset_passwords.find_one({'hash_code': value}):
+            raise colander.Invalid(node,
+                                   _("The entered code does not exist"))
