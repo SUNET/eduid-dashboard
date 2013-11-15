@@ -9,11 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2013-11-11 15:01+0100\n"
-=======
-"POT-Creation-Date: 2013-10-25 10:45+0200\n"
->>>>>>> 079ca003f054cc0b2746e318845ed283f092c96f
+"POT-Creation-Date: 2013-11-15 10:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -143,19 +139,19 @@ msgstr ""
 msgid "Select the attribute to search"
 msgstr ""
 
-#: eduiddashboard/permissions.py:56
+#: eduiddashboard/permissions.py:70
 msgid "You do not have sufficient permissions to access this user"
 msgstr ""
 
-#: eduiddashboard/permissions.py:84
+#: eduiddashboard/permissions.py:98
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-#: eduiddashboard/permissions.py:221
+#: eduiddashboard/permissions.py:234
 msgid "Not logged in"
 msgstr ""
 
-#: eduiddashboard/permissions.py:230
+#: eduiddashboard/permissions.py:243
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 
@@ -403,6 +399,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
+#: eduiddashboard/views/password.py:104
 msgid "Change password"
 msgstr ""
 
@@ -542,7 +539,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:7
-#: eduiddashboard/views/password.py:167 eduiddashboard/views/password.py:199
+#: eduiddashboard/views/password.py:170 eduiddashboard/views/password.py:202
 msgid "Forgot your password?"
 msgstr ""
 
@@ -732,7 +729,7 @@ msgstr ""
 msgid "A new confirmation code has been sent to your mobile number"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:103 eduiddashboard/views/mobiles.py:141
+#: eduiddashboard/views/mobiles.py:103
 msgid "Mobile phone number was successfully removed"
 msgstr ""
 
@@ -742,6 +739,10 @@ msgstr ""
 
 #: eduiddashboard/views/mobiles.py:121
 msgid "You need to verify that mobile phone number before be able to set as primary"
+msgstr ""
+
+#: eduiddashboard/views/mobiles.py:141
+msgid "Mobile phone number was successfully made primary"
 msgstr ""
 
 #: eduiddashboard/views/mobiles.py:197
@@ -793,55 +794,55 @@ msgstr ""
 msgid "Reset your password in {site_name}"
 msgstr ""
 
-#: eduiddashboard/views/password.py:115
+#: eduiddashboard/views/password.py:117
 msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/password.py:118
+#: eduiddashboard/views/password.py:120
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/password.py:168 eduiddashboard/views/password.py:200
+#: eduiddashboard/views/password.py:171 eduiddashboard/views/password.py:203
 msgid "Reset password"
 msgstr ""
 
-#: eduiddashboard/views/password.py:180
+#: eduiddashboard/views/password.py:183
 msgid ""
 "An email has been sent to your ${email} inbox.This email will contain "
 "instructions and a linkthat will let you reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:218
+#: eduiddashboard/views/password.py:221
 msgid ""
 "An message has been sent to your government mailbox with the instructions to "
 "reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:231
+#: eduiddashboard/views/password.py:234
 msgid "Enter your confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/password.py:232
+#: eduiddashboard/views/password.py:235
 msgid "Enter code"
 msgstr ""
 
-#: eduiddashboard/views/password.py:252
+#: eduiddashboard/views/password.py:255
 msgid "Complete your password reset"
 msgstr ""
 
-#: eduiddashboard/views/password.py:272
+#: eduiddashboard/views/password.py:275
 msgid "Password has been reset successfully"
 msgstr ""
 
-#: eduiddashboard/views/password.py:274
+#: eduiddashboard/views/password.py:277
 msgid ""
 "An error has occured while updating your password,please try again or contact"
 " support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/password.py:277
+#: eduiddashboard/views/password.py:280
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr ""
 
