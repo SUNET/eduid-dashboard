@@ -2,7 +2,7 @@
 
 import logging
 
-from deform import widget
+from deform import widget, Button
 import pycountry
 
 from pyramid.i18n import get_localizer
@@ -67,7 +67,7 @@ class PostalAddressView(BaseFormView):
     schema = PostalAddress()
     route = 'postaladdress'
 
-    buttons = ('save', )
+    buttons = (Button(name='save', title=_('Save')), )
 
     def get_addresses(self):
         postal_address = {}
