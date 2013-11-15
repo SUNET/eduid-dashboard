@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-15 12:51+0100\n"
+"POT-Creation-Date: 2013-11-15 13:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,15 +39,15 @@ msgid "Email address"
 msgstr ""
 
 #: eduiddashboard/models.py:49
-msgid "Swedish personal identity number"
+msgid "Swedish national identity number"
 msgstr ""
 
 #: eduiddashboard/models.py:53
-msgid "The Swedish personal identity number consists of 12 digits"
+msgid "The Swedish national identity number consists of 12 digits"
 msgstr ""
 
 #: eduiddashboard/models.py:57
-msgid "yyyymmdd-xxx"
+msgid "yyyymmdd-xxxx"
 msgstr ""
 
 #: eduiddashboard/models.py:77

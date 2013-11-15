@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-15 10:37+0100\n"
+"POT-Creation-Date: 2013-11-15 13:52+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -41,16 +41,18 @@ msgstr "Dirección Postal"
 
 #: eduiddashboard/models.py:49
 #, fuzzy
-msgid "Swedish personal identity number"
-msgstr "Número de identificación personal (NIN)"
+#| msgid "Add national identity number"
+msgid "Swedish national identity number"
+msgstr "números de identificación personal"
 
 #: eduiddashboard/models.py:53
 #, fuzzy
-msgid "The Swedish personal identity number consists of 12 digits"
+#| msgid "The Swedish personal identity number consists of 12 digits"
+msgid "The Swedish national identity number consists of 12 digits"
 msgstr "El número de identificación personal está formado por 12 dígitos"
 
 #: eduiddashboard/models.py:57
-msgid "yyyymmdd-xxx"
+msgid "yyyymmdd-xxxx"
 msgstr ""
 
 #: eduiddashboard/models.py:77
@@ -180,7 +182,6 @@ msgstr ""
 
 #: eduiddashboard/utils.py:93
 #, fuzzy
-#| msgid "Passwords"
 msgid "Password"
 msgstr "Contraseñas"
 
@@ -198,7 +199,6 @@ msgstr ""
 
 #: eduiddashboard/validators.py:58
 #, fuzzy
-#| msgid "This email is already registered"
 msgid "This email address is already in use"
 msgstr "Este email ya se está registrado"
 
@@ -208,7 +208,6 @@ msgstr ""
 
 #: eduiddashboard/validators.py:74 eduiddashboard/validators.py:89
 #, fuzzy
-#| msgid "This email does not exist"
 msgid "Email address does not exist"
 msgstr "Este email no ha sido registrado aún"
 
@@ -218,13 +217,11 @@ msgstr "Se requiere un email al menos"
 
 #: eduiddashboard/validators.py:103
 #, fuzzy
-#| msgid "This email does not exist"
 msgid "Username or email address does not exist"
 msgstr "Este email no ha sido registrado aún"
 
 #: eduiddashboard/validators.py:114
 #, fuzzy
-#| msgid "National identity number not verified"
 msgid ""
 "This national identity number does not exist, is not verified or is not "
 "active"
@@ -232,19 +229,16 @@ msgstr "números de identificación personal"
 
 #: eduiddashboard/validators.py:128
 #, fuzzy
-#| msgid "National identity number confirmation code"
 msgid "This national identity number is already in use"
 msgstr "números de identificación personal"
 
 #: eduiddashboard/validators.py:133
 #, fuzzy
-#| msgid "National identity number has been removed"
 msgid "This national identity number is already registered by you"
 msgstr "números de identificación personal"
 
 #: eduiddashboard/validators.py:142
 #, fuzzy
-#| msgid "This email does not exist"
 msgid "The entered code does not exist"
 msgstr "Este email no ha sido registrado aún"
 
@@ -457,7 +451,7 @@ msgid "Are you sure you want to save your permission changes?"
 msgstr ""
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
-#: eduiddashboard/views/personal.py:42
+#: eduiddashboard/views/personal.py:43
 #, fuzzy
 msgid "Personal information"
 msgstr "Información pesonal"
@@ -465,7 +459,6 @@ msgstr "Información pesonal"
 #: eduiddashboard/templates/postaladdress-form.jinja2:4
 #: eduiddashboard/views/postal_address.py:45
 #, fuzzy
-#| msgid "Add postal address"
 msgid "Postal address"
 msgstr "Dirección Postal"
 
@@ -487,13 +480,11 @@ msgstr ""
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:36
 #, fuzzy
-#| msgid "Postal code"
 msgid "Postal Code"
 msgstr "Dirección Postal"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:60
 #, fuzzy
-#| msgid "Remove postal address"
 msgid "Alternative postal address"
 msgstr "Dirección Postal"
 
@@ -619,7 +610,6 @@ msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:19
 #, fuzzy
-#| msgid "Current password"
 msgid "Reset password by e-mail"
 msgstr "Cambia tu contraseña"
 
@@ -758,7 +748,7 @@ msgstr "Dirección Postal"
 
 #: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
-#: eduiddashboard/views/personal.py:79
+#: eduiddashboard/views/personal.py:81
 msgid "Changes saved"
 msgstr ""
 
@@ -819,7 +809,6 @@ msgstr ""
 
 #: eduiddashboard/views/mobiles.py:141
 #, fuzzy
-#| msgid "The mobile phone number has been verified"
 msgid "Mobile phone number was successfully made primary"
 msgstr "No se puede encontrar este email"
 
@@ -889,7 +878,6 @@ msgstr ""
 
 #: eduiddashboard/views/password.py:171 eduiddashboard/views/password.py:203
 #, fuzzy
-#| msgid "Current password"
 msgid "Reset password"
 msgstr "Cambia tu contraseña"
 
@@ -907,7 +895,6 @@ msgstr ""
 
 #: eduiddashboard/views/password.py:234
 #, fuzzy
-#| msgid "Resend confirmation code"
 msgid "Enter your confirmation code"
 msgstr "Reenviar el email de verificación"
 
@@ -941,6 +928,11 @@ msgstr ""
 #: eduiddashboard/views/permissions.py:52
 #: eduiddashboard/views/postal_address.py:133
 msgid "Changes saved."
+msgstr ""
+
+#: eduiddashboard/views/personal.py:60
+#: eduiddashboard/views/postal_address.py:70
+msgid "Save"
 msgstr ""
 
 #~ msgid "active"
@@ -1209,12 +1201,6 @@ msgstr ""
 #~ msgid "You have not rights to set the official  postal address manually"
 #~ msgstr "Tienes que verificar algunas direcciones de email"
 
-#~ msgid ""
-#~ "Invalid telephone number. It must be "
-#~ "written using international notation, starting"
-#~ " with \"+\"."
-#~ msgstr ""
-
 #~ msgid "This email is not registered already"
 #~ msgstr "Este email no ha sido registrado aún"
 
@@ -1236,110 +1222,13 @@ msgstr ""
 #~ msgid "Postal addresses"
 #~ msgstr "Dirección Postal"
 
-#~ msgid ""
-#~ "<p>Please enter your national identity "
-#~ "number for automatic retrieval of your"
-#~ " place of\n"
-#~ "        residence from the Swedish population register.</p>\n"
-#~ "    "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "    <p>Be aware that your postal address from the population register\n"
-#~ "        will be used when sending letters by mail to you.</p>\n"
-#~ "    "
-#~ msgstr ""
-
 #~ msgid "Type"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please add your place of residence "
-#~ "by clicking on the button below or"
-#~ " by adding your national\n"
-#~ "        identity number to your profile"
-#~ " for automated retrieval from the "
-#~ "Swedish population register.\n"
-#~ "    "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "<h2>Dear %(given_name)s,</h2>\n"
-#~ "\n"
-#~ "<p>We are sending this email because "
-#~ "we have received a request to "
-#~ "reset the password for your\n"
-#~ "<a href=\"%(site_url)s\">%(site_name)s</a> account "
-#~ "%(email)s. If you did not initiate "
-#~ "this request,\n"
-#~ "you may simply disregard this email.\n"
-#~ "</p>\n"
-#~ "\n"
-#~ "<p>Click on the following link to create a new password.</p>\n"
-#~ "\n"
-#~ "<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
-#~ "\n"
-#~ "(This is an automated email. Please do not reply.)\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Dear %(given_name)s,\n"
-#~ "\n"
-#~ "We are sending this email because "
-#~ "we have received a request to "
-#~ "reset the password for your\n"
-#~ "%(site_name)s account %(email)s. If you "
-#~ "did not initiate this request,\n"
-#~ "you may simply disregard this email.\n"
-#~ "\n"
-#~ "Click on the following link to create a new password.\n"
-#~ "\n"
-#~ "%(reset_password_link)s\n"
-#~ "\n"
-#~ "(This is an automated email. Please do not reply.)\n"
 #~ msgstr ""
 
 #~ msgid "Emails addresses"
 #~ msgstr "Dirección Postal"
 
-#~ msgid ""
-#~ "You need to complete the verification"
-#~ " process before to be able to "
-#~ "mark as primary"
-#~ msgstr ""
-
 #~ msgid "A confirmation code has been sent your mobile phone number"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your mobile phone. Please enter "
-#~ "your confirmation code <a href=\"#\" "
-#~ "class=\"verifycode\" data-"
-#~ "identifier=\"${identifier}\">here</a>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your govt inbox. Please enter "
-#~ "your confirmation code <a href=\"#\" "
-#~ "class=\"verifycode\" data-identifier=\"${id}\">here</a>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "An email has been sent to the "
-#~ "address you entered.This email will "
-#~ "contain instructions and a linkthat will"
-#~ " let you reset your password."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Please read the email sent to you"
-#~ " for further instructions. This window "
-#~ "can now safely be closed."
 #~ msgstr ""
 
 #~ msgid "Postal Address"
@@ -1364,5 +1253,11 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Postal address was successfully removed."
+#~ msgstr ""
+
+#~ msgid "Swedish personal identity number"
+#~ msgstr "Número de identificación personal (NIN)"
+
+#~ msgid "yyyymmdd-xxx"
 #~ msgstr ""
 
