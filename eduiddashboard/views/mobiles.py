@@ -59,9 +59,9 @@ def send_verification_code(request, user, mobile_number, code=None):
 
 def convert_to_e_164(request, mobile):
     """ convert a mobile to international notation +XX XXXXXXXX """
-    if not mobile['mobile'].startswith(u'+'):
+    if mobile['mobile'].startswith(u'0'):
         country_code = request.registry.settings.get('default_country_code')
-        mobile['mobile'] = country_code + mobile['mobile']
+        mobile['mobile'] = country_code + mobile['mobile'].lstrip(u'0')
 
 
 def mark_as_verified_mobile(request, user, verified_mobile):
