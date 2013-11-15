@@ -282,6 +282,7 @@ def main(global_config, **settings):
         'auth_shared_secret',
         'mongo_uri_am',
         'personal_dashboard_base_url',
+        'vccs_url',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
