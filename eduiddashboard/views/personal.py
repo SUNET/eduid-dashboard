@@ -1,5 +1,6 @@
 ## Personal data form
 
+from deform import Button
 from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
@@ -56,6 +57,7 @@ class PersonalDataView(BaseFormView):
 
     schema = Person()
     route = 'personaldata'
+    buttons = (Button(name='save', title=_('Save')), )
 
     def get_template_context(self):
 

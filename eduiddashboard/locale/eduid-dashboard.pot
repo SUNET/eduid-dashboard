@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-15 10:01+0100\n"
+"POT-Creation-Date: 2013-11-15 13:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,15 +39,15 @@ msgid "Email address"
 msgstr ""
 
 #: eduiddashboard/models.py:49
-msgid "Swedish personal identity number"
+msgid "Swedish national identity number"
 msgstr ""
 
 #: eduiddashboard/models.py:53
-msgid "The Swedish personal identity number consists of 12 digits"
+msgid "The Swedish national identity number consists of 12 digits"
 msgstr ""
 
 #: eduiddashboard/models.py:57
-msgid "yyyymmdd-xxx"
+msgid "yyyymmdd-xxxx"
 msgstr ""
 
 #: eduiddashboard/models.py:77
@@ -412,7 +412,7 @@ msgid "Are you sure you want to save your permission changes?"
 msgstr ""
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
-#: eduiddashboard/views/personal.py:42
+#: eduiddashboard/views/personal.py:43
 msgid "Personal information"
 msgstr ""
 
@@ -690,7 +690,7 @@ msgstr ""
 
 #: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
-#: eduiddashboard/views/personal.py:79
+#: eduiddashboard/views/personal.py:81
 msgid "Changes saved"
 msgstr ""
 
@@ -853,5 +853,9 @@ msgstr ""
 #: eduiddashboard/views/permissions.py:52
 #: eduiddashboard/views/postal_address.py:133
 msgid "Changes saved."
+msgstr ""
+
+#: eduiddashboard/views/personal.py:60 eduiddashboard/views/postal_address.py:70
+msgid "Save"
 msgstr ""
 

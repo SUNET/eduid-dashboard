@@ -46,15 +46,15 @@ class Email(colander.MappingSchema):
 class NIN(colander.MappingSchema):
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),
-        title=_('Swedish personal identity number'),
+        title=_('Swedish national identity number'),
         validator=colander.All(
             colander.Regex(
                 regex=re.compile('\d{8}-\d{4}'),
-                msg=_('The Swedish personal identity number consists of 12 digits')
+                msg=_('The Swedish national identity number consists of 12 digits')
             ),
             NINUniqueValidator()
         ),
-        widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxx'))
+        widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxxx'))
     )
 
 
