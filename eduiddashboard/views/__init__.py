@@ -114,7 +114,8 @@ class BaseActionsView(object):
         data_id = self.get_verification_data_id(data_to_verify)
         if 'code' in post_data:
             code_sent = post_data['code']
-            verification_code = get_verification_code(self.request, self.data_attribute, data_id)
+            verification_code = get_verification_code(self.request, self.data_attribute, obj_id = data_id,
+                                                      user = self.user)
             if code_sent == verification_code['code']:
                 if verification_code['expired']:
                     return {

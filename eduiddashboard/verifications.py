@@ -13,18 +13,22 @@ def dummy_message(request, message):
     log.debug('[DUMMY_MESSAGE]: {0}'.format(message))
 
 
-def get_verification_code(request, model_name, obj_id=None, code=None):
+def get_verification_code(request, model_name, obj_id=None, code=None, user=None):
     filters = {
         'model_name': model_name,
     }
     if obj_id is not None:
         filters['obj_id'] = obj_id
-    else:
+    if code is not None:
         filters['code'] = code
+    if user is not None:
+        filters['user_oid'] = user['_id']
+    log.debug("Verification code lookup filters : {!r}".format(filters))
     result = request.db.verifications.find_one(filters)
     expiration_timeout = request.registry.settings.get('verification_code_timeout')
     expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
     result['expired'] = result['timestamp'] < expire_limit
+    log.debug("Verification lookup result : {!r}".format(result))
     return result
 
 
