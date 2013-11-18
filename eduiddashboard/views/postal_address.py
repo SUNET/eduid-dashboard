@@ -119,7 +119,7 @@ class PostalAddressView(BaseFormView):
             else:
                 addresses[1] = address
         else:
-            addresses[0] = address
+            addresses = [address]
 
         # update the session data
         self.user['postalAddress'] = addresses
