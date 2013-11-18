@@ -36,11 +36,15 @@ class MailsFormTests(LoggedInReguestTests):
                 response = form.submit('add')
 
                 self.assertEqual(response.status, '200 OK')
-                self.assertIn(good_value, response.body)
                 self.assertIsNotNone(getattr(response, 'form', None))
             if not good_value.startswith('+'):
                 country_code = self.settings['default_country_code']
-                good_value = country_code + good_value
+                if good_value.startswith('0') and len(good_value) > 6:
+                    good_value = country_code + good_value[1:]
+                else:
+                    good_value = country_code + good_value
+
+            self.assertIn(good_value, response.body)
             self.assertIsNotNone(self.db.verifications.find_one({
                 'obj_id': good_value, 'verified': False},
             ))
