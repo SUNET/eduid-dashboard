@@ -38,11 +38,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
     if not vccs.add_credentials(user['mail'], [new_factor]):
         return False  # something failed
 
-    if 'passwords' not in user:
-        passwords = []
-    else:
-        passwords = user['passwords']
-
+    passwords = user.get('passwords', [])
     if passwords and old_password:
         # revoking old credentials
         old_password = check_password(vccs_url, old_password, user)
