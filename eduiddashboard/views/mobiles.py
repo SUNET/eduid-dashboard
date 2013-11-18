@@ -112,9 +112,6 @@ class MobilesActionsView(BaseActionsView):
                 'message': _("That mobile phone number doesn't exists"),
             }
 
-        count = 0
-
-        mobile = mobiles[index]
         if index > len(mobiles):
             return {
                 'result': 'bad',
@@ -122,12 +119,12 @@ class MobilesActionsView(BaseActionsView):
                              "before be able to set as primary"),
             }
 
+        # set all to False, and then set the new primary to True using the index
         for mobile in mobiles:
-            if count == index:
-                mobile['primary'] = True
-            else:
-                mobile['primary'] = False
-            count += 1
+            mobile['primary'] = False
+
+        assert(mobiles[index]['verified'])  # double check
+        mobiles[index]['primary'] = True
 
         self.user['mobile'] = mobiles
 
