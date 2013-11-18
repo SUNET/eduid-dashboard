@@ -109,8 +109,10 @@ class PasswordsView(BaseFormView):
         new_password = passwords_data['new_password']
         old_password = passwords_data['old_password']
 
-        # adding new credentials
         user = self.request.session['user']
+        # Load user from database to ensure we are working on an up-to-date set of credentials.
+        # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
+        user = self.request.userdb.get_user_by_oid(user['_id'])
 
         ok = change_password(self.request, user, old_password, new_password)
         if ok:

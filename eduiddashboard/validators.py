@@ -14,7 +14,13 @@ class OldPasswordValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         old_password = value
+
         user = request.session['user']
+        # Load user from database to ensure we are working on an up-to-date set of credentials.
+        user = request.userdb.get_user_by_oid(user['_id'])
+        # XXX if we saved user['passwords'] to node.bindings.request['user']['passwords'] here,
+        # we could possibly avoid doing the same refresh again when changing passwords
+        # (in PasswordsView.save_success()).
 
         vccs_url = request.registry.settings.get('vccs_url')
         password = check_password(vccs_url, old_password, user)
