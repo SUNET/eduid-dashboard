@@ -199,6 +199,14 @@ ul.circles-widget-labels li {
   margin-top: 7px;
 }
 
+.masthead {
+  padding-top: 10px;
+}
+
+.masthead img {
+  max-height: 110px;
+}
+
 div.profile-filled {
   float: right;
   width: 220px;
