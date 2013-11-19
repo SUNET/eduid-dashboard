@@ -286,5 +286,9 @@ table.postal-addresses {
   width: 200px;
 }
 
+div.reset-password-buttons p {
+  text-align: center;
+}
+
 /* End of reset password view styles
 -------------------------------------------------- */
