@@ -169,4 +169,5 @@ class HTTPXRelocate(HTTPOk):
     def __init__(self, new_location, **kwargs):
         super(HTTPXRelocate, self).__init__('', headers=[
             ('X-Relocate', new_location),
+            ('Content-Type', 'text/html; charset=UTF-8'),
         ])
