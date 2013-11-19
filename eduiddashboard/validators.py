@@ -95,6 +95,18 @@ class EmailExistsValidator(object):
                                    _("Email address does not exist"))
 
 
+class MobilePhoneUniqueValidator(object):
+
+    def __call__(self, node, value):
+
+        request = node.bindings.get('request')
+
+        if 'add' in request.POST:
+            if request.userdb.exists_by_field('mobile.mobile', value):
+                raise colander.Invalid(node,
+                                       _("This mobile phone was already registered"))
+
+
 class EmailOrUsernameExistsValidator(object):
 
     def __call__(self, node, value):
