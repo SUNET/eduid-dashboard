@@ -119,7 +119,9 @@
                 error: function() {
                   $('body').trigger('communication-error');
                 },
-                beforeSubmit: window.beforeSubmit
+                beforeSubmit: window.beforeSubmit,
+                dataType: 'html',
+
              },
              extra_options = ${field.ajax_options} || {};
          $('#' + oid).ajaxForm($.extend(options, extra_options));
