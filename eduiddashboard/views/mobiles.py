@@ -70,6 +70,8 @@ def mark_as_verified_mobile(request, user, verified_mobile):
     for mobile in mobiles:
         if mobile['mobile'] == verified_mobile:
             mobile['verified'] = True
+            if len(mobiles) == 1:
+                mobile['primary'] = True
 
 
 @view_config(route_name='mobiles-actions', permission='edit')
@@ -174,6 +176,7 @@ class MobilesView(BaseFormView):
         convert_to_e_164(self.request, mobile)
         mobile_number = mobile['mobile']
         mobile['verified'] = False
+        mobile['primary'] = False
 
         mobiles = self.user.get('mobile', [])
         mobiles.append(mobile)
