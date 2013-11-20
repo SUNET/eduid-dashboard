@@ -7,7 +7,6 @@ import deform
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.validators import (EmailUniqueValidator,
-                                       EmailExistsValidator,
                                        EmailOrUsernameExistsValidator,
                                        ResetPasswordCodeExistsValidator,
                                        PasswordValidator,
@@ -109,11 +108,11 @@ class Passwords(colander.MappingSchema):
 class EmailResetPassword(colander.MappingSchema):
 
     email_or_username = colander.SchemaNode(
-      colander.String(),
-      title=_("Enter your email address or your eduID username"),
-      validator=colander.All(
-        EmailOrUsernameExistsValidator(),
-      )
+        colander.String(),
+        title=_("Enter your email address or your eduID username"),
+        validator=colander.All(
+            EmailOrUsernameExistsValidator(),
+        )
     )
 
 
@@ -131,12 +130,13 @@ class NINResetPassword(colander.MappingSchema):
     #     )
     # )
     email_or_username = colander.SchemaNode(
-      colander.String(),
-      title=_("Enter your email address or your eduID username"),
-      validator=colander.All(
-        EmailOrUsernameExistsValidator(),
-      )
+        colander.String(),
+        title=_("Enter your email address or your eduID username"),
+        validator=colander.All(
+            EmailOrUsernameExistsValidator(),
+        )
     )
+
 
 class ResetPasswordEnterCode(colander.MappingSchema):
 
@@ -162,12 +162,21 @@ class ResetPasswordStep2(colander.MappingSchema):
                                    _("Passwords don't match"))
 
 
+@colander.deferred
+def postal_address_default_country(node, kw):
+    request = kw.get('request')
+    default_location = request.registry.settings.get('default_country_location')
+    print default_location
+    return default_location
+
+
 class PostalAddress(colander.MappingSchema):
     address = colander.SchemaNode(colander.String(), title=_('Address'))
     locality = colander.SchemaNode(colander.String(), title=_('City'))
     postalCode = colander.SchemaNode(colander.String(), title=_('Postal code'),
                                      validator=colander.Length(min=5, max=6))
-    country = colander.SchemaNode(colander.String(), title=_('Country'))
+    country = colander.SchemaNode(colander.String(), title=_('Country'),
+                                  default=postal_address_default_country)
 
 
 class Mobile(colander.MappingSchema):
