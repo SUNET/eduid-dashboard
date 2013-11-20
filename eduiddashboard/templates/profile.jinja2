@@ -141,7 +141,22 @@ $(document).ready(function () {
 
     $('body').on('form-submitted action-executed', function() {
       // move the form messages to the messages main area
-      $('.alert').appendTo(".messages");
+      $('.alert').not($('div.messages div.alert')).each(function (index) {
+          var exists = false,
+              message = $(this).html();
+          $('.messages div.alert').each(function (index2) {
+            if ($(this).html() == message) {
+              exists = true;
+              messagesResetTimer(index);
+            }
+          });
+          if (!exists) {
+            $(this).appendTo(".messages");
+          } else {
+            $(this).hide();
+          }
+      });
+
       window.setTimeout(clearMessages, 10000);
     });
 

@@ -77,13 +77,28 @@
         if (window.messagesTimer) {
           window.clearTimeout(window.messagesTimer);
         }
-        $('.alert').fadeOut();
-      }
+        $('.alert').fadeOut(400, function (){
+          $(this).remove();
+        });
+      };
+
+      var setMessagesTimer = function () {
+        window.messagesTimer = window.setTimeout(clearMessages, 10000);
+      };
+
+      window.messagesResetTimer = function (index) {
+        window.clearTimeout(window.messagesTimer);
+        // do a fancy effect
+        window.setMessagesTimer();
+        $($('.alert')[index]).animate({opacity: 0.25}, 150).delay(150).animate({opacity: 1}, 150);
+
+      };
+
       $(document).ready(function () {
         $('a.null-link').click(function (e) {
             e.preventDefault();
         });
-        window.messagesTimer = window.setTimeout(clearMessages, 10000);
+        setMessagesTimer();
       });
     </script>
     {% block extrajs %}
