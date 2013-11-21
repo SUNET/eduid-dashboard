@@ -223,6 +223,8 @@ class NinsView(BaseFormView):
         newnin = self.schema.serialize(ninform)
         newnin = newnin['norEduPersonNIN']
 
+        nins = self.user.get('norEduPersonNIN', [])
+
         for nin in nins:
             nin['active'] = False
 
@@ -232,8 +234,6 @@ class NinsView(BaseFormView):
             'active': True,
         }
 
-        nins = self.user.get('norEduPersonNIN', [])
-        nin_identifier = len(nins)
         nins.append(ninsubdoc)
 
         self.user['norEduPersonNIN'] = nins
