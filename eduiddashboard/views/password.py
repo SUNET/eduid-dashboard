@@ -20,7 +20,7 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.utils import flash, get_unique_hash
+from eduiddashboard.utils import flash, get_short_hash
 
 
 def change_password(request, user, old_password, new_password):
@@ -35,7 +35,7 @@ def change_password(request, user, old_password, new_password):
 
 
 def new_reset_password_code(request, user, mechanism='email'):
-    hash_code = get_unique_hash()
+    hash_code = get_short_hash()
     request.db.reset_passwords.insert({
         'email': user['mail'],
         'hash_code': hash_code,
