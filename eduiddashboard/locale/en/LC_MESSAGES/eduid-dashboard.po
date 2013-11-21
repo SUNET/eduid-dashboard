@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-15 13:52+0100\n"
+"POT-Creation-Date: 2013-11-21 16:15+0100\n"
 "PO-Revision-Date: 2013-10-04 08:30+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -78,7 +78,7 @@ msgstr ""
 msgid "Confirm new password"
 msgstr ""
 
-#: eduiddashboard/models.py:105 eduiddashboard/models.py:161
+#: eduiddashboard/models.py:105 eduiddashboard/models.py:162
 msgid "Passwords don't match"
 msgstr ""
 
@@ -86,57 +86,57 @@ msgstr ""
 msgid "Enter your email address or your eduID username"
 msgstr ""
 
-#: eduiddashboard/models.py:144 eduiddashboard/views/__init__.py:85
+#: eduiddashboard/models.py:145 eduiddashboard/views/__init__.py:85
 msgid "Confirmation code"
 msgstr ""
 
-#: eduiddashboard/models.py:165
+#: eduiddashboard/models.py:174
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr ""
 
-#: eduiddashboard/models.py:166
+#: eduiddashboard/models.py:175
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
-#: eduiddashboard/models.py:167
+#: eduiddashboard/models.py:176
 msgid "Postal code"
 msgstr ""
 
-#: eduiddashboard/models.py:169
+#: eduiddashboard/models.py:178
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:176
+#: eduiddashboard/models.py:187
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
 msgstr ""
 
-#: eduiddashboard/models.py:178
+#: eduiddashboard/models.py:191
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:179
+#: eduiddashboard/models.py:192
 msgid "Mobile phone number"
 msgstr ""
 
-#: eduiddashboard/models.py:194
+#: eduiddashboard/models.py:207
 msgid "text"
 msgstr ""
 
-#: eduiddashboard/models.py:195
+#: eduiddashboard/models.py:208
 msgid "the exact match text for the attribute type selected for search"
 msgstr ""
 
-#: eduiddashboard/models.py:202
+#: eduiddashboard/models.py:215
 msgid "attribute type"
 msgstr ""
 
-#: eduiddashboard/models.py:203
+#: eduiddashboard/models.py:216
 msgid "Select the attribute to search"
 msgstr ""
 
@@ -168,53 +168,57 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: eduiddashboard/validators.py:22
+#: eduiddashboard/validators.py:28
 msgid "Current password is incorrect"
 msgstr ""
 
-#: eduiddashboard/validators.py:31
+#: eduiddashboard/validators.py:37
 msgid "The password is too short, minimum length is ${len}"
 msgstr ""
 
-#: eduiddashboard/validators.py:45
+#: eduiddashboard/validators.py:51
 msgid "The permission selected is not available"
 msgstr ""
 
-#: eduiddashboard/validators.py:58
+#: eduiddashboard/validators.py:64
 msgid "This email address is already in use"
 msgstr ""
 
-#: eduiddashboard/validators.py:63
+#: eduiddashboard/validators.py:69
 msgid "This email address is available"
 msgstr ""
 
-#: eduiddashboard/validators.py:74 eduiddashboard/validators.py:89
+#: eduiddashboard/validators.py:80 eduiddashboard/validators.py:95
 msgid "Email address does not exist"
 msgstr ""
 
-#: eduiddashboard/validators.py:78
+#: eduiddashboard/validators.py:84
 msgid "At least one email is required"
 msgstr ""
 
-#: eduiddashboard/validators.py:103
+#: eduiddashboard/validators.py:107
+msgid "This mobile phone was already registered"
+msgstr ""
+
+#: eduiddashboard/validators.py:121
 msgid "Username or email address does not exist"
 msgstr ""
 
-#: eduiddashboard/validators.py:114
+#: eduiddashboard/validators.py:132
 msgid ""
 "This national identity number does not exist, is not verified or is not "
 "active"
 msgstr ""
 
-#: eduiddashboard/validators.py:128
+#: eduiddashboard/validators.py:146
 msgid "This national identity number is already in use"
 msgstr ""
 
-#: eduiddashboard/validators.py:133
+#: eduiddashboard/validators.py:151
 msgid "This national identity number is already registered by you"
 msgstr ""
 
-#: eduiddashboard/validators.py:142
+#: eduiddashboard/validators.py:160
 msgid "The entered code does not exist"
 msgstr ""
 
@@ -236,7 +240,7 @@ msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:8
 #: eduiddashboard/templates/disabled-widgets.jinja2:10
-msgid "AL 1"
+msgid "Unconfirmed"
 msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:9
@@ -245,7 +249,7 @@ msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:12
 #: eduiddashboard/templates/disabled-widgets.jinja2:14
-msgid "AL 2"
+msgid "Confirmed"
 msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:13
@@ -254,7 +258,8 @@ msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:16
 #: eduiddashboard/templates/disabled-widgets.jinja2:18
-msgid "AL 3"
+#: eduiddashboard/templates/nins-form.jinja2:18
+msgid "Verified"
 msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:17
@@ -305,7 +310,8 @@ msgstr ""
 msgid "Pending confirmation"
 msgstr ""
 
-#: eduiddashboard/templates/emails-form.jinja2:33
+#: eduiddashboard/templates/emails-form.jinja2:34
+#: eduiddashboard/templates/emails-form.jinja2:37
 #: eduiddashboard/templates/mobiles-form.jinja2:31
 #: eduiddashboard/templates/nins-form.jinja2:30
 msgid "Remove"
@@ -385,10 +391,6 @@ msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:4 eduiddashboard/views/nins.py:95
 msgid "National identity number"
-msgstr ""
-
-#: eduiddashboard/templates/nins-form.jinja2:18
-msgid "Verified"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:20
@@ -545,7 +547,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:7
-#: eduiddashboard/views/password.py:170 eduiddashboard/views/password.py:202
+#: eduiddashboard/views/password.py:172 eduiddashboard/views/password.py:204
 msgid "Forgot your password?"
 msgstr ""
 
@@ -561,11 +563,11 @@ msgid ""
 "e-mail based reset will reset also your Assurance Level</p>"
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:15
+#: eduiddashboard/templates/reset-password.jinja2:16
 msgid "Reset password by government mailbox service"
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:19
+#: eduiddashboard/templates/reset-password.jinja2:22
 msgid "Reset password by e-mail"
 msgstr ""
 
@@ -696,7 +698,7 @@ msgstr ""
 msgid "Add email address"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
+#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:196
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
 #: eduiddashboard/views/personal.py:81
 msgid "Changes saved"
@@ -717,33 +719,33 @@ msgstr ""
 msgid "A mobile phone number is pending confirmation"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:79
+#: eduiddashboard/views/mobiles.py:81
 msgid "The mobile phone number has been verified"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:80
+#: eduiddashboard/views/mobiles.py:82
 msgid ""
 "The confirmation code used is invalid, please try again or request a new "
 "code"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:81
+#: eduiddashboard/views/mobiles.py:83
 msgid "A confirmation code has been sent to your mobile phone number"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:82
+#: eduiddashboard/views/mobiles.py:84
 msgid "Mobile phone code"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:83
+#: eduiddashboard/views/mobiles.py:85
 msgid "A new confirmation code has been sent to your mobile number"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:103
+#: eduiddashboard/views/mobiles.py:105
 msgid "Mobile phone number was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:112
+#: eduiddashboard/views/mobiles.py:114
 msgid "That mobile phone number doesn't exists"
 msgstr ""
 
@@ -757,7 +759,7 @@ msgstr ""
 msgid "Mobile phone number was successfully made primary"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:197
+#: eduiddashboard/views/mobiles.py:198
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
@@ -806,55 +808,55 @@ msgstr ""
 msgid "Reset your password in {site_name}"
 msgstr ""
 
-#: eduiddashboard/views/password.py:117
+#: eduiddashboard/views/password.py:119
 msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/password.py:120
+#: eduiddashboard/views/password.py:122
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/password.py:171 eduiddashboard/views/password.py:203
+#: eduiddashboard/views/password.py:173 eduiddashboard/views/password.py:205
 msgid "Reset password"
 msgstr ""
 
-#: eduiddashboard/views/password.py:183
+#: eduiddashboard/views/password.py:185
 msgid ""
 "An email has been sent to your ${email} inbox.This email will contain "
 "instructions and a linkthat will let you reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:221
+#: eduiddashboard/views/password.py:223
 msgid ""
 "An message has been sent to your government mailbox with the instructions"
 " to reset your password."
 msgstr ""
 
-#: eduiddashboard/views/password.py:234
+#: eduiddashboard/views/password.py:236
 msgid "Enter your confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/password.py:235
+#: eduiddashboard/views/password.py:237
 msgid "Enter code"
 msgstr ""
 
-#: eduiddashboard/views/password.py:255
+#: eduiddashboard/views/password.py:257
 msgid "Complete your password reset"
 msgstr ""
 
-#: eduiddashboard/views/password.py:275
+#: eduiddashboard/views/password.py:277
 msgid "Password has been reset successfully"
 msgstr ""
 
-#: eduiddashboard/views/password.py:277
+#: eduiddashboard/views/password.py:279
 msgid ""
 "An error has occured while updating your password,please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/password.py:280
+#: eduiddashboard/views/password.py:282
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr ""
 
@@ -1266,5 +1268,14 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "yyyymmdd-xxx"
+#~ msgstr ""
+
+#~ msgid "AL 1"
+#~ msgstr ""
+
+#~ msgid "AL 2"
+#~ msgstr ""
+
+#~ msgid "AL 3"
 #~ msgstr ""
 
