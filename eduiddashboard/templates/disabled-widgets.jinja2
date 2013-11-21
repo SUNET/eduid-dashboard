@@ -5,17 +5,17 @@
     {% with loa=request.context.loa_to_int() %}
      <h4>{{ _("Level of assurance") }}</h4>
      <ul class='circles-widget-labels'>
-       <li><a href='#' title="{{ _('AL 1') }}" data-toggle='popover'
+       <li><a href='#' title="{{ _('Unconfirmed') }}" data-toggle='popover'
              data-content='{{_("On Assurance Level 1 you can do something")}}'>
-           {{ _('AL 1') }}</a></li>
+           {{ _('Unconfirmed') }}</a></li>
        {% if max_loa >= 2 %}
-       <li><a href='#' title="{{ _('AL 2') }}" data-toggle='popover'
+       <li><a href='#' title="{{ _('Confirmed') }}" data-toggle='popover'
              data-content='{{ _("On Assurance Level 2 you can do something")}}'>
-           {{ _('AL 2') }}</a></li>
+           {{ _('Confirmed') }}</a></li>
        {% endif %}{% if max_loa >= 3 %}
-       <li><a href='#' title="{{ _('AL 3') }}" data-toggle='popover'
+       <li><a href='#' title="{{ _('Verified') }}" data-toggle='popover'
              data-content='{{ _("On Assurance Level 3 you can do something")}}'>
-           {{ _('AL 3') }}</a></li>
+           {{ _('Verified') }}</a></li>
        {% endif %}           </ul>
 
      <div class='circles-widget level-{{ loa }} max-level-{{ max_loa }}'>
