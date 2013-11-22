@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2013-11-21 16:15+0100\n"
-"PO-Revision-Date: 2013-11-21 15:19+0000\n"
+"PO-Revision-Date: 2013-11-22 08:42+0000\n"
 "Last-Translator: ft\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -569,15 +569,15 @@ msgstr "Återställ ditt lösenord via e-post"
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
 msgid "http://www.swamid.se/assurance/al1"
-msgstr "AL1"
+msgstr "Obekräftad"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
 msgid "http://www.swamid.se/assurance/al2"
-msgstr "AL2"
+msgstr "Bekräftad"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
 msgid "http://www.swamid.se/assurance/al3"
-msgstr "AL3"
+msgstr "Verifierad"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
 #, python-format
