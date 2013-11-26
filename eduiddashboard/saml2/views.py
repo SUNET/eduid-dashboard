@@ -2,7 +2,7 @@ from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 
-from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest,
+from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
                                     HTTPUnauthorized)
 from pyramid.response import Response
 from pyramid.renderers import render_to_response, render
@@ -10,8 +10,9 @@ from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
-from eduiddashboard.saml2.auth import authenticate, login
-from eduiddashboard.saml2.cache import IdentityCache, OutstandingQueriesCache
+from eduiddashboard.saml2.auth import authenticate, login, logout
+from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
+                                        StateCache, )
 
 import logging
 logger = logging.getLogger(__name__)
@@ -68,8 +69,7 @@ def login_view(request):
 
     selected_idp = request.GET.get('idp', None)
 
-    # is a embedded wayf needed?
-    idps = request.saml2_config.getattr('idp', 'sp')
+    idps = request.saml2_config.getattr('idp')
     if selected_idp is None and len(idps) > 1:
         logger.debug('A discovery process is needed')
 
@@ -157,13 +157,96 @@ def echo_attributes(request):
 
 
 @view_config(route_name='saml2-logout')
-def logout(request):
-    raise NotImplementedError
+def logout_view(request):
+    """SAML Logout Request initiator
+
+    This view initiates the SAML2 Logout request
+    using the pysaml2 library to create the LogoutRequest.
+    """
+    logger.debug('Logout process started')
+    state = StateCache(request.session)
+
+    client = Saml2Client(request.saml2_config, state_cache=state,
+                         identity_cache=IdentityCache(request.session))
+    subject_id = _get_subject_id(request.session)
+    if subject_id is None:
+        logger.warning(
+            'The session does not contains the subject id for user %s'
+            % request.user)
+    logouts = client.global_logout(subject_id)
+    loresponse = logouts.values()[0]
+    headers_tuple = loresponse[1]['headers']
+    location = headers_tuple[0][1]
+
+    state.sync()
+    logger.debug('Redirecting to the IdP to continue the logout process')
+    return HTTPFound(location=location)
 
 
-@view_config(route_name='saml2-logout-service')
+@view_config(route_name='saml2-logout-service', request_method='get',
+             renderer='templates/saml2-logout.jinja2')
 def logout_service(request):
-    raise NotImplementedError
+    """SAML Logout Response endpoint
+
+    The IdP will send the logout response to this view,
+    which will process it with pysaml2 help and log the user
+    out.
+    Note that the IdP can request a logout even when
+    we didn't initiate the process as a single logout
+    request started by another SP.
+    """
+    logger.debug('Logout service started')
+
+    state = StateCache(request.session)
+    client = Saml2Client(request.saml2_config, state_cache=state,
+                         identity_cache=IdentityCache(request.session))
+    settings = request.registry.settings
+
+    logout_redirect_url = settings.get('saml2.logout_redirect_url')
+    next_page = request.GET.get('next_page', logout_redirect_url)
+
+    if 'SAMLResponse' in request.GET:  # we started the logout
+        logger.debug('Receiving a logout response from the IdP')
+        response = client.logout_response(request.GET['SAMLResponse'],
+                                          binding=BINDING_HTTP_REDIRECT)
+        state.sync()
+        if response and response[1] == '200 Ok':
+            headers = logout(request)
+            return HTTPFound(next_page, headers=headers)
+        else:
+            logger.error('Unknown error during the logout')
+            return HTTPBadRequest('Error during logout')
+
+    elif 'SAMLRequest' in request.GET:  # logout started by the IdP
+        logger.debug('Receiving a logout request from the IdP')
+        subject_id = _get_subject_id(request.session)
+        if subject_id is None:
+            logger.warning(
+                'The session does not contain the subject id for user {0} '
+                'Performing local logout'.format(
+                    authenticated_userid(request)
+                )
+            )
+            headers = logout(request)
+            return HTTPFound(url=next_page, headers=headers)
+        else:
+            response, success = client.logout_request(request.GET, subject_id)
+            state.sync()
+            if success:
+                headers = logout(request)
+                assert response[0][0] == 'Location'
+                url = response[0][1]
+                return HTTPFound(location=url, headers=headers)
+            elif response is not None:
+                assert response[0][0] == 'Location'
+                url = response[0][1]
+                return HTTPFound(location=url)
+            else:
+                logger.error('Unknown error during the logout')
+                return HTTPBadRequest('Error during logout')
+    else:
+        logger.error('No SAMLResponse or SAMLRequest parameter found')
+        raise HTTPNotFound('No SAMLResponse or SAMLRequest parameter found')
 
 
 @view_config(route_name='saml2-metadata')

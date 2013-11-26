@@ -23,7 +23,7 @@ SAML_CONFIG = {
     'service': {
         # we are just a lonely SP
         'sp': {
-            'name': 'Askbot - OpenMOOC SP',
+            'name': 'Eduid Dashboard SP',
             'endpoints': {
                 # url and binding to the assetion consumer service view
                 # do not change the binding or service name

@@ -39,6 +39,7 @@ def includeme(config):
     for item in (
         'saml2.settings_module',
         'saml2.login_redirect_url',
+        'saml2.logout_redirect_url',
         'saml2.user_main_attribute',
         'auth_tk_secret'
     ):
@@ -88,7 +89,7 @@ def includeme(config):
     config.add_route('saml2-acs', '/saml2/acs/')
     config.add_route('saml2-echo-attributes', '/saml2/echo-attributes/')
     config.add_route('saml2-logout', '/saml2/logout/')
-    config.add_route('saml2-logout-service', '/saml2/slo/')
+    config.add_route('saml2-logout-service', '/saml2/ls/')
     config.add_route('saml2-metadata', '/saml2/metadata/')
 
     config.add_route('saml2-wayf-demo', '/saml2/wayf-demo/')
