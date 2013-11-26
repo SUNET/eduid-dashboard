@@ -171,9 +171,11 @@ def error500view(context, request):
 @view_config(route_name='error500', renderer='templates/error500.jinja2')
 def exception_view(context, request):
     logger.error("The error was: %s" % context, exc_info=(context))
-    message = getattr(context, 'message', '')
     request.response.status = 500
-    return {'msg': message}
+    #message = getattr(context, 'message', '')
+    # `message' might include things like database connection details (with authentication
+    # parameters), so it should NOT be displayed to the user.
+    return {'msg': 'Code exception'}
 
 
 @view_config(route_name='error404', renderer='templates/error404.jinja2')
