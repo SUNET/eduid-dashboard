@@ -54,8 +54,8 @@ def get_address_id(address):
                                address['country'])
 
 
-@view_config(route_name='postaladdress', permission='edit',
-             renderer='templates/postaladdress-form.jinja2')
+# @view_config(route_name='postaladdress', permission='edit',
+#              renderer='templates/postaladdress-form.jinja2')
 class PostalAddressView(BaseFormView):
     """
     Change user postal address
