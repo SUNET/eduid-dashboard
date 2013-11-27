@@ -28,9 +28,11 @@
               {{_(loa)}}
             </div>
           {% endwith %}
+          {% if user is defined %}
           <div class='userinfo'>
             {{ user.get('mail') }}
           </div>
+          {% endif %}
           {% endblock %}
           <ul class="nav nav-pills pull-right">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
