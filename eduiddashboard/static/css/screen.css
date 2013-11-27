@@ -80,6 +80,10 @@
     font-size: 150%;
 }
 
+.clear-right {
+    float: right;
+    clear: right;
+}
 
 /* Bottom footer styles
 -------------------------------------------------- */
