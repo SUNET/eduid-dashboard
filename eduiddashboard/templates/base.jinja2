@@ -28,6 +28,9 @@
               {{_(loa)}}
             </div>
           {% endwith %}
+          <div class='username'>
+            {{ user.get('displayName') }}
+          </div>
           {% endblock %}
           <ul class="nav nav-pills pull-right">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
