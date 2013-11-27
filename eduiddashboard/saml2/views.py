@@ -112,9 +112,17 @@ def assertion_consumer_service(request):
     oq_cache = OutstandingQueriesCache(request.session)
     outstanding_queries = oq_cache.outstanding_queries()
 
-    # process the authentication response
-    response = client.parse_authn_request_response(xmlstr, BINDING_HTTP_POST,
-                                                   outstanding_queries)
+    try:
+        # process the authentication response
+        response = client.parse_authn_request_response(xmlstr, BINDING_HTTP_POST,
+                                                       outstanding_queries)
+    except AssertionError:
+        logger.error('SAML response is not verified')
+        return HTTPBadRequest(
+            """SAML response is not verified. May be caused by the response
+            was not issued at a reasonable time or the SAML status is not ok.
+            Check the IDP datetime setup""")
+
     if response is None:
         logger.error('SAML response is None')
         return HTTPBadRequest(
