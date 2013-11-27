@@ -88,7 +88,7 @@ def get_available_tabs(context):
         emails.get_tab(),
         permissions.get_tab(),
         mobiles.get_tab(),
-        postal_address.get_tab(),
+        # postal_address.get_tab(),
         {
             'label': _('Password'),
             'status': get_dummy_status,
