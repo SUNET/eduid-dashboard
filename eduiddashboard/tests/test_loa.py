@@ -101,7 +101,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                             'eduPersonIdentityProofing': loa(2),
                         })
 
-        self.testapp.get('/profile/passwords/',
+        self.testapp.get('/profile/security/',
                          status=401)
 
     def test_edit_with_max_loa_credentials(self):
@@ -111,5 +111,5 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                             'eduPersonIdentityProofing': loa(2),
                         })
 
-        self.testapp.get('/profile/passwords/',
+        self.testapp.get('/profile/security/',
                          status=200)

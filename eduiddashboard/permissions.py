@@ -260,7 +260,7 @@ class PersonFactory(BaseFactory):
     pass
 
 
-class PasswordsFactory(BaseCredentialsFactory):
+class SecurityFactory(BaseCredentialsFactory):
     pass
 
 

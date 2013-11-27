@@ -15,7 +15,7 @@ from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
-                                        PasswordsFactory, ResetPasswordFactory,
+                                        SecurityFactory, ResetPasswordFactory,
                                         PostalAddressFactory, MobilesFactory,
                                         PermissionsFactory, VerificationsFactory,
                                         StatusFactory, HomeFactory,
@@ -166,8 +166,8 @@ def profile_urls(config):
                      factory=PersonFactory)
     config.add_route('emails-actions', '/emails-actions/',
                      factory=PersonFactory)
-    config.add_route('passwords', '/passwords/',
-                     factory=PasswordsFactory)
+    config.add_route('security', '/security/',
+                     factory=SecurityFactory)
     config.add_route('reset-password', '/reset-password/',
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-enter-code', '/reset-password/enter-code/',

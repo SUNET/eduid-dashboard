@@ -60,13 +60,13 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_logged_get(self):
         self.set_logged()
-        response = self.testapp.get('/profile/passwords/')
+        response = self.testapp.get('/profile/security/')
 
         self.assertEqual(response.status, '200 OK')
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_notlogged_get(self):
-        response = self.testapp.get('/profile/passwords/')
+        response = self.testapp.get('/profile/security/')
         self.assertEqual(response.status, '302 Found')
 
     def test_add_credentials(self):
@@ -87,7 +87,7 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_valid_password(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/passwords/')
+        response_form = self.testapp.get('/profile/security/')
 
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
@@ -104,7 +104,7 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_not_valid_old_password(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/passwords/', status=200)
+        response_form = self.testapp.get('/profile/security/', status=200)
 
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
@@ -125,7 +125,7 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_not_valid_repeated_password(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/passwords/', status=200)
+        response_form = self.testapp.get('/profile/security/', status=200)
 
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
