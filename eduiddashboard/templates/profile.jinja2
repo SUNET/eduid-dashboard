@@ -3,17 +3,17 @@
 {% block nav_class_home %}active{% endblock %}
 
 {% block title %}
+  {% if context.workmode == 'personal' %}
+  <h3>{{ _("Profile") }}</h3>
+  {% else %}
+  <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
+  {% endif %}
   <div class='profile-filled'>
     <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
     <div class="progress progress-striped">
       <div class="bar" style="width: {{ profile_filled }}%;"></div>
     </div>
   </div>
-  {% if context.workmode == 'personal' %}
-  <h3>{{ _("Profile") }}</h3>
-  {% else %}
-  <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
-  {% endif %}
 {% endblock %}
 
 
@@ -23,7 +23,6 @@
     <div class='span6'>
 
         {% if pending_actions %}
-          <h4>{{_("Improve profile")}}</h4>
           <ul class='unstyled pending-actions'>
           {% for formid, msg in pending_actions %}
             <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
