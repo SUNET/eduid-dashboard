@@ -183,7 +183,7 @@ def logout_view(request):
     return HTTPFound(location=location)
 
 
-@view_config(route_name='saml2-logout-service', request_method='get',
+@view_config(route_name='saml2-logout-service',
              renderer='templates/saml2-logout.jinja2')
 def logout_service(request):
     """SAML Logout Response endpoint
@@ -207,10 +207,12 @@ def logout_service(request):
 
     if 'SAMLResponse' in request.GET:  # we started the logout
         logger.debug('Receiving a logout response from the IdP')
-        response = client.logout_response(request.GET['SAMLResponse'],
-                                          binding=BINDING_HTTP_REDIRECT)
+        response = client.parse_logout_request_response(
+            request.GET['SAMLResponse'],
+            BINDING_HTTP_REDIRECT
+        )
         state.sync()
-        if response and response[1] == '200 Ok':
+        if response and response.status_ok():
             headers = logout(request)
             return HTTPFound(next_page, headers=headers)
         else:
