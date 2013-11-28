@@ -22,24 +22,19 @@
     <div id='wrap'>
       <div class="container">
         <div class="masthead">
+          {% block loasquare %}
+          {% with loa=request.context.get_loa() %}
+            <div class='loa-big'>
+              {{ user.get('mail') }} ({{_(loa)}})
+            </div>
+          {% endwith %}
+          {% endblock %}
           <ul class="nav nav-pills pull-right">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
           </ul>
           <a href="{{ request.route_path('home') }}"><img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
           <div class="clear-right"></div>
-          {% block loasquare %}
-          {% with loa=request.context.get_loa() %}
-            <div class='loa-big'>
-              {{_(loa)}}
-            </div>
-          {% endwith %}
-          {% if user is defined %}
-          <div class='userinfo'>
-            {{ user.get('mail') }}
-          </div>
-          {% endif %}
-          {% endblock %}
         </div>
 
        <div class="messages">
