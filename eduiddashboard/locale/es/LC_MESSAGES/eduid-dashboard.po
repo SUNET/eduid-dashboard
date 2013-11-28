@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-21 16:15+0100\n"
+"POT-Creation-Date: 2013-11-28 10:28+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -46,8 +46,9 @@ msgstr "números de identificación personal"
 
 #: eduiddashboard/models.py:53
 #, fuzzy
-msgid "The Swedish national identity number consists of 12 digits"
-msgstr "El número de identificación personal está formado por 12 dígitos"
+#| msgid "This national identity number is already registered by you"
+msgid "The Swedish national identity number should be entered as yyyymmdd-xxxx"
+msgstr "números de identificación personal"
 
 #: eduiddashboard/models.py:57
 msgid "yyyymmdd-xxxx"
@@ -488,53 +489,48 @@ msgstr "Dirección Postal"
 msgid "Alternative postal address"
 msgstr "Dirección Postal"
 
-#: eduiddashboard/templates/profile.jinja2:7
-msgid "Profile filled"
-msgstr "Perfil completado"
-
-#: eduiddashboard/templates/profile.jinja2:13
+#: eduiddashboard/templates/profile.jinja2:10
 #, fuzzy
 msgid "Profile"
 msgstr "Su perfil de usuario"
 
-#: eduiddashboard/templates/profile.jinja2:15
+#: eduiddashboard/templates/profile.jinja2:12
 #, python-format
 msgid "Editing %(email)s user"
 msgstr "Editando el usuario %(email)s"
 
-#: eduiddashboard/templates/profile.jinja2:26
-#, fuzzy
-msgid "Improve profile"
-msgstr "Su perfil de usuario"
+#: eduiddashboard/templates/profile.jinja2:44
+msgid "Profile filled"
+msgstr "Perfil completado"
 
-#: eduiddashboard/templates/profile.jinja2:63
+#: eduiddashboard/templates/profile.jinja2:66
 msgid "Lost your confirmation code?"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:63
+#: eduiddashboard/templates/profile.jinja2:66
 #, fuzzy
 msgid "Resend confirmation code"
 msgstr "Reenviar el email de verificación"
 
-#: eduiddashboard/templates/profile.jinja2:68
+#: eduiddashboard/templates/profile.jinja2:71
 msgid "Finish"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:100
+#: eduiddashboard/templates/profile.jinja2:103
 msgid "Warning!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:100
+#: eduiddashboard/templates/profile.jinja2:103
 msgid ""
 "An error has occurred, please try again or contact support if the problem"
 " persists."
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:110
 msgid "Error!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:110
 msgid "Permission denied"
 msgstr ""
 
@@ -746,7 +742,7 @@ msgstr ""
 msgid "Add email address"
 msgstr "Dirección Postal"
 
-#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:196
+#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
 #: eduiddashboard/views/personal.py:81
 msgid "Changes saved"
@@ -759,7 +755,7 @@ msgid ""
 "identifier=\"${id}\">here</a>."
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:161
+#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:160
 #, fuzzy
 msgid "Add mobile phone number"
 msgstr "número de teléfono móvil"
@@ -801,18 +797,18 @@ msgstr ""
 msgid "That mobile phone number doesn't exists"
 msgstr "No se puede encontrar este email"
 
-#: eduiddashboard/views/mobiles.py:121
+#: eduiddashboard/views/mobiles.py:120
 msgid ""
 "You need to verify that mobile phone number before be able to set as "
 "primary"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:141
+#: eduiddashboard/views/mobiles.py:140
 #, fuzzy
 msgid "Mobile phone number was successfully made primary"
 msgstr "No se puede encontrar este email"
 
-#: eduiddashboard/views/mobiles.py:198
+#: eduiddashboard/views/mobiles.py:197
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
@@ -1269,4 +1265,10 @@ msgstr ""
 
 #~ msgid "AL 3"
 #~ msgstr ""
+
+#~ msgid "The Swedish national identity number consists of 12 digits"
+#~ msgstr "El número de identificación personal está formado por 12 dígitos"
+
+#~ msgid "Improve profile"
+#~ msgstr "Su perfil de usuario"
 

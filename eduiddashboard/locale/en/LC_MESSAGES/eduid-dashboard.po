@@ -8,16 +8,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-21 16:15+0100\n"
+"POT-Creation-Date: 2013-11-28 10:28+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
-"X-Generator: Poedit 1.5.4\n"
 
 #: eduiddashboard/emails.py:33
 msgid "{site_name} confirmation email"
@@ -44,7 +43,7 @@ msgid "Swedish national identity number"
 msgstr ""
 
 #: eduiddashboard/models.py:53
-msgid "The Swedish national identity number consists of 12 digits"
+msgid "The Swedish national identity number should be entered as yyyymmdd-xxxx"
 msgstr ""
 
 #: eduiddashboard/models.py:57
@@ -452,50 +451,46 @@ msgstr ""
 msgid "Alternative postal address"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:7
-msgid "Profile filled"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:13
+#: eduiddashboard/templates/profile.jinja2:10
 msgid "Profile"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:15
+#: eduiddashboard/templates/profile.jinja2:12
 #, python-format
 msgid "Editing %(email)s user"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:26
-msgid "Improve profile"
+#: eduiddashboard/templates/profile.jinja2:44
+msgid "Profile filled"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:63
+#: eduiddashboard/templates/profile.jinja2:66
 msgid "Lost your confirmation code?"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:63
+#: eduiddashboard/templates/profile.jinja2:66
 msgid "Resend confirmation code"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:68
+#: eduiddashboard/templates/profile.jinja2:71
 msgid "Finish"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:100
+#: eduiddashboard/templates/profile.jinja2:103
 msgid "Warning!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:100
+#: eduiddashboard/templates/profile.jinja2:103
 msgid ""
 "An error has occurred, please try again or contact support if the problem"
 " persists."
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:110
 msgid "Error!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:110
 msgid "Permission denied"
 msgstr ""
 
@@ -699,7 +694,7 @@ msgstr ""
 msgid "Add email address"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:196
+#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
 #: eduiddashboard/views/personal.py:81
 msgid "Changes saved"
@@ -712,7 +707,7 @@ msgid ""
 "identifier=\"${id}\">here</a>."
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:161
+#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:160
 msgid "Add mobile phone number"
 msgstr ""
 
@@ -750,17 +745,17 @@ msgstr ""
 msgid "That mobile phone number doesn't exists"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:121
+#: eduiddashboard/views/mobiles.py:120
 msgid ""
 "You need to verify that mobile phone number before be able to set as "
 "primary"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:141
+#: eduiddashboard/views/mobiles.py:140
 msgid "Mobile phone number was successfully made primary"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:198
+#: eduiddashboard/views/mobiles.py:197
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
@@ -1278,5 +1273,11 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "AL 3"
+#~ msgstr ""
+
+#~ msgid "The Swedish national identity number consists of 12 digits"
+#~ msgstr ""
+
+#~ msgid "Improve profile"
 #~ msgstr ""
 
