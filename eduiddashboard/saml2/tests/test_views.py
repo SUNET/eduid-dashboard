@@ -76,6 +76,29 @@ class Saml2ViewsTests(Saml2RequestTests):
         res = self.testapp.get('/saml2/metadata/')
         self.assertEqual(res.status, '200 OK')
 
+    def test_logout_nologgedin(self):
+        res = self.testapp.get('/saml2/logout/')
+        self.assertEqual(res.status, '302 Found')
+        self.assertIn(self.settings['saml2.logout_redirect_url'], res.location)
+
+    def test_logout_loggedin(self):
+        came_from = '/afterlogin/'
+
+        session_id = self.add_outstanding_query(came_from)
+
+        saml_response = auth_response(session_id, "user1@example.com")
+
+        res = self.testapp.post('/saml2/acs/', params={
+            'SAMLResponse': base64.b64encode(saml_response),
+            'RelayState': came_from,
+        })
+        cookies = res.cookies_set
+
+        res = self.testapp.get('/saml2/logout/', headers={'cookies': cookies['auth_tkt']})
+
+        self.assertEqual(res.status, '302 Found')
+        self.assertIn('https://idp.example.com/simplesaml/saml2/idp/SingleLogoutService.php', res.location)
+
 
 class Saml2ViewsTestsUsingWayf(Saml2RequestTests):
 

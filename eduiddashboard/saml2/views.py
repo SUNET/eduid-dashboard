@@ -23,7 +23,10 @@ def _set_subject_id(session, subject_id):
 
 
 def _get_subject_id(session):
-    return session['_saml2_subject_id']
+    try:
+        return session['_saml2_subject_id']
+    except KeyError:
+        return None
 
 
 @forbidden_view_config()
@@ -171,12 +174,14 @@ def logout_view(request):
     subject_id = _get_subject_id(request.session)
     if subject_id is None:
         logger.warning(
-            'The session does not contains the subject id for user %s'
-            % request.user)
-    logouts = client.global_logout(subject_id)
-    loresponse = logouts.values()[0]
-    headers_tuple = loresponse[1]['headers']
-    location = headers_tuple[0][1]
+            'The session does not contains the subject id for user ')
+        location = request.registry.settings.get('saml2.logout_redirect_url')
+
+    else:
+        logouts = client.global_logout(subject_id)
+        loresponse = logouts.values()[0]
+        headers_tuple = loresponse[1]['headers']
+        location = headers_tuple[0][1]
 
     state.sync()
     logger.debug('Redirecting to the IdP to continue the logout process')
