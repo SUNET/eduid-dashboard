@@ -32,6 +32,7 @@
           <ul class="nav nav-pills pull-right">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
+            <li><a href="{{ 'saml2-logout'|route_url }}">{{ _("Logout") }}</a></li>
           </ul>
           <a href="{{ request.route_path('home') }}"><img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
           <div class="clear-right"></div>

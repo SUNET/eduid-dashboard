@@ -24,6 +24,7 @@ def configure_authtk(config, settings):
 
     authn_policy = AuthTktAuthenticationPolicy(
         settings['auth_tk_secret'], hashalg='sha512',
+        wild_domain=False,
         **extra_authn_policy)
 
     authz_policy = ACLAuthorizationPolicy()

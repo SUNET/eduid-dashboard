@@ -65,7 +65,7 @@ def login_view(request):
     came_from = request.GET.get('next', login_redirect_url)
 
     if authenticated_userid(request):
-        return HTTPFound(came_from)
+        return HTTPFound(location=came_from)
 
     selected_idp = request.GET.get('idp', None)
 
@@ -232,20 +232,16 @@ def logout_service(request):
             headers = logout(request)
             return HTTPFound(url=next_page, headers=headers)
         else:
-            response, success = client.logout_request(request.GET, subject_id)
+            http_info = client.handle_logout_request(
+                request.GET['SAMLRequest'],
+                subject_id,
+                BINDING_HTTP_REDIRECT,
+                relay_state=request.GET['RelayState']
+            )
             state.sync()
-            if success:
-                headers = logout(request)
-                assert response[0][0] == 'Location'
-                url = response[0][1]
-                return HTTPFound(location=url, headers=headers)
-            elif response is not None:
-                assert response[0][0] == 'Location'
-                url = response[0][1]
-                return HTTPFound(location=url)
-            else:
-                logger.error('Unknown error during the logout')
-                return HTTPBadRequest('Error during logout')
+            location = get_location(http_info)
+            headers = logout(request)
+            return HTTPFound(location=location, headers=headers)
     else:
         logger.error('No SAMLResponse or SAMLRequest parameter found')
         raise HTTPNotFound('No SAMLResponse or SAMLRequest parameter found')
