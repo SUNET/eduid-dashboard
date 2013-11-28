@@ -3,6 +3,8 @@ from mock import patch
 import simplejson as json
 import vccs_client
 
+from eduid_am.exceptions import UserDoesNotExist
+
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import check_password, add_credentials
@@ -144,8 +146,8 @@ class PasswordFormTests(LoggedInReguestTests):
         form = response_form.forms['resetpasswordemailview-form']
 
         form['email_or_username'].value = 'notexistingmail@foodomain.com'
-        response = form.submit('reset')
-        self.assertIn("Username or email address does not exist", response.body)
+        with self.assertRaises(UserDoesNotExist):
+            response = form.submit('reset')
 
         reset_passwords = list(self.db.reset_passwords.find())
         for email in self.user['mailAliases']:

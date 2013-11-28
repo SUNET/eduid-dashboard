@@ -50,7 +50,7 @@ class NIN(colander.MappingSchema):
         validator=colander.All(
             colander.Regex(
                 regex=re.compile('\d{8}-\d{4}'),
-                msg=_('The Swedish national identity number consists of 12 digits')
+                msg=_('The Swedish national identity number should be entered as yyyymmdd-xxxx')
             ),
             NINUniqueValidator()
         ),

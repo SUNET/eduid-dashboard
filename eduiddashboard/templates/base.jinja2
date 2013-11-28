@@ -25,7 +25,7 @@
           {% block loasquare %}
           {% with loa=request.context.get_loa() %}
             <div class='loa-big'>
-              {{_(loa)}}
+              {{ user.get('mail') }} ({{_(loa)}})
             </div>
           {% endwith %}
           {% endblock %}
@@ -34,6 +34,7 @@
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
           </ul>
           <a href="{{ request.route_path('home') }}"><img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
+          <div class="clear-right"></div>
         </div>
 
        <div class="messages">

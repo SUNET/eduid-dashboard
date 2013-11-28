@@ -80,6 +80,10 @@
     font-size: 150%;
 }
 
+.clear-right {
+    float: right;
+    clear: right;
+}
 
 /* Bottom footer styles
 -------------------------------------------------- */
@@ -191,12 +195,26 @@ ul.circles-widget-labels li {
 
 .loa-big {
   float:  right;
-  width: 82px;
-  height: 40px;
-  font-size: 25px;
+  width: auto;
+  height: 20px;
+  font-size: 14px;
+  text-align: center;
+  padding-top: 7px;
+  padding-left: 5px;
+  vertical-align: middle;
+}
+
+.userinfo {
+  float: right;
+  width: auto;
+  height: 30px;
+  font-size: 20px;
   font-weight: bold;
   text-align: center;
-  margin-top: 7px;
+  padding-top: 8px;
+  margin-left: 50px;
+  padding-right: 5px;
+  border-right: 1px solid #ccc;
 }
 
 .masthead {
@@ -208,7 +226,6 @@ ul.circles-widget-labels li {
 }
 
 div.profile-filled {
-  float: right;
   width: 220px;
 }
 
@@ -217,7 +234,7 @@ div.profile-filled div.title {
 }
 
 div.profile-combo {
-  margin-top: 40px;
+  margin-top: 10px;
 }
 
 form.form-inline div {

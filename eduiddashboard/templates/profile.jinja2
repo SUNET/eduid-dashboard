@@ -3,28 +3,19 @@
 {% block nav_class_home %}active{% endblock %}
 
 {% block title %}
-  <div class='profile-filled'>
-    <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
-    <div class="progress progress-striped">
-      <div class="bar" style="width: {{ profile_filled }}%;"></div>
-    </div>
-  </div>
-  {% if context.workmode == 'personal' %}
-  <h3>{{ _("Profile") }}</h3>
-  {% else %}
-  <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
-  {% endif %}
-{% endblock %}
-
-
-{% block contents %}
-
   <div class='row'>
     <div class='span6'>
 
+      {% if context.workmode == 'personal' %}
+      <h3>{{ _("Profile") }}</h3>
+      {% else %}
+      <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
+      {% endif %}
+    </div>
+    <div class='span6'>
+
         {% if pending_actions %}
-          <h4>{{_("Improve profile")}}</h4>
-          <ul class='unstyled pending-actions'>
+          <ul class='unstyled pending-actions' style='text-align:right;'>
           {% for formid, msg in pending_actions %}
             <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
           {% endfor %}
@@ -34,6 +25,10 @@
     </div>
 
   </div>
+{% endblock %}
+
+
+{% block contents %}
 
   <div class='clearfix'></div>
 
@@ -44,6 +39,14 @@
             <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
         </li>
       {% endfor %}
+
+      <div class='profile-filled' style='padding-top:80px'>
+        <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+        <div class="progress progress-striped">
+          <div class="bar" style="width: {{ profile_filled }}%;"></div>
+        </div>
+      </div>
+
     </ul>
 
     <div class='tab-content info-container'>

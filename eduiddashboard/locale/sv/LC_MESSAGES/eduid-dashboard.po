@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-21 16:15+0100\n"
-"PO-Revision-Date: 2013-11-22 08:42+0000\n"
-"Last-Translator: ft\n"
+"POT-Creation-Date: 2013-11-28 10:28+0100\n"
+"PO-Revision-Date: 2013-11-28 09:30+0000\n"
+"Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,8 +47,9 @@ msgid "Swedish national identity number"
 msgstr "Personnummer"
 
 #: eduiddashboard/models.py:53
-msgid "The Swedish national identity number consists of 12 digits"
-msgstr "Personnummer måste innehålla århundrade (12-siffrigt)"
+msgid ""
+"The Swedish national identity number should be entered as yyyymmdd-xxxx"
+msgstr "Ange personnummer som ååååmmdd-xxxx"
 
 #: eduiddashboard/models.py:57
 msgid "yyyymmdd-xxxx"
@@ -452,50 +453,46 @@ msgstr "Postkod"
 msgid "Alternative postal address"
 msgstr "Alternativ postadress"
 
-#: eduiddashboard/templates/profile.jinja2:7
-msgid "Profile filled"
-msgstr "Profilstatus"
-
-#: eduiddashboard/templates/profile.jinja2:13
+#: eduiddashboard/templates/profile.jinja2:10
 msgid "Profile"
 msgstr "Profil"
 
-#: eduiddashboard/templates/profile.jinja2:15
+#: eduiddashboard/templates/profile.jinja2:12
 #, python-format
 msgid "Editing %(email)s user"
 msgstr "Editerar användaren %(email)s "
 
-#: eduiddashboard/templates/profile.jinja2:26
-msgid "Improve profile"
-msgstr "Förbättra profilen"
+#: eduiddashboard/templates/profile.jinja2:44
+msgid "Profile filled"
+msgstr "Profilstatus"
 
-#: eduiddashboard/templates/profile.jinja2:63
+#: eduiddashboard/templates/profile.jinja2:66
 msgid "Lost your confirmation code?"
 msgstr "Tappat bort din bekräftelsekod?"
 
-#: eduiddashboard/templates/profile.jinja2:63
+#: eduiddashboard/templates/profile.jinja2:66
 msgid "Resend confirmation code"
 msgstr "Skicka bekräftelsekoden igen"
 
-#: eduiddashboard/templates/profile.jinja2:68
+#: eduiddashboard/templates/profile.jinja2:71
 msgid "Finish"
 msgstr "Klar"
 
-#: eduiddashboard/templates/profile.jinja2:100
+#: eduiddashboard/templates/profile.jinja2:103
 msgid "Warning!"
 msgstr "Varning!"
 
-#: eduiddashboard/templates/profile.jinja2:100
+#: eduiddashboard/templates/profile.jinja2:103
 msgid ""
 "An error has occurred, please try again or contact support if the problem "
 "persists."
 msgstr "Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:110
 msgid "Error!"
 msgstr "Fel!"
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:110
 msgid "Permission denied"
 msgstr "Åtkomst nekad"
 
@@ -690,7 +687,7 @@ msgstr "E-postadress borttagen"
 msgid "Add email address"
 msgstr "Lägg till e-postadress"
 
-#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:196
+#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
 #: eduiddashboard/views/nins.py:209 eduiddashboard/views/nins.py:246
 #: eduiddashboard/views/personal.py:81
 msgid "Changes saved"
@@ -703,13 +700,13 @@ msgid ""
 "identifier=\"${id}\">here</a>."
 msgstr "En bekräftelseskod har skickats till din e-postadress. Ange din bekräftelsekod <a href=\"#\" class=\"verifycode\" data-identifier=\"${id}\">här</a>."
 
-#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:161
+#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:160
 msgid "Add mobile phone number"
 msgstr "Lägg till ett mobiltelefonnummer"
 
 #: eduiddashboard/views/mobiles.py:29
 msgid "A mobile phone number is pending confirmation"
-msgstr "Ett mobiltelefonnummer behöver bekräftas"
+msgstr "Bekräfta ett mobiltelefonnummer"
 
 #: eduiddashboard/views/mobiles.py:81
 msgid "The mobile phone number has been verified"
@@ -741,16 +738,16 @@ msgstr "Mobiltelefonnumret har tagits bort "
 msgid "That mobile phone number doesn't exists"
 msgstr "Mobiltelefonnumret kunde inte hittas"
 
-#: eduiddashboard/views/mobiles.py:121
+#: eduiddashboard/views/mobiles.py:120
 msgid ""
 "You need to verify that mobile phone number before be able to set as primary"
 msgstr "Du behöver verifiera ditt mobilnummer innan det går att ange som primärt"
 
-#: eduiddashboard/views/mobiles.py:141
+#: eduiddashboard/views/mobiles.py:140
 msgid "Mobile phone number was successfully made primary"
 msgstr "Mobiltelefonnumret är "
 
-#: eduiddashboard/views/mobiles.py:198
+#: eduiddashboard/views/mobiles.py:197
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on the "
 "\"Pending confirmation\" link below and enter your confirmation code."
