@@ -103,18 +103,23 @@ class PasswordsView(BaseFormView):
     route = 'security'
     buttons = (Button(name='save', title=_('Change password')), )
 
+    def get_template_context(self):
+        context = super(PasswordsView, self).get_template_context()
+        if hasattr(self, 'new_password'):
+            context.update({'new_password': self.new_password})
+        return context
 
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
-        new_password = passwords_data['new_password']
         old_password = passwords_data['old_password']
+        self.new_password = get_short_hash()
 
         user = self.request.session['user']
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
         user = self.request.userdb.get_user_by_oid(user['_id'])
 
-        ok = change_password(self.request, user, old_password, new_password)
+        ok = change_password(self.request, user, old_password, self.new_password)
         if ok:
             self.request.session.flash(_('Your password has been successfully updated'),
                                        queue='forms')

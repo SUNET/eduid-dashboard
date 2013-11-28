@@ -91,18 +91,6 @@ class Passwords(colander.MappingSchema):
                                        title=_('Current password'),
                                        widget=deform.widget.PasswordWidget(size=20),
                                        validator=OldPasswordValidator())
-    new_password = colander.SchemaNode(colander.String(),
-                                       title=_('New password'),
-                                       widget=deform.widget.PasswordWidget(size=20),
-                                       validator=PasswordValidator())
-    new_password_repeated = colander.SchemaNode(colander.String(),
-                                                title=_('Confirm new password'),
-                                                widget=deform.widget.PasswordWidget(size=20))
-
-    def validator(self, node, data):
-        if data['new_password'] != data['new_password_repeated']:
-            raise colander.Invalid(node,
-                                   _("Passwords don't match"))
 
 
 class EmailResetPassword(colander.MappingSchema):
