@@ -89,7 +89,7 @@ class UserDB(IUserDB):
             self._db, attr, value))
         try:
             user = self._db.get_user_by_field(attr, value)
-            logger.debug("Found user {!r}".format(user))
+            logger.debug("Found user {!s}".format(user.get('_id')))
             return user
         except UserDoesNotExist:
             logger.error("UserDoesNotExist, {!r} = {!r}".format(attr, value))
