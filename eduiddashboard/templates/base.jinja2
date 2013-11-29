@@ -25,7 +25,10 @@
           {% block loasquare %}
           {% with loa=request.context.get_loa() %}
             <div class='loa-big'>
-              {{ user.get('mail') }} ({{_(loa)}})
+              {% if user is defined %}
+                {{ user.get('mail') }}
+              {% endif %}
+              ({{_(loa)}})
             </div>
           {% endwith %}
           {% endblock %}
