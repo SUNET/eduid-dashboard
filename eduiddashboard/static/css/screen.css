@@ -307,5 +307,9 @@ div.reset-password-buttons p {
   text-align: center;
 }
 
+table.passwords {
+  background-color: white;
+}
+
 /* End of reset password view styles
 -------------------------------------------------- */

@@ -1,5 +1,6 @@
 ## Passwords form
 
+from pwgen import pwgen
 from deform import Button
 
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
@@ -112,7 +113,9 @@ class PasswordsView(BaseFormView):
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         old_password = passwords_data['old_password']
-        self.new_password = get_short_hash()
+        password_length = self.request.registry.settings.get('password_length')
+        self.new_password = pwgen(int(password_length),
+                                  no_capitalize=True, no_symbols=True)
 
         user = self.request.session['user']
         # Load user from database to ensure we are working on an up-to-date set of credentials.
