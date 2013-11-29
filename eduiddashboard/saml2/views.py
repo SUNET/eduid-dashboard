@@ -235,7 +235,7 @@ def logout_service(request):
                 )
             )
             headers = logout(request)
-            return HTTPFound(url=next_page, headers=headers)
+            return HTTPFound(location=next_page, headers=headers)
         else:
             http_info = client.handle_logout_request(
                 request.GET['SAMLRequest'],
