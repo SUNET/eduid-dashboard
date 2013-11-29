@@ -34,7 +34,7 @@ requires = [
     'colander==1.0b1',
     'deform==0.9.8',
     'deform_bootstrap==0.2.9',
-    'pysaml2>=1.0.3',
+    'pysaml2>=1.0.4beta',
     'pycountry==1.2',
     'waitress==0.8.2',
     'vccs_client==0.3',
