@@ -283,6 +283,7 @@ def main(global_config, **settings):
         'mongo_uri_am',
         'personal_dashboard_base_url',
         'vccs_url',
+        'auth_tk_timeout',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -346,6 +347,8 @@ def main(global_config, **settings):
 
     if settings['proofing_links'] is None:
         raise ConfigurationError('The proofing_links configuration is not OK')
+
+    settings['session.expire'] = settings['auth_tk_timeout']
 
     settings['groups_callback'] = read_setting_from_env(settings,
                                                         'groups_callback',

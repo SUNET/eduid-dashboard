@@ -17,7 +17,9 @@ def read_setting_from_env(settings, key, default=None):
 
 def configure_authtk(config, settings):
 
-    extra_authn_policy = {}
+    extra_authn_policy = {
+        'timeout': int(settings.get('auth_tk_timeout')),
+    }
 
     if 'groups_callback' in settings:
         extra_authn_policy['callback'] = settings['groups_callback']
@@ -42,7 +44,8 @@ def includeme(config):
         'saml2.login_redirect_url',
         'saml2.logout_redirect_url',
         'saml2.user_main_attribute',
-        'auth_tk_secret'
+        'auth_tk_secret',
+        'auth_tk_timeout',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
