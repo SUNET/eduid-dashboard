@@ -123,9 +123,9 @@ class Saml2ViewsTests(Saml2RequestTests):
         self.assertEqual(res.status, '302 Found')
         self.assertIn(self.settings['saml2.logout_redirect_url'], res.location)
         # Set a expired cookie (just the logout header)
-        self.assertEqual('auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT',
-                         res.headers.get('Set-Cookie'))
+        self.assertIn('auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
+                      'Expires=Wed, 31-Dec-97 23:59:59 GMT',
+                      res.headers.getall('Set-Cookie'))
 
     def test_logout_service_startingSP_already_logout(self):
 
@@ -142,9 +142,9 @@ class Saml2ViewsTests(Saml2RequestTests):
         self.assertEqual(res.status, '302 Found')
         self.assertIn(self.settings['saml2.logout_redirect_url'], res.location)
         # Set a expired cookie (just the logout header)
-        self.assertEqual('auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT',
-                         res.headers.get('Set-Cookie'))
+        self.assertIn('auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
+                      'Expires=Wed, 31-Dec-97 23:59:59 GMT',
+                      res.headers.getall('Set-Cookie'))
 
     def test_logout_service_startingIDP(self):
         self.config.testing_securitypolicy(userid='user1@example.com',
@@ -174,9 +174,9 @@ class Saml2ViewsTests(Saml2RequestTests):
         self.assertIn('https://idp.example.com/simplesaml/saml2/idp/'
                       'SingleLogoutService.php?SAMLResponse=', res.location)
         # Set a expired cookie (just the logout header)
-        self.assertEqual('auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
-                         'Expires=Wed, 31-Dec-97 23:59:59 GMT',
-                         res.headers.get('Set-Cookie'))
+        self.assertIn('auth_tkt=""; Path=/; Domain=localhost; Max-Age=0; '
+                      'Expires=Wed, 31-Dec-97 23:59:59 GMT',
+                      res.headers.getall('Set-Cookie'))
 
 
 class Saml2ViewsTestsUsingWayf(Saml2RequestTests):

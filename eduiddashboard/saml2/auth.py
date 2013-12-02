@@ -99,5 +99,7 @@ def login(request, session_info, user):
 
 
 def logout(request):
+    if request.session is not None:
+        request.session.delete()
     headers = forget(request)
     return headers
