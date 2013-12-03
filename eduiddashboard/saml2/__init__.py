@@ -1,6 +1,7 @@
 import os
 
-from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authentication import (AuthTktAuthenticationPolicy,
+                                    SessionAuthenticationPolicy)
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import ConfigurationError
 
@@ -15,19 +16,22 @@ def read_setting_from_env(settings, key, default=None):
         return settings.get(key, default)
 
 
-def configure_authtk(config, settings):
+def configure_auth(config, settings):
 
-    extra_authn_policy = {
-        'timeout': int(settings.get('auth_tk_timeout')),
-    }
+    extra_authn_policy = {}
 
     if 'groups_callback' in settings:
         extra_authn_policy['callback'] = settings['groups_callback']
 
-    authn_policy = AuthTktAuthenticationPolicy(
-        settings['auth_tk_secret'], hashalg='sha512',
-        wild_domain=False,
-        **extra_authn_policy)
+    if not settings.get('testing'):
+        authn_policy = SessionAuthenticationPolicy(prefix='session',
+                                                   **extra_authn_policy)
+    else:
+        authn_policy = AuthTktAuthenticationPolicy(
+            settings.get('auth_tk_secret', '1234'),
+            hashalg='sha512',
+            wild_domain=False,
+            **extra_authn_policy)
 
     authz_policy = ACLAuthorizationPolicy()
 
@@ -44,8 +48,6 @@ def includeme(config):
         'saml2.login_redirect_url',
         'saml2.logout_redirect_url',
         'saml2.user_main_attribute',
-        'auth_tk_secret',
-        'auth_tk_timeout',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -88,6 +90,7 @@ def includeme(config):
         config.registry.settings['userdb'] = userdb
         config.add_request_method(get_userdb, 'userdb', reify=True)
 
+    config = configure_auth(config, settings)
     # saml2 views
     config.add_route('saml2-login', '/saml2/login/')
     config.add_route('saml2-acs', '/saml2/acs/')

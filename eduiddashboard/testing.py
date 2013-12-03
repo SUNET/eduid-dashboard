@@ -82,13 +82,13 @@ MOCKED_USER_STANDARD = {
 }
 
 INITIAL_VERIFICATIONS = [{
-        '_id': ObjectId('234567890123456789012301'),
-        'code' : '9d392c',
-        'model_name' : 'mobile',
-        'obj_id' : '+34 6096096096',
-        'user_oid' : ObjectId("012345678901234567890123"),
-        'timestamp': datetime.utcnow(),
-        'verified': False,
+    '_id': ObjectId('234567890123456789012301'),
+    'code': '9d392c',
+    'model_name': 'mobile',
+    'obj_id': '+34 6096096096',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
 }]
 
 
@@ -160,9 +160,10 @@ class LoggedInReguestTests(unittest.TestCase):
             'saml2.attribute_mapping': "mail = mail",
             # Required only if not dont want mongodb
             # 'groups_callback': dummy_groups_callback,
-            'session.type': 'memory',
-            'session.lock_dir': '/tmp',
-            'session.webtest_varname': 'session',
+            #'session.type': 'memory',
+            #'session.lock_dir': '/tmp',
+            #'session.webtest_varname': 'session',
+            # 'session.secret': '1234',
             'mongo_uri': MONGO_URI_TEST,
             'mongo_uri_am': MONGO_URI_AM_TEST,
             'testing': True,
@@ -273,7 +274,7 @@ class LoggedInReguestTests(unittest.TestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
         return request
 
     def check_values(self, fields, values):
