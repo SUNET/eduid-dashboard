@@ -66,7 +66,7 @@ def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha2
 
 
 def flash(request, message_type, message):
-    request.session.flash("{0}|{1}".format(message_type, message))
+    request.session.flash("{0}|{1}".format(message_type, message.decode('utf-8')))
 
 
 def get_icon_string(status):
