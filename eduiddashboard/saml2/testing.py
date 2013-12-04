@@ -14,7 +14,6 @@ from pyramid import testing
 
 from eduiddashboard.saml2.userdb import IUserDB
 from eduiddashboard.saml2 import includeme as saml2_includeme
-from eduiddashboard.saml2 import configure_authtk
 
 
 class MockedUserDB(IUserDB):
@@ -72,8 +71,6 @@ def saml2_main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory)
 
-    config = configure_authtk(config, settings)
-
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
 
@@ -97,10 +94,10 @@ class Saml2RequestTests(unittest.TestCase):
         # db in a different way
 
         self.settings = {
-            'auth_tk_secret': '123456',
             'saml2.settings_module': path.join(path.dirname(__file__),
                                                'tests/data/saml2_settings.py'),
             'saml2.login_redirect_url': '/',
+            'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'saml2.attribute_mapping': "mail = mail",
             'auth_tk_secret': '123456',

@@ -86,7 +86,6 @@ def auth_response(session_id, uid):
     </saml:Assertion>
 </samlp:Response>"""
 
-
     return saml_response_tpl.format(**{
         'uid': uid,
         'session_id': session_id,
@@ -95,3 +94,52 @@ def auth_response(session_id, uid):
         'yesterday': yesterday.strftime('%Y-%m-%dT%H:%M:%SZ'),
         'sp_url': sp_baseurl,
     })
+
+
+def logout_response(session_id):
+    timestamp = datetime.datetime.now() - datetime.timedelta(seconds=10)
+
+    saml_logout_response = """
+<samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                      xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                      ID="_57c8021aeb90bbf93d5a587f5c9c68cccfe42d95f6"
+                      Version="2.0"
+                      IssueInstant="{now}"
+                      Destination="http://eduid.example.com:6544/saml2/ls/"
+                      InResponseTo="{session_id}"
+                      >
+    <saml:Issuer>https://idp.example.com/simplesaml/saml2/idp/metadata.php</saml:Issuer>
+    <samlp:Status>
+        <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success" />
+    </samlp:Status>
+</samlp:LogoutResponse>""".format(
+        now=timestamp.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        session_id=session_id
+    )
+
+    return saml_logout_response
+
+
+def logout_request(session_id, idp=None):
+    timestamp = datetime.datetime.now() - datetime.timedelta(seconds=10)
+    if idp is None:
+        idp = 'https://idp.example.com/simplesaml/saml2/idp/metadata.php'
+    saml_logout_request = """
+<samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+                     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                     ID="{session_id}"
+                     Version="2.0"
+                     IssueInstant="{now}"
+                     Destination="http://eduid.example.com:6544/saml2/ls/"
+                     >
+    <saml:Issuer>{idp}</saml:Issuer>
+    <saml:NameID SPNameQualifier="http://eduid.example.com:6544/saml2/metadata/"
+                 Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
+                 >{session_id}</saml:NameID>
+    <samlp:SessionIndex>{session_id}</samlp:SessionIndex>
+</samlp:LogoutRequest>""".format(
+        now=timestamp.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        session_id=session_id,
+        idp=idp
+    )
+    return saml_logout_request

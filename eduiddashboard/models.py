@@ -166,7 +166,6 @@ class ResetPasswordStep2(colander.MappingSchema):
 def postal_address_default_country(node, kw):
     request = kw.get('request')
     default_location = request.registry.settings.get('default_country_location')
-    print default_location
     return default_location
 
 
