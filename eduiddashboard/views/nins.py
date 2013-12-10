@@ -76,9 +76,8 @@ def mark_as_verified_nin(request, user, verified_nin):
     """
     if user.get('norEduPersonNIN', None) is None:
         user['norEduPersonNIN'] = [verified_nin]
-        # TODO depends on a question sended to the list
-        # it could be a simple value or a list
-
+    else:
+        user['norEduPersonNIN'].append(verified_nin)
 
 
 def post_verified_nin(request, user, verified_nin):
@@ -176,25 +175,35 @@ class NinsView(BaseFormView):
     def appstruct(self):
         return {}
 
-    def get_nins_list(self):
-        active_nin = self.user.get('norEduPersonNIN', None)
+    def get_not_verified_nins_list(self):
+        active_nins = self.user.get('norEduPersonNIN', [])
         nins = []
         verifications = self.request.db.verifications
         not_verified_nins = verifications.find({
             'model_name': 'norEduPersonNIN',
             'user_oid': self.user['_id'],
-        }, sort={'timestamp': 1})
-        if active_nin is not None:
+        }, sort=[('timestamp', 1)])
+        if active_nins:
+            active_nin = active_nins[-1]
             nin_found = False
             for nin in not_verified_nins:
                 if active_nin == nin['obj_id']:
                     nin_found = True
-                elif nin_found:
+                elif nin_found and not nin['verified']:
+                    nins.append(nin['obj_id'])
+        else:
+            for nin in not_verified_nins:
+                if not nin['verified']:
                     nins.append(nin['obj_id'])
 
         return nins
 
-
+    def get_active_nin(self):
+        active_nins = self.user.get('norEduPersonNIN', [])
+        if active_nins:
+            return active_nins[-1]
+        else:
+            return None
 
     def get_template_context(self):
         """
@@ -210,10 +219,10 @@ class NinsView(BaseFormView):
                                                             {})
         proofing_link = proofing_links.get('nin')
 
-
-
         context.update({
             'nins': self.user.get('norEduPersonNIN', []),
+            'not_verified_nins': self.get_not_verified_nins_list(),
+            'active_nin': self.get_active_nin(),
             'proofing_link': proofing_link,
         })
 

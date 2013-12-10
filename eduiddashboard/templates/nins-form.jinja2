@@ -8,34 +8,38 @@
 
   {{ safe_actions_url('nins-actions') }}
 
-  {% if nins %}
-  <table class='table table-striped table-thin table-form nins'>
 
-    {% for nin in nins %}
-    <tr class='ninrow' data-identifier="{{ loop.index0 }}">
-        <td class='identifier'>{{ nin.norEduPersonNIN }}</td>
-      {% if nin.verified %}
+  {% if active_nin %}
+    <table class='table table-striped table-thin table-form nins'>
+      <tr class='ninrow' data-identifier="{{ loop.index0 }}">
+          <td class='identifier'>{{ nin }}</td>
           <td><span class='nobutton'>{{_("Verified")}}</span></td>
-        {%  if nin.active %}
           <td><span class='nobutton'>{{_("Active")}}</span></td>
-        {% else %}
           <td></td>
-        {% endif %}
-      {% else %}
-        <td>
-          <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
-               data-index='{{ loop.index0 }}' name='verify'>
-        </td>
-        <td>
-          <input type='button' class='btn btn-link' value="{{_('Remove')}}"
-               data-index='{{ loop.index0 }}' name='remove'>
-        </td>
-      {% endif %}
-    </tr>
-    {% endfor %}
-  </table>
+      </tr>
+    </table>
+  {% else %}
+    {% if not_verified_nins %}
+    <table class='table table-striped table-thin table-form nins'>
 
+      {% for nin in not_verified_nins %}
+      <tr class='ninrow' data-identifier="{{ loop.index0 }}">
+          <td class='identifier'>{{ nin }}</td>
+          <td>
+            <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
+                 data-index='{{ loop.index0 }}' name='verify'>
+          </td>
+          <td>
+            <input type='button' class='btn btn-link' value="{{_('Remove')}}"
+                 data-index='{{ loop.index0 }}' name='remove'>
+          </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    {% endif %}
   {% endif %}
+
 
 {% endblock %}
 
