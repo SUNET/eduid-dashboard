@@ -54,6 +54,14 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
     return code
 
 
+def get_not_verificated_objects(request, model_name, user):
+    return request.db.verifications.find({
+        'user_oid': user['_id'],
+        'model_name': model_name,
+        'verified': False,
+    })
+
+
 def verificate_code(request, model_name, code):
     from eduiddashboard.views.emails import mark_as_verified_email
     from eduiddashboard.views.mobiles import mark_as_verified_mobile

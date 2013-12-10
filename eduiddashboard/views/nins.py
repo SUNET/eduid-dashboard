@@ -17,8 +17,9 @@ from eduiddashboard.verifications import new_verification_code
 
 def get_status(user):
     """
-    Check if there is one norEduPersonNIN active and verified
-        is already verified if the active NIN was verified
+    Check if there is exist norEduPersonNIN active
+    Else:
+        Check is user has pending nin in verifications collection
 
     return msg and icon
     """
@@ -70,14 +71,14 @@ def send_verification_code(request, user, nin, code=None):
 
 
 def mark_as_verified_nin(request, user, verified_nin):
-    nins = user['norEduPersonNIN']
+    """
+        Replace old nin with the new verified nin.
+    """
+    if user.get('norEduPersonNIN', None) is None:
+        user['norEduPersonNIN'] = [verified_nin]
+        # TODO depends on a question sended to the list
+        # it could be a simple value or a list
 
-    for nin in nins:
-        if nin['norEduPersonNIN'] == verified_nin:
-            nin['verified'] = True
-            nin['active'] = True
-        else:
-            nin['active'] = False
 
 
 def post_verified_nin(request, user, verified_nin):
@@ -114,6 +115,7 @@ class NINsActionsView(BaseActionsView):
 
     def verify_action(self, index, post_data):
         """ Only the active (the last one) NIN can be verified """
+        # TODO Need refact
         nins = self.user.get(self.data_attribute, {})
         if index != len(nins) - 1:
             return {
@@ -125,6 +127,7 @@ class NINsActionsView(BaseActionsView):
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
+        # TODO Need refact
         nins = self.user.get('norEduPersonNIN', [])
         if len(nins) > index:
             remove_nin = nins[index]
@@ -173,11 +176,42 @@ class NinsView(BaseFormView):
     def appstruct(self):
         return {}
 
+    def get_nins_list(self):
+        active_nin = self.user.get('norEduPersonNIN', None)
+        nins = []
+        verifications = self.request.db.verifications
+        not_verified_nins = verifications.find({
+            'model_name': 'norEduPersonNIN',
+            'user_oid': self.user['_id'],
+        }, sort={'timestamp': 1})
+        if active_nin is not None:
+            nin_found = False
+            for nin in not_verified_nins:
+                if active_nin == nin['obj_id']:
+                    nin_found = True
+                elif nin_found:
+                    nins.append(nin['obj_id'])
+
+        return nins
+
+
+
     def get_template_context(self):
+        """
+            Take active NIN (on am profile)
+            Take NINs from verifications, sorted by older and compared with
+            the present active NIN.
+            If they are older, then don't take it.
+            If there are not verified nins newer than the active NIN, then
+            take them as not verified NINs
+        """
         context = super(NinsView, self).get_template_context()
         proofing_links = self.request.registry.settings.get('proofing_links',
                                                             {})
         proofing_link = proofing_links.get('nin')
+
+
+
         context.update({
             'nins': self.user.get('norEduPersonNIN', []),
             'proofing_link': proofing_link,
@@ -189,23 +223,6 @@ class NinsView(BaseFormView):
         newnin = self.schema.serialize(ninform)
         newnin = newnin['norEduPersonNIN']
 
-        ninsubdoc = {
-            'norEduPersonNIN': newnin,
-            'verified': False,
-            'active': False,
-        }
-
-        nins = self.user.get('norEduPersonNIN', [])
-        nin_identifier = len(nins)
-        nins.append(ninsubdoc)
-
-        self.user['norEduPersonNIN'] = nins
-
-        # Do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
-
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
@@ -213,8 +230,7 @@ class NinsView(BaseFormView):
 
         msg = _('A confirmation code has been sent to your govt inbox. '
                 'Please click on "Pending confirmation" link below to enter.'
-                'your confirmation code',
-                mapping={'id': nin_identifier})
+                'your confirmation code')
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
@@ -225,16 +241,7 @@ class NinsView(BaseFormView):
 
         nins = self.user.get('norEduPersonNIN', [])
 
-        for nin in nins:
-            nin['active'] = False
-
-        ninsubdoc = {
-            'norEduPersonNIN': newnin,
-            'verified': True,
-            'active': True,
-        }
-
-        nins.append(ninsubdoc)
+        nins.append(newnin)
 
         self.user['norEduPersonNIN'] = nins
 
