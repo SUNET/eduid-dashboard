@@ -1,9 +1,10 @@
 from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
+from saml2.response import LogoutResponse
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
-                                    HTTPUnauthorized)
+                                    HTTPUnauthorized, HTTPInternalServerError)
 from pyramid.response import Response
 from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
@@ -180,11 +181,18 @@ def logout_view(request):
     else:
         logouts = client.global_logout(subject_id)
         loresponse = logouts.values()[0]
-        headers_tuple = loresponse[1]['headers']
-        location = headers_tuple[0][1]
+        # loresponse is a dict for REDIRECT binding, and LogoutResponse for SOAP binding
+        if isinstance(loresponse, LogoutResponse):
+            if loresponse.status_ok():
+                location = request.registry.settings.get('saml2.logout_redirect_url')
+            else:
+                return HTTPInternalServerError('Logout failed')
+        else:
+            headers_tuple = loresponse[1]['headers']
+            location = headers_tuple[0][1]
 
     state.sync()
-    logger.debug('Redirecting to the IdP to continue the logout process')
+    logger.debug('Redirecting to {!r} to continue the logout process'.format(location))
     return HTTPFound(location=location)
 
 
