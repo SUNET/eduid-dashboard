@@ -89,7 +89,7 @@ def post_verified_nin(request, user, verified_nin):
 def get_tab():
     return {
         'status': get_status,
-        'label': _('National identity number'),
+        'label': _('Confirm Identity'),
         'id': 'nins',
     }
 
