@@ -25,10 +25,14 @@
       {% for nin in not_verified_nins %}
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
+          {% if loop.last %}
           <td>
             <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
                  data-index='{{ loop.index0 }}' name='verify'>
           </td>
+          {% else %}
+          <td><span class='muted'>{{ _('Pending confirmation')}}</span></td>
+          {% endif %}
           <td>
             <input type='button' class='btn btn-link' value="{{_('Remove')}}"
                  data-index='{{ loop.index0 }}' name='remove'>

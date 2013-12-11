@@ -3,7 +3,7 @@
 import deform
 
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPConflict, HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
 
 from eduiddashboard.i18n import TranslationString as _
@@ -12,7 +12,8 @@ from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 
-from eduiddashboard.verifications import new_verification_code
+from eduiddashboard.verifications import (new_verification_code,
+                                          save_as_verificated)
 
 
 def get_status(user):
@@ -97,6 +98,38 @@ def get_tab():
     }
 
 
+def get_not_verified_nins_list(self):
+    active_nins = self.user.get('norEduPersonNIN', [])
+    nins = []
+    verifications = self.request.db.verifications
+    not_verified_nins = verifications.find({
+        'model_name': 'norEduPersonNIN',
+        'user_oid': self.user['_id'],
+    }, sort=[('timestamp', 1)])
+    if active_nins:
+        active_nin = active_nins[-1]
+        nin_found = False
+        for nin in not_verified_nins:
+            if active_nin == nin['obj_id']:
+                nin_found = True
+            elif nin_found and not nin['verified']:
+                nins.append(nin['obj_id'])
+    else:
+        for nin in not_verified_nins:
+            if not nin['verified']:
+                nins.append(nin['obj_id'])
+
+    return nins
+
+
+def get_active_nin(self):
+    active_nins = self.user.get('norEduPersonNIN', [])
+    if active_nins:
+        return active_nins[-1]
+    else:
+        return None
+
+
 @view_config(route_name='nins-actions', permission='edit')
 class NINsActionsView(BaseActionsView):
 
@@ -108,6 +141,9 @@ class NINsActionsView(BaseActionsView):
         'placeholder': _('National identity number confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to your govt mailbox'),
     }
+
+    get_not_verified_nins_list = get_not_verified_nins_list
+    get_active_nin = get_active_nin
 
     def get_verification_data_id(self, data_to_verify):
         return data_to_verify[self.data_attribute]
@@ -127,25 +163,20 @@ class NINsActionsView(BaseActionsView):
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
         # TODO Need refact
-        nins = self.user.get('norEduPersonNIN', [])
+        nins = self.get_not_verified_nins_list()
+
         if len(nins) > index:
             remove_nin = nins[index]
         else:
             raise HTTPNotFound("The index provides can't be found")
 
-        remove_nin = nins[index]
-
-        if remove_nin['verified']:
-            raise HTTPConflict("This nin can't be removed")
-
-        nins.remove(nins[index])
-
-        self.user['norEduPersonNIN'] = nins
-
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
+        verifications = self.request.db.verifications
+        verifications.remove({
+            'model_name': 'norEduPersonNIN',
+            'obj_id': remove_nin,
+            'user_oid': self.user['_id'],
+            'verified': False,
+        })
 
         return {
             'result': 'ok',
@@ -168,42 +199,16 @@ class NinsView(BaseFormView):
     schema = NIN()
     route = 'nins'
 
-    buttons = (deform.Button(name='add', title=_('Add national identity number')), )
+    buttons = (deform.Button(name='add',
+                             title=_('Add national identity number')), )
 
     bootstrap_form_style = 'form-inline'
 
+    get_not_verified_nins_list = get_not_verified_nins_list
+    get_active_nin = get_active_nin
+
     def appstruct(self):
         return {}
-
-    def get_not_verified_nins_list(self):
-        active_nins = self.user.get('norEduPersonNIN', [])
-        nins = []
-        verifications = self.request.db.verifications
-        not_verified_nins = verifications.find({
-            'model_name': 'norEduPersonNIN',
-            'user_oid': self.user['_id'],
-        }, sort=[('timestamp', 1)])
-        if active_nins:
-            active_nin = active_nins[-1]
-            nin_found = False
-            for nin in not_verified_nins:
-                if active_nin == nin['obj_id']:
-                    nin_found = True
-                elif nin_found and not nin['verified']:
-                    nins.append(nin['obj_id'])
-        else:
-            for nin in not_verified_nins:
-                if not nin['verified']:
-                    nins.append(nin['obj_id'])
-
-        return nins
-
-    def get_active_nin(self):
-        active_nins = self.user.get('norEduPersonNIN', [])
-        if active_nins:
-            return active_nins[-1]
-        else:
-            return None
 
     def get_template_context(self):
         """
@@ -253,6 +258,10 @@ class NinsView(BaseFormView):
         nins.append(newnin)
 
         self.user['norEduPersonNIN'] = nins
+
+        # Save the state in the verifications collection
+        save_as_verificated(self.request, 'norEduPersonNIN',
+                            self.user['_id'], newnin)
 
         # Do the save staff
         self.request.db.profiles.save(self.user, safe=True)

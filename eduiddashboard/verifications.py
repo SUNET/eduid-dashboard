@@ -94,7 +94,8 @@ def verificate_code(request, model_name, code):
     obj_id = result['obj_id']
     if obj_id:
         user = request.userdb.get_user_by_oid(result['user_oid'])
-        # Callback to a function which marks as verificated the proper user attribute
+        # Callback to a function which marks as verificated the proper user
+        # attribute
         verifiers[model_name](request, user, obj_id)
         post_verified = post_verifiers.get(model_name, None)
         if post_verified is not None:
@@ -102,6 +103,36 @@ def verificate_code(request, model_name, code):
         # Do the save staff
         request.db.profiles.save(user, safe=True)
         request.context.propagate_user_changes(user)
+    return obj_id
+
+
+def save_as_verificated(request, model_name, user_oid, obj_id):
+    from eduiddashboard.views.nins import post_verified_nin
+
+    post_verifiers = {
+        'norEduPersonNIN': post_verified_nin,
+    }
+
+    result = request.db.verifications.find_and_modify(
+        {
+            "model_name": model_name,
+            "user_oid": user_oid,
+            "obj_id": obj_id,
+        }, {
+            "$set": {
+                "verified": True,
+                "timestamp": datetime.now(utc),
+            }
+        },
+        new=True,
+        safe=True
+    )
+    obj_id = result['obj_id']
+    if obj_id:
+        user = request.userdb.get_user_by_oid(result['user_oid'])
+        post_verified = post_verifiers.get(model_name, None)
+        if post_verified is not None:
+            post_verified(request, user, obj_id)
     return obj_id
 
 
