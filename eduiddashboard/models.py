@@ -49,6 +49,13 @@ NINFormatValidator = colander.Regex(
 )
 
 
+def normalize_nin(nin):
+    # Normalize nin, removing hyphen and whitespaces
+    newnin = nin.replace(' ', '')
+    newnin = newnin.replace('-', '')
+    return nin
+
+
 class NIN(colander.MappingSchema):
     """
         Allowed NIN input format:

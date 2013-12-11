@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.models import NIN
+from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
@@ -238,6 +238,8 @@ class NinsView(BaseFormView):
         newnin = self.schema.serialize(ninform)
         newnin = newnin['norEduPersonNIN']
 
+        newnin = normalize_nin(newnin)
+
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 
@@ -253,6 +255,8 @@ class NinsView(BaseFormView):
     def add_success_other(self, ninform):
         newnin = self.schema.serialize(ninform)
         newnin = newnin['norEduPersonNIN']
+
+        newnin = normalize_nin(newnin)
 
         nins = self.user.get('norEduPersonNIN', [])
 

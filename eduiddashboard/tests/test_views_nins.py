@@ -29,7 +29,7 @@ class NinsFormTests(LoggedInReguestTests):
         self.assertNotIn('johnsmith@example.info', response_form.body)
 
         form = response_form.forms[self.formname]
-        nin = '20001010-0001'
+        nin = '200010100001'
         form['norEduPersonNIN'].value = nin
         with patch.object(UserDB, 'exists_by_filter', clear=True):
 
@@ -44,7 +44,7 @@ class NinsFormTests(LoggedInReguestTests):
     def test_add_not_valid_nin(self):
         self.set_logged(user='johnsmith@example.org')
 
-        nin = '200010100001'
+        nin = '200010100001-'
         response_form = self.testapp.get('/profile/nins/')
 
         form = response_form.forms[self.formname]
@@ -68,7 +68,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
 
-        form['norEduPersonNIN'].value = '12345678-9012'
+        form['norEduPersonNIN'].value = '123456789012'
 
         with patch.object(UserDB, 'exists_by_filter', clear=True):
 
@@ -77,7 +77,7 @@ class NinsFormTests(LoggedInReguestTests):
             response = form.submit('add')
 
             self.assertEqual(response.status, '200 OK')
-            self.assertIn('12345678-9012', response.body)
+            self.assertIn('123456789012', response.body)
             self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 

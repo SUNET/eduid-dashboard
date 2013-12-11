@@ -1,4 +1,5 @@
 import colander
+from copy import copy
 
 from eduiddashboard.userdb import UserDB
 
@@ -124,6 +125,9 @@ class EmailOrUsernameExistsValidator(object):
 class NINExistsValidator(object):
 
     def __call__(self, node, value):
+
+        from eduiddashboard.models import normalize_nin
+        value = normalize_nin(copy(value))
         request = node.bindings.get('request')
         try:
             request.userdb.get_user_by_nin(value)
@@ -140,6 +144,9 @@ class NINUniqueValidator(object):
             Check if the NIN was not already registered by the present user in the
                 verifications process.
         """
+
+        from eduiddashboard.models import normalize_nin
+        value = normalize_nin(copy(value))
 
         request = node.bindings.get('request')
 
