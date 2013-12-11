@@ -37,7 +37,7 @@ def get_status(request, user):
 
     if non_verified_nins:
             pending_actions = _('Validation required for national identity number')
-    elif non_verified_nins and not nins:
+    elif not nins:
             pending_actions = _('Add national identity number')
 
     status = {
