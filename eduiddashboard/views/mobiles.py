@@ -12,7 +12,7 @@ from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
-def get_status(user):
+def get_status(request, user):
     """
     Check if all mobiles are verified already
 

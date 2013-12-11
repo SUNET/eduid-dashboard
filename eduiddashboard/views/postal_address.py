@@ -22,7 +22,7 @@ def contains_official_postal_address(postal_address):
     return False
 
 
-def get_status(user):
+def get_status(request, user):
     """
     Check if all postal addresses are verified already
 

@@ -11,7 +11,7 @@ from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
 
-def get_status(user):
+def get_status(request, user):
     """
     Check if all emails are verified already
 

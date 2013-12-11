@@ -102,7 +102,7 @@ def get_available_tabs(context):
     else:
         tabs = default_tabs
     for tab in tabs:
-        tab['status'] = tab['status'](context.user)
+        tab['status'] = tab['status'](context.request, context.user)
     return tabs
 
 

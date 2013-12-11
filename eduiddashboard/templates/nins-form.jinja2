@@ -9,19 +9,16 @@
   {{ safe_actions_url('nins-actions') }}
 
 
-  {% if active_nin %}
     <table class='table table-striped table-thin table-form nins'>
-      <tr class='ninrow' data-identifier="{{ loop.index0 }}">
-          <td class='identifier'>{{ nin }}</td>
+    {% if active_nin %}
+      <tr class='ninrow' data-identifier="0">
+          <td class='identifier'>{{ active_nin }}</td>
           <td><span class='nobutton'>{{_("Verified")}}</span></td>
           <td><span class='nobutton'>{{_("Active")}}</span></td>
           <td></td>
       </tr>
-    </table>
-  {% else %}
+    {% endif %}
     {% if not_verified_nins %}
-    <table class='table table-striped table-thin table-form nins'>
-
       {% for nin in not_verified_nins %}
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
@@ -39,10 +36,8 @@
           </td>
       </tr>
       {% endfor %}
-    </table>
-
     {% endif %}
-  {% endif %}
+    </table>
 
 
 {% endblock %}
