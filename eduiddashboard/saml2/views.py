@@ -184,12 +184,14 @@ def logout_view(request):
         # loresponse is a dict for REDIRECT binding, and LogoutResponse for SOAP binding
         if isinstance(loresponse, LogoutResponse):
             if loresponse.status_ok():
+                logger.debug('Performing local logout of {!r}'.format(authenticated_userid(request)))
+                headers = logout(request)
                 location = request.registry.settings.get('saml2.logout_redirect_url')
+                return HTTPFound(location=location, headers=headers)
             else:
                 return HTTPInternalServerError('Logout failed')
-        else:
-            headers_tuple = loresponse[1]['headers']
-            location = headers_tuple[0][1]
+        headers_tuple = loresponse[1]['headers']
+        location = headers_tuple[0][1]
 
     state.sync()
     logger.debug('Redirecting to {!r} to continue the logout process'.format(location))
