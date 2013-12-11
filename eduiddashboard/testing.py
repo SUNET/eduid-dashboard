@@ -29,19 +29,7 @@ MOCKED_USER_STANDARD = {
     'givenName': 'John',
     'sn': 'Smith',
     'displayName': 'John Smith',
-    'norEduPersonNIN': [{
-        'norEduPersonNIN': '21098765-4321',
-        'verified': True,
-        'active': False,
-    }, {
-        'norEduPersonNIN': '12345678-9012',
-        'verified': False,
-        'active': False,
-    }, {
-        'norEduPersonNIN': '12345678-9013',
-        'verified': True,
-        'active': True,
-    }],
+    'norEduPersonNIN': ['12345678-9013'],
     'photo': 'https://pointing.to/your/photo',
     'preferredLanguage': 'en',
     'eduPersonEntitlement': [
@@ -89,6 +77,30 @@ INITIAL_VERIFICATIONS = [{
     'user_oid': ObjectId("012345678901234567890123"),
     'timestamp': datetime.utcnow(),
     'verified': False,
+}, {
+    '_id': ObjectId(),
+    'code': '123123',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '21098765-4321',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
+}, {
+    '_id': ObjectId(),
+    'code': '123124',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '12345678-9013',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': True,
+}, {
+    '_id': ObjectId(),
+    'code': '123124',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '12345678-9050',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
 }]
 
 
@@ -121,6 +133,7 @@ class MockedUserDB(IUserDB):
 
 def loa(index):
     return AVAILABLE_LOA_LEVEL[index-1]
+
 
 def dummy_groups_callback(userid, request):
     return [request.context.workmode]
