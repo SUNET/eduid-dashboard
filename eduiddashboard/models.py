@@ -43,15 +43,29 @@ class Email(colander.MappingSchema):
                                widget=deform.widget.TextInputWidget(mask=_('Email address')))
 
 
+NINFormatValidator = colander.Regex(
+    regex=re.compile(r'^(\d{8}|\d{6})(-|\ |)\d{4}$'),
+    msg=_('The Swedish national identity number should be entered as yyyymmdd-xxxx')
+)
+
+
 class NIN(colander.MappingSchema):
+    """
+        Allowed NIN input format:
+
+        197801011234 (normalized form)
+        19780101 1234
+        19780101-1234
+        780101-1234 (with 100year old guessing)
+        7801011234 (with 100year old guessing)
+        780101 1234 (with 100year old guessing)
+
+    """
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),
         title=_('Swedish national identity number'),
         validator=colander.All(
-            colander.Regex(
-                regex=re.compile('\d{8}-\d{4}'),
-                msg=_('The Swedish national identity number should be entered as yyyymmdd-xxxx')
-            ),
+            NINFormatValidator,
             NINUniqueValidator()
         ),
         widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxxx'))
