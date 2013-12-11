@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-28 10:28+0100\n"
+"POT-Creation-Date: 2013-12-10 14:52+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -46,7 +46,6 @@ msgstr "números de identificación personal"
 
 #: eduiddashboard/models.py:53
 #, fuzzy
-#| msgid "This national identity number is already registered by you"
 msgid "The Swedish national identity number should be entered as yyyymmdd-xxxx"
 msgstr "números de identificación personal"
 
@@ -102,56 +101,56 @@ msgstr ""
 msgid "Confirmation code"
 msgstr "estado de verificación"
 
-#: eduiddashboard/models.py:174
+#: eduiddashboard/models.py:173
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 #, fuzzy
 msgid "Address"
 msgstr "Dirección Postal"
 
-#: eduiddashboard/models.py:175
+#: eduiddashboard/models.py:174
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
-#: eduiddashboard/models.py:176
+#: eduiddashboard/models.py:175
 #, fuzzy
 msgid "Postal code"
 msgstr "Dirección Postal"
 
-#: eduiddashboard/models.py:178
+#: eduiddashboard/models.py:177
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:187
+#: eduiddashboard/models.py:186
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
 msgstr ""
 
-#: eduiddashboard/models.py:191
+#: eduiddashboard/models.py:190
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:192
+#: eduiddashboard/models.py:191
 #, fuzzy
 msgid "Mobile phone number"
 msgstr "Añadir un nuevo email"
 
-#: eduiddashboard/models.py:207
+#: eduiddashboard/models.py:206
 msgid "text"
 msgstr "texto"
 
-#: eduiddashboard/models.py:208
+#: eduiddashboard/models.py:207
 msgid "the exact match text for the attribute type selected for search"
 msgstr "el texto exacto a buscar con el tipo de atributo seleccionado"
 
-#: eduiddashboard/models.py:215
+#: eduiddashboard/models.py:214
 msgid "attribute type"
 msgstr "tipo de attributo"
 
-#: eduiddashboard/models.py:216
+#: eduiddashboard/models.py:215
 msgid "Select the attribute to search"
 msgstr "Seleccionar atributo para buscar"
 
@@ -249,13 +248,17 @@ msgstr "Este email no ha sido registrado aún"
 msgid "Dashboard"
 msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:33
+#: eduiddashboard/templates/base.jinja2:36
 msgid "Home"
 msgstr "Inicio"
 
-#: eduiddashboard/templates/base.jinja2:34
+#: eduiddashboard/templates/base.jinja2:37
 msgid "Help"
 msgstr "Ayuda"
+
+#: eduiddashboard/templates/base.jinja2:38
+msgid "Logout"
+msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
@@ -433,8 +436,8 @@ msgstr ""
 #: eduiddashboard/templates/nins-form.jinja2:51
 #, python-format
 msgid ""
-"You can access to your associated inbox nin by clicking this <a "
-"href=\"%(nin)s\">link</a>"
+"You can access your governmental inbox using <a href=\"%(nin)s\">Mina "
+"meddelanden</a>"
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
@@ -1271,4 +1274,10 @@ msgstr ""
 
 #~ msgid "Improve profile"
 #~ msgstr "Su perfil de usuario"
+
+#~ msgid ""
+#~ "You can access to your associated "
+#~ "inbox nin by clicking this <a "
+#~ "href=\"%(nin)s\">link</a>"
+#~ msgstr ""
 

@@ -1,4 +1,5 @@
 import colander
+from copy import copy
 
 from eduiddashboard.userdb import UserDB
 
@@ -124,6 +125,9 @@ class EmailOrUsernameExistsValidator(object):
 class NINExistsValidator(object):
 
     def __call__(self, node, value):
+
+        from eduiddashboard.models import normalize_nin
+        value = normalize_nin(copy(value))
         request = node.bindings.get('request')
         try:
             request.userdb.get_user_by_nin(value)
@@ -135,20 +139,33 @@ class NINExistsValidator(object):
 class NINUniqueValidator(object):
 
     def __call__(self, node, value):
+        """
+            Check if the NIN was not already registered and verified by any user
+            Check if the NIN was not already registered by the present user in the
+                verifications process.
+        """
+
+        from eduiddashboard.models import normalize_nin
+        value = normalize_nin(copy(value))
 
         request = node.bindings.get('request')
-        nin_filter = {
-            'norEduPersonNIN.norEduPersonNIN': value,
-            'norEduPersonNIN.verified': True,
-        }
-        if request.userdb.exists_by_filter(nin_filter):
-            raise colander.Invalid(node,
+
+        if request.userdb.exists_by_filter({
+            'norEduPersonNIN': value,
+        }):
+            raise colander.Invalid(
+                node,
                 _("This national identity number is already in use"))
-        user = request.context.get_user()
-        nin_exist = len([x for x in user.get('norEduPersonNIN', []) if x['norEduPersonNIN'] == value]) > 0
-        if nin_exist:
-            raise colander.Invalid(node,
-                _("This national identity number is already registered by you"))
+
+        verifications = request.db.verifications
+
+        if verifications.find({
+            'obj_id': value,
+            'model_name': 'norEduPersonNIN',
+            'verified': False
+        }).count() > 0:
+            raise colander.Invalid(node, _('This national identity number is '
+                                   'already in use by you'))
 
 
 class ResetPasswordCodeExistsValidator(object):

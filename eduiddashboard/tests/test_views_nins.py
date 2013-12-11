@@ -29,7 +29,7 @@ class NinsFormTests(LoggedInReguestTests):
         self.assertNotIn('johnsmith@example.info', response_form.body)
 
         form = response_form.forms[self.formname]
-        nin = '20001010-0001'
+        nin = '200010100001'
         form['norEduPersonNIN'].value = nin
         with patch.object(UserDB, 'exists_by_filter', clear=True):
 
@@ -44,7 +44,7 @@ class NinsFormTests(LoggedInReguestTests):
     def test_add_not_valid_nin(self):
         self.set_logged(user='johnsmith@example.org')
 
-        nin = '200010100001'
+        nin = '200010100001-'
         response_form = self.testapp.get('/profile/nins/')
 
         form = response_form.forms[self.formname]
@@ -66,11 +66,9 @@ class NinsFormTests(LoggedInReguestTests):
 
         response_form = self.testapp.get('/profile/nins/')
 
-        self.assertIn('12345678-9012', response_form.body)
-
         form = response_form.forms[self.formname]
 
-        form['norEduPersonNIN'].value = '12345678-9012'
+        form['norEduPersonNIN'].value = '123456789012'
 
         with patch.object(UserDB, 'exists_by_filter', clear=True):
 
@@ -79,7 +77,7 @@ class NinsFormTests(LoggedInReguestTests):
             response = form.submit('add')
 
             self.assertEqual(response.status, '200 OK')
-            self.assertIn('12345678-9012', response.body)
+            self.assertIn('123456789012', response.body)
             self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
@@ -88,9 +86,19 @@ class NinsFormTests(LoggedInReguestTests):
 
         self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 123456789000, 'action': 'verify'},
-            status=200
+            {'identifier': 50, 'action': 'verify'},
+            status=404
         )
+
+    def test_verify_existant_nin(self):
+        self.set_logged()
+
+        response = self.testapp.post(
+            '/profile/nins-actions/',
+            {'identifier': 0, 'action': 'verify'}
+        )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'getcode')
 
     def test_remove_existant_verified_nin(self):
         self.set_logged()
@@ -98,22 +106,29 @@ class NinsFormTests(LoggedInReguestTests):
         self.testapp.post(
             '/profile/nins-actions/',
             {'identifier': 0, 'action': 'remove'},
-            status=409)
+            status=200)
 
     def test_remove_existant_notverified_nin(self):
         self.set_logged()
-        userdb = self.db.profiles.find_one({'_id': self.user['_id']})
-        nins_number = len(userdb['norEduPersonNIN'])
+
+        nins_before = self.db.verifications.find({
+            'model_name': 'norEduPersonNIN',
+            'user_oid': self.user['_id']
+        }).count()
 
         response = self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 1, 'action': 'remove'},
+            {'identifier': 0, 'action': 'remove'},
             status=200)
-        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+
+        nins_after = self.db.verifications.find({
+            'model_name': 'norEduPersonNIN',
+            'user_oid': self.user['_id']
+        }).count()
 
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'ok')
-        self.assertEqual(nins_number - 1, len(userdb_after['norEduPersonNIN']))
+        self.assertEqual(nins_before - 1, nins_after)
 
     def test_remove_not_existant_nin(self):
         self.set_logged(user='johnsmith@example.org')
@@ -123,35 +138,3 @@ class NinsFormTests(LoggedInReguestTests):
             {'identifier': 24, 'action': 'remove'},
             status=404
         )
-
-
-class NinsFormTests2(LoggedInReguestTests):
-
-    formname = 'ninsview-form'
-
-    users = [{
-        'mail': 'johnsmith@example.com',
-        'norEduPersonNIN': [{
-            'norEduPersonNIN': '210987654321',
-            'verified': True,
-            'active': False,
-        }, {
-            'norEduPersonNIN': '123456789012',
-            'verified': False,
-            'active': False,
-        }, {
-            'norEduPersonNIN': '123456789013',
-            'verified': False,
-            'active': True,
-        }],
-    }]
-
-    def test_verify_existant_nin(self):
-        self.set_logged()
-
-        response = self.testapp.post(
-            '/profile/nins-actions/',
-            {'identifier': 2, 'action': 'verify'}
-        )
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'getcode')

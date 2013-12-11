@@ -10,7 +10,7 @@ from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView
 
 
-def get_status(user):
+def get_status(request, user):
     """
 
     return msg and icon

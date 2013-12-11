@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-28 10:28+0100\n"
+"POT-Creation-Date: 2013-12-10 14:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,52 +90,52 @@ msgstr ""
 msgid "Confirmation code"
 msgstr ""
 
-#: eduiddashboard/models.py:174
+#: eduiddashboard/models.py:173
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr ""
 
-#: eduiddashboard/models.py:175
+#: eduiddashboard/models.py:174
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
-#: eduiddashboard/models.py:176
+#: eduiddashboard/models.py:175
 msgid "Postal code"
 msgstr ""
 
-#: eduiddashboard/models.py:178
+#: eduiddashboard/models.py:177
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:187
+#: eduiddashboard/models.py:186
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written using"
 " international notation, starting with \"+\" and followed by 10-20 digits."
 msgstr ""
 
-#: eduiddashboard/models.py:191
+#: eduiddashboard/models.py:190
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:192
+#: eduiddashboard/models.py:191
 msgid "Mobile phone number"
 msgstr ""
 
-#: eduiddashboard/models.py:207
+#: eduiddashboard/models.py:206
 msgid "text"
 msgstr ""
 
-#: eduiddashboard/models.py:208
+#: eduiddashboard/models.py:207
 msgid "the exact match text for the attribute type selected for search"
 msgstr ""
 
-#: eduiddashboard/models.py:215
+#: eduiddashboard/models.py:214
 msgid "attribute type"
 msgstr ""
 
-#: eduiddashboard/models.py:216
+#: eduiddashboard/models.py:215
 msgid "Select the attribute to search"
 msgstr ""
 
@@ -223,12 +223,16 @@ msgstr ""
 msgid "Dashboard"
 msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:33
+#: eduiddashboard/templates/base.jinja2:36
 msgid "Home"
 msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:34
+#: eduiddashboard/templates/base.jinja2:37
 msgid "Help"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:38
+msgid "Logout"
 msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
@@ -396,8 +400,8 @@ msgstr ""
 #: eduiddashboard/templates/nins-form.jinja2:51
 #, python-format
 msgid ""
-"You can access to your associated inbox nin by clicking this <a "
-"href=\"%(nin)s\">link</a>"
+"You can access your governmental inbox using <a href=\"%(nin)s\">Mina "
+"meddelanden</a>"
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
