@@ -112,7 +112,7 @@ class BaseActionsView(object):
         """ Common action to verificate some given data. You can override in subclasses """
         data_to_verify = self.user.get(self.data_attribute, [])[index]
         data_id = self.get_verification_data_id(data_to_verify)
-        self._verify_action(data_id, post_data)
+        return self._verify_action(data_id, post_data)
 
     def _verify_action(self, data_id, post_data):
         if 'code' in post_data:
