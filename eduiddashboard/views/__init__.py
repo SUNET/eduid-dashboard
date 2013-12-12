@@ -12,7 +12,7 @@ from eduiddashboard.utils import get_short_hash
 from eduiddashboard.verifications import get_verification_code, verificate_code, new_verification_code
 
 
-def get_dummy_status(user):
+def get_dummy_status(request, user):
     return None
 
 
@@ -112,10 +112,15 @@ class BaseActionsView(object):
         """ Common action to verificate some given data. You can override in subclasses """
         data_to_verify = self.user.get(self.data_attribute, [])[index]
         data_id = self.get_verification_data_id(data_to_verify)
+        return self._verify_action(data_id, post_data)
+
+    def _verify_action(self, data_id, post_data):
         if 'code' in post_data:
             code_sent = post_data['code']
-            verification_code = get_verification_code(self.request, self.data_attribute, obj_id = data_id,
-                                                      user = self.user)
+            verification_code = get_verification_code(self.request,
+                                                      self.data_attribute,
+                                                      obj_id=data_id,
+                                                      user=self.user)
             if code_sent == verification_code['code']:
                 if verification_code['expired']:
                     return {

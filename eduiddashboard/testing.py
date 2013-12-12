@@ -29,19 +29,7 @@ MOCKED_USER_STANDARD = {
     'givenName': 'John',
     'sn': 'Smith',
     'displayName': 'John Smith',
-    'norEduPersonNIN': [{
-        'norEduPersonNIN': '21098765-4321',
-        'verified': True,
-        'active': False,
-    }, {
-        'norEduPersonNIN': '12345678-9012',
-        'verified': False,
-        'active': False,
-    }, {
-        'norEduPersonNIN': '12345678-9013',
-        'verified': True,
-        'active': True,
-    }],
+    'norEduPersonNIN': ['123456789013'],
     'photo': 'https://pointing.to/your/photo',
     'preferredLanguage': 'en',
     'eduPersonEntitlement': [
@@ -82,13 +70,37 @@ MOCKED_USER_STANDARD = {
 }
 
 INITIAL_VERIFICATIONS = [{
-        '_id': ObjectId('234567890123456789012301'),
-        'code' : '9d392c',
-        'model_name' : 'mobile',
-        'obj_id' : '+34 6096096096',
-        'user_oid' : ObjectId("012345678901234567890123"),
-        'timestamp': datetime.utcnow(),
-        'verified': False,
+    '_id': ObjectId('234567890123456789012301'),
+    'code': '9d392c',
+    'model_name': 'mobile',
+    'obj_id': '+34 6096096096',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
+}, {
+    '_id': ObjectId(),
+    'code': '123123',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '210987654321',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
+}, {
+    '_id': ObjectId(),
+    'code': '123124',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '123456789013',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': True,
+}, {
+    '_id': ObjectId(),
+    'code': '123124',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '123456789050',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
 }]
 
 
@@ -121,6 +133,7 @@ class MockedUserDB(IUserDB):
 
 def loa(index):
     return AVAILABLE_LOA_LEVEL[index-1]
+
 
 def dummy_groups_callback(userid, request):
     return [request.context.workmode]
@@ -155,13 +168,15 @@ class LoggedInReguestTests(unittest.TestCase):
             'saml2.settings_module': path.join(path.dirname(__file__),
                                                'saml2/tests/data/saml2_settings.py'),
             'saml2.login_redirect_url': '/',
+            'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'saml2.attribute_mapping': "mail = mail",
             # Required only if not dont want mongodb
             # 'groups_callback': dummy_groups_callback,
-            'session.type': 'memory',
-            'session.lock_dir': '/tmp',
-            'session.webtest_varname': 'session',
+            #'session.type': 'memory',
+            #'session.lock_dir': '/tmp',
+            #'session.webtest_varname': 'session',
+            # 'session.secret': '1234',
             'mongo_uri': MONGO_URI_TEST,
             'mongo_uri_am': MONGO_URI_AM_TEST,
             'testing': True,
@@ -272,7 +287,7 @@ class LoggedInReguestTests(unittest.TestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
         return request
 
     def check_values(self, fields, values):

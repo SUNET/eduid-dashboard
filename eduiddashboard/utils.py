@@ -66,7 +66,7 @@ def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha2
 
 
 def flash(request, message_type, message):
-    request.session.flash("{0}|{1}".format(message_type, message))
+    request.session.flash(u"{0}|{1}".format(message_type, message))
 
 
 def get_icon_string(status):
@@ -102,7 +102,7 @@ def get_available_tabs(context):
     else:
         tabs = default_tabs
     for tab in tabs:
-        tab['status'] = tab['status'](context.user)
+        tab['status'] = tab['status'](context.request, context.user)
     return tabs
 
 

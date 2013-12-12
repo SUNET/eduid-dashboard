@@ -19,7 +19,7 @@
 
 import logging
 
-from pyramid.security import remember
+from pyramid.security import remember, forget
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 
@@ -96,3 +96,10 @@ def login(request, session_info, user):
     )
     remember_headers = remember(request, user[main_attribute])
     return remember_headers
+
+
+def logout(request):
+    if request.session is not None:
+        request.session.delete()
+    headers = forget(request)
+    return headers

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-11-28 10:28+0100\n"
-"PO-Revision-Date: 2013-11-28 09:30+0000\n"
+"POT-Creation-Date: 2013-12-10 14:52+0100\n"
+"PO-Revision-Date: 2013-12-10 13:58+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -95,53 +95,53 @@ msgstr "Ange din e-postadress eller ditt användarnamn"
 msgid "Confirmation code"
 msgstr "Bekräftelsekod"
 
-#: eduiddashboard/models.py:174
+#: eduiddashboard/models.py:173
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr "Adress"
 
-#: eduiddashboard/models.py:175
+#: eduiddashboard/models.py:174
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr "Stad"
 
-#: eduiddashboard/models.py:176
+#: eduiddashboard/models.py:175
 msgid "Postal code"
 msgstr "Postkod"
 
-#: eduiddashboard/models.py:178
+#: eduiddashboard/models.py:177
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr "Land"
 
-#: eduiddashboard/models.py:187
+#: eduiddashboard/models.py:186
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
 msgstr "Felaktigt telefonnummer. Telefonnumret måste börja med \"+\" följt av 10-20 siffror."
 
-#: eduiddashboard/models.py:191
+#: eduiddashboard/models.py:190
 msgid "mobile"
 msgstr "mobiltelefon"
 
-#: eduiddashboard/models.py:192
+#: eduiddashboard/models.py:191
 msgid "Mobile phone number"
 msgstr "Mobiltelefonnummer"
 
-#: eduiddashboard/models.py:207
+#: eduiddashboard/models.py:206
 msgid "text"
 msgstr "text"
 
-#: eduiddashboard/models.py:208
+#: eduiddashboard/models.py:207
 msgid "the exact match text for the attribute type selected for search"
 msgstr ""
 
-#: eduiddashboard/models.py:215
+#: eduiddashboard/models.py:214
 msgid "attribute type"
 msgstr "attributtyp"
 
-#: eduiddashboard/models.py:216
+#: eduiddashboard/models.py:215
 msgid "Select the attribute to search"
 msgstr "Välj attribut att söka med"
 
@@ -231,13 +231,17 @@ msgstr "Ogiltig bekräftelsekod"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: eduiddashboard/templates/base.jinja2:33
+#: eduiddashboard/templates/base.jinja2:36
 msgid "Home"
 msgstr "Hem"
 
-#: eduiddashboard/templates/base.jinja2:34
+#: eduiddashboard/templates/base.jinja2:37
 msgid "Help"
 msgstr "Hjälp"
+
+#: eduiddashboard/templates/base.jinja2:38
+msgid "Logout"
+msgstr "Logga ut"
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
@@ -404,9 +408,9 @@ msgstr "Aktiv"
 #: eduiddashboard/templates/nins-form.jinja2:51
 #, python-format
 msgid ""
-"You can access to your associated inbox nin by clicking this <a "
-"href=\"%(nin)s\">link</a>"
-msgstr ""
+"You can access your governmental inbox using <a href=\"%(nin)s\">Mina "
+"meddelanden</a>"
+msgstr "Du når din myndighetspost genom <a href=\"%(nin)s\">Mina meddelanden</a> "
 
 #: eduiddashboard/templates/passwords-form.jinja2:4
 #: eduiddashboard/views/password.py:104

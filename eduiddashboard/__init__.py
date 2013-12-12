@@ -21,7 +21,6 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         StatusFactory, HomeFactory,
                                         ForbiddenFactory, HelpFactory)
 
-from eduiddashboard.saml2 import configure_authtk
 from eduiddashboard.userdb import UserDB, get_userdb
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 
@@ -347,6 +346,22 @@ def main(global_config, **settings):
     if settings['proofing_links'] is None:
         raise ConfigurationError('The proofing_links configuration is not OK')
 
+    try:
+        settings['session.expire'] = int(settings.get('session.expire', 3600))
+    except ValueError:
+        raise ConfigurationError('session.expire should be a valid integer')
+
+    try:
+        settings['session.timeout'] = int(settings.get(
+            'session.timeout',
+            settings['session.expire'])
+        )
+    except ValueError:
+        raise ConfigurationError('session.expire should be a valid integer')
+
+    settings['session.key'] = read_setting_from_env(settings, 'session.key',
+                                                    'session')
+
     settings['groups_callback'] = read_setting_from_env(settings,
                                                         'groups_callback',
                                                         groups_callback)
@@ -386,8 +401,6 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
-
-    config = configure_authtk(config, settings)
 
     locale_path = read_setting_from_env(settings, 'locale_dirs',
                                         'eduiddashboard:locale')
