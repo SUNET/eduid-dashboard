@@ -2,10 +2,11 @@
 
 from pwgen import pwgen
 from deform import Button
+import json
 
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.i18n import get_localizer
-from pyramid.renderers import render
+from pyramid.renderers import render, render_to_response
 from pyramid.view import view_config
 
 from pyramid_deform import FormView
@@ -104,10 +105,31 @@ class PasswordsView(BaseFormView):
     route = 'security'
     buttons = (Button(name='save', title=_('Change password')), )
 
+    def __init__(self, context, request):
+        super(PasswordsView, self).__init__(context, request)
+
+        self.ajax_options = json.dumps({
+            'replaceTarget': False,
+            'url': context.route_url(self.route),
+            'target': "#changePasswordDialog .modal-body",
+        })
+
+    def __call__(self):
+        result = super(PasswordsView, self).__call__()
+        if self.request.method == 'POST':
+            template = 'eduiddashboard:templates/passwords-form-dialog.jinja2'
+        else:
+            template = 'eduiddashboard:templates/passwords-form.jinja2'
+        return render_to_response(template, result, request=self.request)
+
     def get_template_context(self):
         context = super(PasswordsView, self).get_template_context()
         if hasattr(self, 'new_password'):
             context.update({'new_password': self.new_password})
+        context.update({
+            'changed': getattr(self, 'changed', False),
+            'message': getattr(self, 'message', ''),
+        })
         return context
 
     def save_success(self, passwordform):
@@ -122,14 +144,12 @@ class PasswordsView(BaseFormView):
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
         user = self.request.userdb.get_user_by_oid(user['_id'])
 
-        ok = change_password(self.request, user, old_password, self.new_password)
-        if ok:
-            self.request.session.flash(_('Your password has been successfully updated'),
-                                       queue='forms')
+        self.changed = change_password(self.request, user, old_password, self.new_password)
+        if self.changed:
+            self.message = _('Your password has been successfully updated')
         else:
-            self.request.session.flash(_('An error has occured while updating your password, '
-                                         'please try again or contact support if the problem persists.'),
-                                       queue='forms')
+            self.message = _('An error has occured while updating your password, '
+                             'please try again or contact support if the problem persists.')
 
 
 @view_config(route_name='reset-password', renderer='templates/reset-password.jinja2',

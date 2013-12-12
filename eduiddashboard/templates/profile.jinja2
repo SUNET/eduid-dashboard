@@ -144,7 +144,7 @@ $(document).ready(function () {
 
     $('body').on('form-submitted action-executed', function() {
       // move the form messages to the messages main area
-      $('.alert').not($('div.messages div.alert')).each(function (index) {
+      $('.alert').not($('div.messages div.alert')).not('.fixed').each(function (index) {
           var exists = false,
               message = $(this).html();
           $('.messages div.alert').each(function (index2) {
