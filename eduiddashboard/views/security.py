@@ -91,8 +91,7 @@ def send_reset_password_gov_message(request, nin, user, code, reset_password_lin
     request.msgrelay.nin_reset_password(nin, code, reset_password_link, user_language)
 
 
-@view_config(route_name='security', permission='edit',
-             renderer='templates/passwords-form.jinja2')
+@view_config(route_name='security', permission='edit')
 class PasswordsView(BaseFormView):
     """
     Change user passwords
