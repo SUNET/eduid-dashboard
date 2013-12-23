@@ -315,15 +315,27 @@ class NinsWizard(BaseWizard):
     def step_0(self, data):
         """ The NIN form """
 
-        ninsview = NinsView(self.context, self.request)
+        nins_view = NinsView(self.context, self.request)
 
-        return ninsview.add_nin_external(data)
+        return nins_view.add_nin_external(data)
 
     def step_1(self, data):
         """ The verification code form """
-        return {
-            'status': 'ok'
-        }
+        nins_action_view = NINsActionsView(self.context, self.request)
+
+        result = nins_action_view._verify_action(self.datakey, data)
+
+        if result['result'] == 'ok':
+            return {
+                'status': 'ok',
+            }
+        else:
+            return {
+                'status': 'failure',
+                'data': {
+                    'code': result['message']
+                }
+            }
 
 
 def nins_open_wizard(context, request):

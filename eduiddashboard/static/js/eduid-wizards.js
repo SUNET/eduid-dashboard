@@ -35,7 +35,7 @@ var EduidWizard = function (container_path, options) {
             this.reset().close();
 
         } else if (currentCard.validate()) {
-            jsondata = currentCard.el.find('input, select').serializeObject();
+            jsondata = wizard.el.find('input, select').serializeObject();
             $.extend(jsondata, {
                 step: currentCard.index,
                 action: 'next_step'

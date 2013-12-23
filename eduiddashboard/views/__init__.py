@@ -1,5 +1,6 @@
 import json
 from copy import deepcopy
+from bson import ObjectId
 
 from pyramid.httpexceptions import HTTPOk, HTTPMethodNotAllowed
 from pyramid.i18n import get_localizer
@@ -195,6 +196,7 @@ class BaseWizard(object):
         'model': 'base',
     }
     last_step = 10
+    datakey = None
 
     def __init__(self, context, request):
         self.request = request
@@ -206,13 +208,27 @@ class BaseWizard(object):
             'model': self.model
         }
         self.collection = request.db[self.collection_name]
+        self.datakey = self.get_datakey()
+
+        if self.datakey:
+            self.object_filter['datakey'] = self.datakey
+
         self.obj = self.get_object()
 
+    def get_datakey(self):
+        if self.request.POST:
+            return self.request.POST.get(self.model, None)
+        elif self.request.GET:
+            return self.requets.GET.get(self.model, None)
+        return None
+
     def get_object(self):
+
         obj = self.collection.find_one(self.object_filter)
         if not obj:
             obj = deepcopy(self.object_filter)
             obj.update({
+                '_id': ObjectId(),
                 'step': 0,
                 'dismissed': False,
                 'finished': False,
@@ -220,25 +236,10 @@ class BaseWizard(object):
         return obj
 
     def next_step(self):
-        finished = (self.obj['step'] == self.last_step)
-        self.obj['finished'] = False
+        self.obj['finished'] = (self.obj['step'] == self.last_step)
+        self.obj['step'] += 0
+        self.collection.save(self.obj)
 
-        if self.obj['step'] == 0:
-            self.obj['step'] = 1
-            obj_id = self.collection.save(self.obj)
-            self.obj['_id'] = obj_id
-        elif not finished:
-            self.obj['step'] += 1
-            update_dict = {'step': {
-                '$inc': 1,
-            }}
-            self.collection.update(self.object_filter, update_dict)
-        elif finished:
-            update_dict = {'$set': {
-                'finished': True,
-                'step': self.last_step,
-            }}
-            self.collection.update(self.object_filter, update_dict)
         return self.obj['step']
 
     def dismiss_wizard(self):
@@ -271,13 +272,15 @@ class BaseWizard(object):
             step = self.request.POST['step']
             action_method = getattr(self, 'step_%s' % step)
             post_data = self.request.POST
-            result = action_method(post_data)
-            if result and result['status'] == 'ok':
-                self.next_step()
-        elif self.request.POST['action'] == 'dismissed':
-            result = self.dismiss_wizard()
+            response = action_method(post_data)
 
-        return result
+            if response and response['status'] == 'ok':
+                self.next_step()
+
+        elif self.request.POST['action'] == 'dismissed':
+            response = self.dismiss_wizard()
+
+        return response
 
     def get_template_context(self):
         return {
