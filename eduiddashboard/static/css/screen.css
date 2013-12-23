@@ -344,6 +344,11 @@ table.passwords {
 .wizard-progress-container > .progress {
     width:180px;
 }
+
+.wizard-modal .help-inline .error {
+  color: #b94a48;
+}
+
 /* End of wizard
 -------------------------------------------------- */
 

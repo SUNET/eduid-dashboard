@@ -277,7 +277,7 @@ class BaseWizard(object):
         elif self.request.POST['action'] == 'dismissed':
             result = self.dismiss_wizard()
 
-        return Response(json.dumps(result))
+        return result
 
     def get_template_context(self):
         return {

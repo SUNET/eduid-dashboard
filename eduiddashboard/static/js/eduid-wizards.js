@@ -30,7 +30,7 @@ var EduidWizard = function (container_path, options) {
 
         this.log("handling 'next' button click (custom method)");
 
-        if (currentCard.index == (this._cards.length - 1)) {
+        if (currentCard.index === (this._cards.length - 1)) {
             // This is the last card
             this.reset().close();
 
@@ -45,9 +45,20 @@ var EduidWizard = function (container_path, options) {
                 data: jsondata,
                 type: 'POST',
                 success: function (data, textStatus, jqXHR){
-                    if (!wizard._readyToSubmit) {
+                    if (data.status === 'ok') {
                         // go to next card
                         currentCard = wizard.incrementCard();
+                    }
+                    else if (data.status == 'failure') {
+                        for(var input in data.data) {
+                            if (wizard.el.find('[name=' + input + ']')) {
+                                wizard.el.find('[name=' + input + ']').after(
+            "<span class=\"help-inline\"><span class=\"error\">" + data.data[input] +
+            "</span></span>");
+                            }
+                        }
+
+                        // handle the errors form or another server messages
                     }
                 },
                 error: function (event, jqXHR, ajaxSettings, thrownError) {
@@ -61,7 +72,9 @@ var EduidWizard = function (container_path, options) {
     wizard.cancelButton.click(function (e) {
         $.ajax({
             url: wizard.args.submitUrl,
-            data: {action: 'dismissed'},
+            data: {
+                action: 'dismissed'
+            },
             type: 'POST',
             success: function (data, textStatus, jqXHR){
                 wizard.reset().close();

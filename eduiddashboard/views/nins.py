@@ -234,16 +234,17 @@ class NinsView(BaseFormView):
 
         return context
 
-    def add_success_personal(self, ninform):
-        newnin = self.schema.serialize(ninform)
+    def addition_with_code_validation(self, form):
+        newnin = self.schema.serialize(form)
         newnin = newnin['norEduPersonNIN']
 
         newnin = normalize_nin(newnin)
 
-        self.request.session.flash(_('Changes saved'),
-                                   queue='forms')
-
         send_verification_code(self.request, self.user, newnin)
+
+    def add_success_personal(self, ninform):
+
+        self.addition_with_code_validation(ninform)
 
         msg = _('A confirmation code has been sent to your govt inbox. '
                 'Please click on "Pending confirmation" link below to enter.'
@@ -251,6 +252,28 @@ class NinsView(BaseFormView):
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
+
+    def add_nin_external(self, data):
+
+        self.schema = self.schema.bind(**self.get_bind_data())
+        form = self.form_class(self.schema, buttons=self.buttons,
+                               **dict(self.form_options))
+        self.before(form)
+
+        controls = self.request.POST.items()
+        try:
+            validated = form.validate(controls)
+        except deform.exception.ValidationFailure as e:
+            return {
+                'status': 'failure',
+                'data': e.error.asdict()
+            }
+
+        self.addition_with_code_validation(validated)
+
+        return {
+            'status': 'ok'
+        }
 
     def add_success_other(self, ninform):
         newnin = self.schema.serialize(ninform)
@@ -283,7 +306,7 @@ class NinsView(BaseFormView):
             self.add_success_other(ninform)
 
 
-@view_config(route_name='wizard-nins', permission='edit')
+@view_config(route_name='wizard-nins', permission='edit', renderer='json')
 class NinsWizard(BaseWizard):
     model = 'norEduPersonNIN'
     route = 'wizard-nins'
@@ -291,9 +314,10 @@ class NinsWizard(BaseWizard):
 
     def step_0(self, data):
         """ The NIN form """
-        return {
-            'status': 'ok'
-        }
+
+        ninsview = NinsView(self.context, self.request)
+
+        return ninsview.add_nin_external(data)
 
     def step_1(self, data):
         """ The verification code form """
