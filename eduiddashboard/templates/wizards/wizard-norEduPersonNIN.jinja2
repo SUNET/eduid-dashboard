@@ -4,6 +4,7 @@
 
 {% block wizard_cards %}
   <div class="wizard-card" data-cardname="step0">
+
     <h3>{{ _("Identity number") }}</h3>
     <div class="wizard-input-section">
       <p>{{ _("Please enter your national identity number.") }}</p>
@@ -38,6 +39,7 @@
 
 {% block wizard_extrajs %}
 <script type="text/javascript">
+    var active_card = {{ step }};
     function validateNIN(el) {
       var val = el.val(),
           re = /^(\d{8}|\d{6})(-|\ |)\d{4}$/,

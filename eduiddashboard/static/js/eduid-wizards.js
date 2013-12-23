@@ -1,5 +1,5 @@
 /*jslint vars: false, nomen: true, browser: true */
-/*global $, console, alert, Wizard */
+/*global $, console, alert, active_card, Wizard */
 
 
 $.fn.serializeObject = function () {
@@ -50,15 +50,14 @@ var EduidWizard = function (container_path, options) {
                         currentCard = wizard.incrementCard();
                     }
                     else if (data.status == 'failure') {
-                        for(var input in data.data) {
-                            if (wizard.el.find('[name=' + input + ']')) {
-                                wizard.el.find('[name=' + input + ']').after(
-            "<span class=\"help-inline\"><span class=\"error\">" + data.data[input] +
-            "</span></span>");
-                            }
-                        }
+                        currentCard.el.find('.control-group').toggleClass("error", false);
+                        currentCard.el.find('select, input, textarea').popover("destroy");
 
-                        // handle the errors form or another server messages
+                        for(var input in data.data) {
+                            var el = currentCard.el.find('[name=' + input + ']');
+                            wizard.errorPopover(el, data.data[input]);
+                            el.parent(".control-group").toggleClass("error", true);
+                        }
                     }
                 },
                 error: function (event, jqXHR, ajaxSettings, thrownError) {
@@ -87,6 +86,8 @@ var EduidWizard = function (container_path, options) {
         });
     });
 
+
+    wizard.active_card
 
     wizard.show();
 };
