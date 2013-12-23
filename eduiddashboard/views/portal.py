@@ -14,6 +14,8 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_max_available_loa,
                                   get_available_tabs)
 
+from eduiddashboard.views.nins import nins_open_wizard
+
 from eduiddashboard.models import UserSearcher
 
 import logging
@@ -38,6 +40,8 @@ def profile_editor(context, request):
     max_loa = get_max_available_loa(context.get_groups())
     max_loa = context.loa_to_int(loa=max_loa)
 
+    open_wizard = nins_open_wizard(context, request)
+
     view_context = {
         'tabs': tabs,
         'userid': context.user.get(context.main_attribute),
@@ -46,7 +50,9 @@ def profile_editor(context, request):
         'pending_actions': pending_actions,
         'workmode': context.workmode,
         'max_loa': max_loa,
-        'polling_timeout_for_admin': request.registry.settings.get('polling_timeout_for_admin', 2000),
+        'polling_timeout_for_admin': request.registry.settings.get(
+            'polling_timeout_for_admin', 2000),
+        'open_wizard': open_wizard,
     }
 
     return view_context

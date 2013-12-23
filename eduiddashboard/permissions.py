@@ -3,7 +3,7 @@ import re
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden, HTTPFound
 from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
-                              ALL_PERMISSIONS, DENY_ALL)
+                              ALL_PERMISSIONS)
 from pyramid.security import forget
 from eduiddashboard.i18n import TranslationString as _
 
@@ -271,6 +271,9 @@ class PostalAddressFactory(BaseFactory):
 class MobilesFactory(BaseFactory):
     pass
 
+
+class NinsFactory(BaseFactory):
+    pass
 
 class ResetPasswordFactory(RootFactory):
     pass

@@ -1,0 +1,105 @@
+ <!-- The modal wizard -->
+ <div class="wizard" id="{{ model }}-wizard">
+    <h1>{% block wizardname %}Wizard Name{% endblock%}</h1>
+
+    {% block wizard_cards %}
+    <div class="wizard-card" data-cardname="nin">
+      <h3>Identity number</h3>
+      <div class="wizard-input-section">
+        <p>Please enter your national identity number.</p>
+        <div class="control-group">
+          <input id="nin" name="nin" type="text" 
+                 placeholder="yyyymmdd-xxxx" data-validate="validateNiN" />
+        </div>
+      </div>
+    </div>
+
+    <div class="wizard-card" data-cardname="mm">
+      <h3>Confirm identity number</h3>
+      <div class="wizard-input-section">
+        <p>Please enter your confirmation code recieved from my messages</p>
+        <div class="control-group">
+          <input id="mm-confirm" name="code" type="text" placeholder="Confirmation code" />
+        </div>
+      </div>
+    </div>
+
+    <div class="wizard-card">
+      <h3>Finish</h3>
+      <div class="wizard-input-section">
+        <p>Congratulations, you're almost done. Please verify that the information below is correct and then click submit.</p>
+      </div>
+    </div>
+
+    {% endblock %}
+
+    <div class="wizard-error">
+        <div class="alert alert-error">
+        {% block wizard_error %}
+          {% trans %}
+          <strong>There was a problem</strong> with your submission.
+          Please correct the errors and re-submit.
+          {% endtrans %}
+        {% endblock %}
+        </div>
+    </div>
+
+    <div class="wizard-failure">
+        <div class="alert alert-error">
+        {% block wizard_failure %}
+          {% trans %}
+          <strong>There was a problem</strong> submitting the form.
+          Please try again in a minute.
+          {% endtrans %}
+        {% endblock %}
+        </div>
+    </div>
+
+    <div class="wizard-success">
+        <div class="alert alert-success">
+        {% block wizard_success %}
+          {% trans %}The wizard is completed{% endtrans %}
+        {% endblock %}
+        </div>
+        <a class="btn im-done">Done</a>
+      </div>
+    </div>
+<div>
+
+<!-- End of modal wizard -->
+
+<script type="text/javascript">
+
+$(function() {
+    $.fn.wizard.logging = true;
+  
+    eduidwizard = EduidWizard("#{{ model }}-wizard", {
+        showCancel: false,
+        isModal: true,
+        submitUrl: "{{ path }}",
+        buttons: {
+          submitText: "{{ _("Done") }}",
+          submittingText: "{{ _("Sending") }}",
+          nextText: "{{ _("Next") }}",
+          backText: "{{ _("Back") }}",
+        },
+    });
+});
+</script>
+
+{% block wizard_extrajs %}
+<script type="text/javascript">
+    function exampleValidator(el) {
+      var val = el.val(),
+          re = /^[0-9]{8}-?[0-9]{4}$/,
+          ret = {
+            status: true
+          };
+      if (!re.test(val)) {
+        ret.status = false;
+        ret.msg = "Invalid identity number";
+      }
+      return ret;
+    }
+</script>
+{% endblock %}

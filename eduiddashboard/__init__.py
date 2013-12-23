@@ -17,9 +17,10 @@ from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
                                         PostalAddressFactory, MobilesFactory,
-                                        PermissionsFactory, VerificationsFactory,
-                                        StatusFactory, HomeFactory,
-                                        ForbiddenFactory, HelpFactory)
+                                        PermissionsFactory, StatusFactory,
+                                        VerificationsFactory, HomeFactory,
+                                        NinsFactory, ForbiddenFactory,
+                                        HelpFactory)
 
 from eduiddashboard.userdb import UserDB, get_userdb
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
@@ -186,12 +187,16 @@ def profile_urls(config):
     config.add_route('permissions', '/permissions/',
                      factory=PermissionsFactory)
     config.add_route('nins', '/nins/',
-                     factory=MobilesFactory)
+                     factory=NinsFactory)
     config.add_route('nins-actions', '/nins-actions/',
-                     factory=MobilesFactory)
+                     factory=NinsFactory)
 
     config.add_route('userstatus', '/userstatus/',
                      factory=StatusFactory)
+
+    # wizard routes
+    config.add_route('wizard-nins', '/nin-wizard/',
+                     factory=NinsFactory)
 
 
 def includeme(config):

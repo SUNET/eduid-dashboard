@@ -1,15 +1,19 @@
 import json
+from copy import deepcopy
 
-from pyramid.httpexceptions import HTTPOk
+from pyramid.httpexceptions import HTTPOk, HTTPMethodNotAllowed
 from pyramid.i18n import get_localizer
 from pyramid.response import Response
+from pyramid.renderers import render_to_response
 
 from pyramid_deform import FormView
 
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_short_hash
-from eduiddashboard.verifications import get_verification_code, verificate_code, new_verification_code
+from eduiddashboard.verifications import (get_verification_code,
+                                          verificate_code,
+                                          new_verification_code)
 
 
 def get_dummy_status(request, user):
@@ -84,7 +88,8 @@ class BaseActionsView(object):
         'request': _('Check your email for further instructions'),
         'placeholder': _('Confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to you'),
-        'expired': _('The confirmation code has expired. Please click on "Resend confirmation code" to get a new one'),
+        'expired': _('The confirmation code has expired. Please click on '
+                     '"Resend confirmation code" to get a new one'),
     }
 
     def __init__(self, context, request):
@@ -109,7 +114,9 @@ class BaseActionsView(object):
         raise NotImplementedError()
 
     def verify_action(self, index, post_data):
-        """ Common action to verificate some given data. You can override in subclasses """
+        """ Common action to verificate some given data.
+            You can override in subclasses
+        """
         data_to_verify = self.user.get(self.data_attribute, [])[index]
         data_id = self.get_verification_data_id(data_to_verify)
         return self._verify_action(data_id, post_data)
@@ -128,7 +135,8 @@ class BaseActionsView(object):
                         'message': self.verify_messages['expired'],
                     }
                 else:
-                    verificate_code(self.request, self.data_attribute, code_sent)
+                    verificate_code(self.request, self.data_attribute,
+                                    code_sent)
                     return {
                         'result': 'ok',
                         'message': self.verify_messages['ok'],
@@ -176,3 +184,112 @@ class HTTPXRelocate(HTTPOk):
             ('X-Relocate', new_location),
             ('Content-Type', 'text/html; charset=UTF-8'),
         ])
+
+
+class BaseWizard(object):
+
+    collection_name = 'wizards'
+    model = 'base'
+    route = 'base'
+    generic_filter = {
+        'model': 'base',
+    }
+    last_step = 10
+
+    def __init__(self, context, request):
+        self.request = request
+        self.context = context
+        self.user = context.user
+
+        self.object_filter = {
+            'userid': self.user.get('_id'),
+            'model': self.model
+        }
+        self.collection = request.db[self.collection_name]
+        self.obj = self.get_object()
+
+    def get_object(self):
+        obj = self.collection.find_one(self.object_filter)
+        if not obj:
+            obj = deepcopy(self.object_filter)
+            obj.update({
+                'step': 0,
+                'dismissed': False,
+                'finished': False,
+            })
+        return obj
+
+    def next_step(self):
+        finished = (self.obj['step'] == self.last_step)
+        self.obj['finished'] = False
+
+        if self.obj['step'] == 0:
+            self.obj['step'] = 1
+            obj_id = self.collection.save(self.obj)
+            self.obj['_id'] = obj_id
+        elif not finished:
+            self.obj['step'] += 1
+            update_dict = {'step': {
+                '$inc': 1,
+            }}
+            self.collection.update(self.object_filter, update_dict)
+        elif finished:
+            update_dict = {'$set': {
+                'finished': True,
+                'step': self.last_step,
+            }}
+            self.collection.update(self.object_filter, update_dict)
+        return self.obj['step']
+
+    def dismiss_wizard(self):
+        if self.obj['step'] == 0:
+            self.obj['dismissed'] = True
+            obj_id = self.collection.save(self.obj)
+            self.obj['_id'] = obj_id
+        else:
+            self.collection.update(self.object_filter, {'$set': {
+                'dismisseed': True
+            }})
+        return {
+            'status': 'ok',
+            'message': _('The wizard was dismissed'),
+        }
+
+    def is_open_wizard(self):
+        return not (self.obj['dismissed'] or self.obj['finished'])
+
+    def __call__(self):
+        if self.request.method == 'POST':
+            return self.post()
+        elif self.request.method == 'GET':
+            return self.get()
+
+        return HTTPMethodNotAllowed()
+
+    def post(self):
+        if self.request.POST['action'] == 'next_step':
+            step = self.request.POST['step']
+            action_method = getattr(self, 'step_%s' % step)
+            post_data = self.request.POST
+            result = action_method(post_data)
+            if result and result['status'] == 'ok':
+                self.next_step()
+        elif self.request.POST['action'] == 'dismissed':
+            result = self.dismiss_wizard()
+
+        return Response(json.dumps(result))
+
+    def get_template_context(self):
+        return {
+            'user': self.user,
+            'step': self.obj['step'],
+            'path': self.request.route_path(self.route),
+            'model': self.model,
+        }
+
+    def get(self):
+        template = 'eduiddashboard:templates/wizards/wizard-{0}.jinja2'.format(
+            self.model)
+        return render_to_response(template,
+                                  self.get_template_context(),
+                                  request=self.request)

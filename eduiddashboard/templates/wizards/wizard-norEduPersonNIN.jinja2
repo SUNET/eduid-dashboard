@@ -1,0 +1,56 @@
+{% extends "templates/wizards/basewizard.jinja2" %}
+
+{% block wizard_name %}{{ _("Confirm your identity") }}{% endblock %}
+
+{% block wizard_cards %}
+  <div class="wizard-card" data-cardname="step0">
+    <h3>{{ _("Identity number") }}</h3>
+    <div class="wizard-input-section">
+      <p>{{ _("Please enter your national identity number.") }}</p>
+      <div class="control-group">
+        <input id="nin" name="nin" type="text" 
+               placeholder="yyyymmdd-xxxx" data-validate="validateNIN" />
+      </div>
+    </div>
+  </div>
+
+  <div class="wizard-card" data-cardname="step1">
+    <h3>{{ _("Confirm identity number") }}</h3>
+    <div class="wizard-input-section">
+      <p>{{ _("Please enter your confirmation code recieved from my messages") }}</p>
+      <div class="control-group">
+        <input id="mm-confirm" name="code" type="text"
+              placeholder="{{_("Confirmation code") }}" />
+      </div>
+    </div>
+  </div>
+
+  <div class="wizard-card" data-cardname="success">
+    <h3>{{ _("Finish") }}</h3>
+    <div class="wizard-input-section">
+      <p>
+         {% trans %} Congratulations, you're almost done. Please verify that
+         the information below is correct and then click submit.{% endtrans %}
+      </p>
+    </div>
+  </div>
+{% endblock %}
+
+{% block wizard_extrajs %}
+<script type="text/javascript">
+    function validateNIN(el) {
+      var val = el.val(),
+          re = /^(\d{8}|\d{6})(-|\ |)\d{4}$/,
+          ret = {
+            status: true
+          };
+      if (!re.test(val)) {
+        ret.status = false;
+        ret.msg = "{{ _("Invalid identity number") }}";
+        return ret;
+      }
+      // if format is valid, then try to send to server
+      return ret;
+    }
+</script>
+{% endblock %}

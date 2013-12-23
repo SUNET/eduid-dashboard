@@ -9,7 +9,7 @@ from pyramid.i18n import get_localizer
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
-from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
 
 from eduiddashboard.verifications import (new_verification_code,
@@ -281,3 +281,29 @@ class NinsView(BaseFormView):
             self.add_success_personal(ninform)
         else:
             self.add_success_other(ninform)
+
+
+@view_config(route_name='wizard-nins', permission='edit')
+class NinsWizard(BaseWizard):
+    model = 'norEduPersonNIN'
+    route = 'wizard-nins'
+    last_step = 1
+
+    def step_0(self, data):
+        """ The NIN form """
+        return {
+            'status': 'ok'
+        }
+
+    def step_1(self, data):
+        """ The verification code form """
+        return {
+            'status': 'ok'
+        }
+
+
+def nins_open_wizard(context, request):
+    if context.workmode != 'personal':
+        return False
+    ninswizard = NinsWizard(context, request)
+    return ninswizard.is_open_wizard()

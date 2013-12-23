@@ -107,10 +107,13 @@
     </script>
     {% block extrajs %}
     {% endblock %}
+
+    {% if 'example.com' not in request.url %}
     <div id="getsat-widget-6824"></div>
     <script type="text/javascript" src="https://loader.engage.gsfn.us/loader.js"></script>
     <script type="text/javascript">
       if (typeof GSFN !== "undefined") { GSFN.loadWidget(6824,{"containerId":"getsat-widget-6824"}); }
     </script>
+    {% endif %}
   </body>
 </html>
