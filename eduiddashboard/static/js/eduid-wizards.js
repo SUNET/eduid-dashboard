@@ -58,5 +58,22 @@ var EduidWizard = function (container_path, options) {
         }
     };
 
+    wizard.cancelButton.click(function (e) {
+        $.ajax({
+            url: wizard.args.submitUrl,
+            data: {action: 'dismissed'},
+            type: 'POST',
+            success: function (data, textStatus, jqXHR){
+                wizard.reset().close();
+            },
+            error: function (event, jqXHR, ajaxSettings, thrownError) {
+                console.debug('Hey!, there are some errors here ' +
+                              thrownError);
+                wizard.close();
+            }
+        });
+    });
+
+
     wizard.show();
 };

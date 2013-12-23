@@ -74,7 +74,7 @@ $(function() {
     $.fn.wizard.logging = true;
   
     eduidwizard = EduidWizard("#{{ model }}-wizard", {
-        showCancel: false,
+        showCancel: true,
         isModal: true,
         submitUrl: "{{ path }}",
         buttons: {
@@ -82,6 +82,7 @@ $(function() {
           submittingText: "{{ _("Sending") }}",
           nextText: "{{ _("Next") }}",
           backText: "{{ _("Back") }}",
+          cancelText: "{{ _("Dismiss") }}",
         },
     });
 });
