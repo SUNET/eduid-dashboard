@@ -219,7 +219,7 @@ class BaseWizard(object):
         if self.request.POST:
             return self.request.POST.get(self.model, None)
         elif self.request.GET:
-            return self.requets.GET.get(self.model, None)
+            return self.request.GET.get(self.model, None)
         return None
 
     def get_object(self):
@@ -237,7 +237,7 @@ class BaseWizard(object):
 
     def next_step(self):
         self.obj['finished'] = (self.obj['step'] == self.last_step)
-        self.obj['step'] += 0
+        self.obj['step'] += 1
         self.collection.save(self.obj)
 
         return self.obj['step']
@@ -288,6 +288,7 @@ class BaseWizard(object):
             'step': self.obj['step'],
             'path': self.request.route_path(self.route),
             'model': self.model,
+            'datakey': self.datakey or '',
         }
 
     def get(self):

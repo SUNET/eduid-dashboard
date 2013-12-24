@@ -72,19 +72,23 @@
 
 $(function() {
     $.fn.wizard.logging = true;
-  
-    eduidwizard = EduidWizard("#{{ model }}-wizard", {
-        showCancel: true,
-        isModal: true,
-        submitUrl: "{{ path }}",
-        buttons: {
-          submitText: "{{ _("Done") }}",
-          submittingText: "{{ _("Sending") }}",
-          nextText: "{{ _("Next") }}",
-          backText: "{{ _("Back") }}",
-          cancelText: "{{ _("Dismiss") }}",
-        },
-    });
+    var active_card = {{ step + 1 }},
+        {% if datakey is defined and datakey %}
+        datakey = "{{ datakey }}",
+        {% endif %}
+        eduidwizard;
+    eduidwizard = EduidWizard("#{{ model }}-wizard", active_card, {
+            showCancel: true,
+            isModal: true,
+            submitUrl: "{{ path }}",
+            buttons: {
+              submitText: "{{ _("Done") }}",
+              submittingText: "{{ _("Sending") }}",
+              nextText: "{{ _("Next") }}",
+              backText: "{{ _("Back") }}",
+              cancelText: "{{ _("Dismiss") }}",
+            },
+        });
 });
 </script>
 

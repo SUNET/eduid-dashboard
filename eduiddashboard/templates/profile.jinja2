@@ -141,7 +141,15 @@ $(document).ready(function () {
     loa_popovers();
 
   {% if workmode == 'personal' and open_wizard %}
-    $.get( '{{ "wizard-nins" | route_url }}', function (data, textStatus, jqXHR) {
+    {% if datakey is defined and datakey %}
+      var params = {
+          norEduPersonNIN: '{{ datakey }}'
+        },
+        initial_card = 1;
+    {% else %}
+      var params = {};
+    {% endif %}
+    $.get( '{{ "wizard-nins" | route_url }}', params, function (data, textStatus, jqXHR) {
         $('div.openwizard').html(data);
     });
   {% endif %}

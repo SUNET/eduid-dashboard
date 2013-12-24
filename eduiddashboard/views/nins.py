@@ -340,6 +340,10 @@ class NinsWizard(BaseWizard):
 
 def nins_open_wizard(context, request):
     if context.workmode != 'personal':
-        return False
+        return (False, None)
     ninswizard = NinsWizard(context, request)
-    return ninswizard.is_open_wizard()
+
+    datakey = ninswizard.obj.get('datakey', None)
+    open_wizard = ninswizard.is_open_wizard()
+
+    return (open_wizard, datakey)

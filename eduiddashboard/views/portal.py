@@ -40,7 +40,7 @@ def profile_editor(context, request):
     max_loa = get_max_available_loa(context.get_groups())
     max_loa = context.loa_to_int(loa=max_loa)
 
-    open_wizard = nins_open_wizard(context, request)
+    (open_wizard, datakey) = nins_open_wizard(context, request)
 
     view_context = {
         'tabs': tabs,
@@ -53,6 +53,7 @@ def profile_editor(context, request):
         'polling_timeout_for_admin': request.registry.settings.get(
             'polling_timeout_for_admin', 2000),
         'open_wizard': open_wizard,
+        'datakey': datakey,
     }
 
     return view_context

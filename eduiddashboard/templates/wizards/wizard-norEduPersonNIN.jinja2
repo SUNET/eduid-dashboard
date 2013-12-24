@@ -10,6 +10,7 @@
       <p>{{ _("Please enter your national identity number.") }}</p>
       <div class="control-group">
         <input id="nin" name="norEduPersonNIN" type="text" 
+              {% if datakey %}value="{{ datakey }}"{% endif %}
                placeholder="yyyymmdd-xxxx" data-validate="validateNIN" />
       </div>
     </div>
@@ -39,20 +40,19 @@
 
 {% block wizard_extrajs %}
 <script type="text/javascript">
-    var active_card = {{ step }};
-    function validateNIN(el) {
-      var val = el.val(),
-          re = /^(\d{8}|\d{6})(-|\ |)\d{4}$/,
-          ret = {
-            status: true
-          };
-      if (!re.test(val)) {
-        ret.status = false;
-        ret.msg = "{{ _("Invalid identity number") }}";
-        return ret;
-      }
-      // if format is valid, then try to send to server
-      return ret;
-    }
+    var validateNIN = function (el) {
+           var val = el.val(),
+               re = /^(\d{8}|\d{6})(-|\ |)\d{4}$/,
+               ret = {
+                 status: true
+               };
+           if (!re.test(val)) {
+             ret.status = false;
+             ret.msg = "{{ _("Invalid identity number") }}";
+             return ret;
+           }
+           // if format is valid, then try to send to server
+           return ret;
+        }
 </script>
 {% endblock %}

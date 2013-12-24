@@ -19,9 +19,11 @@ $.fn.serializeObject = function () {
 };
 
 
-var EduidWizard = function (container_path, options) {
+var EduidWizard = function (container_path, active_card, options) {
 
-    var wizard = $(container_path).wizard(options);
+    var wizard = $(container_path).wizard(options),
+        presentcard,
+        newcard;
 
     Wizard.prototype._onNextClick = function () {
         var jsondata,
@@ -86,8 +88,14 @@ var EduidWizard = function (container_path, options) {
         });
     });
 
-
-    wizard.active_card
-
     wizard.show();
+    if (active_card > 1) {
+        presentcard = wizard._cards[0];
+        presentcard.deselect();
+        presentcard.markVisited();
+        newcard = wizard.setCard(active_card-1);
+        newcard.select();
+    }
+
+    return wizard;
 };
