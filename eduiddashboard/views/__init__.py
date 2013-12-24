@@ -257,7 +257,8 @@ class BaseWizard(object):
         }
 
     def is_open_wizard(self):
-        return not (self.obj['dismissed'] or self.obj['finished'])
+        return (not self.context.user.get(self.model) and
+                not (self.obj['dismissed'] or self.obj['finished']))
 
     def __call__(self):
         if self.request.method == 'POST':

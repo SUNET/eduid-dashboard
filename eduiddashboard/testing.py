@@ -226,7 +226,9 @@ class LoggedInReguestTests(unittest.TestCase):
 
         self.db.profiles.drop()
         self.db.verifications.drop()
-        for verification_data in INITIAL_VERIFICATIONS:
+        self.initial_verifications = (getattr(self, 'initial_verifications', None)
+                                      or INITIAL_VERIFICATIONS)
+        for verification_data in self.initial_verifications:
             self.db.verifications.insert(verification_data)
         self.amdb.attributes.drop()
 

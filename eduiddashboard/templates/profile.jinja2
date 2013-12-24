@@ -74,8 +74,9 @@
     </div>
   </div>
 
-  <div class="openwizard hide">
-  </div>
+  {% if open_wizard %}
+  <div class="openwizard hide"></div>
+  {% endif  %}
 
 {% endblock %}
 

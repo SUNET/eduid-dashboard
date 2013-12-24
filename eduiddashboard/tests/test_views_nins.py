@@ -1,6 +1,7 @@
 import json
-
 from mock import patch
+from bson import ObjectId
+from datetime import datetime
 
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard.userdb import UserDB
@@ -138,3 +139,107 @@ class NinsFormTests(LoggedInReguestTests):
             {'identifier': 24, 'action': 'remove'},
             status=404
         )
+
+
+class NinWizardTests(LoggedInReguestTests):
+
+    users = [{
+        'mail': 'johnsmith@example.com',
+        'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
+        'norEduPersonNIN': ['123456789013']
+    }, {
+        'mail': 'johnsmith@example.org',
+        'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
+        'norEduPersonNIN': []
+    }]
+
+    def test_no_display_wizard(self):
+        self.set_logged(user='johnsmith@example.com')
+        response = self.testapp.get('/profile/', status=200)
+        self.assertNotIn('openwizard', response.body)
+
+    def test_not_logged_not_display_wizard(self):
+        """ Redirect to saml views if no logged session """
+        self.testapp.get('/profile/nin-wizard/', status=302)
+
+    def test_display_wizard(self):
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.get('/profile/', status=200)
+        self.assertIn('openwizard', response.body)
+
+    def test_get_wizard_nin(self):
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.get('/profile/nin-wizard/', status=200)
+        self.assertIn('norEduPersonNIN', response.body)
+
+    def test_step0_notvalid_nin(self):
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.post('/profile/nin-wizard/', {
+            'action': 'next_step',
+            'step': 0,
+            'norEduPersonNIN': 'a123a',
+        }, status=200)
+        self.assertEqual(response.json['status'], 'failure')
+
+    def test_step0_valid_nin(self):
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.post('/profile/nin-wizard/', {
+            'action': 'next_step',
+            'step': 0,
+            'norEduPersonNIN': 'a123a',
+        }, status=200)
+        self.assertEqual(response.json['status'], 'failure')
+
+    def test_step_storage(self):
+        self.set_logged(user='johnsmith@example.org')
+        self.testapp.post('/profile/nin-wizard/', {
+            'action': 'next_step',
+            'step': 0,
+            'norEduPersonNIN': '12341234-1234',
+        }, status=200)
+        response = self.testapp.get('/profile/', status=200)
+        self.assertIn('initial_card = 1', response.body)
+
+
+class NinWizardStep1Tests(LoggedInReguestTests):
+
+    users = [{
+        'mail': 'johnsmith@example.com',
+        'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
+        'norEduPersonNIN': ['123456789013']
+    }, {
+        'mail': 'johnsmith@example.org',
+        'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
+        'norEduPersonNIN': []
+    }]
+
+    initial_verifications = [{
+        '_id': ObjectId('234567890123456789012301'),
+        'code': '1234',
+        'model_name': 'norEduPersonNIN',
+        'obj_id': '12341234-1234',
+        'user_oid': ObjectId("901234567890123456789012"),
+        'timestamp': datetime.utcnow(),
+        'verified': False,
+    }]
+
+    def test_step1_valid_code(self):
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.post('/profile/nin-wizard/', {
+            'action': 'next_step',
+            'step': 1,
+            'norEduPersonNIN': '12341234-1234',
+            'code': '1234',
+        }, status=200)
+        self.assertEqual(response.json['status'], 'ok')
+
+    def test_step1_not_valid_code(self):
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.post('/profile/nin-wizard/', {
+            'action': 'next_step',
+            'step': 1,
+            'norEduPersonNIN': '12341234-1234',
+            'code': '1234asdf',
+        }, status=200)
+        self.assertEqual(response.json['status'], 'failure')
+        self.assertIn('text', response.json['text'])
