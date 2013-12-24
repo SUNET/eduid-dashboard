@@ -280,6 +280,15 @@ class BaseWizard(object):
         elif self.request.POST['action'] == 'dismissed':
             response = self.dismiss_wizard()
 
+        elif callable(getattr(self, self.request.POST['action'], None)):
+            response = getattr(self, self.request.POST['action'])()
+
+        else:
+            response = {
+                'status': 'error',
+                'text': 'Unexpected error',
+            }
+
         return response
 
     def get_template_context(self):

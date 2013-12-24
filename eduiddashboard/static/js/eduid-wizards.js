@@ -23,7 +23,25 @@ var EduidWizard = function (container_path, active_card, options) {
 
     var wizard = $(container_path).wizard(options),
         presentcard,
-        newcard;
+        newcard,
+        show_alert = function (message, level) {
+            var currentCard = wizard.getActiveCard();
+
+            if (level === undefined) {
+                level = 'error';
+            }
+            if (currentCard.el.find('div.alert.alert-' + level).length > 0) {
+                currentCard.el.find('div.alert.alert-' + level).html(message);
+            }
+            else {
+                currentCard.el.find('> h3').
+                    before("<div class='alert alert-" + level + "'>" + message + "</div>");
+            }
+            setTimeout(function () {
+                currentCard.el.find('div.alert').hide('slow').html("");
+            }, 5000);
+        }
+
 
     Wizard.prototype._onNextClick = function () {
         var jsondata,
@@ -86,6 +104,38 @@ var EduidWizard = function (container_path, active_card, options) {
                 wizard.close();
             }
         });
+    });
+
+    wizard.el.find('a[data-role=action]').click(function (e) {
+        var action = $(e.target).attr('data-action'),
+            jsondata = wizard.el.find('input, select').serializeObject(),
+            currentCard = wizard.getActiveCard();
+
+        $.extend(jsondata, {
+            step: currentCard.index,
+            action: action
+        });
+        $.ajax({
+            url: options.submitUrl,
+            data: jsondata,
+            type: 'POST',
+            success: function (data, textStatus, jqXHR){
+                if (data.status === 'ok') {
+                    // show a successs message
+                    show_alert(data.text, 'success');
+                }
+                else if (data.status === 'error') {
+                    // show a error message
+                    show_alert(data.text);
+                }
+            },
+            error: function (event, jqXHR, ajaxSettings, thrownError) {
+                show_alert('Unexpected error, please retry later');
+                console.debug('Hey!, there are some errors here ' +
+                              thrownError);
+            }
+        });
+        e.preventDefault();
     });
 
     wizard.show();

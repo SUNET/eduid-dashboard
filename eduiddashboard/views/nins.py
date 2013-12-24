@@ -337,6 +337,25 @@ class NinsWizard(BaseWizard):
                 }
             }
 
+    def resendcode(self):
+
+        if self.datakey is None:
+            message = _("Your National identity number validation request "
+                        "can't be found")
+            message = get_localizer(self.request).translate(message)
+            return {
+                'status': 'failure',
+                'text': message
+            }
+        message = NINsActionsView.verify_messages['new_code_sent']
+        message = get_localizer(self.request).translate(message)
+        send_verification_code(self.request, self.context.user, self.datakey)
+
+        return {
+            'status': 'ok',
+            'text': message,
+        }
+
 
 def nins_open_wizard(context, request):
     if context.workmode != 'personal':
