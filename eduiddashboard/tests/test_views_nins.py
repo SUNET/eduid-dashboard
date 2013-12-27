@@ -242,4 +242,4 @@ class NinWizardStep1Tests(LoggedInReguestTests):
             'code': '1234asdf',
         }, status=200)
         self.assertEqual(response.json['status'], 'failure')
-        self.assertIn('text', response.json['text'])
+        self.assertIn('code', response.json['data'])
