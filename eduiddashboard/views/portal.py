@@ -177,7 +177,10 @@ def set_language(context, request):
     if lang not in settings['available_languages']:
         return HTTPNotFound()
 
-    response = HTTPFound(location=request.environ['HTTP_REFERER'])
+    url = request.environ.get('HTTP_REFERER', None)
+    if url is None:
+        url = request.route_path('home')
+    response = HTTPFound(location=url)
     cookie_domain = settings.get('lang_cookie_domain', None)
     cookie_name = settings.get('lang_cookie_name')
 

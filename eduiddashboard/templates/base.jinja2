@@ -40,7 +40,7 @@
             {% for lang in request.registry.settings.get('available_languages', []) %}
             <li class="langselector">
               {% if request.locale == lang %}
-                <span>{{ lang }}<span>
+                <span>{{ lang }}</span>
               {% else %}
                 <a href="{{ request.route_path('set_language')}}?lang={{lang}}">
                    {{ lang }}
