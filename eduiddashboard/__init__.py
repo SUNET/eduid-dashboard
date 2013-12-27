@@ -10,6 +10,7 @@ from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
+from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
@@ -239,6 +240,8 @@ def includeme(config):
     config.add_route('help', '/help/', factory=HelpFactory)
     config.add_route('session-reload', '/session-reload/',
                      factory=PersonFactory)
+
+    config.add_route('set_language', '/set_language/')
     config.add_route('error500test', '/error500test/')
     config.add_route('error500', '/error500/')
 
@@ -279,6 +282,14 @@ def main(global_config, **settings):
     settings['available_languages'] = [
         lang for lang in available_languages.split(' ') if lang
     ]
+
+    settings['lang_cookie_domain'] = read_setting_from_env(settings,
+                                                           'lang_cookie_domain',
+                                                           None)
+
+    settings['lang_cookie_name'] = read_setting_from_env(settings,
+                                                         'lang_cookie_name',
+                                                         'lang')
 
     for item in (
         'mongo_uri',
@@ -406,6 +417,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
+
+    config.set_request_property(get_locale_name, 'locale', reify=True)
 
     locale_path = read_setting_from_env(settings, 'locale_dirs',
                                         'eduiddashboard:locale')

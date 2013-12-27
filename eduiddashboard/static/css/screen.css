@@ -225,6 +225,29 @@ ul.circles-widget-labels li {
   max-height: 110px;
 }
 
+.nav-pills li.nav-separator {
+  height: 34px;
+  width: 0px;
+  border-left: solid rgb(0, 136, 204) 1px;
+  display: inline-block;
+}
+
+li.langselector span {
+  color: rgb(85, 85, 85);;
+  display: block;
+  height: 14px;
+  line-height: 14px;
+  margin-bottom: 2px;
+  margin-right: 2px;
+  margin-top: 2px;
+  padding-bottom: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 8px;
+  text-align: left;
+  width: 15px;
+}
+
 div.profile-filled {
   width: 220px;
 }

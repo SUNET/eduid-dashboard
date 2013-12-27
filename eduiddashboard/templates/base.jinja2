@@ -36,6 +36,19 @@
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
             <li><a href="{{ 'saml2-logout'|route_url }}">{{ _("Logout") }}</a></li>
+            <li class='nav-separator'></li>
+            {% for lang in request.registry.settings.get('available_languages', []) %}
+            <li class="langselector">
+              {% if request.locale == lang %}
+                <span>{{ lang }}<span>
+              {% else %}
+                <a href="{{ request.route_path('set_language')}}?lang={{lang}}">
+                   {{ lang }}
+               </a>
+              {% endif %}
+             </li>
+            {% endfor %}
+            <li class='nav-separator'></li>
           </ul>
           <a href="{{ request.route_path('home') }}"><img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
           <div class="clear-right"></div>

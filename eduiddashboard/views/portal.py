@@ -1,7 +1,7 @@
 import deform
 
 from pyramid.i18n import get_locale_name
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
@@ -168,6 +168,26 @@ def token_login(context, request):
         logger.info("Token authentication failed (email: {!r})".format(email))
         # Show and error, the user can't be logged
         return HTTPBadRequest()
+
+
+@view_config(route_name='set_language', request_method='GET')
+def set_language(context, request):
+    settings = request.registry.settings
+    lang = request.GET.get('lang', 'en')
+    if lang not in settings['available_languages']:
+        return HTTPNotFound()
+
+    response = HTTPFound(location=request.environ['HTTP_REFERER'])
+    cookie_domain = settings.get('lang_cookie_domain', None)
+    cookie_name = settings.get('lang_cookie_name')
+
+    extra_options = {}
+    if cookie_domain is not None:
+        extra_options['domain'] = cookie_domain
+
+    response.set_cookie(cookie_name, value=lang, **extra_options)
+
+    return response
 
 
 @view_config(route_name='error500test')
