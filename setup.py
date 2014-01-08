@@ -24,7 +24,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'eduid_am==0.2',
     'pymongo==2.5.1',
-    'pyramid==1.4.1',
+    'pyramid==1.4',
     'pyramid_jinja2==1.6',
     'pyramid_debugtoolbar==1.0.4',
     'pyramid_beaker==0.7',
@@ -34,13 +34,13 @@ requires = [
     'colander==1.0b1',
     'deform==0.9.8',
     'deform_bootstrap==0.2.9',
-    'pysaml2==1.0.4beta4',
+    'pysaml2==1.0.4beta2',
     'pycountry==1.2',
     'waitress==0.8.2',
     'vccs_client==0.3',
     'pwgen==0.4',
     # Fix eduid_msg version
-    'eduid_msg==0.7.2',
+    'eduid_msg==0.6.1',
 ]
 
 if sys.version_info[0] < 3:
