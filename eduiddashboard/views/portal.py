@@ -1,7 +1,7 @@
 import deform
 
 from pyramid.i18n import get_locale_name
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
@@ -13,6 +13,8 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_pending_actions,
                                   get_max_available_loa,
                                   get_available_tabs)
+
+from eduiddashboard.views.nins import nins_open_wizard
 
 from eduiddashboard.models import UserSearcher
 
@@ -38,6 +40,8 @@ def profile_editor(context, request):
     max_loa = get_max_available_loa(context.get_groups())
     max_loa = context.loa_to_int(loa=max_loa)
 
+    (open_wizard, datakey) = nins_open_wizard(context, request)
+
     view_context = {
         'tabs': tabs,
         'userid': context.user.get(context.main_attribute),
@@ -46,7 +50,10 @@ def profile_editor(context, request):
         'pending_actions': pending_actions,
         'workmode': context.workmode,
         'max_loa': max_loa,
-        'polling_timeout_for_admin': request.registry.settings.get('polling_timeout_for_admin', 2000),
+        'polling_timeout_for_admin': request.registry.settings.get(
+            'polling_timeout_for_admin', 2000),
+        'open_wizard': open_wizard,
+        'datakey': datakey,
     }
 
     return view_context
@@ -161,6 +168,29 @@ def token_login(context, request):
         logger.info("Token authentication failed (email: {!r})".format(email))
         # Show and error, the user can't be logged
         return HTTPBadRequest()
+
+
+@view_config(route_name='set_language', request_method='GET')
+def set_language(context, request):
+    settings = request.registry.settings
+    lang = request.GET.get('lang', 'en')
+    if lang not in settings['available_languages']:
+        return HTTPNotFound()
+
+    url = request.environ.get('HTTP_REFERER', None)
+    if url is None:
+        url = request.route_path('home')
+    response = HTTPFound(location=url)
+    cookie_domain = settings.get('lang_cookie_domain', None)
+    cookie_name = settings.get('lang_cookie_name')
+
+    extra_options = {}
+    if cookie_domain is not None:
+        extra_options['domain'] = cookie_domain
+
+    response.set_cookie(cookie_name, value=lang, **extra_options)
+
+    return response
 
 
 @view_config(route_name='error500test')

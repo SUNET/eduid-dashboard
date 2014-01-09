@@ -9,7 +9,7 @@ from pyramid.i18n import get_localizer
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
-from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
 
 from eduiddashboard.verifications import (new_verification_code,
@@ -234,16 +234,17 @@ class NinsView(BaseFormView):
 
         return context
 
-    def add_success_personal(self, ninform):
-        newnin = self.schema.serialize(ninform)
+    def addition_with_code_validation(self, form):
+        newnin = self.schema.serialize(form)
         newnin = newnin['norEduPersonNIN']
 
         newnin = normalize_nin(newnin)
 
-        self.request.session.flash(_('Changes saved'),
-                                   queue='forms')
-
         send_verification_code(self.request, self.user, newnin)
+
+    def add_success_personal(self, ninform):
+
+        self.addition_with_code_validation(ninform)
 
         msg = _('A confirmation code has been sent to your govt inbox. '
                 'Please click on "Pending confirmation" link below to enter.'
@@ -251,6 +252,28 @@ class NinsView(BaseFormView):
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
+
+    def add_nin_external(self, data):
+
+        self.schema = self.schema.bind(**self.get_bind_data())
+        form = self.form_class(self.schema, buttons=self.buttons,
+                               **dict(self.form_options))
+        self.before(form)
+
+        controls = self.request.POST.items()
+        try:
+            validated = form.validate(controls)
+        except deform.exception.ValidationFailure as e:
+            return {
+                'status': 'failure',
+                'data': e.error.asdict()
+            }
+
+        self.addition_with_code_validation(validated)
+
+        return {
+            'status': 'ok'
+        }
 
     def add_success_other(self, ninform):
         newnin = self.schema.serialize(ninform)
@@ -281,3 +304,65 @@ class NinsView(BaseFormView):
             self.add_success_personal(ninform)
         else:
             self.add_success_other(ninform)
+
+
+@view_config(route_name='wizard-nins', permission='edit', renderer='json')
+class NinsWizard(BaseWizard):
+    model = 'norEduPersonNIN'
+    route = 'wizard-nins'
+    last_step = 1
+
+    def step_0(self, data):
+        """ The NIN form """
+
+        nins_view = NinsView(self.context, self.request)
+
+        return nins_view.add_nin_external(data)
+
+    def step_1(self, data):
+        """ The verification code form """
+        nins_action_view = NINsActionsView(self.context, self.request)
+
+        result = nins_action_view._verify_action(self.datakey, data)
+
+        if result['result'] == 'ok':
+            return {
+                'status': 'ok',
+            }
+        else:
+            return {
+                'status': 'failure',
+                'data': {
+                    'code': result['message']
+                }
+            }
+
+    def resendcode(self):
+
+        if self.datakey is None:
+            message = _("Your National identity number validation request "
+                        "can't be found")
+            message = get_localizer(self.request).translate(message)
+            return {
+                'status': 'failure',
+                'text': message
+            }
+        message = NINsActionsView.verify_messages['new_code_sent']
+        message = get_localizer(self.request).translate(message)
+        send_verification_code(self.request, self.context.user, self.datakey)
+
+        return {
+            'status': 'ok',
+            'text': message,
+        }
+
+
+def nins_open_wizard(context, request):
+    if context.workmode != 'personal':
+        return (False, None)
+    ninswizard = NinsWizard(context, request)
+
+    datakey = ninswizard.obj.get('datakey', None)
+    open_wizard = ninswizard.is_open_wizard()
+
+    return (open_wizard, datakey)

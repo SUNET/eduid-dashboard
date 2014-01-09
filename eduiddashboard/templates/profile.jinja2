@@ -74,12 +74,16 @@
     </div>
   </div>
 
+  {% if open_wizard %}
+  <div class="openwizard hide"></div>
+  {% endif  %}
 
 {% endblock %}
 
 
 {% block extracss %}
     <link href="{{'deform:static/css/ui-lightness/jquery-ui-1.8.11.custom.css'|static_url}}" rel="stylesheet" media="screen">
+    <link href="{{'eduiddashboard:static/css/bootstrap-wizard.css'|static_url}}" rel="stylesheet" media="screen">
 {% endblock %}
 
 
@@ -92,9 +96,13 @@
 <script src="{{'deform:static/scripts/deform.js'|static_url}}"></script>
 <script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
 
+<script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
+
 <script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/proofing.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/bootstrap-wizard.js'|static_url}}"></script>
 
+<script src="{{'eduiddashboard:static/js/eduid-wizards.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/tablelist-form.js'|static_url}}"></script>
 
 <script id='communication-error-template' language='text/template'>
@@ -132,6 +140,20 @@ $(document).ready(function () {
     $("a[data-toggle=tooltip]").tooltip();
     $("button[data-toggle=tooltip]").tooltip();
     loa_popovers();
+
+  {% if workmode == 'personal' and open_wizard %}
+    {% if datakey is defined and datakey %}
+      var params = {
+          norEduPersonNIN: '{{ datakey }}'
+        },
+        initial_card = 1;
+    {% else %}
+      var params = {};
+    {% endif %}
+    $.get( '{{ "wizard-nins" | route_url }}', params, function (data, textStatus, jqXHR) {
+        $('div.openwizard').html(data);
+    });
+  {% endif %}
 
     function showStatus() {
       userstatus.renderStatus('{{ context.safe_route_url('userstatus') }}');

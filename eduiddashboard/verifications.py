@@ -51,6 +51,11 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
         upsert=True,
         safe=True,
     )
+
+    session_verifications = request.session.get('verifications', [])
+    session_verifications.append(code)
+    request.session['verifications'] = session_verifications
+
     return code
 
 

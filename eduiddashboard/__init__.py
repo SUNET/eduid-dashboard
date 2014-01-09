@@ -10,6 +10,7 @@ from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
+from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
 from eduiddashboard.db import MongoDB, get_db
@@ -17,9 +18,10 @@ from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
                                         PostalAddressFactory, MobilesFactory,
-                                        PermissionsFactory, VerificationsFactory,
-                                        StatusFactory, HomeFactory,
-                                        ForbiddenFactory, HelpFactory)
+                                        PermissionsFactory, StatusFactory,
+                                        VerificationsFactory, HomeFactory,
+                                        NinsFactory, ForbiddenFactory,
+                                        HelpFactory)
 
 from eduiddashboard.userdb import UserDB, get_userdb
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
@@ -35,15 +37,15 @@ REQUIRED_GROUP_PER_WORKMODE = {
 }
 
 REQUIRED_LOA_PER_WORKMODE = {
-    'personal': 'http://www.swamid.se/assurance/al1',
-    'helpdesk': 'http://www.swamid.se/assurance/al2',
-    'admin': 'http://www.swamid.se/assurance/al3',
+    'personal': 'http://www.swamid.se/policy/assurance/al1',
+    'helpdesk': 'http://www.swamid.se/policy/assurance/al2',
+    'admin': 'http://www.swamid.se/policy/assurance/al3',
 }
 
 AVAILABLE_LOA_LEVEL = [
-    'http://www.swamid.se/assurance/al1',
-    'http://www.swamid.se/assurance/al2',
-    'http://www.swamid.se/assurance/al3',
+    'http://www.swamid.se/policy/assurance/al1',
+    'http://www.swamid.se/policy/assurance/al2',
+    'http://www.swamid.se/policy/assurance/al3',
 ]
 
 
@@ -186,12 +188,16 @@ def profile_urls(config):
     config.add_route('permissions', '/permissions/',
                      factory=PermissionsFactory)
     config.add_route('nins', '/nins/',
-                     factory=MobilesFactory)
+                     factory=NinsFactory)
     config.add_route('nins-actions', '/nins-actions/',
-                     factory=MobilesFactory)
+                     factory=NinsFactory)
 
     config.add_route('userstatus', '/userstatus/',
                      factory=StatusFactory)
+
+    # wizard routes
+    config.add_route('wizard-nins', '/nin-wizard/',
+                     factory=NinsFactory)
 
 
 def includeme(config):
@@ -234,6 +240,8 @@ def includeme(config):
     config.add_route('help', '/help/', factory=HelpFactory)
     config.add_route('session-reload', '/session-reload/',
                      factory=PersonFactory)
+
+    config.add_route('set_language', '/set_language/')
     config.add_route('error500test', '/error500test/')
     config.add_route('error500', '/error500/')
 
@@ -274,6 +282,14 @@ def main(global_config, **settings):
     settings['available_languages'] = [
         lang for lang in available_languages.split(' ') if lang
     ]
+
+    settings['lang_cookie_domain'] = read_setting_from_env(settings,
+                                                           'lang_cookie_domain',
+                                                           None)
+
+    settings['lang_cookie_name'] = read_setting_from_env(settings,
+                                                         'lang_cookie_name',
+                                                         'lang')
 
     for item in (
         'mongo_uri',
@@ -401,6 +417,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
+
+    config.set_request_property(get_locale_name, 'locale', reify=True)
 
     locale_path = read_setting_from_env(settings, 'locale_dirs',
                                         'eduiddashboard:locale')
