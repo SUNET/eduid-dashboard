@@ -41,6 +41,9 @@ requires = [
     'pwgen==0.4',
     # Fix eduid_msg version
     'eduid_msg==0.6.1',
+
+    'eventlet',
+    'gunicorn==18.0',
 ]
 
 if sys.version_info[0] < 3:
