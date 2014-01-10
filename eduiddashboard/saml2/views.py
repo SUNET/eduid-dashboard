@@ -89,9 +89,9 @@ def login_view(request):
             entityid=selected_idp, relay_state=came_from,
             binding=BINDING_HTTP_REDIRECT,
         )
-    except TypeError, e:
+    except TypeError:
         logger.error('Unable to know which IdP to use')
-        raise unicode(e)
+        raise
 
     oq_cache = OutstandingQueriesCache(request.session)
     oq_cache.set(session_id, came_from)
