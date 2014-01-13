@@ -23,8 +23,28 @@ from pyramid.security import remember, forget
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 
-
 logger = logging.getLogger(__name__)
+
+
+def get_authn_ctx(session_info):
+    """
+    Get the SAML2 AuthnContext of the currently logged in users session.
+
+    session_info is a dict like
+
+        {'authn_info': [('http://www.swamid.se/policy/assurance/al1',
+                    ['https://dev.idp.eduid.se/idp.xml'])],
+         ...
+        }
+
+    :param session_info: The SAML2 session_info
+    :return: The first AuthnContext
+    :rtype: string | None
+    """
+    try:
+        return session_info['authn_info'][0][0]
+    except KeyError:
+        return None
 
 
 def get_loa(available_loa, session_info):
@@ -36,11 +56,9 @@ def get_loa(available_loa, session_info):
     if not session_info:
         return default_loa
     else:
-        loa = session_info.get('ava', {}).get('eduPersonAssurance', [])
-        if len(loa) > 0:
-            loa = loa[0]
-            if loa in available_loa:
-                return loa
+        loa = get_authn_ctx(session_info)
+        if loa in available_loa:
+            return loa
     return default_loa
 
 
@@ -74,7 +92,6 @@ def authenticate(request, session_info, attribute_mapping):
         logger.error('Could not find saml_user value')
         return None
 
-    user = None
     logger.debug('Retrieving existing user "%s"' % saml_user)
     try:
         user = request.userdb.get_user(saml_user)
