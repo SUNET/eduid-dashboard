@@ -2,6 +2,9 @@ from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 from saml2.response import LogoutResponse
+from saml2.saml import AuthnContextClassRef
+from saml2.samlp import RequestedAuthnContext
+
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
                                     HTTPUnauthorized, HTTPInternalServerError)
@@ -83,11 +86,26 @@ def login_view(request):
             'login_url': request.route_url('saml2-login'),
         })
 
+    # Request the right AuthnContext for workmode
+    # (AL1 for 'personal', AL2 for 'helpdesk' and AL3 for 'admin' by default)
+    required_loa = request.registry.settings.get('required_loa', {})
+    workmode = request.registry.settings.get('workmode')
+    required_loa = required_loa.get(workmode, '')
+    logger.debug('Requesting AuthnContext {!r} for workmode {!r}'.format(required_loa, workmode))
+    kwargs = {
+        "requested_authn_context": RequestedAuthnContext(
+            authn_context_class_ref = AuthnContextClassRef(
+                text = required_loa
+            )
+        )
+    }
+
     client = Saml2Client(request.saml2_config)
     try:
         (session_id, result) = client.prepare_for_authenticate(
             entityid=selected_idp, relay_state=came_from,
             binding=BINDING_HTTP_REDIRECT,
+            **kwargs
         )
     except TypeError:
         logger.error('Unable to know which IdP to use')
@@ -103,8 +121,6 @@ def login_view(request):
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
     attribute_mapping = request.registry.settings['saml2.attribute_mapping']
-
-    client = Saml2Client(request.saml2_config)
 
     if 'SAMLResponse' not in request.POST:
         return HTTPBadRequest(
