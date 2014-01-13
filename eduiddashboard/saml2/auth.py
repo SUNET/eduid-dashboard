@@ -48,17 +48,31 @@ def get_authn_ctx(session_info):
 
 
 def get_loa(available_loa, session_info):
-    if available_loa:
-        default_loa = available_loa[0]
-    else:
-        default_loa = AVAILABLE_LOA_LEVEL[0]
+    """
+    Get the Assurance Level of the currently logged in users session.
+
+    The difference between this and AuthnContext is that this function
+    makes sure the returned value is known to this application.
+
+    :param available_loa: List of permissible values. First one is default.
+    :param session_info: The SAML2 session_info
+    :return: The AL level
+
+    :type available_loa: [string()]
+    :type session_info: dict
+    :rtype: string | None
+    """
+    if not available_loa:
+        return AVAILABLE_LOA_LEVEL[0]
+
+    default_loa = available_loa[0]
 
     if not session_info:
         return default_loa
-    else:
-        loa = get_authn_ctx(session_info)
-        if loa in available_loa:
-            return loa
+
+    loa = get_authn_ctx(session_info)
+    if loa in available_loa:
+        return loa
     return default_loa
 
 
