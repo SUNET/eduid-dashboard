@@ -21,7 +21,9 @@ class AuthTests(Saml2RequestTests):
         )
         self.assertEqual(
             get_loa(AVAILABLE_LOA_LEVEL,
-                    {'ava': {'eduPersonAssurance': ['http://www.swamid.se/policy/assurance/al2']}}),
+                    {'ava': {'eduPersonAssurance': ['http://www.swamid.se/policy/assurance/al-FOO']},
+                     'authn_info': [('http://www.swamid.se/policy/assurance/al2',
+                                    ['https://dev.idp.eduid.se/idp.xml'])]}),
             'http://www.swamid.se/policy/assurance/al2'
         )
         self.assertEqual(
