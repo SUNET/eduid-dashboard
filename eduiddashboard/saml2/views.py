@@ -22,13 +22,41 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _set_subject_id(session, subject_id):
-    session['_saml2_subject_id'] = subject_id
+def _set_name_id(session, name_id):
+    """
+    Store SAML2 session info.
+
+    This is a dict like
+
+    {'authn_info': [('http://www.swamid.se/policy/assurance/al1',
+                    ['https://dev.idp.eduid.se/idp.xml'])],
+     'name_id': <saml2.saml.NameID object at 0x7fc4800a65d0>,
+     'not_on_or_after': 1389621811,
+     'came_from': u'/',
+     'ava': {'mail': ['ft@example.net'],
+             'givenName': ['Fredrik'],
+             'displayName': ['Fredrik Thulin'],
+             'sn': ['Thulin']},
+      'issuer': 'https://dev.idp.eduid.se/idp.xml'
+    }
+
+    :param session: The current session object
+    :param name_id: SAML2 session info
+    :return: None
+    """
+    session['_saml2_session_name_id'] = name_id
 
 
-def _get_subject_id(session):
+def _get_name_id(session):
+    """
+    Get the SAML2 NameID of the currently logged in user.
+
+    :param session: The current session object
+    :return: NameID
+    :rtype: saml2.saml.NameID | None
+    """
     try:
-        return session['_saml2_subject_id']
+        return session['_saml2_session_name_id']
     except KeyError:
         return None
 
@@ -163,7 +191,7 @@ def assertion_consumer_service(request):
 
     headers = login(request, session_info, user)
 
-    _set_subject_id(request.session, session_info['name_id'])
+    _set_name_id(request.session, session_info['name_id'])
 
     # redirect the user to the view where he came from
     relay_state = request.POST.get('RelayState', '/')
@@ -188,7 +216,7 @@ def logout_view(request):
 
     client = Saml2Client(request.saml2_config, state_cache=state,
                          identity_cache=IdentityCache(request.session))
-    subject_id = _get_subject_id(request.session)
+    subject_id = _get_name_id(request.session)
     if subject_id is None:
         logger.warning(
             'The session does not contains the subject id for user ')
@@ -252,7 +280,7 @@ def logout_service(request):
 
     elif 'SAMLRequest' in request.GET:  # logout started by the IdP
         logger.debug('Receiving a logout request from the IdP')
-        subject_id = _get_subject_id(request.session)
+        subject_id = _get_name_id(request.session)
         if subject_id is None:
             logger.warning(
                 'The session does not contain the subject id for user {0} '
