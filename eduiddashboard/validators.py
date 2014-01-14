@@ -4,6 +4,7 @@ from copy import copy
 from eduiddashboard.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
+from pyramid.i18n import get_localizer
 from eduiddashboard.vccs import check_password
 
 
@@ -166,6 +167,48 @@ class NINUniqueValidator(object):
         }).count() > 0:
             raise colander.Invalid(node, _('This national identity number is '
                                    'already in use by you'))
+
+
+class NINReachableValidator(object):
+
+    def __call__(self, node, value):
+        """
+            Check is the NIN is reachable by eduid_msg service through
+            Mina Meddelanden service
+        """
+
+        from eduiddashboard.models import normalize_nin
+
+        value = normalize_nin(copy(value))
+        request = node.bindings.get('request')
+        settings = request.registry.settings
+        reachable = request.msgrelay.nin_reachable(value)
+        msg = None
+
+        if reachable is False:
+            msg = _('This national identity number is '
+                    'not reachable by the ${service_name}. Please register '
+                    'your national identity number at <a '
+                    'href="${service_url}">${service_name}</a>')
+
+        elif reachable is 'Anonymous':
+            msg = _('Your registration process a '
+                    '${service_name} is not completed. Please go to <a href='
+                    '"${service_url}">${service_name}</a> to complete that.')
+
+        elif reachable is 'Sender_not':
+            msg = _('The ${service_name} service is '
+                    'telling us that eduID has been blocked by you. Please, in'
+                    ' order to receive a confirmation code from us, you should'
+                    ' accept us a sender at <a href="${service_url}">'
+                    '${service_name}</a>')
+
+        if msg:
+            localizer = get_localizer(request)
+            raise colander.Invalid(node, localizer.translate(msg, mapping={
+                'service_name': settings.get('nin_service_name'),
+                'service_url': settings.get('nin_service_url'),
+            }))
 
 
 class ResetPasswordCodeExistsValidator(object):

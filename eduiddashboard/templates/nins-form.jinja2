@@ -50,7 +50,7 @@
 {% endblock %}
 
 {% block askdialog_extra_info %}
-  {% if proofing_link %}
-     {% trans nin=proofing_link %}You can access your governmental inbox using <a href="{{nin}}">Mina meddelanden</a>{% endtrans %}
-  {% endif %}
+  {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
+        You can access your governmental inbox using <a href="{{nin_service_url}}">{{nin_service_name}}</a>
+  {% endtrans %}
 {% endblock %}

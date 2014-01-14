@@ -193,8 +193,8 @@ class LoggedInReguestTests(unittest.TestCase):
                 safe_context_route_url = eduiddashboard.filters:safe_context_route_url
             """,
             'personal_dashboard_base_url': 'http://localhost/',
-            'proofing_links': """
-                nin = http://another.platform/nins/{nin}/
+            'nin_service_name': 'Mina meddelanden',
+            'nin_service_url': 'http://minameddelanden.se/',
             """,
             'available_languages': 'en es',
             'default_country_code': '+46',

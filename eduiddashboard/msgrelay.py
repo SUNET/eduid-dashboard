@@ -77,6 +77,14 @@ class MsgRelay(object):
                                 TEMPLATES_RELATION.get('phone-validator'),
                                 lang)
 
+    def nin_reachable(self, nin):
+
+        if not self.settings.get('testing', False):
+            # We want to do this by the Sync way
+            return self._relay.is_reachable(nin)
+        return True
+
+
     def nin_validator(self, nin, code, language):
         """
             The template keywords are:

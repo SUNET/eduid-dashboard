@@ -298,6 +298,8 @@ def main(global_config, **settings):
         'mongo_uri_am',
         'personal_dashboard_base_url',
         'vccs_url',
+        'nin_service_name',
+        'nin_service_url',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -351,16 +353,6 @@ def main(global_config, **settings):
         settings,
         'available_loa',
         default=AVAILABLE_LOA_LEVEL)
-
-    settings['proofing_links'] = read_mapping(
-        settings,
-        'proofing_links',
-        REQUIRED_PROOFING_LINKS,
-        required=True
-    )
-
-    if settings['proofing_links'] is None:
-        raise ConfigurationError('The proofing_links configuration is not OK')
 
     try:
         settings['session.expire'] = int(settings.get('session.expire', 3600))

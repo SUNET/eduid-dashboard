@@ -220,16 +220,16 @@ class NinsView(BaseFormView):
             take them as not verified NINs
         """
         context = super(NinsView, self).get_template_context()
-        proofing_links = self.request.registry.settings.get('proofing_links',
-                                                            {})
-        proofing_link = proofing_links.get('nin')
+
+        settings = self.request.registry.settings
 
         context.update({
             'nins': self.user.get('norEduPersonNIN', []),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
             'active_nin': self.get_active_nin(),
-            'proofing_link': proofing_link,
+            'nin_service_url': settings.get('nin_service_url'),
+            'nin_service_name': settings.get('nin_service_name'),
         })
 
         return context

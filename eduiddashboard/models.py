@@ -13,6 +13,7 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
                                        NINUniqueValidator,
+                                       NINReachableValidator,
                                        MobilePhoneUniqueValidator)
 
 from eduiddashboard.widgets import permissions_widget
@@ -33,6 +34,16 @@ class BooleanMongo(colander.Boolean):
                  true_val=True):
         super(BooleanMongo, self).__init__(false_choices, true_choices,
                                            false_val, true_val)
+
+
+class All_StopOnFirst(colander.All):
+
+    def __call__(self, node, value):
+        for validator in self.validators:
+            try:
+                validator(node, value)
+            except colander.Invalid as e:
+                raise colander.Invalid(node, e.msg)
 
 
 class Email(colander.MappingSchema):
@@ -71,9 +82,10 @@ class NIN(colander.MappingSchema):
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),
         title=_('Swedish national identity number'),
-        validator=colander.All(
+        validator=All_StopOnFirst(
             NINFormatValidator,
-            NINUniqueValidator()
+            NINUniqueValidator(),
+            NINReachableValidator()
         ),
         widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxxx'))
     )

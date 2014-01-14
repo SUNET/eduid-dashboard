@@ -40,6 +40,6 @@
      repeat="msg field.error.messages()"><p tal:condition="msg"
        id="${errstr if repeat.msg.index==0 else '%s-%s' % (errstr, repeat.msg.index)}"
        class="${field.widget.error_class}"
-       i18n:translate="">${msg}</p></tal:errors>
+       i18n:translate="">${structure:msg}</p></tal:errors>
   <!-- /sequence_item -->
 </div>
