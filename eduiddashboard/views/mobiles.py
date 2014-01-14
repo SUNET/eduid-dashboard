@@ -19,13 +19,14 @@ def get_status(request, user):
     return msg and icon
     """
     mobiles = user.get('mobile', [])
-    pending_actions = None
+    pending_actions, verification_needed = None, -1
 
     if not mobiles:
         pending_actions = _('Add mobile phone number')
     else:
-        for mobile in mobiles:
+        for n, mobile in enumerate(mobiles):
             if not mobile['verified']:
+                verification_needed = n
                 pending_actions = _('A mobile phone number is pending confirmation')
 
     if pending_actions:
@@ -33,6 +34,7 @@ def get_status(request, user):
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
             'completed': (0, 1),
+            'verification_needed': verification_needed,
         }
     return {
         'completed': (1, 1),

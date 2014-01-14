@@ -26,19 +26,20 @@ def get_status(request, user):
     """
 
     completed_fields = 0
-    pending_actions = None
+    pending_actions, verification_needed = None, -1
 
     if user.get('norEduPersonNIN', []):
         completed_fields = 1
 
-    non_verified_nins = get_not_verified_nins_list(request, user)
-
     nins = user.get('norEduPersonNIN', [])
 
-    if non_verified_nins:
-            pending_actions = _('Validation required for national identity number')
-    elif not nins:
-            pending_actions = _('Add national identity number')
+    if not nins:
+        pending_actions = _('Add national identity number')
+    else:
+        for n, nin in enumerate(nins):
+            if not nin['verified']:
+                pending_actions = _('Validation required for national identity number')
+                verification_needed = n
 
     status = {
         'completed': (completed_fields, 1)
@@ -47,6 +48,7 @@ def get_status(request, user):
         status.update({
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
+            'verification_needed': verification_needed,
         })
 
     return status
