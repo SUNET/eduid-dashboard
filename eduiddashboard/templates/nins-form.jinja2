@@ -54,3 +54,13 @@
         You can access your governmental inbox using <a href="{{nin_service_url}}">{{nin_service_name}}</a>
   {% endtrans %}
 {% endblock %}
+
+   {% block extrajs %}
+   <script>
+       window.beforeSubmit = function () {
+           $('#ninsview-formadd').
+              prop('disabled', true).
+              after('<p class="nin-wait">{{_("We are verifying that the provided identity number is valid, please wait a second.")}}');
+       };
+   </script>
+   {% endblock %}

@@ -182,8 +182,14 @@ class NINReachableValidator(object):
         value = normalize_nin(copy(value))
         request = node.bindings.get('request')
         settings = request.registry.settings
-        reachable = request.msgrelay.nin_reachable(value)
         msg = None
+        try:
+            reachable = request.msgrelay.nin_reachable(value)
+        except request.msgrelay.TaskFailed:
+            msg = _('We are having problems with <a href="${service_url}">'
+                    '${service_name}</a> service when why try to verify your '
+                    'national identity number. Please, try again later.')
+            reachable = 'Failed'
 
         if reachable is False:
             msg = _('This national identity number is '
