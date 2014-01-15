@@ -472,6 +472,7 @@
 
 
 		this._createCards();
+
 		this.nextButton.click(this, this._handleNextClick);
 		this.backButton.click(this, this._handleBackClick);
 
@@ -494,9 +495,9 @@
 		this.submitCards.css("height", (navHeight-60)+"px");
 
 		if (this.args.isModal) {
-			this.el.css("margin-top", -(this.el.height() / 2));
+			this.el.css("margin-top", -(this.el.height() / 2));	
 		}
-
+		
 
 
 		/*
@@ -506,7 +507,7 @@
 		if (this.args.isModal) {
 			this.el.css("margin-left", -(this.args.width / 2));
 		}
-
+		
 
 
 
@@ -551,26 +552,28 @@
 
 	Wizard.prototype = {
 
-		errorPopover: function(el, msg) {
+		errorPopover: function(el, msg, allowHtml) {
 			this.log("launching popover on", el);
+			allowHtml = typeof allowHtml !== "undefined" ? allowHtml : false;
 			var popover = el.popover({
 				content: msg,
-				trigger: "manual"
+				trigger: "manual",
+				html: allowHtml
 			}).popover("show").next(".popover");
 
 			popover.addClass("error-popover");
 			return popover;
 		},
-
+		
 		destroyPopover: function(pop) {
 			pop = $(pop);
 			pop.parent(".control-group").toggleClass("error", false);
-
+			
 			/*
 			 * this is the element that the popover was created for
 			 */
 			var el = pop.prev();
-
+			
 			try {
 				el.popover("destroy");
 			}
@@ -582,7 +585,7 @@
 				el.popover("hide");
 			}
 		},
-
+		
 		hidePopovers: function(el) {
 			this.log("hiding all popovers");
 			var self = this;
@@ -662,7 +665,7 @@
 			} else {
 				this.el.css("display", "block");
 			}
-
+			
 			return this;
 		},
 
@@ -700,7 +703,7 @@
 
 		reset: function() {
 			this.log("resetting");
-
+			
 			this.updateProgressBar(0);
 			this.hideSubmitCards();
 
@@ -709,7 +712,7 @@
 
 			this.enableNextButton();
 			this.showButtons();
-
+			
 			this.hidePopovers();
 
 			this.trigger("reset");
@@ -841,7 +844,7 @@
 
 				if (this.args.progressBarCurrent) {
 					this.percentComplete = i * 100.0 / this._cards.length;
-					this.updateProgressBar(this.percentComplete);
+					this.updateProgressBar(this.percentComplete);					
 				}
 				else {
 					var lastPercent = this.percentComplete;

@@ -40,7 +40,7 @@ requires = [
     'vccs_client==0.3',
     'pwgen==0.4',
     # Fix eduid_msg version
-    'eduid_msg==0.7.4',
+    'eduid_msg==0.7.5',
 ]
 
 if sys.version_info[0] < 3:

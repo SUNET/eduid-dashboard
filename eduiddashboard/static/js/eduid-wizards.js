@@ -3,9 +3,10 @@
 
 
 $.fn.serializeObject = function () {
-    var o = {};
-    var a = this.serializeArray();
-    $.each(a, function() {
+    'use strict';
+    var o = {},
+        a = this.serializeArray();
+    $.each(a, function () {
         if (o[this.name] !== undefined) {
             if (!o[this.name].push) {
                 o[this.name] = [o[this.name]];
@@ -18,8 +19,10 @@ $.fn.serializeObject = function () {
     return o;
 };
 
+var currentwizard = {};
 
 var EduidWizard = function (container_path, active_card, options) {
+    'use strict';
 
     var wizard = $(container_path).wizard(options),
         presentcard,
@@ -32,16 +35,16 @@ var EduidWizard = function (container_path, active_card, options) {
             }
             if (currentCard.el.find('div.alert.alert-' + level).length > 0) {
                 currentCard.el.find('div.alert.alert-' + level).html(message);
-            }
-            else {
+            } else {
                 currentCard.el.find('> h3').
                     before("<div class='alert alert-" + level + "'>" + message + "</div>");
             }
             setTimeout(function () {
                 currentCard.el.find('div.alert').hide('slow').html("");
             }, 5000);
-        }
+        };
 
+    currentwizard = wizard;
 
     Wizard.prototype._onNextClick = function () {
         var jsondata,
@@ -49,6 +52,7 @@ var EduidWizard = function (container_path, active_card, options) {
             step = currentCard.index;
 
         this.log("handling 'next' button click (custom method)");
+
 
         if (currentCard.index === (this._cards.length - 1)) {
             // This is the last card
@@ -60,29 +64,35 @@ var EduidWizard = function (container_path, active_card, options) {
                 step: currentCard.index,
                 action: 'next_step'
             });
+            wizard.el.find('.btn.wizard-next').prop('disabled', 'disabled').trigger('button-wait');
             $.ajax({
                 url: this.args.submitUrl,
                 data: jsondata,
                 type: 'POST',
-                success: function (data, textStatus, jqXHR){
+                success: function (data, textStatus, jqXHR) {
+                    var el, input;
                     if (data.status === 'ok') {
                         // go to next card
                         currentCard = wizard.incrementCard();
-                    }
-                    else if (data.status == 'failure') {
+                    } else if (data.status === 'failure') {
                         currentCard.el.find('.control-group').toggleClass("error", false);
                         currentCard.el.find('select, input, textarea').popover("destroy");
-
-                        for(var input in data.data) {
-                            var el = currentCard.el.find('[name=' + input + ']');
-                            wizard.errorPopover(el, data.data[input]);
+                        for (input in data.data) {
+                            el = currentCard.el.find('[name=' + input + ']');
+                            wizard.errorPopover(el, data.data[input], true);
                             el.parent(".control-group").toggleClass("error", true);
                         }
                     }
+                    wizard.el.find('.btn.wizard-next').
+                        removeAttr('disabled').
+                        trigger('button-enabled');
                 },
                 error: function (event, jqXHR, ajaxSettings, thrownError) {
                     console.debug('Hey!, there are some errors here ' +
                                   thrownError);
+                    wizard.el.find('.btn.wizard-next').
+                        removeAttr('disabled').
+                        trigger('button-enabled');
                 }
             });
         }
