@@ -16,11 +16,11 @@
 
         {% if pending_actions %}
           <ul class='unstyled pending-actions' style='text-align:right;'>
-          {% for formid, msg, index in pending_actions %}
+          {% for formid, msg, action, index in pending_actions %}
             {% if index == -1 %}
             <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
             {% else %}
-            <li><a href='#{{ formid }}/{{ index }}'>{{ _(msg) }}</a></li>
+            <li><a href='#{{ formid }}/{{ action }}/{{ index }}'>{{ _(msg) }}</a></li>
             {% endif %}
           {% endfor %}
           </ul>

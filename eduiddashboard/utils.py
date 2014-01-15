@@ -127,6 +127,7 @@ def get_pending_actions(user, tabs):
                 tuples.append((
                     tab['id'],
                     status['pending_actions'],
+                    status['pending_action_type'],
                     status['verification_needed'],
                 ))
 

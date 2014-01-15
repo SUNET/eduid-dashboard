@@ -33,6 +33,7 @@ def get_status(request, user):
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
             'verification_needed': -1,
+            'pending_action_type': '',
         })
     return status
 

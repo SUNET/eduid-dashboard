@@ -18,10 +18,13 @@ def get_status(request, user):
     return msg and icon
     """
 
-    pending_actions, verification_needed = None, -1
+    pending_actions = None
+    pending_action_type = ''
+    verification_needed = -1
     for n, email in enumerate(user.get('mailAliases', [])):
         if not email['verified']:
             pending_actions = _('An email address is pending confirmation')
+            pending_action_type = 'verify'
             verification_needed = n
             break
 
@@ -29,6 +32,7 @@ def get_status(request, user):
         return {
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
+            'pending_action_type': pending_action_type,
             'completed': (0, 1),
             'verification_needed': verification_needed,
         }
