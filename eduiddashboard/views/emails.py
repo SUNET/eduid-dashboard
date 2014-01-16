@@ -70,7 +70,7 @@ class EmailsActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('Email address has been confirmed'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
-        'request': _('Check your email for further instructions'),
+        'request': _('Check your email inbox for {data} for further instructions'),
         'placeholder': _('Email confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to your email'),
     }

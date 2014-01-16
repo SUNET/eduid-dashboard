@@ -86,7 +86,7 @@ class MobilesActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
-        'request': _('A confirmation code has been sent to your mobile phone number'),
+        'request': _('A confirmation code has been sent to the mobile phone number {data}'),
         'placeholder': _('Mobile phone code'),
         'new_code_sent': _('A new confirmation code has been sent to your mobile number'),
     }

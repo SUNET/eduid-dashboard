@@ -45,6 +45,12 @@ var TabbedForm = function (container) {
         initialize_pending_actions = function () {
             $('ul.pending-actions a').click(function (e) {
                 var action_path = e.target.href.split('#')[1];
+                initialize_verification(action_path);
+            });
+        },
+
+        initialize_verification = function(action_path) {
+            if (action_path !== undefined && action_path !== "") {
                 if (action_path.indexOf('/') === -1) {
                     container.find('.nav-tabs a[href=#' + action_path + ']').click();
                 } else {
@@ -57,7 +63,7 @@ var TabbedForm = function (container) {
                     });
                     container.find('.nav-tabs a[href=#' + segments[0] + ']').click();
                 }
-            });
+            }
         },
 
         initialize_nav_tabs = function () {
@@ -97,7 +103,7 @@ var TabbedForm = function (container) {
             if (opentab === undefined || opentab === "") {
                 container.find('.nav-tabs a').first().click();
             } else {
-                container.find('.nav-tabs a[href=#' + opentab + ']').click();
+                initialize_verification(opentab);
             }
         };
 

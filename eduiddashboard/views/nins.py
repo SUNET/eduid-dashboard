@@ -165,7 +165,7 @@ class NINsActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
-        'request': _('A confirmation code has been sent to your govt mailbox'),
+        'request': _('A confirmation code for NIN {data} has been sent to your govt mailbox'),
         'placeholder': _('National identity number confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to your govt mailbox'),
     }
