@@ -93,8 +93,6 @@ class PasswordFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
-        form['new_password'].value = 'new-password'
-        form['new_password_repeated'].value = 'new-password'
 
         response = form.submit('save')
 
@@ -110,8 +108,6 @@ class PasswordFormTests(LoggedInReguestTests):
 
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
-        form['new_password'].value = 'newpassword'
-        form['new_password_repeated'].value = 'newpassword'
 
         with patch('eduiddashboard.vccs', clear=True):
             vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
@@ -124,21 +120,6 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertEqual(response.status, '200 OK')
             self.assertIn('Current password is incorrect', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
-
-    def test_not_valid_repeated_password(self):
-        self.set_logged()
-        response_form = self.testapp.get('/profile/security/', status=200)
-
-        form = response_form.forms[self.formname]
-        form['old_password'].value = self.initial_password
-        form['new_password'].value = 'newpassword'
-        form['new_password_repeated'].value = 'newpassword2'
-
-        response = form.submit('save')
-
-        self.assertEqual(response.status, '200 OK')
-        self.assertIn("Passwords don't match", response.body)
-        self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_reset_password(self):
         response_form = self.testapp.get('/profile/reset-password/email/')
