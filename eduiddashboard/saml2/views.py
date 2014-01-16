@@ -7,7 +7,8 @@ from saml2.samlp import RequestedAuthnContext
 
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
-                                    HTTPUnauthorized, HTTPInternalServerError)
+                                    HTTPUnauthorized, HTTPInternalServerError,
+                                    HTTPOk)
 from pyramid.response import Response
 from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
@@ -20,6 +21,17 @@ from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+class HTTPXRelocate(HTTPOk):
+
+    empty_body = True
+
+    def __init__(self, new_location, **kwargs):
+        super(HTTPXRelocate, self).__init__('', headers=[
+            ('X-Relocate', new_location),
+            ('Content-Type', 'text/html; charset=UTF-8'),
+        ])
 
 
 def _set_name_id(session, name_id):
@@ -88,8 +100,11 @@ def forbidden_view(context, request):
         return response
 
     loginurl = request.route_url('saml2-login',
-                                 _query=(('next', request.path),))
-    return HTTPFound(location=loginurl)
+                                _query=(('next', request.path),))
+    if not request.is_xhr:
+        return HTTPFound(location=loginurl)
+    else:
+        return HTTPXRelocate(loginurl)
 
 
 @view_config(route_name='saml2-login')
@@ -122,8 +137,8 @@ def login_view(request):
     logger.debug('Requesting AuthnContext {!r} for workmode {!r}'.format(required_loa, workmode))
     kwargs = {
         "requested_authn_context": RequestedAuthnContext(
-            authn_context_class_ref = AuthnContextClassRef(
-                text = required_loa
+            authn_context_class_ref=AuthnContextClassRef(
+                text=required_loa
             )
         )
     }
@@ -143,7 +158,12 @@ def login_view(request):
     oq_cache.set(session_id, came_from)
 
     logger.debug('Redirecting the user to the IdP')
-    return HTTPFound(location=get_location(result))
+    if not request.is_xhr:
+        return HTTPFound(location=get_location(result))
+    else:
+        loginurl = request.route_url('saml2-login',
+                                     _query=(('next', request.path),))
+        return HTTPXRelocate(loginurl)
 
 
 @view_config(route_name='saml2-acs', request_method='POST')

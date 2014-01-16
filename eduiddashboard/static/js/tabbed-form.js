@@ -14,7 +14,11 @@ var TabbedForm = function (container) {
     "use strict";
 
     var get_form = function (url, target) {
-            $.get(url + '/', {}, function (data) {
+            $.get(url + '/', {}, function (data, status_text, xhr) {
+                var loc = xhr.getResponseHeader('X-Relocate');
+                if (loc) {
+                      document.location = loc;
+                };
                 target.html(data);
                 if (deform.callbacks !== undefined &&
                         deform.callbacks.length === 0) {
