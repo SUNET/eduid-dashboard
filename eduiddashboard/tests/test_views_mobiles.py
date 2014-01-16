@@ -4,9 +4,10 @@ from mock import patch
 
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard.userdb import UserDB
+from eduiddashboard.msgrelay import MsgRelay
 
 
-class MailsFormTests(LoggedInReguestTests):
+class MobilesFormTests(LoggedInReguestTests):
 
     formname = 'mobilesview-form'
 
@@ -30,13 +31,16 @@ class MailsFormTests(LoggedInReguestTests):
 
         for good_value in ('+34678455654', '0720123456'):
             form['mobile'].value = good_value
-            with patch.object(UserDB, 'exists_by_field', clear=True):
-                UserDB.exists_by_field.return_value = False
 
-                response = form.submit('add')
+            with patch.object(MsgRelay, 'mobile_validator', clear=True):
+                with patch.object(UserDB, 'exists_by_field', clear=True):
+                    UserDB.exists_by_field.return_value = False
+                    MsgRelay.mobile_validator.return_value = True
 
-                self.assertEqual(response.status, '200 OK')
-                self.assertIsNotNone(getattr(response, 'form', None))
+                    response = form.submit('add')
+
+                    self.assertEqual(response.status, '200 OK')
+                    self.assertIsNotNone(getattr(response, 'form', None))
             if not good_value.startswith('+'):
                 country_code = self.settings['default_country_code']
                 if good_value.startswith('0') and len(good_value) > 6:
