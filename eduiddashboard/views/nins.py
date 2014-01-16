@@ -77,13 +77,39 @@ def mark_as_verified_nin(request, user, verified_nin):
         user['norEduPersonNIN'].append(verified_nin)
 
 
-def post_verified_nin(request, user, verified_nin):
+def retrieve_postal_address(request, user, verified_nin):
     """
         Function to get the official postal address from
         the government service
     """
+    address = request.msgrelay.get_postal_address(verified_nin)
+
+    address['type'] = 'official'
+    address['verified'] = True
+
+    user_addresses = user.get('postalAddress', [])
+
+    changed = False
+    for user_address in user_addresses:
+        if user_address.get('type') == 'official':
+            user_addresses.remove(user_address)
+            user_addresses.append(address)
+            changed = True
+
+    if not changed:
+        user_addresses.append(address)
+
+    user['postalAddress'] = user_addresses
+    request.db.profiles.save(user, safe=True)
+    request.context.propagate_user_changes(user)
+
+
+def post_verified_nin(request, user, verified_nin):
+    """
+        Function to do things after the nin is fully verified
+    """
     log.debug('Retrieving postal address from NIN service')
-    log.warning('The postal addresss service communication is not implemented')
+    retrieve_postal_address(request, user, verified_nin)
 
 
 def get_tab():

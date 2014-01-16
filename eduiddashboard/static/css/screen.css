@@ -372,6 +372,43 @@ table.passwords {
   color: #b94a48;
 }
 
+
+.wizard-modal .spinner {
+  display: inline-block;
+  opacity: 0;
+  width: 0;
+
+  -webkit-transition: opacity 0.25s, width 0.25s;
+  -moz-transition: opacity 0.25s, width 0.25s;
+  -o-transition: opacity 0.25s, width 0.25s;
+  transition: opacity 0.25s, width 0.25s;
+}
+
+.wizard-modal .has-spinner.loading {
+  opacity: 1;
+}
+
+.wizard-modal .has-spinner.loading .spinner {
+  opacity: 1;
+  width: auto; /* This doesn't work, just fix for unkown width elements */
+}
+
+.wizard-modal .has-spinner.btn-mini.active .spinner {
+    width: 10px;
+}
+
+.wizard-modal .has-spinner.btn-small.active .spinner {
+    width: 13px;
+}
+
+.wizard-modal .has-spinner.btn.loading .spinner {
+    width: 16px;
+}
+
+.wizard-modal .has-spinner.btn-large.loading .spinner {
+    width: 19px;
+}
+
 /* End of wizard
 -------------------------------------------------- */
 

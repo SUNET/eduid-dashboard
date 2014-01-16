@@ -1,4 +1,4 @@
-from time import sleep
+from collections import OrderedDict
 
 from eduid_msg.celery import celery, get_message_relay
 import eduid_msg.tasks
@@ -32,6 +32,41 @@ class DummyTask:
         return self.retval
 
 
+def parse_address_dict(data):
+    """
+        The expected address format is:
+
+            OrderedDict([
+                (u'Name', OrderedDict([
+                    (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                    (u'GivenNameMarking', u'20'),
+                    (u'GivenName', u'public name'),
+                    (u'SurName', u'thesurname')
+                ])),
+                (u'OfficialAddress', OrderedDict([
+                    (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                    (u'Address2', u'StreetName 103'),
+                    (u'PostalCode', u'74141'),
+                    (u'City', u'STOCKHOLM')
+                ]))
+            ])
+
+
+        The returned format is like this:
+            {
+                'Address2': u'StreetName 103',
+                'PostalCode': u'74141',
+                'City': u'STOCKHOLM',
+            }
+    """
+
+    dataaddress = data.get('OfficialAddress', OrderedDict())
+
+    address = {}
+    for (key, value) in dataaddress.iteritems():
+        if not key.startswith('@xmlns:'):
+            address[key] = value
+    return address
 
 
 class MsgRelay(object):
@@ -106,7 +141,7 @@ class MsgRelay(object):
             else:
                 raise self.TaskFailed('Something goes wrong')
 
-        if not self.settings.get('testing', False):
+        else:
             return self._is_reachable.apply_async(nin)
 
     def nin_validator(self, nin, code, language):
@@ -150,6 +185,55 @@ class MsgRelay(object):
         self._send_message.delay('mm', content, nin,
                                  TEMPLATES_RELATION.get('nin-reset-password'),
                                  lang)
+
+    def get_postal_address(self, nin):
+        """
+            The expected address format is:
+
+                OrderedDict([
+                    (u'Name', OrderedDict([
+                        (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                        (u'GivenNameMarking', u'20'),
+                        (u'GivenName', u'personal name'),
+                        (u'SurName', u'thesurname')
+                    ])),
+                    (u'OfficialAddress', OrderedDict([
+                        (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                        (u'Address2', u'StreetName 103'),
+                        (u'PostalCode', u'74141'),
+                        (u'City', u'STOCKHOLM')
+                    ]))
+                ])
+
+
+            The returned format is like this:
+                {
+                    'Address2': u'StreetName 103',
+                    'PostalCode': u'74141',
+                    'City': u'STOCKHOLM',
+                }
+        """
+
+        if not self.settings.get('testing', False):
+            rtask = self._get_postal_address.apply_async(args=[nin])
+            try:
+                rtask.wait()
+            except:
+                raise self.TaskFailed('Something goes wrong')
+
+            if rtask.successful():
+                result = rtask.get()
+                return parse_address_dict(result)
+            else:
+                raise self.TaskFailed('Something goes wrong')
+
+        else:
+            # Return a sample if the testing is True
+            return {
+                'Address2': u'StreetName 103',
+                'PostalCode': u'74141',
+                'City': u'STOCKHOLM',
+            }
 
 
 def get_msgrelay(request):

@@ -46,6 +46,7 @@ var EduidWizard = function (container_path, active_card, options) {
 
     currentwizard = wizard;
 
+
     Wizard.prototype._onNextClick = function () {
         var jsondata,
             currentCard = this.getActiveCard(),
@@ -64,7 +65,15 @@ var EduidWizard = function (container_path, active_card, options) {
                 step: currentCard.index,
                 action: 'next_step'
             });
-            wizard.el.find('.btn.wizard-next').prop('disabled', 'disabled').trigger('button-wait');
+            wizard.el.find('.btn.wizard-next').attr('disabled', 'disabled').
+                addClass('loading').trigger('button-wait');
+
+            if (wizard.el.find('.btn.wizard-next .spinner').length == 0) {
+                setTimeout(function () {
+                    wizard.el.find('.btn.wizard-next').prepend('<span class="spinner"><i class="fa-spin icon-refresh icon-white"></i></span>');
+                }, 200);
+            }
+
             $.ajax({
                 url: this.args.submitUrl,
                 data: jsondata,
@@ -85,6 +94,7 @@ var EduidWizard = function (container_path, active_card, options) {
                     }
                     wizard.el.find('.btn.wizard-next').
                         removeAttr('disabled').
+                        removeClass('loading').
                         trigger('button-enabled');
                 },
                 error: function (event, jqXHR, ajaxSettings, thrownError) {
@@ -115,6 +125,9 @@ var EduidWizard = function (container_path, active_card, options) {
             }
         });
     });
+
+
+    wizard.el.find('.btn.wizard-next').addClass('has-spinner');
 
     wizard.el.find('a[data-role=action]').click(function (e) {
         var action = $(e.target).attr('data-action'),

@@ -19,7 +19,7 @@
   <div class="wizard-card" data-cardname="step1">
     <h3>{{ _("Confirm identity number") }}</h3>
     <div class="wizard-input-section">
-      <p>{{ _("Please enter your confirmation code recieved from my messages") }}</p>
+      <p>{{ _("Please enter your confirmation code recieved from my messages.") }}</p>
       <div class="control-group">
         <input id="mm-confirm" name="code" type="text"
               placeholder="{{_("Confirmation code") }}" />
@@ -34,8 +34,7 @@
     <h3>{{ _("Finish") }}</h3>
     <div class="wizard-input-section">
       <p>
-         {% trans %} Congratulations, you're almost done. Please verify that
-         the information below is correct and then click submit.{% endtrans %}
+         {% trans %}Congratulations, your national number was verified.{% endtrans %}
       </p>
     </div>
   </div>
@@ -57,22 +56,5 @@
            // if format is valid, then try to send to server
            return ret;
         };
-    currentwizard.el.find('.btn.wizard-next').
-        on('button-wait', function (e) {
-            setTimeout(function () {
-                if ($(e.target).attr('disabled') !== undefined) {
-                    $(e.target).popover({
-                        placement: 'top',
-                        content: '{{_("We are verifying that the provided identity number is valid, please wait a second.")}}',
-                        html: true,
-                        delay: {show: 250, hide: 250},
-                        trigger: 'manual'
-                    });
-                    $(e.target).popover('show');
-                }
-            }, 250);
-        }).on('button-enabled', function (e) {
-            $(this).popover('hide');
-        });
 </script>
 {% endblock %}
