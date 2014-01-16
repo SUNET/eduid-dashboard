@@ -14,12 +14,14 @@
 
         askCode = function(actions_url, action, container, value, title, placeholder) {
             askDialog(value, actions_url, title, '', placeholder, function(code) {
+                $('#askDialog .ok-button.has-spinner').addClass('loading').attr('disabled', 'disabled');
                 $.post(actions_url, {
                     action: action,
                     identifier: value,
                     code: code
                 },
                 function(data, statusText, xhr) {
+                    $('#askDialog .ok-button.has-spinner').removeClass('loading').removeAttr('disabled');
                     var dialog = $('#askDialog');
                     sendInfo(dialog, data.result, data.message);
                     if (data.result == 'ok') {
