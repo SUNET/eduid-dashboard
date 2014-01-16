@@ -3,8 +3,12 @@ from mock import patch
 from bson import ObjectId
 from datetime import datetime
 
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInReguestTests, MockedMsgRelay
 from eduiddashboard.userdb import UserDB
+
+
+def return_true(*args, **kwargs):
+    return True
 
 
 class NinsFormTests(LoggedInReguestTests):
@@ -32,15 +36,20 @@ class NinsFormTests(LoggedInReguestTests):
         form = response_form.forms[self.formname]
         nin = '200010100001'
         form['norEduPersonNIN'].value = nin
+
+        from eduiddashboard.msgrelay import MsgRelay
         with patch.object(UserDB, 'exists_by_filter', clear=True):
 
-            UserDB.exists_by_filter.return_value = False
+            with patch.multiple(MsgRelay, nin_validator=return_true,
+                                nin_reachable=return_true):
 
-            response = form.submit('add')
+                UserDB.exists_by_filter.return_value = False
 
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn(nin, response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
+                response = form.submit('add')
+
+                self.assertEqual(response.status, '200 OK')
+                self.assertIn(nin, response.body)
+                self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_not_valid_nin(self):
         self.set_logged(user='johnsmith@example.org')
@@ -192,13 +201,18 @@ class NinWizardTests(LoggedInReguestTests):
 
     def test_step_storage(self):
         self.set_logged(user='johnsmith@example.org')
-        self.testapp.post('/profile/nin-wizard/', {
-            'action': 'next_step',
-            'step': 0,
-            'norEduPersonNIN': '12341234-1234',
-        }, status=200)
-        response = self.testapp.get('/profile/', status=200)
-        self.assertIn('initial_card = 1', response.body)
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            self.testapp.post('/profile/nin-wizard/', {
+                'action': 'next_step',
+                'step': 0,
+                'norEduPersonNIN': '12341234-1234',
+            }, status=200)
+            response = self.testapp.get('/profile/', status=200)
+            self.assertIn('initial_card = 1', response.body)
 
 
 class NinWizardStep1Tests(LoggedInReguestTests):
@@ -225,13 +239,22 @@ class NinWizardStep1Tests(LoggedInReguestTests):
 
     def test_step1_valid_code(self):
         self.set_logged(user='johnsmith@example.org')
-        response = self.testapp.post('/profile/nin-wizard/', {
-            'action': 'next_step',
-            'step': 1,
-            'norEduPersonNIN': '12341234-1234',
-            'code': '1234',
-        }, status=200)
-        self.assertEqual(response.json['status'], 'ok')
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.object(MsgRelay, 'get_postal_address'):
+            MsgRelay.get_postal_address.return_value = {
+                'Address2': u'StreetName 103',
+                'PostalCode': u'74141',
+                'City': u'STOCKHOLM',
+            }
+            response = self.testapp.post('/profile/nin-wizard/', {
+                'action': 'next_step',
+                'step': 1,
+                'norEduPersonNIN': '12341234-1234',
+                'code': '1234',
+            }, status=200)
+            self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')

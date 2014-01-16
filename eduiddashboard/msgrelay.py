@@ -20,18 +20,6 @@ LANGUAGE_MAPPING = {
 }
 
 
-class DummyTask:
-
-    def __init__(self, retval=True):
-        self.retval = retval
-
-    def apply(self, *args, **kwargs):
-        return self.retval
-
-    def delay(self, *args, **kwargs):
-        return self.retval
-
-
 def parse_address_dict(data):
     """
         The expected address format is:
@@ -86,14 +74,9 @@ class MsgRelay(object):
 
         self._relay = get_message_relay(celery)
         self.settings = settings
-        if self.settings.get('testing', False):
-            self._send_message = DummyTask()
-            self._is_reachable = DummyTask()
-            self._get_postal_address = DummyTask()
-        else:
-            self._send_message = send_message
-            self._is_reachable = is_reachable
-            self._get_postal_address = get_postal_address
+        self._send_message = send_message
+        self._is_reachable = is_reachable
+        self._get_postal_address = get_postal_address
 
     def get_language(self, lang):
         return LANGUAGE_MAPPING.get(lang, 'en_US')
@@ -127,22 +110,19 @@ class MsgRelay(object):
 
     def nin_reachable(self, nin):
 
-        if not self.settings.get('testing', False):
-            # We want to do this by the Sync way, using the wait and get
-            # methods to lock this process until the result is ready
-            rtask = self._is_reachable.apply_async(args=[nin])
-            try:
-                rtask.wait()
-            except:
-                raise self.TaskFailed('Something goes wrong')
+        # We want to do this by the Sync way, using the wait and get
+        # methods to lock this process until the result is ready
 
-            if rtask.successful():
-                return rtask.get()
-            else:
-                raise self.TaskFailed('Something goes wrong')
+        rtask = self._is_reachable.apply_async(args=[nin])
+        try:
+            rtask.wait()
+        except:
+            raise self.TaskFailed('Something goes wrong')
 
+        if rtask.successful():
+            return rtask.get()
         else:
-            return self._is_reachable.apply_async(nin)
+            raise self.TaskFailed('Something goes wrong')
 
     def nin_validator(self, nin, code, language):
         """
@@ -214,26 +194,17 @@ class MsgRelay(object):
                 }
         """
 
-        if not self.settings.get('testing', False):
-            rtask = self._get_postal_address.apply_async(args=[nin])
-            try:
-                rtask.wait()
-            except:
-                raise self.TaskFailed('Something goes wrong')
+        rtask = self._get_postal_address.apply_async(args=[nin])
+        try:
+            rtask.wait()
+        except:
+            raise self.TaskFailed('Something goes wrong')
 
-            if rtask.successful():
-                result = rtask.get()
-                return parse_address_dict(result)
-            else:
-                raise self.TaskFailed('Something goes wrong')
-
+        if rtask.successful():
+            result = rtask.get()
+            return parse_address_dict(result)
         else:
-            # Return a sample if the testing is True
-            return {
-                'Address2': u'StreetName 103',
-                'PostalCode': u'74141',
-                'City': u'STOCKHOLM',
-            }
+            raise self.TaskFailed('Something goes wrong')
 
 
 def get_msgrelay(request):

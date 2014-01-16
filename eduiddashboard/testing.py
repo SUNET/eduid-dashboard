@@ -19,6 +19,7 @@ from eduiddashboard.db import MongoDB
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.userdb import IUserDB
+from eduiddashboard.msgrelay import MsgRelay
 
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
@@ -102,6 +103,66 @@ INITIAL_VERIFICATIONS = [{
     'timestamp': datetime.utcnow(),
     'verified': False,
 }]
+
+
+class MockedResult(object):
+
+    def __init__(self, retval, failed):
+        self.retval = retval
+        self.failed = failed
+        if not self.failed:
+            self.status = 'SUCCESS'
+        else:
+            self.status = 'FAILED'
+
+    def get(self):
+        if not self.failed:
+            return self.retval
+        else:
+            raise MsgRelay.TaskFailed('task failed')
+
+    def wait(self):
+        if not self.failed:
+            return self.retval
+        else:
+            raise MsgRelay.TaskFailed('task failed')
+
+    def successful(self):
+        return self.status == 'SUCCESS'
+
+
+class MockedTask(object):
+
+    def __init__(self, *args, **kwargs):
+        self.retval = None
+        self.failed = False
+
+    def apply(self, *args, **kwargs):
+        return MockedResult(self.retval, self.failed)
+
+    def delay(self, *args, **kwargs):
+        return MockedResult(self.retval, self.failed)
+
+    def apply_async(self, *args, **kwargs):
+        return MockedResult(self.retval, self.failed)
+
+
+class MockedMsgRelay(object):
+
+    def __init__(self, settings):
+        pass
+
+    def mobile_validator(self, targetphone, code, language):
+        pass
+
+    def nin_reachable(self, nin):
+        return getattr(self, 'retval', True)
+
+    def nin_validator(self, nin, code, language):
+        pass
+
+    def get_postal_address(self, nin):
+        return getattr(self, 'retval', {})
 
 
 class MockedUserDB(IUserDB):
