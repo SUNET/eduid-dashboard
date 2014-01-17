@@ -186,28 +186,27 @@ class NINReachableValidator(object):
         try:
             reachable = request.msgrelay.nin_reachable(value)
         except request.msgrelay.TaskFailed:
-            msg = _('We are having problems with <a href="${service_url}">'
-                    '${service_name}</a> service when why try to verify your '
-                    'national identity number. Please, try again later.')
+            msg = _('Sorry, we are experiencing temporary technical '
+                    'problem with ${service_name}, please try again '
+                    'later.')
             reachable = 'Failed'
 
         if reachable is False:
             msg = _('This national identity number is '
-                    'not reachable by the ${service_name}. Please register '
-                    'your national identity number at <a '
-                    'href="${service_url}">${service_name}</a>')
+                    'not registered with ${service_name}. Please register '
+                    'at <a href="${service_url}">${service_name}</a>.')
 
         elif reachable is 'Anonymous':
-            msg = _('Your registration process a '
-                    '${service_name} is not completed. Please go to <a href='
-                    '"${service_url}">${service_name}</a> to complete that.')
+            msg = _('Your registration process with '
+                    '${service_name} is not completed. Please visit <a href='
+                    '"${service_url}">${service_name}</a> to complete your registration.')
 
         elif reachable is 'Sender_not':
             msg = _('The ${service_name} service is '
-                    'telling us that eduID has been blocked by you. Please, in'
-                    ' order to receive a confirmation code from us, you should'
-                    ' accept us a sender at <a href="${service_url}">'
-                    '${service_name}</a>')
+                    'telling us that SUNET (eduID) has been blocked by you. In'
+                    ' order to receive a confirmation code from us, you need to'
+                    ' accept SUNET (eduID) as a sender at <a href="${service_url}">'
+                    '${service_name}</a>.')
 
         if msg:
             localizer = get_localizer(request)
