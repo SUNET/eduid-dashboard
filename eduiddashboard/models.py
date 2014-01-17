@@ -64,7 +64,7 @@ def normalize_nin(nin):
     # Normalize nin, removing hyphen and whitespaces
     newnin = nin.replace(' ', '')
     newnin = newnin.replace('-', '')
-    return nin
+    return newnin
 
 
 class NIN(colander.MappingSchema):
