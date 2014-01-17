@@ -27,18 +27,21 @@ def get_status(request, user):
 
     completed_fields = 0
     pending_actions = None
+    pending_action_type = ''
+    verification_needed = -1
 
     if user.get('norEduPersonNIN', []):
         completed_fields = 1
 
-    non_verified_nins = get_not_verified_nins_list(request, user)
+    all_nins = user.get('norEduPersonNIN', [])
+    unverified_nins = get_not_verified_nins_list(request, user)
 
-    nins = user.get('norEduPersonNIN', [])
-
-    if non_verified_nins:
-            pending_actions = _('Validation required for national identity number')
-    elif not nins:
-            pending_actions = _('Add national identity number')
+    if not all_nins and not unverified_nins:
+        pending_actions = _('Add national identity number')
+    if unverified_nins:
+        pending_actions = _('Validation required for national identity number')
+        pending_action_type = 'verify'
+        verification_needed = len(unverified_nins) - 1
 
     status = {
         'completed': (completed_fields, 1)
@@ -47,6 +50,8 @@ def get_status(request, user):
         status.update({
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
+            'pending_action_type': pending_action_type,
+            'verification_needed': verification_needed,
         })
 
     return status
@@ -159,7 +164,7 @@ class NINsActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
-        'request': _('A confirmation code has been sent to your govt mailbox'),
+        'request': _('A confirmation code for NIN {data} has been sent to your govt mailbox'),
         'placeholder': _('National identity number confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to your govt mailbox'),
     }

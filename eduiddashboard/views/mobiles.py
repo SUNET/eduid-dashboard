@@ -20,19 +20,25 @@ def get_status(request, user):
     """
     mobiles = user.get('mobile', [])
     pending_actions = None
+    pending_action_type = ''
+    verification_needed = -1
 
     if not mobiles:
         pending_actions = _('Add mobile phone number')
     else:
-        for mobile in mobiles:
+        for n, mobile in enumerate(mobiles):
             if not mobile['verified']:
+                verification_needed = n
+                pending_action_type = 'verify'
                 pending_actions = _('A mobile phone number is pending confirmation')
 
     if pending_actions:
         return {
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
+            'pending_action_type': pending_action_type,
             'completed': (0, 1),
+            'verification_needed': verification_needed,
         }
     return {
         'completed': (1, 1),
@@ -80,7 +86,7 @@ class MobilesActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
-        'request': _('A confirmation code has been sent to your mobile phone number'),
+        'request': _('A confirmation code has been sent to the mobile phone number {data}'),
         'placeholder': _('Mobile phone code'),
         'new_code_sent': _('A new confirmation code has been sent to your mobile number'),
     }

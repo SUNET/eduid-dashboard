@@ -148,9 +148,10 @@ class BaseActionsView(object):
                     'message': self.verify_messages['error'],
                 }
         else:
+            message = self.verify_messages['request'].format(data=data_id)
             return {
                 'result': 'getcode',
-                'message': self.verify_messages['request'],
+                'message': message,
                 'placeholder': self.verify_messages['placeholder'],
             }
 

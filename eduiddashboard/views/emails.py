@@ -19,16 +19,22 @@ def get_status(request, user):
     """
 
     pending_actions = None
-    for email in user.get('mailAliases', []):
+    pending_action_type = ''
+    verification_needed = -1
+    for n, email in enumerate(user.get('mailAliases', [])):
         if not email['verified']:
             pending_actions = _('An email address is pending confirmation')
+            pending_action_type = 'verify'
+            verification_needed = n
             break
 
     if pending_actions:
         return {
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
+            'pending_action_type': pending_action_type,
             'completed': (0, 1),
+            'verification_needed': verification_needed,
         }
     return {
         'completed': (1, 1),
@@ -64,7 +70,7 @@ class EmailsActionsView(BaseActionsView):
     verify_messages = {
         'ok': _('Email address has been confirmed'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
-        'request': _('Check your email for further instructions'),
+        'request': _('Check your email inbox for {data} for further instructions'),
         'placeholder': _('Email confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to your email'),
     }

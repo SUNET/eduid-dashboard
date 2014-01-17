@@ -4,6 +4,7 @@ __pycache__
 *.egg
 *.egg-info
 *.pyc
+.*.swp
 build/
 dist/
 sessions/
