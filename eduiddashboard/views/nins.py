@@ -87,6 +87,10 @@ def retrieve_postal_address(request, user, verified_nin):
         Function to get the official postal address from
         the government service
     """
+
+    if not request.registry.settings.get('enable_postal_address_retrieve', True):
+        return
+
     address = request.msgrelay.get_postal_address(verified_nin)
 
     address['type'] = 'official'

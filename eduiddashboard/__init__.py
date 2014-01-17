@@ -354,6 +354,10 @@ def main(global_config, **settings):
         'available_loa',
         default=AVAILABLE_LOA_LEVEL)
 
+    settings['enable_postal_address_retrieve'] = read_setting_from_env(
+        settings, 'enable_postal_address_retrieve', True
+    )
+
     try:
         settings['session.expire'] = int(settings.get('session.expire', 3600))
     except ValueError:
