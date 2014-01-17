@@ -102,7 +102,9 @@ class MailsFormTests(LoggedInReguestTests):
         response_json = json.loads(response.body)
 
         self.assertEqual(response_json['result'], 'getcode')
-        self.assertIn('Check your email for further instructions',
+        self.assertIn('Check your email inbox for',
+                      response_json['message'])
+        self.assertIn('for further instructions',
                       response_json['message'])
 
     def test_remove_existant_email(self):

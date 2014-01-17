@@ -33,16 +33,15 @@ def get_status(request, user):
     if user.get('norEduPersonNIN', []):
         completed_fields = 1
 
-    nins = user.get('norEduPersonNIN', [])
+    all_nins = user.get('norEduPersonNIN', [])
+    unverified_nins = get_not_verified_nins_list(request, user)
 
-    if not nins:
+    if not all_nins and not unverified_nins:
         pending_actions = _('Add national identity number')
-    else:
-        for n, nin in enumerate(nins):
-            if not nin['verified']:
-                pending_actions = _('Validation required for national identity number')
-                pending_action_type = 'verify'
-                verification_needed = n
+    if unverified_nins:
+        pending_actions = _('Validation required for national identity number')
+        pending_action_type = 'verify'
+        verification_needed = len(unverified_nins) - 1
 
     status = {
         'completed': (completed_fields, 1)
