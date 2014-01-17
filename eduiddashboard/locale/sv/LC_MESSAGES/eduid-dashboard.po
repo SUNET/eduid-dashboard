@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-17 12:55+0100\n"
-"PO-Revision-Date: 2014-01-17 12:11+0000\n"
+"POT-Creation-Date: 2014-01-17 13:38+0100\n"
+"PO-Revision-Date: 2014-01-17 12:41+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -313,7 +313,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
-#: eduiddashboard/views/emails.py:41
+#: eduiddashboard/views/emails.py:47
 msgid "Email addresses"
 msgstr "E-postadresser"
 
@@ -411,7 +411,7 @@ msgid "Any user match with the filter"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:4
-#: eduiddashboard/views/mobiles.py:45
+#: eduiddashboard/views/mobiles.py:51
 msgid "Mobile phone numbers"
 msgstr "Mobiltelefonnummer"
 
@@ -475,7 +475,7 @@ msgid "Are you sure you want to save your permission changes?"
 msgstr "Spara dina ändrade rättigheter?"
 
 #: eduiddashboard/templates/personaldata-form.jinja2:4
-#: eduiddashboard/views/personal.py:43
+#: eduiddashboard/views/personal.py:44
 msgid "Personal information"
 msgstr "Personlig information"
 
@@ -515,38 +515,38 @@ msgstr "Profil"
 msgid "Editing %(email)s user"
 msgstr "Editerar användaren %(email)s "
 
-#: eduiddashboard/templates/profile.jinja2:44
+#: eduiddashboard/templates/profile.jinja2:48
 msgid "Profile filled"
 msgstr "Profilstatus"
 
-#: eduiddashboard/templates/profile.jinja2:66
+#: eduiddashboard/templates/profile.jinja2:70
 msgid "Lost your confirmation code?"
 msgstr "Tappat bort din bekräftelsekod?"
 
-#: eduiddashboard/templates/profile.jinja2:66
+#: eduiddashboard/templates/profile.jinja2:70
 msgid "Resend confirmation code"
 msgstr "Skicka bekräftelsekoden igen"
 
-#: eduiddashboard/templates/profile.jinja2:71
+#: eduiddashboard/templates/profile.jinja2:75
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:34
 msgid "Finish"
 msgstr "Klar"
 
-#: eduiddashboard/templates/profile.jinja2:113
+#: eduiddashboard/templates/profile.jinja2:117
 msgid "Warning!"
 msgstr "Varning!"
 
-#: eduiddashboard/templates/profile.jinja2:113
+#: eduiddashboard/templates/profile.jinja2:117
 msgid ""
 "An error has occurred, please try again or contact support if the problem "
 "persists."
 msgstr "Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/templates/profile.jinja2:120
+#: eduiddashboard/templates/profile.jinja2:124
 msgid "Error!"
 msgstr "Fel!"
 
-#: eduiddashboard/templates/profile.jinja2:120
+#: eduiddashboard/templates/profile.jinja2:124
 msgid "Permission denied"
 msgstr "Åtkomst nekad"
 
@@ -754,7 +754,7 @@ msgstr "Information har bekräftats"
 msgid "Confirmation code is invalid"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/views/__init__.py:89 eduiddashboard/views/emails.py:67
+#: eduiddashboard/views/__init__.py:89
 msgid "Check your email for further instructions"
 msgstr "Se e-post för vidare instruktioner"
 
@@ -768,163 +768,167 @@ msgid ""
 "code\" to get a new one"
 msgstr "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en ny."
 
-#: eduiddashboard/views/__init__.py:256
+#: eduiddashboard/views/__init__.py:257
 msgid "The wizard was dismissed"
 msgstr "Guiden har avbrutits"
 
-#: eduiddashboard/views/emails.py:24
+#: eduiddashboard/views/emails.py:26
 msgid "An email address is pending confirmation"
 msgstr "En e-postadress behöver bekräftas"
 
-#: eduiddashboard/views/emails.py:56
+#: eduiddashboard/views/emails.py:62
 msgid "Email {email} verified"
 msgstr "E-postadressen {email} bekräftad"
 
-#: eduiddashboard/views/emails.py:65
+#: eduiddashboard/views/emails.py:71
 msgid "Email address has been confirmed"
 msgstr "E-postadressen är bekräftad"
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:161
+#: eduiddashboard/views/emails.py:72 eduiddashboard/views/nins.py:166
 msgid ""
 "The confirmation code is invalid, please try again or request a new code"
 msgstr "Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny bekräftelsekod"
 
-#: eduiddashboard/views/emails.py:68
+#: eduiddashboard/views/emails.py:73
+msgid "Check your email inbox for {data} for further instructions"
+msgstr "Se e-post för vidare instruktioner"
+
+#: eduiddashboard/views/emails.py:74
 msgid "Email confirmation code"
 msgstr "Bekräftelsekod för e-postadress"
 
-#: eduiddashboard/views/emails.py:69
+#: eduiddashboard/views/emails.py:75
 msgid "A new confirmation code has been sent to your email"
 msgstr "En ny bekräftelsekod har skickats till din e-postadress"
 
-#: eduiddashboard/views/emails.py:77
+#: eduiddashboard/views/emails.py:83
 msgid "You need to confirm your email address before it can become primary"
 msgstr "Du måste bekräfta din e-postadress innan den kan sättas som primär e-postadress"
 
-#: eduiddashboard/views/emails.py:86
+#: eduiddashboard/views/emails.py:92
 msgid "Your primary email address was successfully changed"
 msgstr "Din primära e-postadress har ändrats"
 
-#: eduiddashboard/views/emails.py:94
+#: eduiddashboard/views/emails.py:100
 msgid "Error: You only have one email address and it  can not be removed"
 msgstr "Fel: Minst en e-postadress krävs, denna kan ej tas bort"
 
-#: eduiddashboard/views/emails.py:113
+#: eduiddashboard/views/emails.py:119
 msgid "Email address was successfully removed"
 msgstr "E-postadress borttagen"
 
-#: eduiddashboard/views/emails.py:135
+#: eduiddashboard/views/emails.py:141
 msgid "Add email address"
 msgstr "Lägg till e-postadress"
 
-#: eduiddashboard/views/emails.py:172 eduiddashboard/views/mobiles.py:195
-#: eduiddashboard/views/nins.py:325 eduiddashboard/views/personal.py:81
+#: eduiddashboard/views/emails.py:178 eduiddashboard/views/mobiles.py:201
+#: eduiddashboard/views/nins.py:330 eduiddashboard/views/personal.py:82
 msgid "Changes saved"
 msgstr "Ändringarna har sparats"
 
-#: eduiddashboard/views/emails.py:177
+#: eduiddashboard/views/emails.py:183
 msgid ""
 "A confirmation email has been sent to your email address. Please enter your "
 "confirmation code <a href=\"#\" class=\"verifycode\" data-"
 "identifier=\"${id}\">here</a>."
 msgstr "En bekräftelseskod har skickats till din e-postadress. Ange din bekräftelsekod <a href=\"#\" class=\"verifycode\" data-identifier=\"${id}\">här</a>."
 
-#: eduiddashboard/views/mobiles.py:25 eduiddashboard/views/mobiles.py:160
+#: eduiddashboard/views/mobiles.py:27 eduiddashboard/views/mobiles.py:166
 msgid "Add mobile phone number"
 msgstr "Lägg till ett mobiltelefonnummer"
 
-#: eduiddashboard/views/mobiles.py:29
+#: eduiddashboard/views/mobiles.py:33
 msgid "A mobile phone number is pending confirmation"
 msgstr "Bekräfta ett mobiltelefonnummer"
 
-#: eduiddashboard/views/mobiles.py:81
+#: eduiddashboard/views/mobiles.py:87
 msgid "The mobile phone number has been verified"
 msgstr "Mobiltelefonnumret är bekräftat"
 
-#: eduiddashboard/views/mobiles.py:82
+#: eduiddashboard/views/mobiles.py:88
 msgid ""
 "The confirmation code used is invalid, please try again or request a new "
 "code"
 msgstr "Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny bekräftelsekod"
 
-#: eduiddashboard/views/mobiles.py:83
-msgid "A confirmation code has been sent to your mobile phone number"
+#: eduiddashboard/views/mobiles.py:89
+msgid "A confirmation code has been sent to the mobile phone number {data}"
 msgstr "En bekräftelseskod har skickats till ditt mobiltelefonnummer"
 
-#: eduiddashboard/views/mobiles.py:84
+#: eduiddashboard/views/mobiles.py:90
 msgid "Mobile phone code"
 msgstr "Mobiltelefonkod"
 
-#: eduiddashboard/views/mobiles.py:85
+#: eduiddashboard/views/mobiles.py:91
 msgid "A new confirmation code has been sent to your mobile number"
 msgstr "En ny bekräftelsekod har skickats till ditt mobiltelefonnummer"
 
-#: eduiddashboard/views/mobiles.py:105
+#: eduiddashboard/views/mobiles.py:111
 msgid "Mobile phone number was successfully removed"
 msgstr "Mobiltelefonnumret har tagits bort "
 
-#: eduiddashboard/views/mobiles.py:114
+#: eduiddashboard/views/mobiles.py:120
 msgid "That mobile phone number doesn't exists"
 msgstr "Mobiltelefonnumret kunde inte hittas"
 
-#: eduiddashboard/views/mobiles.py:120
+#: eduiddashboard/views/mobiles.py:126
 msgid ""
 "You need to verify that mobile phone number before be able to set as primary"
 msgstr "Du behöver verifiera ditt mobilnummer innan det går att ange som primärt"
 
-#: eduiddashboard/views/mobiles.py:140
+#: eduiddashboard/views/mobiles.py:146
 msgid "Mobile phone number was successfully made primary"
 msgstr "Mobiltelefonnumret är "
 
-#: eduiddashboard/views/mobiles.py:197
+#: eduiddashboard/views/mobiles.py:203
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on the "
 "\"Pending confirmation\" link below and enter your confirmation code."
 msgstr "En bekräftelsekod har skickats till ditt mobiltelefonnummer. Vänligen ange din bekräftelsekod genom att klicka på \"Bekräfta\" här nedan."
 
-#: eduiddashboard/views/nins.py:39
-msgid "Validation required for national identity number"
-msgstr "Bekräfta personnummer"
-
-#: eduiddashboard/views/nins.py:41 eduiddashboard/views/nins.py:230
+#: eduiddashboard/views/nins.py:40 eduiddashboard/views/nins.py:235
 msgid "Add national identity number"
 msgstr "Lägg till personnummer"
 
-#: eduiddashboard/views/nins.py:118
+#: eduiddashboard/views/nins.py:42
+msgid "Validation required for national identity number"
+msgstr "Bekräfta personnummer"
+
+#: eduiddashboard/views/nins.py:123
 msgid "Confirm Identity"
 msgstr "Bekräfta identitet"
 
-#: eduiddashboard/views/nins.py:160
+#: eduiddashboard/views/nins.py:165
 msgid "National identity number verified"
 msgstr "Personnumret är bekräftat "
 
-#: eduiddashboard/views/nins.py:162
-msgid "A confirmation code has been sent to your govt mailbox"
-msgstr "En bekräftelsekod har skickats till din inlåda hos \"Mina Meddelanden\""
+#: eduiddashboard/views/nins.py:167
+msgid "A confirmation code for NIN {data} has been sent to your govt mailbox"
+msgstr "En bekräftelsekod har skickats till inlåda hos \"Mina Meddelanden\""
 
-#: eduiddashboard/views/nins.py:163
+#: eduiddashboard/views/nins.py:168
 msgid "National identity number confirmation code"
 msgstr "Bekräftelsekod för personnummer"
 
-#: eduiddashboard/views/nins.py:164
+#: eduiddashboard/views/nins.py:169
 msgid "A new confirmation code has been sent to your govt mailbox"
 msgstr "En ny bekräftelsekod har skickats till din inlåda hos \"Mina Meddelanden\""
 
-#: eduiddashboard/views/nins.py:184
+#: eduiddashboard/views/nins.py:189
 msgid "The provided nin can't be verified. You only can verify the last one"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:210
+#: eduiddashboard/views/nins.py:215
 msgid "National identity number has been removed"
 msgstr "Personnumret har tagits bort"
 
-#: eduiddashboard/views/nins.py:275
+#: eduiddashboard/views/nins.py:280
 msgid ""
 "A confirmation code has been sent to your govt inbox. Please click on "
 "\"Pending confirmation\" link below to enter.your confirmation code"
 msgstr "En bekräftelsekod har skickats till din inkorg hos \"Mina Meddelanden\". Vänligen ange din bekräftelsekod genom att klicka på \"Bekräfta\" här nedan."
 
-#: eduiddashboard/views/nins.py:369
+#: eduiddashboard/views/nins.py:374
 msgid "Your National identity number validation request can't be found"
 msgstr "Kan ej hitta en bekräftelseförfrågan för ditt personnummer "
 
@@ -937,7 +941,7 @@ msgstr "Rättigheter"
 msgid "Changes saved."
 msgstr "Ändringarna har sparats."
 
-#: eduiddashboard/views/personal.py:60
+#: eduiddashboard/views/personal.py:61
 #: eduiddashboard/views/postal_address.py:70
 msgid "Save"
 msgstr "Spara"
