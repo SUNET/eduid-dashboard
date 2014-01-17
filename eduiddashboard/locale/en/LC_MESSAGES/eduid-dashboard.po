@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-17 10:41+0100\n"
+"POT-Creation-Date: 2014-01-17 12:55+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -622,15 +622,21 @@ msgid "Reset password by e-mail"
 msgstr ""
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
-msgid "http://www.swamid.se/assurance/al1"
+#, fuzzy
+#| msgid "http://www.swamid.se/assurance/al1"
+msgid "http://www.swamid.se/policy/assurance/al1"
 msgstr "Unconfirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
-msgid "http://www.swamid.se/assurance/al2"
+#, fuzzy
+#| msgid "http://www.swamid.se/assurance/al2"
+msgid "http://www.swamid.se/policy/assurance/al2"
 msgstr "Confirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
-msgid "http://www.swamid.se/assurance/al3"
+#, fuzzy
+#| msgid "http://www.swamid.se/assurance/al3"
+msgid "http://www.swamid.se/policy/assurance/al3"
 msgstr "Verified"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
@@ -1428,10 +1434,5 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "This national identity number is already registered by you"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You can access your governmental inbox"
-#~ " using <a href=\"%(nin)s\">Mina meddelanden</a>"
 #~ msgstr ""
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-17 10:41+0100\n"
+"POT-Creation-Date: 2014-01-17 12:55+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -664,15 +664,21 @@ msgid "Reset password by e-mail"
 msgstr "Cambia tu contraseña"
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
-msgid "http://www.swamid.se/assurance/al1"
+#, fuzzy
+#| msgid "http://www.swamid.se/assurance/al1"
+msgid "http://www.swamid.se/policy/assurance/al1"
 msgstr "AL 1"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
-msgid "http://www.swamid.se/assurance/al2"
+#, fuzzy
+#| msgid "http://www.swamid.se/assurance/al2"
+msgid "http://www.swamid.se/policy/assurance/al2"
 msgstr "AL 2"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
-msgid "http://www.swamid.se/assurance/al3"
+#, fuzzy
+#| msgid "http://www.swamid.se/assurance/al3"
+msgid "http://www.swamid.se/policy/assurance/al3"
 msgstr "AL 3"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
@@ -756,7 +762,6 @@ msgstr ""
 
 #: eduiddashboard/templates/wizards/basewizard.jinja2:87
 #, fuzzy
-#| msgid "text"
 msgid "Next"
 msgstr "texto"
 
@@ -774,31 +779,26 @@ msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:8
 #, fuzzy
-#| msgid "National identity number"
 msgid "Identity number"
 msgstr "números de identificación personal"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:10
 #, fuzzy
-#| msgid "Swedish national identity number"
 msgid "Please enter your national identity number."
 msgstr "números de identificación personal"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:20
 #, fuzzy
-#| msgid "National identity number"
 msgid "Confirm identity number"
 msgstr "números de identificación personal"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:22
 #, fuzzy
-#| msgid "Enter your confirmation code"
 msgid "Please enter your confirmation code recieved from my messages."
 msgstr "Reenviar el email de verificación"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:28
 #, fuzzy
-#| msgid "Resend confirmation code"
 msgid "Resend a new confirmation code"
 msgstr "Reenviar el email de verificación"
 
@@ -808,7 +808,6 @@ msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:53
 #, fuzzy
-#| msgid "National identity number"
 msgid "Invalid identity number"
 msgstr "números de identificación personal"
 
@@ -1006,7 +1005,6 @@ msgstr ""
 
 #: eduiddashboard/views/nins.py:369
 #, fuzzy
-#| msgid "National identity number confirmation code"
 msgid "Your National identity number validation request can't be found"
 msgstr "números de identificación personal"
 
@@ -1433,9 +1431,4 @@ msgstr ""
 
 #~ msgid "This national identity number is already registered by you"
 #~ msgstr "números de identificación personal"
-
-#~ msgid ""
-#~ "You can access your governmental inbox"
-#~ " using <a href=\"%(nin)s\">Mina meddelanden</a>"
-#~ msgstr ""
 

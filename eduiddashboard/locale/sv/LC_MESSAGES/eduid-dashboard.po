@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-17 10:41+0100\n"
-"PO-Revision-Date: 2014-01-17 09:43+0000\n"
+"POT-Creation-Date: 2014-01-17 12:55+0100\n"
+"PO-Revision-Date: 2014-01-17 12:11+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -619,15 +619,15 @@ msgid "Reset password by e-mail"
 msgstr "Återställ ditt lösenord via e-post"
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
-msgid "http://www.swamid.se/assurance/al1"
+msgid "http://www.swamid.se/policy/assurance/al1"
 msgstr "Obekräftad"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
-msgid "http://www.swamid.se/assurance/al2"
+msgid "http://www.swamid.se/policy/assurance/al2"
 msgstr "Bekräftad"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
-msgid "http://www.swamid.se/assurance/al3"
+msgid "http://www.swamid.se/policy/assurance/al3"
 msgstr "Verifierad"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
@@ -900,7 +900,7 @@ msgstr "Personnumret är bekräftat "
 
 #: eduiddashboard/views/nins.py:162
 msgid "A confirmation code has been sent to your govt mailbox"
-msgstr "En bekräftelsekod har skickats till inlåda hos \"Mina Meddelanden\""
+msgstr "En bekräftelsekod har skickats till din inlåda hos \"Mina Meddelanden\""
 
 #: eduiddashboard/views/nins.py:163
 msgid "National identity number confirmation code"
@@ -908,7 +908,7 @@ msgstr "Bekräftelsekod för personnummer"
 
 #: eduiddashboard/views/nins.py:164
 msgid "A new confirmation code has been sent to your govt mailbox"
-msgstr "En ny bekräftelsekod har skickats till inlåda hos \"Mina Meddelanden\""
+msgstr "En ny bekräftelsekod har skickats till din inlåda hos \"Mina Meddelanden\""
 
 #: eduiddashboard/views/nins.py:184
 msgid "The provided nin can't be verified. You only can verify the last one"
