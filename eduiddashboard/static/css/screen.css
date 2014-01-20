@@ -414,3 +414,15 @@ table.passwords {
     width: 19px;
 }
 
+/* End of Spinner on buttons
+-------------------------------------------------- */
+
+/* Messages */
+
+div.messages-wrapper {
+  position:absolute;
+  top:70px;
+  left:330px;
+  width:600px;
+  height:0px;
+}
