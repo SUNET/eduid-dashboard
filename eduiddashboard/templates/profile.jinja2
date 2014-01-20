@@ -11,11 +11,9 @@
       {% else %}
       <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
       {% endif %}
-    </div>
-    <div class='span6'>
 
         {% if pending_actions %}
-          <ul class='unstyled pending-actions' style='text-align:right;'>
+          <ul class='unstyled pending-actions'>
           {% for formid, msg, action, index in pending_actions %}
             {% if index == -1 %}
             <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
