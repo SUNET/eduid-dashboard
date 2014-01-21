@@ -1,12 +1,12 @@
  <!-- The modal wizard -->
  <div class="wizard" id="{{ model }}-wizard">
-    <h1>{% block wizardname %}Wizard Name{% endblock%}</h1>
+    <h1>{% block wizardname %}{% trans %}Confirm your identity{% endtrans %}{% endblock%}</h1>
 
     {% block wizard_cards %}
     <div class="wizard-card" data-cardname="nin">
-      <h3>Identity number</h3>
+      <h3>{% trans %}National identity number{% endtrans %}</h3>
       <div class="wizard-input-section">
-        <p>Please enter your national identity number.</p>
+        <p>{% trans %}Please enter your national identity number.{% endtrans %}</p>
         <div class="control-group">
           <input id="nin" name="nin" type="text" 
                  placeholder="yyyymmdd-xxxx" data-validate="validateNiN" />
@@ -15,9 +15,9 @@
     </div>
 
     <div class="wizard-card" data-cardname="mm">
-      <h3>Confirm identity number</h3>
+      <h3>{% trans %}Confirm national identity number{% endtrans %}</h3>
       <div class="wizard-input-section">
-        <p>Please enter your confirmation code recieved from my messages</p>
+        <p>{% trans %}Please enter your confirmation code recieved from my messages.{% endtrans %}</p>
         <div class="control-group">
           <input id="mm-confirm" name="code" type="text" placeholder="Confirmation code" />
         </div>
@@ -25,9 +25,9 @@
     </div>
 
     <div class="wizard-card">
-      <h3>Finish</h3>
+      <h3>{% trans %}Finish{% endtrans %}</h3>
       <div class="wizard-input-section">
-        <p>Congratulations, you're almost done. Please verify that the information below is correct and then click submit.</p>
+        {% trans %}<p>Congratulations, you're almost done. Please verify that the information below is correct and then click submit.</p>{% endtrans %}
       </div>
     </div>
 
@@ -38,7 +38,7 @@
         {% block wizard_error %}
           {% trans %}
           <strong>There was a problem</strong> with your submission.
-          Please correct the errors and re-submit.
+          Please correct any errors and re-submit.
           {% endtrans %}
         {% endblock %}
         </div>
@@ -49,7 +49,7 @@
         {% block wizard_failure %}
           {% trans %}
           <strong>There was a problem</strong> submitting the form.
-          Please try again in a minute.
+          Please try again.
           {% endtrans %}
         {% endblock %}
         </div>
@@ -102,7 +102,7 @@ $(function() {
           };
       if (!re.test(val)) {
         ret.status = false;
-        ret.msg = "Invalid identity number";
+        ret.msg = "{{ _("Invalid identity number") }}";
       }
       return ret;
     }

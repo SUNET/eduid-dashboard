@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-17 13:38+0100\n"
+"POT-Creation-Date: 2014-01-21 10:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,6 +411,7 @@ msgid "Add a mobile phone number by clicking on the button below."
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:4
+#: eduiddashboard/templates/wizards/basewizard.jinja2:7
 msgid "National identity number"
 msgstr ""
 
@@ -506,38 +507,39 @@ msgstr ""
 msgid "Editing %(email)s user"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:48
+#: eduiddashboard/templates/profile.jinja2:46
 msgid "Profile filled"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:70
+#: eduiddashboard/templates/profile.jinja2:68
 msgid "Lost your confirmation code?"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:70
+#: eduiddashboard/templates/profile.jinja2:68
 msgid "Resend confirmation code"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:75
+#: eduiddashboard/templates/profile.jinja2:73
+#: eduiddashboard/templates/wizards/basewizard.jinja2:28
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:34
 msgid "Finish"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:117
+#: eduiddashboard/templates/profile.jinja2:115
 msgid "Warning!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:117
+#: eduiddashboard/templates/profile.jinja2:115
 msgid ""
 "An error has occurred, please try again or contact support if the problem "
 "persists."
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:124
+#: eduiddashboard/templates/profile.jinja2:122
 msgid "Error!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:124
+#: eduiddashboard/templates/profile.jinja2:122
 msgid "Permission denied"
 msgstr ""
 
@@ -673,11 +675,36 @@ msgstr ""
 msgid "Please select your <strong>Identity Provider</strong> from the following list:"
 msgstr ""
 
+#: eduiddashboard/templates/wizards/basewizard.jinja2:3
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:3
+msgid "Confirm your identity"
+msgstr ""
+
+#: eduiddashboard/templates/wizards/basewizard.jinja2:9
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:10
+msgid "Please enter your national identity number."
+msgstr ""
+
+#: eduiddashboard/templates/wizards/basewizard.jinja2:18
+msgid "Confirm national identity number"
+msgstr ""
+
+#: eduiddashboard/templates/wizards/basewizard.jinja2:20
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:22
+msgid "Please enter your confirmation code recieved from my messages."
+msgstr ""
+
+#: eduiddashboard/templates/wizards/basewizard.jinja2:30
+msgid ""
+"<p>Congratulations, you're almost done. Please verify that the information "
+"below is correct and then click submit.</p>"
+msgstr ""
+
 #: eduiddashboard/templates/wizards/basewizard.jinja2:39
 msgid ""
 "\n"
 "          <strong>There was a problem</strong> with your submission.\n"
-"          Please correct the errors and re-submit.\n"
+"          Please correct any errors and re-submit.\n"
 "          "
 msgstr ""
 
@@ -685,7 +712,7 @@ msgstr ""
 msgid ""
 "\n"
 "          <strong>There was a problem</strong> submitting the form.\n"
-"          Please try again in a minute.\n"
+"          Please try again.\n"
 "          "
 msgstr ""
 
@@ -713,24 +740,17 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:3
-msgid "Confirm your identity"
+#: eduiddashboard/templates/wizards/basewizard.jinja2:105
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:53
+msgid "Invalid identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:8
 msgid "Identity number"
 msgstr ""
 
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:10
-msgid "Please enter your national identity number."
-msgstr ""
-
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:20
 msgid "Confirm identity number"
-msgstr ""
-
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:22
-msgid "Please enter your confirmation code recieved from my messages."
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:28
@@ -739,10 +759,6 @@ msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:37
 msgid "Congratulations, your national number was verified."
-msgstr ""
-
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:53
-msgid "Invalid identity number"
 msgstr ""
 
 #: eduiddashboard/views/__init__.py:87
@@ -783,7 +799,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:72 eduiddashboard/views/nins.py:166
+#: eduiddashboard/views/emails.py:72 eduiddashboard/views/nins.py:170
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -820,7 +836,7 @@ msgid "Add email address"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:178 eduiddashboard/views/mobiles.py:201
-#: eduiddashboard/views/nins.py:330 eduiddashboard/views/personal.py:82
+#: eduiddashboard/views/nins.py:334 eduiddashboard/views/personal.py:82
 msgid "Changes saved"
 msgstr ""
 
@@ -881,7 +897,7 @@ msgid ""
 "\"Pending confirmation\" link below and enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:40 eduiddashboard/views/nins.py:235
+#: eduiddashboard/views/nins.py:40 eduiddashboard/views/nins.py:239
 msgid "Add national identity number"
 msgstr ""
 
@@ -889,41 +905,41 @@ msgstr ""
 msgid "Validation required for national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:123
+#: eduiddashboard/views/nins.py:127
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:165
+#: eduiddashboard/views/nins.py:169
 msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:167
+#: eduiddashboard/views/nins.py:171
 msgid "A confirmation code for NIN {data} has been sent to your govt mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:168
+#: eduiddashboard/views/nins.py:172
 msgid "National identity number confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:169
+#: eduiddashboard/views/nins.py:173
 msgid "A new confirmation code has been sent to your govt mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:189
+#: eduiddashboard/views/nins.py:193
 msgid "The provided nin can't be verified. You only can verify the last one"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:215
+#: eduiddashboard/views/nins.py:219
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:280
+#: eduiddashboard/views/nins.py:284
 msgid ""
 "A confirmation code has been sent to your govt inbox. Please click on "
 "\"Pending confirmation\" link below to enter.your confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:374
+#: eduiddashboard/views/nins.py:378
 msgid "Your National identity number validation request can't be found"
 msgstr ""
 
