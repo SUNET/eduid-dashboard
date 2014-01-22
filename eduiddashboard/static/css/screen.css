@@ -335,8 +335,8 @@ table.passwords {
 }
 
 #changePasswordDialog .modal-body {
-  max-height: 500px;
-  height: 500px;
+  max-height: 550px;
+  height: 550px;
 }
 
 #changePasswordDialog .suggested-password {
