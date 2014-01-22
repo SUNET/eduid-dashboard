@@ -9,6 +9,8 @@ from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
 
+import logging
+logger = logging.getLogger(__name__)
 
 EMAIL_RE = re.compile(r'[^@]+@[^@]+')
 OID_RE = re.compile(r'[0-9a-fA-F]{12}')
@@ -67,6 +69,7 @@ class BaseFactory(object):
             'saml2.user_main_attribute', 'mail')
 
         if not self.authorize():
+            logger.debug('Un-authorized access attempt to user {!r}'.format(self.user))
             raise HTTPForbidden(_('You do not have sufficient permissions to access this user'))
 
         self.__acl__ = self.acls[self.workmode]
@@ -95,6 +98,8 @@ class BaseFactory(object):
         required_loa_int = self.loa_to_int(loa=required_loa)
 
         if user_loa_int < required_loa_int:
+            logger.info('User AL too low for workmode {!r} ({!r} < {!r})'.format(
+                self.workmode, self.get_loa(), required_loa))
             raise HTTPForbidden(_('You do not have sufficient AL to access to this '
                                 'workmode'))
 
@@ -106,6 +111,7 @@ class BaseFactory(object):
         if self._user is not None:
             return self._user
 
+        user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
             userid = user and user.get('mail', '') or ''
@@ -166,6 +172,8 @@ class BaseFactory(object):
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
+        logger.debug('Required URN for workmode {!r} is {!r}, user entitlements are {!r}'.format(
+            self.workmode, required_urn, user.get('eduPersonEntitlement', [])))
         if required_urn is '':
             return ['']
         elif required_urn in user.get('eduPersonEntitlement', []):
@@ -174,6 +182,8 @@ class BaseFactory(object):
 
     def get_loa(self):
         available_loa = self.request.registry.settings.get('available_loa')
+        logger.debug('AL-level is {!r} (default: {!r})'.format(self.request.session.get('eduPersonAssurance'),
+                                                               available_loa[0]))
         return self.request.session.get('eduPersonAssurance',
                                         available_loa[0])
 

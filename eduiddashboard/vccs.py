@@ -1,6 +1,9 @@
 from bson import ObjectId
+from datetime import datetime
 
 import vccs_client
+
+from eduiddashboard import log
 
 
 def get_vccs_client(vccs_url):
@@ -93,17 +96,25 @@ def add_credentials(vccs_url, old_password, new_password, user):
         )
 
     if not vccs.add_credentials(str(user['_id']), [new_factor]):
+        log.warning("Failed adding password credential {!r} for user {!r}".format(
+            new_factor.credential_id, user['_id']))
         return False  # something failed
+    log.debug("Added password credential {!s} for user {!s}".format(
+        new_factor.credential_id, user['_id']))
 
     if old_factor:
         # Use the user_id_hint inserted by check_password() until we know all
         # credentials use str(user['_id']) as user_id.
         vccs.revoke_credentials(old_password['user_id_hint'], [old_factor])
         passwords.remove(old_password)
+        log.debug("Revoked old credential {!s} (user {!s})".format(
+            old_factor.credential_id, user['_id']))
 
     passwords.append({
         'id': password_id,
         'salt': new_factor.salt,
+        'source': 'dashboard',
+        'ts': datetime.now(),
     })
     user['passwords'] = passwords
 
