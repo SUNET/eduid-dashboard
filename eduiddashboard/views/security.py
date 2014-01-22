@@ -1,6 +1,5 @@
 ## Passwords form
 
-from pwgen import pwgen
 from deform import Button
 import json
 
@@ -22,7 +21,7 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.utils import flash, get_short_hash
+from eduiddashboard.utils import flash, get_short_hash, generate_password
 
 
 def change_password(request, user, old_password, new_password):
@@ -103,6 +102,7 @@ class PasswordsView(BaseFormView):
     schema = Passwords()
     route = 'security'
     buttons = (Button(name='save', title=_('Change password')), )
+    _password = None
 
     def __init__(self, context, request):
         super(PasswordsView, self).__init__(context, request)
@@ -112,6 +112,12 @@ class PasswordsView(BaseFormView):
             'url': context.route_url(self.route),
             'target': "#changePasswordDialog .modal-body",
         })
+
+    def appstruct(self):
+        passwords_dict = {
+            'suggested_password': self.get_suggested_password()
+        }
+        return self.schema.serialize(passwords_dict)
 
     def __call__(self):
         result = super(PasswordsView, self).__call__()
@@ -123,21 +129,27 @@ class PasswordsView(BaseFormView):
 
     def get_template_context(self):
         context = super(PasswordsView, self).get_template_context()
-        if hasattr(self, 'new_password'):
-            context.update({'new_password': self.new_password})
         context.update({
-            'changed': getattr(self, 'changed', False),
             'message': getattr(self, 'message', ''),
         })
         return context
 
+    def get_suggested_password(self):
+        if self._password is not None:
+            return self._password
+        if self.request.method == 'GET':
+            password_length = self.request.registry.settings.get('password_length', 12)
+            self._password = generate_password(length=password_length)
+            self.request.session['last_generated_password'] = self._password
+
+        elif self.request.method == 'POST':
+            self._password = self.request.session.get('last_generated_password', generate_password(length=password_length))
+
+        return self._password
+
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         old_password = passwords_data['old_password']
-        password_length = self.request.registry.settings.get('password_length')
-        self.new_password = pwgen(int(password_length),
-                                  no_capitalize=True, no_symbols=True)
-
         user = self.request.session['user']
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.

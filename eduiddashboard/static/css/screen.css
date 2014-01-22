@@ -342,6 +342,7 @@ table.passwords {
 #changePasswordDialog .suggested-password {
   background-color: #fff;
   color: #555;
+  border: none;
   font-weight: bold;
   font-size: 18px;
 
@@ -357,6 +358,7 @@ table.passwords {
   padding-right: 10px;
 
 }
+
 
 /* End of reset password view styles
 -------------------------------------------------- */

@@ -1,6 +1,7 @@
 from hashlib import sha256
 from uuid import uuid4
 import time
+from pwgen import pwgen
 
 from pyramid.i18n import TranslationString as _
 
@@ -150,3 +151,7 @@ def get_unique_hash():
 
 def get_short_hash(entropy=6):
     return uuid4().hex[:entropy]
+
+
+def generate_password(length=12):
+    return pwgen(int(length), no_capitalize=True, no_symbols=True)
