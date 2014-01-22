@@ -165,8 +165,7 @@ class NINUniqueValidator(object):
             'model_name': 'norEduPersonNIN',
             'verified': False
         }).count() > 0:
-            raise colander.Invalid(node, _('This national identity number is '
-                                   'already in use by you'))
+            raise colander.Invalid(node, _('This national identity number is already in use'))
 
 
 class NINReachableValidator(object):

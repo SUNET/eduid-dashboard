@@ -44,7 +44,7 @@
 <script type="text/javascript">
     var validateNIN = function (el) {
            var val = el.val(),
-               re = /^(\d{8}|\d{6})(-|\ |)\d{4}$/,
+               re = /^(18|19|20)\d{2}(0[1-9]|1[0-2])\d{2}[-\s]?\d{4}$/,
                ret = {
                  status: true
                };
