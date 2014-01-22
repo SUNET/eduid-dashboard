@@ -120,7 +120,11 @@ class PasswordsView(BaseFormView):
         return self.schema.serialize(passwords_dict)
 
     def __call__(self):
+        if self.request.method == 'POST':
+            self.request.POST.add('suggested_password', self.get_suggested_password())
+
         result = super(PasswordsView, self).__call__()
+
         if self.request.method == 'POST':
             template = 'eduiddashboard:templates/passwords-form-dialog.jinja2'
         else:
@@ -131,14 +135,18 @@ class PasswordsView(BaseFormView):
         context = super(PasswordsView, self).get_template_context()
         context.update({
             'message': getattr(self, 'message', ''),
+            'changed': getattr(self, 'changed', False),
         })
         return context
 
     def get_suggested_password(self):
+        """
+            The suggested password is saved in session to avoid form hijacking
+        """
         if self._password is not None:
             return self._password
+        password_length = self.request.registry.settings.get('password_length', 12)
         if self.request.method == 'GET':
-            password_length = self.request.registry.settings.get('password_length', 12)
             self._password = generate_password(length=password_length)
             self.request.session['last_generated_password'] = self._password
 
@@ -149,13 +157,25 @@ class PasswordsView(BaseFormView):
 
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
+
+        if passwords_data.get('use_custom_password'):
+            # The user has entered his own password and it was verified by
+            # validators
+
+            new_password = passwords_data.get('custom_password')
+
+        else:
+            # If the user has selected the suggested password, then it should
+            # be in session
+            new_password = self.get_suggested_password()
+
         old_password = passwords_data['old_password']
         user = self.request.session['user']
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
         user = self.request.userdb.get_user_by_oid(user['_id'])
 
-        self.changed = change_password(self.request, user, old_password, self.new_password)
+        self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
             self.message = _('Your password has been successfully updated')
         else:

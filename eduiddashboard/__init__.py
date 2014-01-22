@@ -405,7 +405,7 @@ def main(global_config, **settings):
     settings['password_length'] = read_setting_from_env(
         settings,
         'password_length',
-        '10',
+        '12',
     )
 
     jinja2_settings(settings)

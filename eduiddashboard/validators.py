@@ -14,6 +14,9 @@ PASSWORD_MIN_LENGTH = 5
 class OldPasswordValidator(object):
 
     def __call__(self, node, value):
+
+        return
+
         request = node.bindings.get('request')
         old_password = value
 

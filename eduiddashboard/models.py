@@ -135,7 +135,8 @@ class Passwords(colander.MappingSchema):
     use_custom_password = colander.SchemaNode(
         colander.Boolean(),
         widget=deform.widget.CheckboxWidget(),
-        title=_('I want to use my own password'))
+        title=_('Use my own password'),
+        missing='false')
 
     suggested_password = colander.SchemaNode(
         colander.String(),
@@ -146,7 +147,7 @@ class Passwords(colander.MappingSchema):
         ),
         missing=password_readonly)
 
-    new_password = colander.SchemaNode(
+    custom_password = colander.SchemaNode(
         colander.String(),
         title=_('Custom password'),
         widget=deform.widget.PasswordWidget(
