@@ -114,7 +114,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
         'id': password_id,
         'salt': new_factor.salt,
         'source': 'dashboard',
-        'ts': datetime.now(),
+        'created_ts': datetime.now(),
     })
     user['passwords'] = passwords
 
