@@ -334,6 +334,30 @@ table.passwords {
   background-color: white;
 }
 
+#changePasswordDialog .modal-body {
+  max-height: 500px;
+  height: 500px;
+}
+
+#changePasswordDialog .suggested-password {
+  background-color: #fff;
+  color: #555;
+  font-weight: bold;
+  font-size: 18px;
+
+}
+
+#changePasswordDialog .form-actions {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  float: right;
+  padding: 0;
+  background: none;
+  padding-right: 10px;
+
+}
+
 /* End of reset password view styles
 -------------------------------------------------- */
 

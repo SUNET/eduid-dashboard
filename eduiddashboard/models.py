@@ -118,12 +118,50 @@ class Person(colander.MappingSchema):
                                             widget=preferred_language_widget)
 
 
+@colander.deferred
+def password_readonly(node, kw):
+    request = kw.get('request')
+    return request.session.get('last_generated_password')
+
+
 class Passwords(colander.MappingSchema):
 
-    old_password = colander.SchemaNode(colander.String(),
-                                       title=_('Current password'),
-                                       widget=deform.widget.PasswordWidget(size=20),
-                                       validator=OldPasswordValidator())
+    old_password = colander.SchemaNode(
+        colander.String(),
+        title=_('Current password'),
+        widget=deform.widget.PasswordWidget(size=20),
+        validator=OldPasswordValidator())
+
+    use_custom_password = colander.SchemaNode(
+        colander.Boolean(),
+        widget=deform.widget.CheckboxWidget(),
+        title=_('I want to use my own password'))
+
+    suggested_password = colander.SchemaNode(
+        colander.String(),
+        title=_('Suggested password'),
+        widget=deform.widget.TextInputWidget(
+            readonly=True,
+            css_class='suggested-password'
+        ),
+        missing=password_readonly)
+
+    new_password = colander.SchemaNode(
+        colander.String(),
+        title=_('Custom password'),
+        widget=deform.widget.PasswordWidget(
+            size=20,
+            css_class='custom-password'),
+        validator=PasswordValidator(),
+        missing='')
+
+    repeated_password = colander.SchemaNode(
+        colander.String(),
+        title=_('Repeat the password'),
+        widget=deform.widget.PasswordWidget(
+            size=20,
+            css_class='custom-password'),
+        missing='')
 
 
 class EmailResetPassword(colander.MappingSchema):
