@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 TEMPLATES_RELATION = {
     'phone-validator': 'dummy',
-    'nin-validator': 'dummy',
+    'nin-validator': 'nin-confirm',
     'nin-reset-password': 'dummy',
 }
 
