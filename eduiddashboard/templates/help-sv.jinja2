@@ -3,5 +3,119 @@
 {% block nav_class_help %}active{% endblock %}
 
 {% block contents %}
-  <p>Det här är hjälpsidan på svenska.</p>
+    <h3>Vanliga frågor om eduID</h3>
+    <div class="accordion" id="accordion2">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                    Vad är eduID?
+                </a>
+            </div>
+            <div id="collapseOne" class="accordion-body collapse in">
+                <div class="accordion-inner">
+                    Tjänsten eduID är skapad och drivs av SUNET för högre utbildning i Sverige. Tjänsten möjliggör för studenter att skapa ett eduID. Ett eduID kan sedan användas för att bl.a. ansöka till kurser på Svenska universitet och högskolor och även använda tjänster på det lärosäte som studenten blir antagen.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                    Vilket e-postkonto ska jag använda för att logga in?
+                </a>
+            </div>
+            <div id="collapseTwo" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    En användare kan logga in med alla e-postadresser som den användaren angett och bekräftat i eduID. Om en användare skapat ett eduID konto genom att logga in med en social tjänst så kan användaren även logga in med samma e-postadress som den användaren loggar in med på den sociala tjänsten.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+                    Hur rapporterar jag fel eller ger feedback?
+                </a>
+            </div>
+            <div id="collapseThree" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    Om du upplever problem eller har frågor så skicka gärna dessa till oss genom att trycka på feedback knappen på höger sida av skärmen. Det går även att kontakta eduID supporten genom att skicka ett mail till pilot@eduid.se så kommer vi svara så snart som möjligt.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFour">
+                    Vart kan jag uppdatera min profil och varför ska jag göra det?
+                </a>
+            </div>
+            <div id="collapseFour" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <p>Efter att en användare har loggat in på eduID kommer användaren till eduID dashboard. Där kan användaren uppdatera sin personliga information och uppdatera sin profil.
+                    Nedan möjligheter att uppdatera profilen finns:</p>
+                    <p><strong>Personlig information</strong></p>
+                    <p>
+                    När man använder eduID för att logga in till en tjänst så skickas den personliga informationen vidare till den tjänsten. Det är dock inte säkert att tjänsten i fråga använder sig av den personliga informationen från eduID.</p>
+                    <p><strong>Bekräfta din identitet</strong></p>
+                    <p>Lägg till ditt personnummer i fältet på bekräfta din identitet sidan för att starta processen att bekräfta ditt personnummer. Ett meddelande skickas då till din e-brevlåda hos Min myndighetspost (minmyndighetspost.se). I meddelandet som skickas till din myndighetspost finns en kod som du kan använda för att bekräfta ditt personnummer i eduID, vilket leder till att ditt eduID även blir bekräftat.
+                    När du väl bekräftat ditt eduID kommer du kunna logga in på tjänster som kräver en bekräftad eduID, t.ex. antagning.se.</p>
+                    <p><strong>E-postadresser</strong></p>
+                    <p>Det är möjligt att lägga till flera e-postadresser till ditt eduID. Efter att en ny e-postadress lagts till så skickas ett meddelande med en bekräftelselänk och kod till den angivna e-postadress. Klicka på länken i meddelandet och ange koden för att bekräfta din e-postadress. En e-postadress måste vara bekräftad innan den kan bli primär. En användare kan endast ha en primär e-postadress. Din primära e-postadress kan användas för att göra en återställning av ditt lösenord. En primär e-postadress kan inte tas bort.</p>
+                    <p><strong>Mobiltelefonnummer</strong></p>
+                    <p>Det är möjligt att lägga till flera mobiltelefonnummer till ditt eduID. Efter att mobiltelefonnummer lagts till så skickas ett SMS med en bekräftelselänk och en kod till det angivna numret. Klicka på länken i SMSet och ange koden för att bekräfta mobiltelefonnumret. I kommande version av eduID kommer de gå att göra en password reset med hjälp av ditt primära mobiltelefonnummer.</p>
+                    <p><strong>Säkerhet</strong></p>
+                    <p>På säkerhetssidan kan en användare byta sitt lösenord till eduID.</p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseFive">
+                    Vad är skillnaden mellan en obekräftad och bekräftad eduID och varför spelar det roll?
+                </a>
+            </div>
+            <div id="collapseFive" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    En obekräftad eller bekräftad eduID indikerar hur säkert det är att den användaren är dem de säger sig vara. För att ansöka till universitet eller högskola är det t.ex. viktigt att vara säker på att användaren som ansöker verkligen är den de utger sig för att vara. En användare kan se ifall deras eduID är obekräftad eller bekräftad högst up till höger på eduID dashboard.
+                    Ett obekräftat eduID betyder att en användares e-postadress har blivit bekräftad att höra till den användaren eller att användaren i fråga har logga in på eduID via en social tjänst.
+                    En bekräftad eduID betyder att användaren har lyckats använda en av eduIDs säkra processer för att bekräfta vilka de är. T.ex. genom att visa upp en identifikationshandling hos en utnämnd eduID helpdesk eller genom att bekräfta sitt personnummer genom att använda den statliga tjänsten Min myndighetspost.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseSix">
+                    Hur byter jag standardspråk i eduID?
+                </a>
+            </div>
+            <div id="collapseSix" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    Det språk som kommer användas som standard i eduID är baserat på den språkinställning som användares webbläsare använder. För att byta standardspråk kan en användare logga in på eduID och välja önskat språk under fliken för personliga information.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseSeven">
+                    Vad är SUNET?
+                </a>
+            </div>
+            <div id="collapseSeven" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    SUNET är den organisation som är ansvarig för det Svenska universitets och datanätverket och även flertal tjänster som används av universitet och högskolor i Sverige. Mer information om SUNET finns på <a href="http://www.sunet.se/"></a>.
+                </div>
+            </div>
+        </div>
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseEight">
+                    Vad är Min myndighetspost?
+                </a>
+            </div>
+            <div id="collapseEight" class="accordion-body collapse">
+                <div class="accordion-inner">
+                     Tjänsten eduID använder sig av den statliga meddelandetjänsten Min myndighetspost för att bekräfta en användares personnummer. Mer information om Min myndighetspost finns på <a href="http://minmyndighetspost.se"></a>.
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
