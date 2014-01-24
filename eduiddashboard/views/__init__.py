@@ -16,6 +16,7 @@ from eduiddashboard.verifications import (get_verification_code,
                                           verificate_code,
                                           new_verification_code)
 
+from eduiddashboard import log
 
 def get_dummy_status(request, user):
     return None
@@ -129,24 +130,27 @@ class BaseActionsView(object):
                                                       self.data_attribute,
                                                       obj_id=data_id,
                                                       user=self.user)
-            if code_sent == verification_code['code']:
-                if verification_code['expired']:
-                    return {
-                        'result': 'error',
-                        'message': self.verify_messages['expired'],
-                    }
+            if verification_code:
+                if code_sent == verification_code['code']:
+                    if verification_code['expired']:
+                        log.debug("User {!r} verification code has expired".format(self.user))
+                        return {
+                            'result': 'error',
+                            'message': self.verify_messages['expired'],
+                        }
+                    else:
+                        verificate_code(self.request, self.data_attribute,
+                                        code_sent)
+                        return {
+                            'result': 'ok',
+                            'message': self.verify_messages['ok'],
+                        }
                 else:
-                    verificate_code(self.request, self.data_attribute,
-                                    code_sent)
-                    return {
-                        'result': 'ok',
-                        'message': self.verify_messages['ok'],
-                    }
-            else:
-                return {
-                    'result': 'error',
-                    'message': self.verify_messages['error'],
-                }
+                    log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
+            return {
+                'result': 'error',
+                'message': self.verify_messages['error'],
+            }
         else:
             message = self.verify_messages['request'].format(data=data_id)
             return {
