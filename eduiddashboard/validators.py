@@ -39,11 +39,11 @@ class PasswordValidator(object):
     """ Validator which check the security level of the password """
 
     def __call__(self, node, value):
-        request = node['request']
+        request = node.bindings.get('request')
         localizer = get_localizer(request)
         settings = request.registry.settings
         value = value.replace(" ", "")
-        password_min_entropy = settings.get('password_entropy', 60)
+        password_min_entropy = int(settings.get('password_entropy', 60))
 
         # We accept a 10% of variance in password_min_entropy because
         # we have calculed the entropy by javascript too and the results

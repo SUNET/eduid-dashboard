@@ -7,7 +7,8 @@ from eduid_am.exceptions import UserDoesNotExist
 
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard import vccs
-from eduiddashboard.vccs import check_password, add_credentials
+from eduiddashboard.vccs import (check_password, add_credentials,
+                                 provision_credentials)
 
 
 class FakeVCCSClient(vccs_client.VCCSClient):
@@ -58,7 +59,7 @@ class PasswordFormTests(LoggedInReguestTests):
         }
         self.patcher = patch.object(vccs, 'get_vccs_client', **mock_config)
         self.patcher.start()
-        add_credentials(vccs_url, 'xxx', self.initial_password, self.user)
+        provision_credentials(vccs_url, self.initial_password, self.user)
 
     def test_logged_get(self):
         self.set_logged()
@@ -87,7 +88,7 @@ class PasswordFormTests(LoggedInReguestTests):
             })
             self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
 
-    def test_valid_password(self):
+    def test_valid_current_password(self):
         self.set_logged()
         response_form = self.testapp.get('/profile/security/')
 
@@ -102,7 +103,7 @@ class PasswordFormTests(LoggedInReguestTests):
         self.assertNotIn('Old password do not match', response.body)
         self.assertNotIn("Both passwords don't match", response.body)
 
-    def test_not_valid_old_password(self):
+    def test_not_valid_current_password(self):
         self.set_logged()
         response_form = self.testapp.get('/profile/security/', status=200)
 
@@ -120,6 +121,51 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertEqual(response.status, '200 OK')
             self.assertIn('Current password is incorrect', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
+
+    def test_password_form_entropy(self):
+        self.set_logged()
+        response_form = self.testapp.get('/profile/security/')
+
+        form = response_form.forms[self.formname]
+        form['old_password'].value = self.initial_password
+        form['custom_password'].value = '0l8m vta8 j9lr'
+        form['repeated_password'].value = form['custom_password'].value
+
+        response = form.submit('save')
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn('Your password has been successfully updated',
+                      response.body)
+        self.assertNotIn('Old password do not match', response.body)
+        self.assertNotIn("Both passwords don't match", response.body)
+
+    def test_password_form_entropy_notvalid(self):
+        self.set_logged()
+        response_form = self.testapp.get('/profile/security/')
+
+        form = response_form.forms[self.formname]
+        form['old_password'].value = self.initial_password
+
+        for password in [
+            'april march',
+            'April March',
+            'meat with potatoes and bread',
+            '123412341234',
+            'asdfasdfasdf',
+            'eduid',
+            'aaaaaaaaaaaaa',
+            'onetwothreefour',
+        ]:
+            form['custom_password'].value = password
+            form['repeated_password'].value = password
+
+            response = form.submit('save')
+
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('The password complexity is too weak.',
+                          response.body, msg='The entropy for {0} is bigger than required'.format(password))
+            self.assertNotIn('Your password has been successfully updated',
+                             response.body)
 
     def test_reset_password(self):
         response_form = self.testapp.get('/profile/reset-password/email/')

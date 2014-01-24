@@ -108,3 +108,39 @@ def add_credentials(vccs_url, old_password, new_password, user):
     user['passwords'] = passwords
 
     return True
+
+
+def provision_credentials(vccs_url, new_password, user):
+    """
+    This function should be used by tests only
+    Provision new password to a user.
+
+    Returns True on success.
+
+    :param vccs_url: URL to VCCS authentication backend
+    :param old_password: plaintext current password
+    :param new_password: plaintext new password
+    :param user: user dict
+
+    :type vccs_url: string
+    :type old_password: string
+    :type user: dict
+    :rtype: bool
+    """
+    password_id = ObjectId()
+    vccs = get_vccs_client(vccs_url)
+    new_factor = vccs_client.VCCSPasswordFactor(new_password,
+                                                credential_id=str(password_id))
+
+    passwords = user.get('passwords', [])
+
+    if not vccs.add_credentials(str(user['_id']), [new_factor]):
+        return False  # something failed
+
+    passwords.append({
+        'id': password_id,
+        'salt': new_factor.salt,
+    })
+    user['passwords'] = passwords
+
+    return True
