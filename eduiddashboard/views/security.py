@@ -146,8 +146,14 @@ class PasswordsView(BaseFormView):
         if self._password is not None:
             return self._password
         password_length = self.request.registry.settings.get('password_length', 12)
+        password_entropy = self.request.registry.settings.get('password_entropy', 60)
         if self.request.method == 'GET':
-            self._password = generate_password(length=password_length)
+            self._password = generate_password(length=password_length,
+                                               entropy=password_entropy)
+
+            self._password = ' '.join([self._password[i*4: i*4+4]
+                                       for i in range(0, len(self._password)/4)])
+
             self.request.session['last_generated_password'] = self._password
 
         elif self.request.method == 'POST':

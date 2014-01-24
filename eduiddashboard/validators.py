@@ -1,23 +1,24 @@
 import colander
 from copy import copy
+import zxcvbn
+
+from pyramid.i18n import get_localizer
 
 from eduiddashboard.userdb import UserDB
-
 from eduiddashboard.i18n import TranslationString as _
-from pyramid.i18n import get_localizer
 from eduiddashboard.vccs import check_password
-
-
-PASSWORD_MIN_LENGTH = 5
 
 
 class OldPasswordValidator(object):
 
     def __call__(self, node, value):
 
-        return
-
         request = node.bindings.get('request')
+
+        if not request.registry.settings('use_vccs', True):
+            return
+
+        localizer = get_localizer(request)
         old_password = value
 
         user = request.session['user']
@@ -31,17 +32,29 @@ class OldPasswordValidator(object):
         password = check_password(vccs_url, old_password, user)
         if not password:
             err = _('Current password is incorrect')
-            raise colander.Invalid(node, err)
+            raise colander.Invalid(node, localizer.translate(err))
 
 
 class PasswordValidator(object):
     """ Validator which check the security level of the password """
 
     def __call__(self, node, value):
-        if len(value) < PASSWORD_MIN_LENGTH:
-            err = _('The password is too short, minimum length is ${len}',
-                    mapping={'len': PASSWORD_MIN_LENGTH})
-            raise colander.Invalid(node, err)
+        request = node['request']
+        localizer = get_localizer(request)
+        settings = request.registry.settings
+        value = value.replace(" ", "")
+        password_min_entropy = settings.get('password_entropy', 60)
+
+        # We accept a 10% of variance in password_min_entropy because
+        # we have calculed the entropy by javascript too and the results
+        # may vary.
+        password_min_entropy = (0.90 * password_min_entropy)
+
+        veredict = zxcvbn.password_strength(value)
+
+        if veredict.get('entropy', 0) < password_min_entropy:
+            err = _('The password complexity is too weak.')
+            raise colander.Invalid(node, localizer.translate(err))
 
 
 class PermissionsValidator(object):

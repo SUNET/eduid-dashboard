@@ -39,6 +39,7 @@ requires = [
     'waitress==0.8.2',
     'vccs_client==0.3',
     'pwgen==0.4',
+    'zxcvbn==1.0',
     # Fix eduid_msg version
     'eduid_msg==0.7.5',
 ]

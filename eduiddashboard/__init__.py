@@ -408,6 +408,12 @@ def main(global_config, **settings):
         '12',
     )
 
+    settings['password_entropy'] = read_setting_from_env(
+        settings,
+        'password_entropy',
+        '60',
+    )
+
     jinja2_settings(settings)
 
     config = Configurator(settings=settings,
