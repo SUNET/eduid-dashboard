@@ -148,7 +148,7 @@ TEST_USER = {
         }]
     }
 
-TEST_VERIFICATIONS =  [{
+TEST_VERIFICATIONS = [{
     '_id': ObjectId('234567890123456789012301'),
     'code': '9d392d',
     'model_name': 'email',
@@ -159,6 +159,8 @@ TEST_VERIFICATIONS =  [{
 }]
 
 from eduiddashboard.testing import MockedUserDB as MUDB
+
+
 class MockedUserDB(MUDB):
 
     test_users = {
@@ -195,7 +197,7 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         response = form.submit('reset')
         self.assertIn('No user matching email', response.text)
 
-        form['email_or_username'].value = 'johnnysmith3@example.com'
+        form['email_or_username'].value = 'johnnysmith2@example.com'
         response = form.submit('reset')
         self.assertIn('is not verified', response.text)
 
