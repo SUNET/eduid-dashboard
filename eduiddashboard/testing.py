@@ -241,7 +241,10 @@ class LoggedInReguestTests(unittest.TestCase):
             'mongo_uri': MONGO_URI_TEST,
             'mongo_uri_am': MONGO_URI_AM_TEST,
             'testing': True,
-            'jinja2.directories': 'eduiddashboard:saml2/templates',
+            'jinja2.directories': [
+                'eduiddashboard:saml2/templates',
+                'eduiddashboard:/templates'
+            ],
             'jinja2.undefined': 'strict',
             'jinja2.filters': """
                 route_url = pyramid_jinja2.filters:route_url_filter
