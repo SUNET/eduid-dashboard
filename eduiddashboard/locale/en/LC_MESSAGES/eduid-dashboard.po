@@ -653,17 +653,14 @@ msgid "Reset password by e-mail"
 msgstr ""
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
-#, fuzzy
 msgid "http://www.swamid.se/policy/assurance/al1"
 msgstr "Unconfirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
-#, fuzzy
 msgid "http://www.swamid.se/policy/assurance/al2"
 msgstr "Confirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
-#, fuzzy
 msgid "http://www.swamid.se/policy/assurance/al3"
 msgstr "Verified"
 
