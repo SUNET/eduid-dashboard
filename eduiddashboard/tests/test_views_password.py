@@ -1,5 +1,8 @@
+from datetime import datetime
 from mock import patch
+from copy import deepcopy
 
+from bson import ObjectId
 import simplejson as json
 import vccs_client
 
@@ -8,7 +11,7 @@ from eduid_am.exceptions import UserDoesNotExist
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials,
-                                 provision_credentials)
+                        provision_credentials)
 
 
 class FakeVCCSClient(vccs_client.VCCSClient):
@@ -167,17 +170,87 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertNotIn('Your password has been successfully updated',
                              response.body)
 
+    def tearDown(self):
+        super(PasswordFormTests, self).tearDown()
+        self.patcher.stop()
+
+
+TEST_USER = {
+        '_id': ObjectId('012345678901234567890123'),
+        'givenName': 'John',
+        'sn': 'Smith',
+        'displayName': 'John Smith',
+        'norEduPersonNIN': ['123456789013'],
+        'photo': 'https://pointing.to/your/photo',
+        'preferredLanguage': 'en',
+        'mail': 'johnnysmith1@example.org',
+        'eduPersonEntitlement': [],
+        'mailAliases': [{
+            'email': 'johnnysmith2@example.com',
+            'verified': True,
+        }, {
+            'email': 'johnnysmith3@example.com',
+            'verified': False,
+        }]
+    }
+
+TEST_VERIFICATIONS = [{
+    '_id': ObjectId('234567890123456789012301'),
+    'code': '9d392d',
+    'model_name': 'email',
+    'obj_id': 'johnnysmith3@example.com',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.utcnow(),
+    'verified': False,
+}]
+
+from eduiddashboard.testing import MockedUserDB as MUDB
+
+
+class MockedUserDB(MUDB):
+
+    test_users = {
+        'johnnysmith1@example.com': TEST_USER,
+    }
+
+
+class ResetPasswordFormTests(LoggedInReguestTests):
+
+    formname = 'passwordsview-form'
+    initial_password = 'old-password'
+    MockedUserDB = MockedUserDB
+    initial_verifications = TEST_VERIFICATIONS
+    user = TEST_USER
+    users = []
+
+    def setUp(self, settings={}):
+        super(ResetPasswordFormTests, self).setUp(settings=settings)
+        vccs_url = self.settings['vccs_url']
+        fake_vccs_client = FakeVCCSClient()
+        mock_config = {
+            'return_value': fake_vccs_client,
+        }
+        self.patcher = patch.object(vccs, 'get_vccs_client', **mock_config)
+        self.patcher.start()
+        add_credentials(vccs_url, 'xxx', self.initial_password, self.user)
+
     def test_reset_password(self):
         response_form = self.testapp.get('/profile/reset-password/email/')
 
         form = response_form.forms['resetpasswordemailview-form']
 
         form['email_or_username'].value = 'notexistingmail@foodomain.com'
-        with self.assertRaises(UserDoesNotExist):
-            response = form.submit('reset')
+        response = form.submit('reset')
+        self.assertIn('No user matching email', response.text)
+
+        form['email_or_username'].value = 'johnnysmith2@example.com'
+        response = form.submit('reset')
+        self.assertIn('is not verified', response.text)
 
         reset_passwords = list(self.db.reset_passwords.find())
         for email in self.user['mailAliases']:
+            if not email['verified']:
+                continue
             form['email_or_username'].value = email['email']
             response = form.submit('reset')
             self.assertEqual(response.status, '302 Found')
@@ -185,5 +258,5 @@ class PasswordFormTests(LoggedInReguestTests):
         self.assertNotEqual(len(reset_passwords), len(reset_passwords_after))
 
     def tearDown(self):
-        super(PasswordFormTests, self).tearDown()
+        super(ResetPasswordFormTests, self).tearDown()
         self.patcher.stop()

@@ -231,7 +231,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
         '_id': ObjectId('234567890123456789012301'),
         'code': '1234',
         'model_name': 'norEduPersonNIN',
-        'obj_id': '12341234-1234',
+        'obj_id': '123412341234',
         'user_oid': ObjectId("901234567890123456789012"),
         'timestamp': datetime.utcnow(),
         'verified': False,

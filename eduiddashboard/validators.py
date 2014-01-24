@@ -3,8 +3,9 @@ from copy import copy
 import zxcvbn
 
 from pyramid.i18n import get_localizer
-
+from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
 from eduiddashboard.userdb import UserDB
+
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 
@@ -108,7 +109,7 @@ class EmailExistsValidator(object):
         request = node.bindings.get('request')
         try:
             request.userdb.get_user_by_email(value)
-        except UserDB.UserDoesNotExist:
+        except UserDoesNotExist:
             raise colander.Invalid(node,
                                    _("Email address does not exist"))
 
@@ -129,14 +130,28 @@ class EmailOrUsernameExistsValidator(object):
 
     def __call__(self, node, value):
         request = node.bindings.get('request')
-        try:
-            request.userdb.get_user_by_username(value)
-        except UserDB.UserDoesNotExist:
+        is_email = '@' in value
+        if not is_email:
             try:
-                request.userdb.get_user_by_email(value)
+                request.userdb.get_user_by_username(value)
             except UserDB.UserDoesNotExist:
                 raise colander.Invalid(node,
-                                       _("Username or email address does not exist"))
+                                       _("Username does not exist"))
+            except UserDB.MultipleUsersReturned:
+                raise colander.Invalid(node,
+                                       _("There is more than one user for that username"))
+        else:
+            try:
+                request.userdb.get_user_by_email(value)
+            except UserDoesNotExist, e:
+                if e.args:
+                    msg = e.args[0]
+                else:
+                    msg = _("email address {} does not exist or is unverified".format(value))
+                raise colander.Invalid(node, msg)
+            except MultipleUsersReturned:
+                raise colander.Invalid(node,
+                                       _("There is more than one user for that email"))
 
 
 class NINExistsValidator(object):
@@ -181,8 +196,7 @@ class NINUniqueValidator(object):
             'model_name': 'norEduPersonNIN',
             'verified': False
         }).count() > 0:
-            raise colander.Invalid(node, _('This national identity number is '
-                                   'already in use by you'))
+            raise colander.Invalid(node, _('This national identity number is already in use'))
 
 
 class NINReachableValidator(object):

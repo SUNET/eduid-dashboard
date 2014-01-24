@@ -358,7 +358,7 @@ class NinsWizard(BaseWizard):
         """ The verification code form """
         nins_action_view = NINsActionsView(self.context, self.request)
 
-        result = nins_action_view._verify_action(self.datakey, data)
+        result = nins_action_view._verify_action(normalize_nin(self.datakey), data)
 
         if result['result'] == 'ok':
             return {

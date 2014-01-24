@@ -55,7 +55,7 @@ class Email(colander.MappingSchema):
 
 
 NINFormatValidator = colander.Regex(
-    regex=re.compile(r'^(\d{8}|\d{6})(-|\ |)\d{4}$'),
+    regex=re.compile(r'^(18|19|20)\d{2}(0[1-9]|1[0-2])\d{2}[-\s]?\d{4}$'),
     msg=_('The Swedish national identity number should be entered as yyyymmdd-xxxx')
 )
 
@@ -74,10 +74,6 @@ class NIN(colander.MappingSchema):
         197801011234 (normalized form)
         19780101 1234
         19780101-1234
-        780101-1234 (with 100year old guessing)
-        7801011234 (with 100year old guessing)
-        780101 1234 (with 100year old guessing)
-
     """
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),

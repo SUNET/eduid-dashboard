@@ -1,5 +1,7 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   <h4>{% trans %}Personal information{% endtrans %}</h4>
+    <h4>{% trans %}Personal information{% endtrans %}</h4>
+    {% trans %}<p>The personal information stored in eduID is sent to service providers you log in to using eduID in
+    order to personalize those services for you. For more information see the help section.</p>{% endtrans %}
 {% endblock %}

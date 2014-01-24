@@ -5,6 +5,8 @@ from bson.tz_util import utc
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard import log
 
+from eduiddashboard import log
+
 
 def dummy_message(request, message):
     """
@@ -25,10 +27,11 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
         filters['user_oid'] = user['_id']
     log.debug("Verification code lookup filters : {!r}".format(filters))
     result = request.db.verifications.find_one(filters)
-    expiration_timeout = request.registry.settings.get('verification_code_timeout')
-    expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
-    result['expired'] = result['timestamp'] < expire_limit
-    log.debug("Verification lookup result : {!r}".format(result))
+    if result:
+        expiration_timeout = request.registry.settings.get('verification_code_timeout')
+        expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
+        result['expired'] = result['timestamp'] < expire_limit
+        log.debug("Verification lookup result : {!r}".format(result))
     return result
 
 
@@ -95,9 +98,11 @@ def verificate_code(request, model_name, code):
         safe=True
     )
     if not result:
+        log.debug("Could not find un-verified code {!r}, model {!r}".format(code, model_name))
         return None
     obj_id = result['obj_id']
     if obj_id:
+        log.debug("Code {!r} ({!s}) marked as verified".format(code, str(obj_id)))
         user = request.userdb.get_user_by_oid(result['user_oid'])
         # Callback to a function which marks as verificated the proper user
         # attribute
@@ -105,6 +110,8 @@ def verificate_code(request, model_name, code):
         post_verified = post_verifiers.get(model_name, None)
         if post_verified is not None:
             post_verified(request, user, obj_id)
+        else:
+            log.debug("No post-verified callback?")
         # Do the save staff
         request.db.profiles.save(user, safe=True)
         request.context.propagate_user_changes(user)

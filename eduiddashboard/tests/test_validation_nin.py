@@ -32,18 +32,6 @@ class TestValidationNIN(unittest.TestCase):
             self.assertIn('norEduPersonNIN', deserialized)
             self.assertIsNotNone(deserialized.get('norEduPersonNIN'))
 
-    def test_oldformat_form_ok(self):
-
-        valid_nins = [
-            '7801011234',
-            '780101 1234',
-            '780101-1234',
-        ]
-        for nin in valid_nins:
-            deserialized = self.schema.deserialize({'norEduPersonNIN': nin})
-            self.assertIn('norEduPersonNIN', deserialized)
-            self.assertIsNotNone(deserialized.get('norEduPersonNIN'))
-
     def test_form_notok(self):
 
         not_valid_nins = [
@@ -54,6 +42,7 @@ class TestValidationNIN(unittest.TestCase):
             '1978010a 123a',
             '1978010a 123',
             '19780101_234',
+            '160101011234',
 
             '7801011234a',
             '780101 123a',
@@ -65,6 +54,8 @@ class TestValidationNIN(unittest.TestCase):
             '78010112-34',
             '780101 123 4',
             'a780101-1234',
+            '780101-1234',
+            '7801011234',
         ]
 
         for nin in not_valid_nins:

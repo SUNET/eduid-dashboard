@@ -19,9 +19,7 @@ from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
 
-import logging
-logger = logging.getLogger(__name__)
-
+from eduiddashboard import log
 
 class HTTPXRelocate(HTTPOk):
 
@@ -93,7 +91,7 @@ def forbidden_view(context, request):
             reason = context.explanation
         except AttributeError:
             reason = 'unknown'
-        logger.debug("User {!r} tripped Forbidden view, request {!r}, reason {!r}".format(
+        log.debug("User {!r} tripped Forbidden view, request {!r}, reason {!r}".format(
             user, request, reason))
         response = Response(render('templates/forbidden.jinja2', {}))
         response.status_int = 401
@@ -121,7 +119,7 @@ def login_view(request):
 
     idps = request.saml2_config.getattr('idp')
     if selected_idp is None and len(idps) > 1:
-        logger.debug('A discovery process is needed')
+        log.debug('A discovery process is needed')
 
         return render_to_response('templates/wayf.jinja2', {
             'available_idps': idps.items(),
@@ -134,7 +132,7 @@ def login_view(request):
     required_loa = request.registry.settings.get('required_loa', {})
     workmode = request.registry.settings.get('workmode')
     required_loa = required_loa.get(workmode, '')
-    logger.debug('Requesting AuthnContext {!r} for workmode {!r}'.format(required_loa, workmode))
+    log.debug('Requesting AuthnContext {!r} for workmode {!r}'.format(required_loa, workmode))
     kwargs = {
         "requested_authn_context": RequestedAuthnContext(
             authn_context_class_ref=AuthnContextClassRef(
@@ -151,13 +149,13 @@ def login_view(request):
             **kwargs
         )
     except TypeError:
-        logger.error('Unable to know which IdP to use')
+        log.error('Unable to know which IdP to use')
         raise
 
     oq_cache = OutstandingQueriesCache(request.session)
     oq_cache.set(session_id, came_from)
 
-    logger.debug('Redirecting the user to the IdP')
+    log.debug('Redirecting the user to the IdP')
     if not request.is_xhr:
         return HTTPFound(location=get_location(result))
     else:
@@ -185,14 +183,14 @@ def assertion_consumer_service(request):
         response = client.parse_authn_request_response(xmlstr, BINDING_HTTP_POST,
                                                        outstanding_queries)
     except AssertionError:
-        logger.error('SAML response is not verified')
+        log.error('SAML response is not verified')
         return HTTPBadRequest(
             """SAML response is not verified. May be caused by the response
             was not issued at a reasonable time or the SAML status is not ok.
             Check the IDP datetime setup""")
 
     if response is None:
-        logger.error('SAML response is None')
+        log.error('SAML response is None')
         return HTTPBadRequest(
             "SAML response has errors. Please check the logs")
 
@@ -202,11 +200,12 @@ def assertion_consumer_service(request):
     # authenticate the remote user
     session_info = response.session_info()
 
-    logger.debug('Trying to authenticate the user')
+    log.debug('Trying to authenticate the user')
+    log.debug('Session info : {!r}'.format(session_info))
 
     user = authenticate(request, session_info, attribute_mapping)
     if user is None:
-        logger.error('The user is None')
+        log.error('The user is None')
         return HTTPUnauthorized("Access not authorized")
 
     headers = login(request, session_info, user)
@@ -215,7 +214,7 @@ def assertion_consumer_service(request):
 
     # redirect the user to the view where he came from
     relay_state = request.POST.get('RelayState', '/')
-    logger.debug('Redirecting to the RelayState: ' + relay_state)
+    log.debug('Redirecting to the RelayState: ' + relay_state)
     return HTTPFound(location=relay_state, headers=headers)
 
 
@@ -231,14 +230,14 @@ def logout_view(request):
     This view initiates the SAML2 Logout request
     using the pysaml2 library to create the LogoutRequest.
     """
-    logger.debug('Logout process started')
+    log.debug('Logout process started')
     state = StateCache(request.session)
 
     client = Saml2Client(request.saml2_config, state_cache=state,
                          identity_cache=IdentityCache(request.session))
     subject_id = _get_name_id(request.session)
     if subject_id is None:
-        logger.warning(
+        log.warning(
             'The session does not contains the subject id for user ')
         location = request.registry.settings.get('saml2.logout_redirect_url')
 
@@ -248,7 +247,7 @@ def logout_view(request):
         # loresponse is a dict for REDIRECT binding, and LogoutResponse for SOAP binding
         if isinstance(loresponse, LogoutResponse):
             if loresponse.status_ok():
-                logger.debug('Performing local logout of {!r}'.format(authenticated_userid(request)))
+                log.debug('Performing local logout of {!r}'.format(authenticated_userid(request)))
                 headers = logout(request)
                 location = request.registry.settings.get('saml2.logout_redirect_url')
                 return HTTPFound(location=location, headers=headers)
@@ -258,7 +257,7 @@ def logout_view(request):
         location = headers_tuple[0][1]
 
     state.sync()
-    logger.debug('Redirecting to {!r} to continue the logout process'.format(location))
+    log.debug('Redirecting to {!r} to continue the logout process'.format(location))
     return HTTPFound(location=location)
 
 
@@ -274,7 +273,7 @@ def logout_service(request):
     we didn't initiate the process as a single logout
     request started by another SP.
     """
-    logger.debug('Logout service started')
+    log.debug('Logout service started')
 
     state = StateCache(request.session)
     client = Saml2Client(request.saml2_config, state_cache=state,
@@ -285,7 +284,7 @@ def logout_service(request):
     next_page = request.GET.get('next_page', logout_redirect_url)
 
     if 'SAMLResponse' in request.GET:  # we started the logout
-        logger.debug('Receiving a logout response from the IdP')
+        log.debug('Receiving a logout response from the IdP')
         response = client.parse_logout_request_response(
             request.GET['SAMLResponse'],
             BINDING_HTTP_REDIRECT
@@ -295,14 +294,14 @@ def logout_service(request):
             headers = logout(request)
             return HTTPFound(next_page, headers=headers)
         else:
-            logger.error('Unknown error during the logout')
+            log.error('Unknown error during the logout')
             return HTTPBadRequest('Error during logout')
 
     elif 'SAMLRequest' in request.GET:  # logout started by the IdP
-        logger.debug('Receiving a logout request from the IdP')
+        log.debug('Receiving a logout request from the IdP')
         subject_id = _get_name_id(request.session)
         if subject_id is None:
-            logger.warning(
+            log.warning(
                 'The session does not contain the subject id for user {0} '
                 'Performing local logout'.format(
                     authenticated_userid(request)
@@ -322,7 +321,7 @@ def logout_service(request):
             headers = logout(request)
             return HTTPFound(location=location, headers=headers)
     else:
-        logger.error('No SAMLResponse or SAMLRequest parameter found')
+        log.error('No SAMLResponse or SAMLRequest parameter found')
         raise HTTPNotFound('No SAMLResponse or SAMLRequest parameter found')
 
 
