@@ -87,6 +87,20 @@
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-2.3.1.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
+    <!--[if IE]>
+    <script type="text/javascript">
+        if (!(window.console && console.log)) {
+            (function() {
+                var noop = function() {};
+                var methods = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error', 'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'markTimeline', 'table', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'];
+                var console = window.console = {};
+                for (var i = 0; i < methods.length; i++) {
+                    console[methods[i]] = noop;
+                }
+            }());
+        }
+    </script>
+    <![endif]-->
     <script>
       if (window.messagesTimer === undefined) {
           window.messagesTimer = null;
