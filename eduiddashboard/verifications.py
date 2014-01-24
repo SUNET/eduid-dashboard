@@ -27,10 +27,11 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
         filters['user_oid'] = user['_id']
     log.debug("Verification code lookup filters : {!r}".format(filters))
     result = request.db.verifications.find_one(filters)
-    expiration_timeout = request.registry.settings.get('verification_code_timeout')
-    expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
-    result['expired'] = result['timestamp'] < expire_limit
-    log.debug("Verification lookup result : {!r}".format(result))
+    if result:
+        expiration_timeout = request.registry.settings.get('verification_code_timeout')
+        expire_limit = datetime.now(utc) - timedelta(minutes=int(expiration_timeout))
+        result['expired'] = result['timestamp'] < expire_limit
+        log.debug("Verification lookup result : {!r}".format(result))
     return result
 
 
