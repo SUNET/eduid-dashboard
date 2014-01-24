@@ -1,7 +1,9 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   <h4>{% trans %}Mobile phone numbers{% endtrans %}</h4>
+    <h4>{% trans %}Mobile phone numbers{% endtrans %}</h4>
+    {% trans %}<p>Below you can add phone numbers connected to your eduID account.
+    For more information see the help section.</p>{% endtrans %}
 {% endblock %}
 
 {% block extra_content %}

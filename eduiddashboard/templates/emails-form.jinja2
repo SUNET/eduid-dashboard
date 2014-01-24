@@ -1,10 +1,9 @@
 {% extends "templates/baseform.jinja2" %}
 
 {% block form_generic_description %}
-   <h4>{% trans %}Email addresses{% endtrans %}</h4>
-   <p>{% trans %}After adding a new address, go to that account and click the
-   link in the confirmation email. Addresses must be confirmed before they can become primary.
-   {% endtrans %}</p>
+    <h4>{% trans %}Email addresses{% endtrans %}</h4>
+    {% trans %}<p>Below you can add additional email addresses connected to your eduID account and also change your
+    primary email address. For more information see the help section.</p>{% endtrans %}
 {% endblock %}
 
 {% block extra_content %}
