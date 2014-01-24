@@ -15,7 +15,7 @@ class OldPasswordValidator(object):
 
         request = node.bindings.get('request')
 
-        if not request.registry.settings('use_vccs', True):
+        if not request.registry.settings.get('use_vccs', True):
             return
 
         localizer = get_localizer(request)
