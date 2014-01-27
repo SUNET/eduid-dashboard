@@ -34,6 +34,10 @@ class BaseFormView(FormView):
         super(BaseFormView, self).__init__(request)
         self.user = context.user
         self.context = context
+        self.response = request.response
+
+        # Stop Internet Explorer from caching view fragments
+        self.response.headers['Cache-Control'] = 'no-cache'
 
         self.classname = self.__class__.__name__.lower()
 
