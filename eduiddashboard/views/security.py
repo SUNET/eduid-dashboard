@@ -277,12 +277,12 @@ class ResetPasswordNINView(BaseResetPasswordView):
         except UserDoesNotExist:
             user = self.request.userdb.get_user_by_username(email_or_username)
         nin = None
-        for edu_nin in user['norEduPersonNIN']:
-            if edu_nin['verified'] and edu_nin['active']:
-                nin = edu_nin['norEduPersonNIN']
-                break
+        if user.get('norEduPersonNIN', False):
+            nin = user['norEduPersonNIN'][-1]
         if nin is None:
-            raise UserDoesNotExist()
+            flash(self.request, 'info', _('Error: missing government mailbox '
+                                          'for %s' % email_or_username))
+            return HTTPFound(location=self.request.route_url('reset-password-mina'))
         code, reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
         send_reset_password_gov_message(self.request, nin, user, code, reset_password_link)
         flash(self.request, 'info', _('An message has been sent to your government mailbox '
@@ -341,7 +341,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:
-            flash(self.request, 'info', _('An error has occured while updating your password,'
+            flash(self.request, 'info', _('An error has occurred while updating your password,'
                                           'please try again or contact support if the problem persists.'))
         return {
             'message': _('You can now log in by <a href="${homelink}">clicking here</a>',
