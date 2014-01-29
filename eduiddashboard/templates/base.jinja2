@@ -71,13 +71,13 @@
             <p>
               &copy; SUNET 2013
               <span class='nav-separator'></span>
-                {% for lang in request.registry.settings.get('available_languages', []) %}
+                {% for lang,label in request.registry.settings.get('available_languages', {}).items() %}
                 <span class="langselector">
                   {% if request.locale == lang %}
-                    <span>{{ lang }}</span>
+                    <span>{{ label }}</span>
                   {% else %}
                     <a href="{{ request.route_path('set_language')}}?lang={{lang}}">
-                       {{ lang }}
+                       {{ label }}
                    </a>
               {% endif %}
              </span>

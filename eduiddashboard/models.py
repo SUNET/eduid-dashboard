@@ -16,6 +16,7 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        NINReachableValidator,
                                        MobilePhoneUniqueValidator)
 
+from eduiddashboard import read_mapping
 from eduiddashboard.widgets import permissions_widget
 
 
@@ -90,13 +91,7 @@ class NIN(colander.MappingSchema):
 @colander.deferred
 def preferred_language_widget(node, kw):
     request = kw.get('request')
-    available_languages = request.registry.settings.get('available_languages')
-
-    lang_choices = []
-    for lang in available_languages:
-        lang_obj = pycountry.languages.get(alpha2=lang)
-        lang_choices.append((lang, lang_obj.name))
-
+    lang_choices = request.registry.settings['available_languages'].items()
     return deform.widget.SelectWidget(values=lang_choices)
 
 

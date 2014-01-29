@@ -77,13 +77,13 @@ def read_setting_from_env(settings, key, default=None):
         return settings.get(key, default)
 
 
-def read_mapping(settings, prop, available_keys, default=None, required=True):
+def read_mapping(settings, prop, available_keys=None, default=None, required=True):
     raw = read_setting_from_env(settings, prop, '')
 
     if raw.strip() == '':
         return default
 
-    rows = raw.split('\n')
+    rows = raw.strip('\n ').split('\n')
 
     mapping = {}
 
@@ -94,12 +94,13 @@ def read_mapping(settings, prop, available_keys, default=None, required=True):
             value = row.split('=')[1].strip()
         else:
             value = ''
-        if key in available_keys:
+        if available_keys is None or key in available_keys:
             mapping[key] = value
 
-    if (len(mapping.keys()) != len(available_keys) and
-            not 'testing' in settings):
-        return None
+    if available_keys is not None:
+        if (len(mapping.keys()) != len(available_keys) and
+                not 'testing' in settings):
+            return None
 
     return mapping
 
@@ -276,12 +277,9 @@ def main(global_config, **settings):
         settings[option] = read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
-    available_languages = read_setting_from_env(settings,
-                                                'available_languages',
-                                                'en es')
-    settings['available_languages'] = [
-        lang for lang in available_languages.split(' ') if lang
-    ]
+    available_languages = read_mapping(settings, 'available_languages',
+                                       default={'en': 'English',
+                                                'sv': 'Svenska'})
 
     settings['lang_cookie_domain'] = read_setting_from_env(settings,
                                                            'lang_cookie_domain',
@@ -333,8 +331,8 @@ def main(global_config, **settings):
     settings['permissions_mapping'] = read_mapping(
         settings,
         'permissions_mapping',
-        AVAILABLE_WORK_MODES,
-        REQUIRED_GROUP_PER_WORKMODE
+        available_keys=AVAILABLE_WORK_MODES,
+        default=REQUIRED_GROUP_PER_WORKMODE
     )
 
     settings['available_permissions'] = read_list(
@@ -345,8 +343,8 @@ def main(global_config, **settings):
     settings['required_loa'] = read_mapping(
         settings,
         'required_loa',
-        AVAILABLE_LOA_LEVEL,
-        REQUIRED_LOA_PER_WORKMODE,
+        available_keys=AVAILABLE_LOA_LEVEL,
+        default=REQUIRED_LOA_PER_WORKMODE,
     )
 
     settings['available_loa'] = read_list(
@@ -378,11 +376,7 @@ def main(global_config, **settings):
                                                         'groups_callback',
                                                         groups_callback)
 
-    settings['available_languages'] = read_setting_from_env(
-        settings,
-        'available_languages',
-        'en sv es',
-    )
+    settings['available_languages'] = available_languages
 
     settings['default_country_code'] = read_setting_from_env(
         settings,

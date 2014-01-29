@@ -243,7 +243,7 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         response = form.submit('reset')
         self.assertIn('No user matching email', response.text)
 
-        form['email_or_username'].value = 'johnnysmith2@example.com'
+        form['email_or_username'].value = 'johnnysmith3@example.com'
         response = form.submit('reset')
         self.assertIn('is not verified', response.text)
 

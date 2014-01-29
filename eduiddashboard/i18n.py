@@ -6,7 +6,7 @@ TranslationString = TranslationStringFactory(translation_domain)
 
 def locale_negotiator(request):
     settings = request.registry.settings
-    available_languages = settings['available_languages']
+    available_languages = settings['available_languages'].keys()
     cookie_name = settings['lang_cookie_name']
 
     cookie_lang = request.cookies.get(cookie_name, None)

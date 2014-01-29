@@ -263,7 +263,10 @@ class LoggedInReguestTests(unittest.TestCase):
             'personal_dashboard_base_url': 'http://localhost/',
             'nin_service_name': 'Mina meddelanden',
             'nin_service_url': 'http://minameddelanden.se/',
-            'available_languages': 'en es',
+            'available_languages': '''
+                en = English
+                sv = Svenska
+            ''',
             'default_country_code': '+46',
             'vccs_url': 'http://localhost:8550/',
         }

@@ -224,7 +224,7 @@ class BaseFactory(object):
         lang = self.user.get('preferredLanguage', None)
         if lang is not None:
             return lang
-        available_languages = self.request.registry.settings.get('available_languages', [])
+        available_languages = self.request.registry.settings.get('available_languages', {}).keys()
         if len(available_languages) > 0:
             return available_languages[0]
         else:
