@@ -24,7 +24,7 @@
       <div class="container" style="position: relative">
         <div class="masthead">
           {% block loasquare %}
-          {% with loa=request.context.get_loa() %}
+          {% with loa=request.context.get_max_loa() %}
             <div class='loa-big'>
               {% if user is defined %}
                 {{ user.get('mail') }}
