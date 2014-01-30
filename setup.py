@@ -67,6 +67,11 @@ testing_extras = test_requires + [
     'nosexcover==1.0.8',
 ]
 
+gunicorn_extras = install_requires + [
+    'eventlet==0.14.0',
+    'gunicorn==18.0',
+]
+
 setup(name='eduid-dashboard',
       version='0.0',
       description='eduid-dashboard',
