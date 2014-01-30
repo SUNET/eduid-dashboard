@@ -102,7 +102,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                         })
 
         self.testapp.get('/profile/security/',
-                         status=401)
+                         status=200)  # TODO: revert to 401 when we re-enable step-up auth for security based on AL
 
     def test_edit_with_max_loa_credentials(self):
         self.set_logged(user='johnsmith@example.com',
