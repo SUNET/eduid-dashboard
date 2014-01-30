@@ -270,7 +270,8 @@ class PersonFactory(BaseFactory):
     pass
 
 
-class SecurityFactory(BaseCredentialsFactory):
+class SecurityFactory(BaseFactory):
+    # TODO: Revert to BaseCredentialsFactory after refactoring the AL implementation
     pass
 
 
