@@ -257,6 +257,29 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         reset_passwords_after = list(self.db.reset_passwords.find())
         self.assertNotEqual(len(reset_passwords), len(reset_passwords_after))
 
+    def test_reset_password_code(self):
+        hash_code = '123456'
+        self.db.reset_passwords.insert({
+            'email': 'johnnysmith3@example.com',
+            'hash_code': hash_code,
+            'mechanism': 'email',
+            'verified': False,
+        }, safe=True)
+        response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
+        self.assertIn('Complete your password reset', response.text)
+
+    def test_reset_password_invalid_code(self):
+        hash_code = '123456'
+        wrong_code = '654321'
+        self.db.reset_passwords.insert({
+            'email': 'johnnysmith3@example.com',
+            'hash_code': hash_code,
+            'mechanism': 'email',
+            'verified': False,
+        }, safe=True)
+        response = self.testapp.get('/profile/reset-password/{0}/'.format(wrong_code))
+        self.assertEqual(response.status, '302 Found')
+
     def tearDown(self):
         super(ResetPasswordFormTests, self).tearDown()
         self.patcher.stop()

@@ -313,6 +313,7 @@ class LoggedInReguestTests(unittest.TestCase):
         super(LoggedInReguestTests, self).tearDown()
         self.db.profiles.drop()
         self.db.verifications.drop()
+        self.db.reset_passwords.drop()
         self.amdb.attributes.drop()
         self.testapp.reset()
 

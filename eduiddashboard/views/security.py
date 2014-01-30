@@ -29,7 +29,7 @@ def change_password(request, user, old_password, new_password):
     vccs_url = request.registry.settings.get('vccs_url')
     added = add_credentials(vccs_url, old_password, new_password, user)
     if added:
-        # do the save staff
+        # do the save stuff
         request.db.profiles.save(user, safe=True)
         update_attributes.delay('eduid_dashboard', str(user['_id']))
     return added
@@ -197,6 +197,14 @@ def reset_password(context, request):
     }
 
 
+@view_config(route_name='reset-password-expired', renderer='templates/reset-password-expired.jinja2',
+             request_method='GET', permission='edit')
+def reset_password_expired(context, request):
+    """ Reset password - expired token"""
+    return {
+    }
+
+
 class BaseResetPasswordView(FormView):
     intro_message = None  # to override in subclasses
 
@@ -248,7 +256,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         email = user['mail']
         send_reset_password_mail(self.request, email, user, code, reset_password_link)
         msg = _('An email has been sent to your ${email} inbox.'
-                'This email will contain instructions and a link'
+                'This email will contain instructions and a link '
                 'that will let you reset your password.', mapping={
                   'email': email,
               })
@@ -325,7 +333,8 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         hash_code = self.request.matchdict['code']
         reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
         if reset_passwords.count() == 0:
-            return HTTPNotFound()
+            flash(self.request, 'error', _('Invalid code.'))
+            return HTTPFound(self.request.route_path('reset-password-expired'))
         return super(ResetPasswordStep2View, self).__call__()
 
     def reset_success(self, passwordform):
@@ -341,7 +350,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:
-            flash(self.request, 'info', _('An error has occurred while updating your password,'
+            flash(self.request, 'info', _('An error has occurred while updating your password, '
                                           'please try again or contact support if the problem persists.'))
         return {
             'message': _('You can now log in by <a href="${homelink}">clicking here</a>',
