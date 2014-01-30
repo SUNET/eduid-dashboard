@@ -21,7 +21,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PermissionsFactory, StatusFactory,
                                         VerificationsFactory, HomeFactory,
                                         NinsFactory, ForbiddenFactory,
-                                        HelpFactory)
+                                        HelpFactory, is_logged)
 
 from eduiddashboard.userdb import UserDB, get_userdb
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
@@ -222,6 +222,8 @@ def includeme(config):
     msgrelay = MsgRelay(config.registry.settings)
     config.registry.settings['msgrelay'] = msgrelay
     config.add_request_method(get_msgrelay, 'msgrelay', reify=True)
+
+    config.set_request_property(is_logged, 'is_logged', reify=True)
 
     config.add_route('home', '/', factory=HomeFactory)
     if settings['workmode'] == 'personal':

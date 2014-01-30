@@ -4,7 +4,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden, HTTPFound
 from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
-from pyramid.security import forget
+from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
@@ -26,6 +26,15 @@ class RootFactory(object):
 
     def get_groups(self, userid, request):
         return []
+
+
+def is_logged(request):
+    user = authenticated_userid(request)
+    if user is None:
+        return False
+    if request.session.get('user', None) is None:
+        return False
+    return True
 
 
 class BaseFactory(object):
