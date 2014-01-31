@@ -37,7 +37,7 @@ requires = [
     'pysaml2==1.2.0beta',
     'pycountry==1.2',
     'waitress==0.8.2',
-    'vccs_client==0.3',
+    'vccs_client==0.4.0',
     'pwgen==0.4',
     'zxcvbn==1.0',
     # Fix eduid_msg version

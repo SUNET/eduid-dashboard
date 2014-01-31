@@ -19,8 +19,8 @@ class OldPasswordValidator(object):
         if not request.registry.settings.get('use_vccs', True):
             return
 
-        localizer = get_localizer(request)
         old_password = value
+        old_password = old_password.replace(" ", "")
 
         user = request.session['user']
         # Load user from database to ensure we are working on an up-to-date set of credentials.
@@ -33,6 +33,7 @@ class OldPasswordValidator(object):
         password = check_password(vccs_url, old_password, user)
         if not password:
             err = _('Current password is incorrect')
+            localizer = get_localizer(request)
             raise colander.Invalid(node, localizer.translate(err))
 
 
@@ -47,7 +48,7 @@ class PasswordValidator(object):
         password_min_entropy = int(settings.get('password_entropy', 60))
 
         # We accept a 10% of variance in password_min_entropy because
-        # we have calculed the entropy by javascript too and the results
+        # we have calculated the entropy by javascript too and the results
         # may vary.
         password_min_entropy = (0.90 * password_min_entropy)
 

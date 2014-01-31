@@ -175,6 +175,8 @@ class PasswordsView(BaseFormView):
             # be in session
             new_password = self.get_suggested_password()
 
+        new_password = new_password.replace(' ', '')
+
         old_password = passwords_data['old_password']
         user = self.request.session['user']
         # Load user from database to ensure we are working on an up-to-date set of credentials.
