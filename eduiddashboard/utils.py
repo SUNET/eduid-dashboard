@@ -162,5 +162,5 @@ def generate_password(length=12, entropy=60):
 
         # We need more entropy that the minimum required, so we add a 10%
         # This allows the user to use the suggested password as custom password
-        if veredict.get('entropy', 0) < (float(entropy) * 1.10):
+        if veredict.get('entropy', 0) > (float(entropy) * 1.10):
             return new_password
