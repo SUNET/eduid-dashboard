@@ -153,6 +153,5 @@ def get_short_hash(entropy=6):
     return uuid4().hex[:entropy]
 
 
-def generate_password(length=12, entropy=60):
-
+def generate_password(length=12):
     return pwgen(int(length), no_capitalize=True, no_symbols=True)
