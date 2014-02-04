@@ -52,6 +52,13 @@ class PasswordValidator(object):
         # may vary.
         password_min_entropy = (0.90 * password_min_entropy)
 
+        generated_password = request.session.get('last_generated_password', '')
+        if len(generated_password) > 0 and generated_password == value:
+            # Don't validate the password if it is the generated password
+            # That is, the user has filled out the form with the suggested
+            # password
+            return
+
         veredict = zxcvbn.password_strength(value)
 
         if veredict.get('entropy', 0) < password_min_entropy:

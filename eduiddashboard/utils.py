@@ -2,7 +2,6 @@ from hashlib import sha256
 from uuid import uuid4
 import time
 from pwgen import pwgen
-import zxcvbn
 
 from pyramid.i18n import TranslationString as _
 
@@ -156,12 +155,4 @@ def get_short_hash(entropy=6):
 
 def generate_password(length=12, entropy=60):
 
-    for _i in range(0, 5):
-        new_password = pwgen(int(length), no_capitalize=True, no_symbols=True)
-        veredict = zxcvbn.password_strength(new_password)
-
-        # We need more entropy that the minimum required, so we add a 10%
-        # This allows the user to use the suggested password as custom password
-        if veredict.get('entropy', 0) > (float(entropy) * (1 - 0.10)):
-            return new_password
-    return new_password
+    return pwgen(int(length), no_capitalize=True, no_symbols=True)
