@@ -22,6 +22,7 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.utils import flash, get_short_hash, generate_password
+from eduiddashboard import log
 
 
 def change_password(request, user, old_password, new_password):
@@ -161,22 +162,24 @@ class PasswordsView(BaseFormView):
 
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
+        user = self.request.session['user']
 
-        if passwords_data.get('use_custom_password'):
+        if passwords_data.get('use_custom_password') == 'true':
             # The user has entered his own password and it was verified by
             # validators
-
+            log.debug("Password change for user {!r} (custom password).".format(user['_id']))
             new_password = passwords_data.get('custom_password')
 
         else:
             # If the user has selected the suggested password, then it should
             # be in session
+            log.debug("Password change for user {!r} (suggested password).".format(user['_id']))
             new_password = self.get_suggested_password()
 
         new_password = new_password.replace(' ', '')
 
         old_password = passwords_data['old_password']
-        user = self.request.session['user']
+
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
         user = self.request.userdb.get_user_by_oid(user['_id'])
