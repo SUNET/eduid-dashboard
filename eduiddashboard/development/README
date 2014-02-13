@@ -1,0 +1,12 @@
+1. Start with following docs/installation.rst and docs/configuration.rst.
+
+2. Bootstrap the local eduid_am database
+
+$ mongo localhost:27017/eduid_am eduid_am_initial.js
+
+3. Add the following line to the configuration file for local development.
+
+# Set development to true for SAML2 decoupling.
+development = true
+# admin, helpdesk, user1, user2
+development_user = admin
