@@ -12,7 +12,7 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard.saml2.userdb import IUserDB
+from eduiddashboard.userdb import IUserDB
 from eduiddashboard.saml2 import includeme as saml2_includeme
 
 
