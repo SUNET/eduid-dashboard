@@ -4,10 +4,26 @@ from eduid_am.celery import celery, get_attribute_manager
 from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
 from eduid_am.tasks import AttributeManager
 
-from eduiddashboard.saml2.userdb import IUserDB
-
 import logging
 logger = logging.getLogger(__name__)
+
+
+class IUserDB:
+
+    def __init__(self, request):
+        self.request = request
+
+    def get_user(self, userid):
+        return {}
+
+    class DuplicatedUser(Exception):
+        pass
+
+    class MultipleUsersReturned(Exception):
+        pass
+
+    class UserDoesNotExist(Exception):
+        pass
 
 
 class UserDB(IUserDB):

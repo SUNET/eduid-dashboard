@@ -18,7 +18,7 @@ from pyramid import testing
 from eduiddashboard.db import MongoDB
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
-from eduiddashboard.saml2.userdb import IUserDB
+from eduiddashboard.userdb import IUserDB
 from eduiddashboard.msgrelay import MsgRelay
 
 
