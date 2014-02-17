@@ -6,6 +6,7 @@ import colander
 import deform
 
 from eduiddashboard.i18n import TranslationString as _
+from eduiddashboard.preparers import EmailNormalizer
 from eduiddashboard.validators import (EmailUniqueValidator,
                                        EmailOrUsernameExistsValidator,
                                        ResetPasswordCodeExistsValidator,
@@ -49,6 +50,7 @@ class All_StopOnFirst(colander.All):
 
 class Email(colander.MappingSchema):
     mail = colander.SchemaNode(colander.String(),
+                               preparer=EmailNormalizer(),
                                validator=colander.All(colander.Email(),
                                                       EmailUniqueValidator()),
                                title=_('email'),

@@ -155,3 +155,7 @@ def get_short_hash(entropy=6):
 
 def generate_password(length=12):
     return pwgen(int(length), no_capitalize=True, no_symbols=True)
+
+
+def normalize_email(addr):
+    return addr.lower()

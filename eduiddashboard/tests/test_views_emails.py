@@ -83,6 +83,28 @@ class MailsFormTests(LoggedInReguestTests):
             self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
+    def test_add_nonnormal_existant_email(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/profile/emails/')
+
+        self.assertIn('johnsmith2@example.com', response_form.body)
+
+        form = response_form.forms[self.formname]
+
+        form['mail'].value = 'JohnSmith2@Example.com'
+
+        with patch.object(UserDB, 'exists_by_field', clear=True):
+
+            UserDB.exists_by_field.return_value = True
+
+            response = form.submit('add')
+
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn('johnsmith2@example.com', response.body)
+            self.assertIn('alert-error', response.body)
+            self.assertIsNotNone(getattr(response, 'form', None))
+
     def test_verify_not_existant_email(self):
         self.set_logged()
 
