@@ -12,7 +12,7 @@
 
   <div class='clearfix'></div>
 
-  {% trans %}<p>Please, fill the follow form to search the user</p>{% endtrans %}
+  {% trans %}<p>User search</p>{% endtrans %}
 
   {{ form.render()|safe }}
 
@@ -32,15 +32,13 @@
         </thead>
         {% for user in users %}
         <tr>
-          <td>{{user.givenName}}</td>
-          <td>{{user.sn}}</td>
+          <td>{{user.givenName | default('')}}</td>
+          <td>{{user.sn | default('')}}</td>
           <td><a href='{{request.route_url("profile-editor", userid=user.mail)}}'>{{user.mail}}</a></li>
           <td>
-            {% if user.norEduPersonNIN %}
+            {% if user.norEduPersonNIN | default(None) %}
               {% for nin in user.norEduPersonNIN %}
-                {% if nin.active %}
-                  {{nin.norEduPersonNIN}}
-                {% endif %}
+                  {{nin}}
               {% endfor %}
             {% endif %}
           </td>
