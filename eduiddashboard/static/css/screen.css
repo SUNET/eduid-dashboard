@@ -233,16 +233,6 @@ ul.circles-widget-labels li {
   display: inline-block;
 }
 
-div#footer span.nav-separator {
-  height: 34px;
-  width: 0px;
-  border-left: 1px solid rgb(0, 136, 204);
-  display: inline-block;
-  margin-left: 10px;
-  margin-right: 10px;
-  margin-bottom: -10px;
-}
-
 div#footer span.langselector {
   color: rgb(85, 85, 85);;
   display: inline-block;

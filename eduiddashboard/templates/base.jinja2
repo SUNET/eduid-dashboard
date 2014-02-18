@@ -71,23 +71,22 @@
     </div>
 
     <div id="footer">
-          <div class='container'>
+        <div class="container">
             <p>
               &copy; SUNET 2013
-              <span class='nav-separator'></span>
+              <span class="pull-right">
                 {% for lang,label in request.registry.settings.get('available_languages', {}).items() %}
-                <span class="langselector">
-                  {% if request.locale == lang %}
-                    <span>{{ label }}</span>
-                  {% else %}
-                    <a href="{{ request.route_path('set_language')}}?lang={{lang}}">
-                       {{ label }}
-                   </a>
-              {% endif %}
-             </span>
-             {% endfor %}
-             </p>
-          </div>
+                    <span class="langselector">
+                        {% if request.locale == lang %}
+                            <span>{{ label }}</span>
+                        {% else %}
+                            <a href="{{ request.route_path('set_language')}}?lang={{lang}}">{{ label }}</a>
+                        {% endif %}
+                    </span>
+                {% endfor %}
+              </span>
+            </p>
+        </div>
     </div>
 
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
