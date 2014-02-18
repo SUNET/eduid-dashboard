@@ -1,4 +1,5 @@
 import deform
+import re
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
@@ -59,18 +60,19 @@ def profile_editor(context, request):
     return view_context
 
 
-SEARCHER_KEYS_MAPPING = {
-    'mail': 'mailAliases.email',
-    'mobile': 'mobile.mobile',
-    'norEduPersonNIN': 'norEduPersonNIN.norEduPersonNIN',
-}
+SEARCHER_FIELDS = [
+    'mailAliases.email',
+    'mobile.mobile',
+    'norEduPersonNIN'
+]
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2',
              request_method='GET', permission='edit')
 def home(context, request):
     """
-        If workmode is not personal mode, then show a user searcher
+    If workmode is not personal mode, then show an admin or helpdesk interface
+
     """
 
     if context.workmode == 'personal':
@@ -80,7 +82,7 @@ def home(context, request):
     searcher_form = Form(searcher_schema, buttons=('search', ),
                          method='get', formid='user-searcher')
 
-    users = []
+    users = None
     showresults = False
 
     if 'search' in request.GET:
@@ -93,17 +95,13 @@ def home(context, request):
                 'users': [],
                 'showresults': False,
             }
+        query_text = re.escape(searcher_data['query'])
+        filter_dict = {'$or': []}
+        field_filter = {'$regex': '.*%s.*' % query_text, '$options': 'i'}
+        for field in SEARCHER_FIELDS:
+            filter_dict['$or'].append({field: field_filter})
 
-        filter_key = SEARCHER_KEYS_MAPPING.get(searcher_data['attribute_type'])
-        if searcher_data['attribute_type'] in SEARCHER_KEYS_MAPPING:
-            filter_dict = {
-                filter_key: searcher_data['text']
-            }
-        else:
-            filter_dict = None
-
-        if filter_dict:
-            users = request.userdb.get_users(filter_dict)
+        users = request.userdb.get_users(filter_dict)
 
         showresults = True
 
