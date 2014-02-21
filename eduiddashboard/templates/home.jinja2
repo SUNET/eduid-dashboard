@@ -4,49 +4,74 @@
 
 
 {% block contents %}
-  <h3>{{ _("Dashboard %(mode)s mode", mode=context.workmode) }}</h3>
+    <h3>{{ _("Dashboard %(mode)s mode", mode=context.workmode) }}</h3>
 
-  <div class='loa-big'>
-    <div>{{ _('Level %(level)s', level=request.session.get('loa', 5)) }}</div>
-  </div>
+    <div class="loa-big">
+    <div>{{ _("Level %(level)s", level=request.session.get("loa", 5)) }}</div>
+    </div>
 
-  <div class='clearfix'></div>
+    <div class="clearfix"></div>
 
-  {% trans %}<p>User search</p>{% endtrans %}
+    {% trans %}<p>User search</p>{% endtrans %}
 
-  {{ form.render()|safe }}
+    {{ form.render()|safe }}
 
-  {% if showresults %}
-    <h3>{{_("Results")}}</h3>
-    {% if users %}
-      <p>{{_("%(number)d users was found", number=users.count()) }}</p>
-
-      <table class='table table-striped'>
-        <thead>
-          <tr>
-            <th>{{_('first name')}}</th>
-            <th>{{_('surname')}}</th>
-            <th>{{_('preferred email')}}</th>
-            <th>{{_('NIN')}}</th>
-          </tr>
-        </thead>
-        {% for user in users %}
-        <tr>
-          <td>{{user.givenName | default('')}}</td>
-          <td>{{user.sn | default('')}}</td>
-          <td><a href='{{request.route_url("profile-editor", userid=user.mail)}}'>{{user.mail}}</a></li>
-          <td>
-            {% if user.norEduPersonNIN | default(None) %}
-              {% for nin in user.norEduPersonNIN %}
-                  {{nin}}
-              {% endfor %}
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
+    {% if showresults %}
+        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="user-table">
+            <thead>
+              <tr>
+                <th>{{_("preferred email")}}</th>
+                <th>{{_("first name")}}</th>
+                <th>{{_("surname")}}</th>
+                <th>{{_("display name")}}</th>
+                <th>{{_("NIN")}}</th>
+                <th>{{_("mobile")}}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td><a href="{{request.route_url("profile-editor", userid=user.mail)}}">{{user.mail}}</a></td>
+                    <td>{{user.givenName | default("")}}</td>
+                    <td>{{user.sn | default("")}}</td>
+                    <td>{{user.displayName | default("")}}</td>
+                    <td>
+                    {% if user.norEduPersonNIN | default(None) %}
+                      {% for nin in user.norEduPersonNIN %}
+                          {{nin}}
+                      {% endfor %}
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if user.mobile | default(None) %}
+                      {% for item in user.mobile %}
+                          {{item.mobile}}
+                      {% endfor %}
+                    {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
       </table>
-    {% else %}
-      <p>{{_("Any user match with the filter")}}</p>
-    {% endif %}
+      <hr>
   {% endif %}
+{% endblock %}
+
+{% block extracss %}
+    <link href="{{"eduiddashboard:static/css/dataTables.bootstrap.css"|static_url}}" rel="stylesheet" media="screen">
+{% endblock %}
+
+{% block extrajs %}
+    <script src="{{"eduiddashboard:static/js/libs/jquery.dataTables.min.js"|static_url}}"></script>
+    <script src="{{"eduiddashboard:static/js/libs/jquery.dataTables.bootstrap.js"|static_url}}"></script>
+    <script>
+        $(document).ready( function () {
+            $('#user-table').dataTable({
+                "oLanguage": {
+                     "sSearch": "Filter:",
+                     "sZeroRecords": "No users matching that search query was found."
+                }
+            });
+        } );
+    </script>
 {% endblock %}

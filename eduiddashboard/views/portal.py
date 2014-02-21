@@ -63,8 +63,13 @@ def profile_editor(context, request):
 SEARCHER_FIELDS = [
     'mailAliases.email',
     'mobile.mobile',
-    'norEduPersonNIN'
+    'norEduPersonNIN',
+    'givenName',
+    'sn',
+    'displayName'
 ]
+
+SEARCH_RESULT_LIMIT = 1000
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2',
@@ -105,9 +110,12 @@ def home(context, request):
 
         showresults = True
 
-    if users and users.count() == 1:
-        raise HTTPFound(request.route_url('profile-editor',
-                        userid=users[0][context.main_attribute]))
+    if users and users.count() > SEARCH_RESULT_LIMIT:
+        users.limit(SEARCH_RESULT_LIMIT)
+
+    # if users and users.count() == 1:
+    #    raise HTTPFound(request.route_url('profile-editor',
+    #                    userid=users[0][context.main_attribute]))
 
     return {
         'form': searcher_form,
