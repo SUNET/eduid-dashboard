@@ -12,11 +12,11 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard.userdb import IUserDB
+from eduid_am.userdb import UserDB
 from eduiddashboard.saml2 import includeme as saml2_includeme
 
 
-class MockedUserDB(IUserDB):
+class MockedUserDB(UserDB):
 
     test_users = {
         'user1@example.com': {

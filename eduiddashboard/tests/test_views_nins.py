@@ -3,8 +3,8 @@ from mock import patch
 from bson import ObjectId
 from datetime import datetime
 
+from eduid_am.userdb import UserDB
 from eduiddashboard.testing import LoggedInReguestTests, MockedMsgRelay
-from eduiddashboard.userdb import UserDB
 
 
 def return_true(*args, **kwargs):

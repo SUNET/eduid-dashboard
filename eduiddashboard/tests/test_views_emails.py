@@ -3,8 +3,8 @@ import re
 
 from mock import patch
 
+from eduid_am.userdb import UserDB
 from eduiddashboard.testing import LoggedInReguestTests
-from eduiddashboard.userdb import UserDB
 
 
 class MailsFormTests(LoggedInReguestTests):

@@ -13,7 +13,8 @@ from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
-from eduiddashboard.db import MongoDB, get_db
+from eduid_am.db import MongoDB, get_db
+from eduid_am.userdb import UserDB, get_userdb
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -23,7 +24,6 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         NinsFactory, ForbiddenFactory,
                                         HelpFactory, is_logged)
 
-from eduiddashboard.userdb import UserDB, get_userdb
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 
 
@@ -208,10 +208,10 @@ def includeme(config):
     settings = config.registry.settings
     mongo_replicaset = settings.get('mongo_replicaset', None)
     if mongo_replicaset is not None:
-        mongodb = MongoDB(settings['mongo_uri'],
+        mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
     else:
-        mongodb = MongoDB(settings['mongo_uri'])
+        mongodb = MongoDB(db_uri=settings['mongo_uri'])
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 

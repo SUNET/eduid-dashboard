@@ -15,10 +15,10 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard.db import MongoDB
+from eduid_am.db import MongoDB
+from eduid_am.userdb import UserDB
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
-from eduiddashboard.userdb import IUserDB
 from eduiddashboard.msgrelay import MsgRelay
 
 
@@ -169,7 +169,7 @@ class MockedMsgRelay(object):
         return getattr(self, 'retval', {})
 
 
-class MockedUserDB(IUserDB):
+class MockedUserDB(UserDB):
 
     test_users = {
         'johnsmith@example.com': MOCKED_USER_STANDARD,
@@ -207,10 +207,10 @@ def dummy_groups_callback(userid, request):
 def get_db(settings):
     mongo_replicaset = settings.get('mongo_replicaset', None)
     if mongo_replicaset is not None:
-        mongodb = MongoDB(settings['mongo_uri'],
+        mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
     else:
-        mongodb = MongoDB(settings['mongo_uri'])
+        mongodb = MongoDB(db_uri=settings['mongo_uri'])
     return mongodb.get_database()
 
 
@@ -321,7 +321,7 @@ class LoggedInReguestTests(unittest.TestCase):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduiddashboard.userdb.UserDB.get_user',
+        patcher = patch('eduid_am.userdb.UserDB.get_user',
                         self.dummy_get_user)
         patcher.start()
 
