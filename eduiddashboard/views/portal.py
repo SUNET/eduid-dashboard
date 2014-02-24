@@ -70,7 +70,7 @@ SEARCHER_FIELDS = [
     'displayName'
 ]
 
-SEARCH_RESULT_LIMIT = 1000
+SEARCH_RESULT_LIMIT = 100
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2',
@@ -113,6 +113,7 @@ def home(context, request):
         showresults = True
 
     if users and users.count() > SEARCH_RESULT_LIMIT:
+        request.session.flash(_('error|More than %d users returned. Please refine your search.' % SEARCH_RESULT_LIMIT))
         users.limit(SEARCH_RESULT_LIMIT)
 
     # if users and users.count() == 1:
