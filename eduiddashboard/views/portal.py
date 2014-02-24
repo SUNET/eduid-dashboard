@@ -14,6 +14,7 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_pending_actions,
                                   get_max_available_loa,
                                   get_available_tabs)
+from eduiddashboard.i18n import TranslationString as _
 
 from eduiddashboard.views.nins import nins_open_wizard
 
@@ -84,7 +85,8 @@ def home(context, request):
         raise HTTPFound(context.route_url('profile-editor'))
 
     searcher_schema = UserSearcher()
-    searcher_form = Form(searcher_schema, buttons=('search', ),
+    buttons = (deform.Button(name='search', title=_('Search')),)
+    searcher_form = Form(searcher_schema, buttons=buttons,
                          method='get', formid='user-searcher')
 
     users = None

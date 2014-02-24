@@ -12,11 +12,15 @@
 
     <div class="clearfix"></div>
 
-    {% trans %}<p>User search</p>{% endtrans %}
-
-    {{ form.render()|safe }}
+    <form id="user-searcher" class="form-search" accept-charset="utf-8" enctype="multipart/form-data" method="get" action="">
+     <div class="input-append">
+        <input type="text" class="input-xlarge search-query" name="query" placeholder="{{_("Search for users")}}">
+        <button type="submit" class="btn" name="search">Search</button>
+        </div>
+    </form>
 
     {% if showresults %}
+        <hr>
         <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="user-table">
             <thead>
               <tr>

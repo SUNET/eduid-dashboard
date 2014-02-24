@@ -254,7 +254,7 @@ class Permissions(colander.Schema):
 
 
 class UserSearcher(colander.MappingSchema):
-
     query = colander.SchemaNode(colander.String(),
+                                description=_('Search for users'),
                                 title=_('query'),
-                                description=_('Enter query to search for'))
+                                widget=deform.widget.TextInputWidget())
