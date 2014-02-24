@@ -13,9 +13,9 @@
     <div class="clearfix"></div>
 
     <form id="user-searcher" class="form-search" accept-charset="utf-8" enctype="multipart/form-data" method="get" action="">
-     <div class="input-append">
-        <input type="text" class="input-xlarge search-query" name="query" placeholder="{{_("Search for users")}}">
-        <button type="submit" class="btn" name="search">Search</button>
+        <div class="input-append">
+            <input type="text" class="input-xlarge search-query" name="query" placeholder="{{_("Search for users")}}">
+            <button type="submit" class="btn" name="search">{{_("Search")}}</button>
         </div>
     </form>
 
@@ -30,12 +30,13 @@
                 <th>{{_("display name")}}</th>
                 <th>{{_("NIN")}}</th>
                 <th>{{_("mobile")}}</th>
+                <th>{{_("admin")}}</th>
               </tr>
             </thead>
             <tbody>
             {% for user in users %}
                 <tr>
-                    <td><a href="{{request.route_url("profile-editor", userid=user.mail)}}">{{user.mail}}</a></td>
+                    <td>{{user.mail}}</td>
                     <td>{{user.givenName | default("")}}</td>
                     <td>{{user.sn | default("")}}</td>
                     <td>{{user.displayName | default("")}}</td>
@@ -49,10 +50,11 @@
                     <td>
                     {% if user.mobile | default(None) %}
                       {% for item in user.mobile %}
-                          {{item.mobile}}
+                          {{item.mobile}}{% if not loop.last %}, {% endif %}
                       {% endfor %}
                     {% endif %}
                     </td>
+                    <td><a href="{{request.route_url("profile-editor", userid=user.mail)}}">{{_("Edit")}}</a></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -72,9 +74,21 @@
         $(document).ready( function () {
             $('#user-table').dataTable({
                 "oLanguage": {
-                     "sSearch": "Filter:",
-                     "sZeroRecords": "No users matching that search query was found."
-                }
+                     "sLengthMenu": "{{_("Display _MENU_ records")}}",
+                     "sInfo": "{{_("Showing _START_ to _END_ of _TOTAL_ entries")}}",
+                     "sInfoFiltered": " - {{_("filtered from _MAX_ records")}}",
+                     "sSearch": "{{_("Filter")}}:",
+                     "sZeroRecords": "{{_("No users matching that search query was found")}}.",
+                     "oPaginate": {
+                        "sNext": "{{_("Next")}}",
+                        "sPrevious": "{{_("Previous")}}"
+                     }
+                },
+                "aoColumnDefs": [
+                    { "bSearchable": false, "aTargets": [ -1 ] },
+                    { "bSortable": false, "aTargets": [ -1 ] },
+                    { "sClass": "text-center", "aTargets": [ -1 ] }
+                ]
             });
         } );
     </script>

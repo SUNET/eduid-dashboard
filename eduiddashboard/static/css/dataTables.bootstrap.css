@@ -203,3 +203,6 @@ div.DTFC_LeftFootWrapper table {
     border-top: none;
 }
 
+table th.text-center, table td.text-center {
+    text-align: center;
+}
