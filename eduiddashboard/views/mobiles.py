@@ -18,7 +18,7 @@ def get_status(request, user):
 
     return msg and icon
     """
-    mobiles = user.get('mobile', [])
+    mobiles = user.get_mobiles()
     pending_actions = None
     pending_action_type = ''
     verification_needed = -1
@@ -70,16 +70,6 @@ def convert_to_e_164(request, mobile):
         mobile['mobile'] = country_code + mobile['mobile'].lstrip(u'0')
 
 
-def mark_as_verified_mobile(request, user, verified_mobile):
-    mobiles = user['mobile']
-
-    for mobile in mobiles:
-        if mobile['mobile'] == verified_mobile:
-            mobile['verified'] = True
-            if len(mobiles) == 1:
-                mobile['primary'] = True
-
-
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
     data_attribute = 'mobile'
@@ -95,16 +85,13 @@ class MobilesActionsView(BaseActionsView):
         return data_to_verify['mobile']
 
     def remove_action(self, index, post_data):
-        mobiles = self.user.get('mobile', [])
+        mobiles = self.user.get_mobiles()
         mobile_to_remove = mobiles[index]
         mobiles.remove(mobile_to_remove)
 
-        self.user['mobile'] = mobiles
+        self.user.set_mobiles(mobiles)
 
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
+        self.user.save(self.request)
 
         return {
             'result': 'ok',
@@ -112,7 +99,7 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def setprimary_action(self, index, post_data):
-        mobiles = self.user.get('mobile', [])
+        mobiles = self.user.get_mobiles()
 
         if index > len(mobiles):
             return {
@@ -134,12 +121,8 @@ class MobilesActionsView(BaseActionsView):
         assert(mobiles[index]['verified'])  # double check
         mobiles[index]['primary'] = True
 
-        self.user['mobile'] = mobiles
-
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
+        self.user.set_mobiles(mobiles)
+        self.user.save(self.request)
 
         return {
             'result': 'ok',
@@ -173,7 +156,7 @@ class MobilesView(BaseFormView):
     def get_template_context(self):
         context = super(MobilesView, self).get_template_context()
         context.update({
-            'mobiles': self.user.get('mobile', []),
+            'mobiles': self.user.get_mobiles(),
         })
         return context
 
@@ -184,17 +167,8 @@ class MobilesView(BaseFormView):
         mobile['verified'] = False
         mobile['primary'] = False
 
-        mobiles = self.user.get('mobile', [])
-        mobiles.append(mobile)
-
-        # update the session data
-        self.user['mobile'] = mobiles
-
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        # update the session data
-        self.context.propagate_user_changes(self.user)
+        self.user.add_mobile(mobile)
+        self.user.save(self.request)
 
         send_verification_code(self.request, self.user, mobile_number)
 

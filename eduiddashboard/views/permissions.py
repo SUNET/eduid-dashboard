@@ -33,7 +33,7 @@ class PermissionsView(BaseFormView):
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
         ma = self.context.main_attribute
-        if self.context.user[ma] == self.request.session.get('user', {}).get(ma):
+        if self.context.user[ma] == self.request.session.get('user', {}).get_mail():
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False

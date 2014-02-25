@@ -123,7 +123,7 @@ class BaseFactory(object):
         user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', None)
-            userid = user and user.get('mail', '') or ''
+            userid = user and user.get_mail() or ''
         else:
             userid = self.request.matchdict.get('userid', '')
         cache_user_in_session = asbool(self.request.registry.settings.get(
@@ -153,15 +153,15 @@ class BaseFactory(object):
                 'personal_dashboard_base_url', None)
             if app_url:
                 kw['_app_url'] = app_url
-            userid = self.user['_id']
+            userid = self.user.get_id()
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
-        userid = self.user[self.main_attribute]
+        userid = self.user.get_doc()[self.main_attribute]
         self.user = self.request.userdb.get_user(userid)
 
     def update_session_user(self):
-        userid = self.request.session.get('user', {}).get(self.main_attribute,
+        userid = self.request.session.get('user').get_doc().get(self.main_attribute,
                                                           None)
         self.user = self.request.userdb.get_user(userid)
         self.request.session['user'] = self.user
@@ -170,7 +170,7 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             self.request.session['user'] = newuser
         else:
-            user_session = self.request.session['user'][self.main_attribute]
+            user_session = self.request.session['user'].get_doc()[self.main_attribute]
             if user_session == newuser[self.main_attribute]:
                 self.request.session['user'] = newuser
 
@@ -182,10 +182,10 @@ class BaseFactory(object):
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         logger.debug('Required URN for workmode {!r} is {!r}, user entitlements are {!r}'.format(
-            self.workmode, required_urn, user.get('eduPersonEntitlement', [])))
+            self.workmode, required_urn, user.get_entitlements()))
         if required_urn is '':
             return ['']
-        elif required_urn in user.get('eduPersonEntitlement', []):
+        elif required_urn in user.get_entitlements():
             return [self.workmode]
         return []
 
@@ -217,20 +217,20 @@ class BaseFactory(object):
 
     def session_user_display(self):
         user = self.request.session.get('user')
-        display_name = user.get('displayName', False)
+        display_name = user.get_display_name()
         if display_name:
             return display_name
 
-        gn = user.get('givenName', '')
-        sn = user.get('sn', '')
+        gn = user.get_given_name()
+        sn = user.get_sn()
         if gn and sn:
             return "{0} {1}".format(gn, sn)
 
-        return user.get('mail')
+        return user.get_mail()
 
     def get_preferred_language(self):
         """ Return always a """
-        lang = self.user.get('preferredLanguage', None)
+        lang = self.user.get_preferred_language()
         if lang is not None:
             return lang
         available_languages = self.request.registry.settings.get('available_languages', {}).keys()

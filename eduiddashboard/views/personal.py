@@ -22,7 +22,7 @@ def get_status(request, user):
 
     ## If there are required fields, then return a pending action message
     for field in schema.children:
-        if user.get(field.name, None) is not None:
+        if user.get_doc().get(field.name, None) is not None:
             completed_fields += 1
 
     status = {
@@ -70,14 +70,11 @@ class PersonalDataView(BaseFormView):
         person = self.schema.serialize(user_modified)
 
         new_preferred_language = person.get('preferredLanguage')
-        old_preferred_language = self.user.get('preferredLanguage')
+        old_preferred_language = self.user.get_preferred_language()
 
         # Insert the new user object
-        self.user.update(person)
-        self.request.db.profiles.save(self.user, safe=True)
-
-        # update the session data
-        self.context.propagate_user_changes(self.user)
+        self.user.get_doc().update(person)
+        self.user.save(self.request)
 
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')

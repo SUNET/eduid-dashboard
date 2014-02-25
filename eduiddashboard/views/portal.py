@@ -44,8 +44,8 @@ def profile_editor(context, request):
 
     view_context = {
         'tabs': tabs,
-        'userid': context.user.get(context.main_attribute),
-        'user': context.user,
+        'userid': context.user.get_doc().get(context.main_attribute),
+        'user': context.user.get_doc(),
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,
@@ -122,7 +122,7 @@ def home(context, request):
              request_method='GET', permission='edit')
 def session_reload(context, request):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    userid = request.session.get('user', {}).get(main_attribute)
+    userid = request.session.get('user').get_doc().get(main_attribute)
     user = request.userdb.get_user(userid)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
@@ -143,7 +143,7 @@ def help(context, request):
     locale_name = get_locale_name(request)
     template = 'eduiddashboard:templates/help-%s.jinja2' % locale_name
 
-    return render_to_response(template, {'user':context.user}, request=request)
+    return render_to_response(template, {'user':context.user.get_doc()}, request=request)
 
 
 @view_config(route_name='token-login', request_method='POST')

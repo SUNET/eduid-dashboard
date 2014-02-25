@@ -15,7 +15,7 @@ def locale_negotiator(request):
 
     user = request.session.get('user')
     if user:
-        preferredLanguage = user.get('preferredLanguage', None)
+        preferredLanguage = user.get_preferred_language()
         if preferredLanguage:
             return preferredLanguage
 

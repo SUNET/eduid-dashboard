@@ -17,6 +17,7 @@ from pyramid import testing
 
 from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
+from eduid_am.user import User
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
@@ -189,10 +190,14 @@ class MockedUserDB(UserDB):
     def get_user(self, userid):
         if userid not in self.test_users:
             raise self.UserDoesNotExist
-        return deepcopy(self.test_users.get(userid))
+        return User(deepcopy(self.test_users.get(userid)))
 
     def all_users(self):
-        for userid, user in self.test_users.items():
+        for user in self.test_users.values():
+            yield User(deepcopy(user))
+
+    def all_userdocs(self):
+        for user in self.test_users.values():
             yield deepcopy(user)
 
 
@@ -219,7 +224,7 @@ class LoggedInReguestTests(unittest.TestCase):
 
     MockedUserDB = MockedUserDB
 
-    user = MOCKED_USER_STANDARD
+    user = User(MOCKED_USER_STANDARD)
     users = []
 
     def setUp(self, settings={}):
@@ -302,12 +307,12 @@ class LoggedInReguestTests(unittest.TestCase):
             self.db.verifications.insert(verification_data)
         self.amdb.attributes.drop()
 
-        users = []
-        for user in self.userdb.all_users():
-            users.append(user)
+        userdocs = []
+        for userdoc in self.userdb.all_userdocs():
+            userdocs.append(deepcopy(userdoc))
 
-        self.db.profiles.insert(users)
-        self.amdb.attributes.insert(users)
+        self.db.profiles.insert(userdocs)
+        self.amdb.attributes.insert(userdocs)
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
