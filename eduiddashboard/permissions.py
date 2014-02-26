@@ -8,6 +8,7 @@ from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
+from eduid_am.user import User
 
 import logging
 logger = logging.getLogger(__name__)
@@ -122,7 +123,7 @@ class BaseFactory(object):
 
         user = None
         if self.workmode == 'personal':
-            user = self.request.session.get('user', None)
+            user = self.request.session.get('user', User({}))
             userid = user and user.get_mail() or ''
         else:
             userid = self.request.matchdict.get('userid', '')
@@ -161,23 +162,23 @@ class BaseFactory(object):
         self.user = self.request.userdb.get_user(userid)
 
     def update_session_user(self):
-        userid = self.request.session.get('user').get_doc().get(self.main_attribute,
+        userid = self.request.session.get('user', User({})).get_doc().get(self.main_attribute,
                                                           None)
         self.user = self.request.userdb.get_user(userid)
         self.request.session['user'] = self.user
 
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':
-            self.request.session['user'] = newuser
+            self.request.session['user'] = User(newuser)
         else:
             user_session = self.request.session['user'].get_doc()[self.main_attribute]
             if user_session == newuser[self.main_attribute]:
-                self.request.session['user'] = newuser
+                self.request.session['user'] = User(newuser)
 
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
     def get_groups(self, userid=None, request=None):
-        user = self.request.session.get('user')
+        user = self.request.session.get('user', User({}))
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
@@ -200,7 +201,7 @@ class BaseFactory(object):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)
         if max_loa is None:
             max_loa = self.request.userdb.get_identity_proofing(
-                self.request.session.get('user'))
+                self.request.session.get('user', User({})))
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
@@ -216,7 +217,7 @@ class BaseFactory(object):
             return 1
 
     def session_user_display(self):
-        user = self.request.session.get('user')
+        user = self.request.session.get('user', User({}))
         display_name = user.get_display_name()
         if display_name:
             return display_name
@@ -268,7 +269,7 @@ class BaseCredentialsFactory(BaseFactory):
 class HomeFactory(BaseFactory):
 
     def get_user(self):
-        return self.request.session.get('user', None)
+        return self.request.session.get('user', User({}))
 
 
 class HelpFactory(BaseFactory):

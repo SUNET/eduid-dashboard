@@ -2,6 +2,7 @@
 
 from pyramid.view import view_config
 
+from eduid_am.user import User
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Permissions
 
@@ -33,7 +34,7 @@ class PermissionsView(BaseFormView):
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
         ma = self.context.main_attribute
-        if self.context.user[ma] == self.request.session.get('user', {}).get_mail():
+        if self.context.user.get_doc()[ma] == self.request.session.get('user', User({})).get_doc()[ma]:
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False
@@ -42,11 +43,7 @@ class PermissionsView(BaseFormView):
     def save_success(self, new_entitletments):
 
         # Insert the new user object
-        self.user.update(new_entitletments)
-
-        self.request.db.profiles.save(self.user, safe=True)
-
-        # update the session data
-        self.context.propagate_user_changes(self.user)
+        self.user.get_doc().update(new_entitletments)
+        self.user.save(self.request)
 
         self.request.session.flash(_('Changes saved.'), queue='forms')

@@ -30,9 +30,7 @@ def change_password(request, user, old_password, new_password):
     vccs_url = request.registry.settings.get('vccs_url')
     added = add_credentials(vccs_url, old_password, new_password, user)
     if added:
-        # do the save stuff
-        request.db.profiles.save(user, safe=True)
-        update_attributes.delay('eduid_dashboard', str(user.get_id()))
+        user.save(request)
     return added
 
 

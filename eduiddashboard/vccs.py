@@ -48,7 +48,7 @@ def check_password(vccs_url, password, user, vccs=None):
         )
         # Old credentials were created using the username (user['mail']) of the user
         # instead of the user['_id']. Try both during a transition period.
-        user_ids = [user.get_id(), user.get_mail()]
+        user_ids = [str(user.get_id()), user.get_mail()]
         if password_dict.get('user_id_hint') is not None:
             user_ids.insert(0, password_dict.get('user_id_hint'))
         try:
@@ -95,7 +95,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
             reference='dashboard',
         )
 
-    if not vccs.add_credentials(user.get_id(), [new_factor]):
+    if not vccs.add_credentials(str(user.get_id()), [new_factor]):
         log.warning("Failed adding password credential {!r} for user {!r}".format(
             new_factor.credential_id, user.get_id()))
         return False  # something failed
@@ -116,7 +116,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
         'source': 'dashboard',
         'created_ts': datetime.now(),
     })
-    user['passwords'] = passwords
+    user.set_passwords(passwords)
 
     return True
 
@@ -145,13 +145,13 @@ def provision_credentials(vccs_url, new_password, user):
 
     passwords = user.get_passwords()
 
-    if not vccs.add_credentials(user.get_id(), [new_factor]):
+    if not vccs.add_credentials(str(user.get_id()), [new_factor]):
         return False  # something failed
 
     passwords.append({
         'id': password_id,
         'salt': new_factor.salt,
     })
-    user['passwords'] = passwords
+    user.set_passwords(passwords)
 
     return True

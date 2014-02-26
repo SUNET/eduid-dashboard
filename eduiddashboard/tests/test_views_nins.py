@@ -123,7 +123,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         nins_before = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user['_id']
+            'user_oid': self.user.get_id()
         }).count()
 
         response = self.testapp.post(
@@ -133,7 +133,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         nins_after = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user['_id']
+            'user_oid': self.user.get_id()
         }).count()
 
         response_json = json.loads(response.body)
