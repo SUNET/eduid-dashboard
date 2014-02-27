@@ -158,12 +158,12 @@ class BaseFactory(object):
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
-        userid = self.user.get_doc()[self.main_attribute]
+        userid = self.user.get(self.main_attribute)
         self.user = self.request.userdb.get_user(userid)
 
     def update_session_user(self):
-        userid = self.request.session.get('user', User({})).get_doc().get(self.main_attribute,
-                                                          None)
+        user = self.request.session.get('user', User({}))
+        userid = user.get(self.main_attribute, None)
         self.user = self.request.userdb.get_user(userid)
         self.request.session['user'] = self.user
 
@@ -171,7 +171,7 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             self.request.session['user'] = User(newuser)
         else:
-            user_session = self.request.session['user'].get_doc()[self.main_attribute]
+            user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
                 self.request.session['user'] = User(newuser)
 

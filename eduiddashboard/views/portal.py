@@ -44,7 +44,7 @@ def profile_editor(context, request):
 
     view_context = {
         'tabs': tabs,
-        'userid': context.user.get_doc().get(context.main_attribute),
+        'userid': context.user.get(context.main_attribute),
         'user': context.user.get_doc(),
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
@@ -122,7 +122,7 @@ def home(context, request):
              request_method='GET', permission='edit')
 def session_reload(context, request):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    userid = request.session.get('user').get_doc().get(main_attribute)
+    userid = request.session.get('user').get(main_attribute)
     user = request.userdb.get_user(userid)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))

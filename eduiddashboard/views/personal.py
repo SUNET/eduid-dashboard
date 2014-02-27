@@ -22,7 +22,7 @@ def get_status(request, user):
 
     ## If there are required fields, then return a pending action message
     for field in schema.children:
-        if user.get_doc().get(field.name, None) is not None:
+        if user.get(field.name, None) is not None:
             completed_fields += 1
 
     status = {

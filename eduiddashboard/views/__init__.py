@@ -123,7 +123,7 @@ class BaseActionsView(object):
         """ Common action to verificate some given data.
             You can override in subclasses
         """
-        data_to_verify = self.user.get_doc().get(self.data_attribute, [])[index]
+        data_to_verify = self.user.get(self.data_attribute, [])[index]
         data_id = self.get_verification_data_id(data_to_verify)
         return self._verify_action(data_id, post_data)
 
@@ -164,7 +164,7 @@ class BaseActionsView(object):
             }
 
     def resend_code_action(self, index, post_data):
-        data = self.user.get_doc().get(self.data_attribute, [])
+        data = self.user.get(self.data_attribute, [])
         data_to_resend = data[index]
         data_id = self.get_verification_data_id(data_to_resend)
         code = new_verification_code(
@@ -266,7 +266,7 @@ class BaseWizard(object):
         }
 
     def is_open_wizard(self):
-        return (not self.context.user.get_doc().get(self.model) and
+        return (not self.context.user.get(self.model) and
                 not (self.obj['dismissed'] or self.obj['finished']))
 
     def __call__(self):
