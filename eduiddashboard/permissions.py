@@ -295,6 +295,7 @@ class MobilesFactory(BaseFactory):
 class NinsFactory(BaseFactory):
     pass
 
+
 class ResetPasswordFactory(RootFactory):
     pass
 
@@ -326,10 +327,13 @@ class VerificationsFactory(BaseFactory):
         return self.request.userdb.get_user_by_oid(verification_code['user_oid'])
 
 
-
 class StatusFactory(BaseFactory):
     pass
 
 
 class ProofingFactory(BaseFactory):
+    pass
+
+
+class AdminFactory(BaseFactory):
     pass

@@ -43,7 +43,7 @@
                     <td>
                     {% if user.norEduPersonNIN | default(None) %}
                       {% for nin in user.norEduPersonNIN %}
-                          {{nin}}
+                          {{nin}}{% if not loop.last %}, {% endif %}
                       {% endfor %}
                     {% endif %}
                     </td>
@@ -54,13 +54,26 @@
                       {% endfor %}
                     {% endif %}
                     </td>
-                    <td><a href="{{request.route_url("profile-editor", userid=user.mail)}}">{{_("Edit")}}</a></td>
+                    <td>
+                        <a href="{{request.route_url("profile-editor", userid=user.mail)}}">{{_("Edit")}}</a>
+                         /
+                        <a href="{{request.route_url("admin-status", userid=user.mail)}}">{{_("Status")}}</a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
       </table>
       <hr>
-  {% endif %}
+    {% endif %}
+    <h3>Debug</h3>
+    <h4>request:</h4>
+    {{ request }}
+    <h4>context.user:</h4>
+    {{ context.user }}
+    <h4>context._user:</h4>
+    {{ context._user }}
+
+
 {% endblock %}
 
 {% block extracss %}

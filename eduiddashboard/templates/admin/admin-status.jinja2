@@ -1,0 +1,46 @@
+{% extends "templates/base.jinja2" %}
+
+{% block nav_class_home %}active{% endblock %}
+
+
+{% block contents %}
+    <h2>{{ request.matchdict.get('userid') }} status</h2>
+    <h3>DB status</h3>
+    {% for dbname, collections in userdata.items() %}
+        <h4>{{ dbname }}</h4>
+        {% for collectionname, user in collections.items() %}
+            <strong>{{ collectionname }}</strong><br>
+            {% for key, value in user.items() %}
+                {{ key }}: {{ value }}<br>
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+    <hr>
+    <div>
+        <h3>DEBUG</h3>
+        <h4>dir(context):</h4>
+        {{ dir_context }}
+        <h4>context.user:</h4>
+        {{ context.user }}
+        <h4>context._user:</h4>
+        {{ context._user }}
+        <h4>request:</h4>
+        {{ request }}
+        <h4>dir(request):</h4>
+        {{ dir_request }}
+        <h4>request.session:</h4>
+        {{ request.session }}
+        <h4>request.matchdict:</h4>
+        {{ request.matchdict }}
+        <h4>request.db:</h4>
+        {{ '' ~ request.db }}
+        <h4>request.userdb:</h4>
+        {{ '' ~ request.userdb }}
+    </div>
+    <hr>
+    {% if context.workmode != "personal" %}
+        <div>
+            <a class="btn btn-primary" href="{{ request.referer|default("/", True) }}">Back</a>
+        </div>
+    {% endif %}
+{% endblock %}
