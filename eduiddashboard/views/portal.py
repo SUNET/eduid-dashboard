@@ -92,7 +92,7 @@ def home(context, request):
     users = None
     showresults = False
 
-    if 'search' in request.GET:
+    if 'query' in request.GET:
         controls = request.GET.items()
         try:
             searcher_data = searcher_form.validate(controls)
