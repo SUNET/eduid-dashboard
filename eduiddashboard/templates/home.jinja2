@@ -4,51 +4,96 @@
 
 
 {% block contents %}
-  <h3>{{ _("Dashboard %(mode)s mode", mode=context.workmode) }}</h3>
+    <h3>{{ _("Dashboard %(mode)s mode", mode=context.workmode) }}</h3>
 
-  <div class='loa-big'>
-    <div>{{ _('Level %(level)s', level=request.session.get('loa', 5)) }}</div>
-  </div>
+    <div class="loa-big">
+    <div>{{ _("Level %(level)s", level=request.session.get("loa", 5)) }}</div>
+    </div>
 
-  <div class='clearfix'></div>
+    <div class="clearfix"></div>
 
-  {% trans %}<p>Please, fill the follow form to search the user</p>{% endtrans %}
+    <form id="user-searcher" class="form-search" accept-charset="utf-8" enctype="multipart/form-data" method="get" action="">
+        <div class="input-append">
+            <input type="text" class="input-xlarge search-query" name="query" placeholder="{{_("Search for users")}}">
+            <button type="submit" class="btn">{{_("Search")}}</button>
+        </div>
+    </form>
 
-  {{ form.render()|safe }}
-
-  {% if showresults %}
-    <h3>{{_("Results")}}</h3>
-    {% if users %}
-      <p>{{_("%(number)d users was found", number=users.count()) }}</p>
-
-      <table class='table table-striped'>
-        <thead>
-          <tr>
-            <th>{{_('first name')}}</th>
-            <th>{{_('surname')}}</th>
-            <th>{{_('preferred email')}}</th>
-            <th>{{_('NIN')}}</th>
-          </tr>
-        </thead>
-        {% for user in users %}
-        <tr>
-          <td>{{user.givenName}}</td>
-          <td>{{user.sn}}</td>
-          <td><a href='{{request.route_url("profile-editor", userid=user.mail)}}'>{{user.mail}}</a></li>
-          <td>
-            {% if user.norEduPersonNIN %}
-              {% for nin in user.norEduPersonNIN %}
-                {% if nin.active %}
-                  {{nin.norEduPersonNIN}}
-                {% endif %}
-              {% endfor %}
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
+    {% if showresults %}
+        <hr>
+        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="user-table">
+            <thead>
+              <tr>
+                <th>{{_("Preferred Email")}}</th>
+                <th>{{_("First Name")}}</th>
+                <th>{{_("Surname")}}</th>
+                <th>{{_("Display Name")}}</th>
+                <th>{{_("NIN")}}</th>
+                <th>{{_("Mobile")}}</th>
+                <th>{{_("Admin")}}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{user.mail}}</td>
+                    <td>{{user.givenName | default("")}}</td>
+                    <td>{{user.sn | default("")}}</td>
+                    <td>{{user.displayName | default("")}}</td>
+                    <td>
+                    {% if user.norEduPersonNIN | default(None) %}
+                      {% for nin in user.norEduPersonNIN %}
+                          {{nin}}{% if not loop.last %}, {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                    </td>
+                    <td>
+                    {% if user.mobile | default(None) %}
+                      {% for item in user.mobile %}
+                          {{item.mobile}}{% if not loop.last %}, {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{request.route_url("profile-editor", userid=user.mail)}}">{{_("Edit")}}</a>
+                         /
+                        <a href="{{request.route_url("admin-status", userid=user.mail)}}">{{_("Status")}}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
       </table>
-    {% else %}
-      <p>{{_("Any user match with the filter")}}</p>
+      <hr>
     {% endif %}
-  {% endif %}
+{% endblock %}
+
+{% block extracss %}
+    <link href="{{"eduiddashboard:static/css/dataTables.bootstrap.css"|static_url}}" rel="stylesheet" media="screen">
+{% endblock %}
+
+{% block extrajs %}
+    <script src="{{"eduiddashboard:static/js/libs/jquery.dataTables.min.js"|static_url}}"></script>
+    <script src="{{"eduiddashboard:static/js/libs/jquery.dataTables.bootstrap.js"|static_url}}"></script>
+    <script>
+        $(document).ready( function () {
+            $('#user-table').dataTable({
+                "oLanguage": {
+                     "sLengthMenu": "{{_("Display _MENU_ records")}}",
+                     "sInfo": "{{_("Showing _START_ to _END_ of _TOTAL_ entries")}}",
+                     "sInfoFiltered": " - {{_("filtered from _MAX_ records")}}",
+                     "sSearch": "{{_("Filter")}}:",
+                     "sZeroRecords": "{{_("No users matching that search query was found")}}.",
+                     "oPaginate": {
+                        "sNext": "{{_("Next")}}",
+                        "sPrevious": "{{_("Previous")}}"
+                     }
+                },
+                "aoColumnDefs": [
+                    { "bSearchable": false, "aTargets": [ -1 ] },
+                    { "bSortable": false, "aTargets": [ -1 ] },
+                    { "sClass": "text-center", "aTargets": [ -1 ] }
+                ]
+            });
+        } );
+    </script>
 {% endblock %}

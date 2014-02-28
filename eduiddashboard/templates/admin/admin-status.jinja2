@@ -1,0 +1,51 @@
+{% extends "templates/base.jinja2" %}
+
+{% block nav_class_home %}active{% endblock %}
+
+
+{% block contents %}
+    <h2>User {{ request.matchdict.get('userid') }}</h2>
+    <h3>DB status</h3>
+
+    <ul class="nav nav-tabs" id="dbtabs">
+    {% for dbname in userdata %}
+        <li><a href="#{{ dbname }}">{{ dbname }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+    {% for dbname, collections in userdata.items() %}
+        <div class="tab-pane active" id="{{ dbname }}">
+        {% for collectionname, user in collections.items() %}
+            <h4>{{ dbname }}.{{ collectionname }}</h4>
+            <table class="table table-bordered table-condensed table-striped">
+                <tbody>
+                {% for key, value in user.items()|sort %}
+                    <tr>
+                        <th>{{ key }}:</th><td>{{ value }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+    {% if context.workmode != "personal" %}
+        <div>
+            <a class="btn btn-primary" href="{{ request.referer|default("/", True) }}">Back</a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $('#dbtabs a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    })
+    $(function () {
+        $('#dbtabs a:first').tab('show');
+    })
+</script>
+{% endblock %}

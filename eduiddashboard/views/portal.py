@@ -1,4 +1,5 @@
 import deform
+import re
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
@@ -14,6 +15,7 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_pending_actions,
                                   get_max_available_loa,
                                   get_available_tabs)
+from eduiddashboard.i18n import TranslationString as _
 
 from eduiddashboard.views.nins import nins_open_wizard
 
@@ -60,31 +62,38 @@ def profile_editor(context, request):
     return view_context
 
 
-SEARCHER_KEYS_MAPPING = {
-    'mail': 'mailAliases.email',
-    'mobile': 'mobile.mobile',
-    'norEduPersonNIN': 'norEduPersonNIN.norEduPersonNIN',
-}
+SEARCHER_FIELDS = [
+    'mailAliases.email',
+    'mobile.mobile',
+    'norEduPersonNIN',
+    'givenName',
+    'sn',
+    'displayName'
+]
+
+SEARCH_RESULT_LIMIT = 100
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2',
              request_method='GET', permission='edit')
 def home(context, request):
     """
-        If workmode is not personal mode, then show a user searcher
+    If workmode is not personal mode, then show an admin or helpdesk interface
+
     """
 
     if context.workmode == 'personal':
         raise HTTPFound(context.route_url('profile-editor'))
 
     searcher_schema = UserSearcher()
-    searcher_form = Form(searcher_schema, buttons=('search', ),
+    buttons = (deform.Button(name='search', title=_('Search')),)
+    searcher_form = Form(searcher_schema, buttons=buttons,
                          method='get', formid='user-searcher')
 
-    users = []
+    users = None
     showresults = False
 
-    if 'search' in request.GET:
+    if 'query' in request.GET:
         controls = request.GET.items()
         try:
             searcher_data = searcher_form.validate(controls)
@@ -94,23 +103,23 @@ def home(context, request):
                 'users': [],
                 'showresults': False,
             }
+        query_text = re.escape(searcher_data['query'])
+        filter_dict = {'$or': []}
+        field_filter = {'$regex': '.*%s.*' % query_text, '$options': 'i'}
+        for field in SEARCHER_FIELDS:
+            filter_dict['$or'].append({field: field_filter})
 
-        filter_key = SEARCHER_KEYS_MAPPING.get(searcher_data['attribute_type'])
-        if searcher_data['attribute_type'] in SEARCHER_KEYS_MAPPING:
-            filter_dict = {
-                filter_key: searcher_data['text']
-            }
-        else:
-            filter_dict = None
-
-        if filter_dict:
-            users = request.userdb.get_users(filter_dict)
+        users = request.userdb.get_users(filter_dict)
 
         showresults = True
 
-    if users and users.count() == 1:
-        raise HTTPFound(request.route_url('profile-editor',
-                        userid=users[0][context.main_attribute]))
+    if users and users.count() > SEARCH_RESULT_LIMIT:
+        request.session.flash(_('error|More than %d users returned. Please refine your search.' % SEARCH_RESULT_LIMIT))
+        users.limit(SEARCH_RESULT_LIMIT)
+
+    # if users and users.count() == 1:
+    #    raise HTTPFound(request.route_url('profile-editor',
+    #                    userid=users[0][context.main_attribute]))
 
     return {
         'form': searcher_form,

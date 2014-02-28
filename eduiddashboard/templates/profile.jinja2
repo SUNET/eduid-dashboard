@@ -82,6 +82,11 @@
   <div class="openwizard hide"></div>
   {% endif  %}
 
+  {% if context.workmode != "personal" %}
+    <div>
+        <a class="btn btn-primary" href="{{ request.referer|default("/", True) }}">Back</a>
+    </div>
+  {% endif %}
 {% endblock %}
 
 

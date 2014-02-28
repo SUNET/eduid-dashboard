@@ -254,21 +254,7 @@ class Permissions(colander.Schema):
 
 
 class UserSearcher(colander.MappingSchema):
-
-    text = colander.SchemaNode(colander.String(),
-                               title=_('text'),
-                               description=_('the exact match text for the '
-                                             'attribute type selected for '
-                                             'search')
-                               )
-
-    attribute_type = colander.SchemaNode(
-        colander.String(),
-        title=_('attribute type'),
-        description=_('Select the attribute to search'),
-        default='mail',
-        widget=deform.widget.RadioChoiceWidget(
-            values=SEARCHER_ATTTRIBUTE_TYPES,
-            inline=True
-        )
-    )
+    query = colander.SchemaNode(colander.String(),
+                                description=_('Search for users'),
+                                title=_('query'),
+                                widget=deform.widget.TextInputWidget())

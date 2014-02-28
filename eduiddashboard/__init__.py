@@ -22,7 +22,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         PermissionsFactory, StatusFactory,
                                         VerificationsFactory, HomeFactory,
                                         NinsFactory, ForbiddenFactory,
-                                        HelpFactory, is_logged)
+                                        HelpFactory, AdminFactory, is_logged)
 
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 
@@ -203,6 +203,14 @@ def profile_urls(config):
                      factory=NinsFactory)
 
 
+def admin_urls(config):
+    config.add_route('admin-status', '/status/', factory=AdminFactory)
+
+
+def disabled_admin_urls(config):
+    config.add_route('admin-status', '/status/', factory=ForbiddenFactory)
+
+
 def includeme(config):
     # DB setup
     settings = config.registry.settings
@@ -230,8 +238,10 @@ def includeme(config):
     config.add_route('home', '/', factory=HomeFactory)
     if settings['workmode'] == 'personal':
         config.include(profile_urls, route_prefix='/profile/')
+        config.include(disabled_admin_urls, route_prefix='/admin/{userid}/')
     else:
         config.include(profile_urls, route_prefix='/users/{userid}/')
+        config.include(admin_urls, route_prefix='/admin/{userid}/')
 
     config.add_route('token-login', '/tokenlogin/')
     if settings['workmode'] == 'personal':
