@@ -4,7 +4,7 @@ import zxcvbn
 
 from pyramid.i18n import get_localizer
 from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
-from eduiddashboard.userdb import UserDB
+from eduid_am.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
@@ -22,9 +22,9 @@ class OldPasswordValidator(object):
         old_password = value
         old_password = old_password.replace(" ", "")
 
-        user = request.session['user']
+        userid = request.session['user'].get_id()
         # Load user from database to ensure we are working on an up-to-date set of credentials.
-        user = request.userdb.get_user_by_oid(user['_id'])
+        user = request.userdb.get_user_by_oid(userid)
         # XXX if we saved user['passwords'] to node.bindings.request['user']['passwords'] here,
         # we could possibly avoid doing the same refresh again when changing passwords
         # (in PasswordsView.save_success()).
@@ -98,7 +98,8 @@ class EmailUniqueValidator(object):
 
         elif 'remove' in request.POST:
             email_discovered = False
-            for emaildict in request.session['user']['mailAliases']:
+            emails = request.session['user'].get_mail_aliases()
+            for emaildict in emails:
                 if emaildict['email'] == value:
                     email_discovered = True
                     break
@@ -106,7 +107,7 @@ class EmailUniqueValidator(object):
                 raise colander.Invalid(node,
                                        _("Email address does not exist"))
 
-            if len(request.session['user']['mailAliases']) <= 1:
+            if len(emails) <= 0:
                 raise colander.Invalid(node,
                                        _("At least one email is required"))
 

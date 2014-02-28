@@ -28,7 +28,7 @@ def get_status(request, user):
 
     return msg and icon
     """
-    postal_address = user.get('postalAddress', [])
+    postal_address = user.get_addresses()
 
     if not contains_official_postal_address(postal_address):
         return {
@@ -72,7 +72,7 @@ class PostalAddressView(BaseFormView):
     def get_addresses(self):
         postal_address = {}
         alternative_postal_address = {}
-        postal_addresses = self.user.get('postalAddress', [])
+        postal_addresses = self.user.get_addresses()
         if len(postal_addresses) > 0:
             if postal_addresses[0]['type'] == 'official':
                 postal_address = postal_addresses[0]
@@ -112,7 +112,7 @@ class PostalAddressView(BaseFormView):
         address['verified'] = False
         address['type'] = 'alternative'
 
-        addresses = self.user.get('postalAddress', [])
+        addresses = self.user.get_addresses()
         if len(addresses) > 0 and addresses[0].get('type') == 'official':
             if len(addresses) == 1:
                 addresses.append(address)
@@ -122,13 +122,8 @@ class PostalAddressView(BaseFormView):
             addresses = [address]
 
         # update the session data
-        self.user['postalAddress'] = addresses
-
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        # update the session data
-        self.context.propagate_user_changes(self.user)
+        self.user.set_addresses(addresses)
+        self.user.save(self.request)
 
         self.request.session.flash(_('Changes saved.'), queue='forms')
 

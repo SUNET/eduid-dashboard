@@ -21,7 +21,7 @@ def get_status(request, user):
     pending_actions = None
     pending_action_type = ''
     verification_needed = -1
-    for n, email in enumerate(user.get('mailAliases', [])):
+    for n, email in enumerate(user.get_mail_aliases()):
         if not email['verified']:
             pending_actions = _('An email address is pending confirmation')
             pending_action_type = 'verify'
@@ -49,20 +49,6 @@ def get_tab():
     }
 
 
-def mark_as_verified_email(request, user, verified_email):
-    emails = user['mailAliases']
-
-    new_emails = []
-    for email in emails:
-        if email['email'] == verified_email:
-            email['verified'] = True
-        new_emails.append(email)
-
-    user.update(new_emails)
-    request.session.flash(_('Email {email} verified').format(email=verified_email),
-                          queue='forms')
-
-
 @view_config(route_name='emails-actions', permission='edit')
 class EmailsActionsView(BaseActionsView):
 
@@ -76,24 +62,21 @@ class EmailsActionsView(BaseActionsView):
     }
 
     def setprimary_action(self, index, post_data):
-        mail = self.user['mailAliases'][index]
+        mail = self.user.get_mail_aliases()[index]
         if not mail.get('verified', False):
             return {
                 'result': 'bad',
                 'message': _("You need to confirm your email address before it can become primary"),
             }
 
-        self.user['mail'] = mail['email']
+        self.user.set_mail(mail['email'])
+        self.user.save(self.request)
 
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
         return {'result': 'ok', 'message': _('Your primary email address was '
                                              'successfully changed')}
 
     def remove_action(self, index, post_data):
-        emails = self.user['mailAliases']
+        emails = self.user.get_mail_aliases()
         if len(emails) == 1:
             return {
                 'result': 'error',
@@ -103,16 +86,13 @@ class EmailsActionsView(BaseActionsView):
         remove_email = emails[index]['email']
         emails.remove(emails[index])
 
-        self.user['mailAliases'] = emails
-        primary_email = self.user.get('mail', '')
+        self.user.set_mail_aliases(emails)
+        primary_email = self.user.get_mail()
 
         if not primary_email or primary_email == remove_email:
-            self.user['mail'] = emails[0]['email']
+            self.user.set_mail(emails[0]['email'])
 
-        # do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
+        self.user.save(self.request)
 
         return {
             'result': 'ok',
@@ -148,8 +128,8 @@ class EmailsView(BaseFormView):
     def get_template_context(self):
         context = super(EmailsView, self).get_template_context()
         context.update({
-            'mails': self.user['mailAliases'],
-            'primary_email': self.user['mail'],
+            'mails': self.user.get_mail_aliases(),
+            'primary_email': self.user.get_mail(),
         })
 
         return context
@@ -159,7 +139,7 @@ class EmailsView(BaseFormView):
 
         # We need to add the new email to the emails list
 
-        emails = self.user['mailAliases']
+        emails = self.user.get_mail_aliases()
 
         mailsubdoc = {
             'email': newemail['mail'],
@@ -168,12 +148,8 @@ class EmailsView(BaseFormView):
 
         emails.append(mailsubdoc)
 
-        self.user.update(emails)
-
-        # Do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
+        self.user.set_mail_aliases(emails)
+        self.user.save(self.request)
 
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')

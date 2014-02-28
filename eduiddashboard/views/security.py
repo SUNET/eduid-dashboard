@@ -30,16 +30,14 @@ def change_password(request, user, old_password, new_password):
     vccs_url = request.registry.settings.get('vccs_url')
     added = add_credentials(vccs_url, old_password, new_password, user)
     if added:
-        # do the save stuff
-        request.db.profiles.save(user, safe=True)
-        update_attributes.delay('eduid_dashboard', str(user['_id']))
+        user.save(request)
     return added
 
 
 def new_reset_password_code(request, user, mechanism='email'):
     hash_code = get_short_hash()
     request.db.reset_passwords.insert({
-        'email': user['mail'],
+        'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
         'verified': False,
@@ -59,7 +57,7 @@ def send_reset_password_mail(request, email, user, code, reset_password_link):
 
     context = {
         "email": email,
-        "given_name": user.get('givenName', ''),
+        "given_name": user.get_given_name(),
         "code": code,
         "reset_password_link": reset_password_link,
         "site_url": request.route_url("home"),
@@ -87,7 +85,7 @@ def send_reset_password_mail(request, email, user, code, reset_password_link):
 
 def send_reset_password_gov_message(request, nin, user, code, reset_password_link):
     """ Send an message to the gov mailbox with the instructions for resetting password """
-    user_language = user.get('preferredLanguage', 'en')
+    user_language = user.get_preferred_language()
     request.msgrelay.nin_reset_password(nin, code, reset_password_link, user_language)
 
 
@@ -167,13 +165,13 @@ class PasswordsView(BaseFormView):
         if passwords_data.get('use_custom_password') == 'true':
             # The user has entered his own password and it was verified by
             # validators
-            log.debug("Password change for user {!r} (custom password).".format(user['_id']))
+            log.debug("Password change for user {!r} (custom password).".format(user.get_id()))
             new_password = passwords_data.get('custom_password')
 
         else:
             # If the user has selected the suggested password, then it should
             # be in session
-            log.debug("Password change for user {!r} (suggested password).".format(user['_id']))
+            log.debug("Password change for user {!r} (suggested password).".format(user.get_id()))
             new_password = self.get_suggested_password()
 
         new_password = new_password.replace(' ', '')
@@ -182,7 +180,7 @@ class PasswordsView(BaseFormView):
 
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
-        user = self.request.userdb.get_user_by_oid(user['_id'])
+        user = self.request.userdb.get_user_by_oid(user.get_id())
 
         self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
@@ -256,7 +254,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         except UserDoesNotExist:
             user = self.request.userdb.get_user_by_username(email_or_username)
         code, reset_password_link = new_reset_password_code(self.request, user)
-        email = user['mail']
+        email = user.get_mail()
         send_reset_password_mail(self.request, email, user, code, reset_password_link)
         msg = _('An email has been sent to your ${email} inbox.'
                 'This email will contain instructions and a link '
@@ -288,8 +286,9 @@ class ResetPasswordNINView(BaseResetPasswordView):
         except UserDoesNotExist:
             user = self.request.userdb.get_user_by_username(email_or_username)
         nin = None
-        if user.get('norEduPersonNIN', False):
-            nin = user['norEduPersonNIN'][-1]
+        nins = user.get_nins()
+        if nins:
+            nin = nins[-1]
         if nin is None:
             flash(self.request, 'info', _('Error: missing government mailbox '
                                           'for %s' % email_or_username))

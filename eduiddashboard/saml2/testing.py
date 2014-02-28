@@ -12,11 +12,12 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard.userdb import IUserDB
+from eduid_am.userdb import UserDB
+from eduid_am.user import User
 from eduiddashboard.saml2 import includeme as saml2_includeme
 
 
-class MockedUserDB(IUserDB):
+class MockedUserDB(UserDB):
 
     test_users = {
         'user1@example.com': {
@@ -39,7 +40,7 @@ class MockedUserDB(IUserDB):
     def get_user(self, userid):
         if userid not in self.test_users:
             raise self.UserDoesNotExist
-        return self.test_users.get(userid)
+        return User(self.test_users.get(userid))
 
 
 class RootFactory(object):

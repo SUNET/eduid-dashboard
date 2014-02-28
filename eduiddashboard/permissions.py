@@ -8,6 +8,7 @@ from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
+from eduid_am.user import User
 
 import logging
 logger = logging.getLogger(__name__)
@@ -122,8 +123,8 @@ class BaseFactory(object):
 
         user = None
         if self.workmode == 'personal':
-            user = self.request.session.get('user', None)
-            userid = user and user.get('mail', '') or ''
+            user = self.request.session.get('user', User({}))
+            userid = user and user.get_mail() or ''
         else:
             userid = self.request.matchdict.get('userid', '')
         cache_user_in_session = asbool(self.request.registry.settings.get(
@@ -153,39 +154,39 @@ class BaseFactory(object):
                 'personal_dashboard_base_url', None)
             if app_url:
                 kw['_app_url'] = app_url
-            userid = self.user['_id']
+            userid = self.user.get_id()
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
-        userid = self.user[self.main_attribute]
+        userid = self.user.get(self.main_attribute)
         self.user = self.request.userdb.get_user(userid)
 
     def update_session_user(self):
-        userid = self.request.session.get('user', {}).get(self.main_attribute,
-                                                          None)
+        user = self.request.session.get('user', User({}))
+        userid = user.get(self.main_attribute, None)
         self.user = self.request.userdb.get_user(userid)
         self.request.session['user'] = self.user
 
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':
-            self.request.session['user'] = newuser
+            self.request.session['user'] = User(newuser)
         else:
-            user_session = self.request.session['user'][self.main_attribute]
+            user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
-                self.request.session['user'] = newuser
+                self.request.session['user'] = User(newuser)
 
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
     def get_groups(self, userid=None, request=None):
-        user = self.request.session.get('user')
+        user = self.request.session.get('user', User({}))
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         logger.debug('Required URN for workmode {!r} is {!r}, user entitlements are {!r}'.format(
-            self.workmode, required_urn, user.get('eduPersonEntitlement', [])))
+            self.workmode, required_urn, user.get_entitlements()))
         if required_urn is '':
             return ['']
-        elif required_urn in user.get('eduPersonEntitlement', []):
+        elif required_urn in user.get_entitlements():
             return [self.workmode]
         return []
 
@@ -200,7 +201,7 @@ class BaseFactory(object):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)
         if max_loa is None:
             max_loa = self.request.userdb.get_identity_proofing(
-                self.request.session.get('user'))
+                self.request.session.get('user', User({})))
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
@@ -216,21 +217,21 @@ class BaseFactory(object):
             return 1
 
     def session_user_display(self):
-        user = self.request.session.get('user')
-        display_name = user.get('displayName', False)
+        user = self.request.session.get('user', User({}))
+        display_name = user.get_display_name()
         if display_name:
             return display_name
 
-        gn = user.get('givenName', '')
-        sn = user.get('sn', '')
+        gn = user.get_given_name()
+        sn = user.get_sn()
         if gn and sn:
             return "{0} {1}".format(gn, sn)
 
-        return user.get('mail')
+        return user.get_mail()
 
     def get_preferred_language(self):
         """ Return always a """
-        lang = self.user.get('preferredLanguage', None)
+        lang = self.user.get_preferred_language()
         if lang is not None:
             return lang
         available_languages = self.request.registry.settings.get('available_languages', {}).keys()
@@ -268,7 +269,7 @@ class BaseCredentialsFactory(BaseFactory):
 class HomeFactory(BaseFactory):
 
     def get_user(self):
-        return self.request.session.get('user', None)
+        return self.request.session.get('user', User({}))
 
 
 class HelpFactory(BaseFactory):

@@ -2,9 +2,8 @@ from datetime import datetime, timedelta
 
 from bson.tz_util import utc
 
+from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
-from eduiddashboard import log
-
 from eduiddashboard import log
 
 
@@ -24,7 +23,7 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
     if code is not None:
         filters['code'] = code
     if user is not None:
-        filters['user_oid'] = user['_id']
+        filters['user_oid'] = user.get_id()
     log.debug("Verification code lookup filters : {!r}".format(filters))
     result = request.db.verifications.find_one(filters)
     if result:
@@ -42,7 +41,7 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
     obj = {
         "model_name": model_name,
         "obj_id": obj_id,
-        "user_oid": user['_id'],
+        "user_oid": user.get_id(),
     }
     request.db.verifications.find_and_modify(
         obj,
@@ -64,26 +63,13 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
 
 def get_not_verificated_objects(request, model_name, user):
     return request.db.verifications.find({
-        'user_oid': user['_id'],
+        'user_oid': user.get_id(),
         'model_name': model_name,
         'verified': False,
     })
 
 
 def verificate_code(request, model_name, code):
-    from eduiddashboard.views.emails import mark_as_verified_email
-    from eduiddashboard.views.mobiles import mark_as_verified_mobile
-    from eduiddashboard.views.nins import mark_as_verified_nin, post_verified_nin
-
-    verifiers = {
-        'mailAliases': mark_as_verified_email,
-        'mobile': mark_as_verified_mobile,
-        'norEduPersonNIN': mark_as_verified_nin,
-    }
-
-    post_verifiers = {
-        'norEduPersonNIN': post_verified_nin,
-    }
 
     result = request.db.verifications.find_and_modify(
         {
@@ -95,35 +81,41 @@ def verificate_code(request, model_name, code):
             }
         },
         new=True,
-        safe=True
-    )
+        safe=True)
+    
     if not result:
-        log.debug("Could not find un-verified code {!r}, model {!r}".format(code, model_name))
-        return None
+        msg = "Could not find un-verified code {!r}, model {!r}"
+        log.debug(msg.format(code, model_name))
+        return
+    
     obj_id = result['obj_id']
+
     if obj_id:
-        log.debug("Code {!r} ({!s}) marked as verified".format(code, str(obj_id)))
+        msg = "Code {!r} ({!s}) marked as verified"
+        log.debug(msg.format(code, str(obj_id)))
+
         user = request.userdb.get_user_by_oid(result['user_oid'])
-        # Callback to a function which marks as verificated the proper user
-        # attribute
-        verifiers[model_name](request, user, obj_id)
-        post_verified = post_verifiers.get(model_name, None)
-        if post_verified is not None:
-            post_verified(request, user, obj_id)
-        else:
-            log.debug("No post-verified callback?")
-        # Do the save staff
-        request.db.profiles.save(user, safe=True)
-        request.context.propagate_user_changes(user)
+
+        if model_name == 'norEduPersonNIN':
+            user.add_verified_nin(obj_id)
+            user.retrieve_address(request, obj_id)
+            msg = _('NIN {obj} verified')
+
+        elif model_name == 'mobile':
+            user.add_verified_mobile(obj_id)
+            msg = _('Mobile {obj} verified')
+
+        elif model_name == 'mailAliases':
+            user.add_verified_email(obj_id)
+            msg = _('Email {obj} verified')
+
+        request.session.flash(msg.format(obj=obj_id),
+                          queue='forms')
+        user.save(request)
     return obj_id
 
 
 def save_as_verificated(request, model_name, user_oid, obj_id):
-    from eduiddashboard.views.nins import post_verified_nin
-
-    post_verifiers = {
-        'norEduPersonNIN': post_verified_nin,
-    }
 
     result = request.db.verifications.find_and_modify(
         {
@@ -140,11 +132,9 @@ def save_as_verificated(request, model_name, user_oid, obj_id):
         safe=True
     )
     obj_id = result['obj_id']
-    if obj_id:
+    if obj_id and model_name == 'norEduPersonNIN':
         user = request.userdb.get_user_by_oid(result['user_oid'])
-        post_verified = post_verifiers.get(model_name, None)
-        if post_verified is not None:
-            post_verified(request, user, obj_id)
+        user.retrieve_address(request, obj_id)
     return obj_id
 
 

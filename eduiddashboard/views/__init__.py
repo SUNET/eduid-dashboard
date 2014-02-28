@@ -213,7 +213,7 @@ class BaseWizard(object):
         self.user = context.user
 
         self.object_filter = {
-            'userid': self.user.get('_id'),
+            'userid': self.user.get_id(),
             'model': self.model
         }
         self.collection = request.db[self.collection_name]
@@ -303,7 +303,7 @@ class BaseWizard(object):
 
     def get_template_context(self):
         return {
-            'user': self.user,
+            'user': self.user.get_doc(),
             'step': self.obj['step'],
             'path': self.request.route_path(self.route),
             'model': self.model,

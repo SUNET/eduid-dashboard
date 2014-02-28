@@ -3,8 +3,8 @@ from mock import patch
 from bson import ObjectId
 from datetime import datetime
 
+from eduid_am.userdb import UserDB
 from eduiddashboard.testing import LoggedInReguestTests, MockedMsgRelay
-from eduiddashboard.userdb import UserDB
 
 
 def return_true(*args, **kwargs):
@@ -123,7 +123,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         nins_before = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user['_id']
+            'user_oid': self.user.get_id()
         }).count()
 
         response = self.testapp.post(
@@ -133,7 +133,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         nins_after = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user['_id']
+            'user_oid': self.user.get_id()
         }).count()
 
         response_json = json.loads(response.body)
