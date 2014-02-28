@@ -44,7 +44,6 @@ def login(request, username):
 
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     request.session[main_attribute] = user.get(main_attribute)
-    user.set_entitlements(urn)
     request.session['user'] = user
     request.session['eduPersonAssurance'] = al_level
     headers = remember(request, user.get(main_attribute))
