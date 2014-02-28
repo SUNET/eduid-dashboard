@@ -1,4 +1,5 @@
 from pyramid.i18n import TranslationStringFactory
+from eduid_am.user import User
 
 translation_domain = 'eduid-dashboard'
 TranslationString = TranslationStringFactory(translation_domain)
@@ -15,7 +16,7 @@ def locale_negotiator(request):
 
     user = request.session.get('user')
     if user:
-        preferredLanguage = user.get('preferredLanguage', None)
+        preferredLanguage = user.get_preferred_language()
         if preferredLanguage:
             return preferredLanguage
 

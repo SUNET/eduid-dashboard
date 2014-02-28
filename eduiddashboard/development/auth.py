@@ -43,8 +43,9 @@ def login(request, username):
         al_level = 'http://www.swamid.se/policy/assurance/al1'
 
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    request.session[main_attribute] = user[main_attribute]
+    request.session[main_attribute] = user.get(main_attribute)
+    user.set_entitlements(urn)
     request.session['user'] = user
     request.session['eduPersonAssurance'] = al_level
-    headers = remember(request, user[main_attribute])
+    headers = remember(request, user.get(main_attribute))
     return request, headers

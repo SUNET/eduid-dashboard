@@ -30,10 +30,10 @@ def get_status(request, user):
     pending_action_type = ''
     verification_needed = -1
 
-    if user.get('norEduPersonNIN', []):
+    all_nins = user.get_nins()
+    if all_nins:
         completed_fields = 1
 
-    all_nins = user.get('norEduPersonNIN', [])
     unverified_nins = get_not_verified_nins_list(request, user)
 
     if not all_nins and not unverified_nins:
@@ -72,55 +72,6 @@ def send_verification_code(request, user, nin, code=None):
     request.msgrelay.nin_validator(nin, code, language)
 
 
-def mark_as_verified_nin(request, user, verified_nin):
-    """
-        Replace old nin with the new verified nin.
-    """
-    if user.get('norEduPersonNIN', None) is None:
-        user['norEduPersonNIN'] = [verified_nin]
-    else:
-        user['norEduPersonNIN'].append(verified_nin)
-
-
-def retrieve_postal_address(request, user, verified_nin):
-    """
-        Function to get the official postal address from
-        the government service
-    """
-
-    if not request.registry.settings.get('enable_postal_address_retrieve', True):
-        return
-
-    address = request.msgrelay.get_postal_address(verified_nin)
-
-    address['type'] = 'official'
-    address['verified'] = True
-
-    user_addresses = user.get('postalAddress', [])
-
-    changed = False
-    for user_address in user_addresses:
-        if user_address.get('type') == 'official':
-            user_addresses.remove(user_address)
-            user_addresses.append(address)
-            changed = True
-
-    if not changed:
-        user_addresses.append(address)
-
-    user['postalAddress'] = user_addresses
-    request.db.profiles.save(user, safe=True)
-    request.context.propagate_user_changes(user)
-
-
-def post_verified_nin(request, user, verified_nin):
-    """
-        Function to do things after the nin is fully verified
-    """
-    log.debug('Retrieving postal address from NIN service')
-    retrieve_postal_address(request, user, verified_nin)
-
-
 def get_tab():
     return {
         'status': get_status,
@@ -130,12 +81,12 @@ def get_tab():
 
 
 def get_not_verified_nins_list(request, user):
-    active_nins = user.get('norEduPersonNIN', [])
+    active_nins = user.get_nins()
     nins = []
     verifications = request.db.verifications
     not_verified_nins = verifications.find({
         'model_name': 'norEduPersonNIN',
-        'user_oid': user['_id'],
+        'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
     if active_nins:
         active_nin = active_nins[-1]
@@ -154,7 +105,7 @@ def get_not_verified_nins_list(request, user):
 
 
 def get_active_nin(self):
-    active_nins = self.user.get('norEduPersonNIN', [])
+    active_nins = self.user.get_nins()
     if active_nins:
         return active_nins[-1]
     else:
@@ -210,7 +161,7 @@ class NINsActionsView(BaseActionsView):
         verifications.remove({
             'model_name': self.data_attribute,
             'obj_id': remove_nin,
-            'user_oid': self.user['_id'],
+            'user_oid': self.user.get_id(),
             'verified': False,
         })
 
@@ -259,7 +210,7 @@ class NinsView(BaseFormView):
         settings = self.request.registry.settings
 
         context.update({
-            'nins': self.user.get('norEduPersonNIN', []),
+            'nins': self.user.get_nins(),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
             'active_nin': self.get_active_nin(),
@@ -316,21 +267,17 @@ class NinsView(BaseFormView):
 
         newnin = normalize_nin(newnin)
 
-        nins = self.user.get('norEduPersonNIN', [])
+        nins = self.user.get_nins()
 
         nins.append(newnin)
 
-        self.user['norEduPersonNIN'] = nins
+        self.user.set_nins(nins)
 
         # Save the state in the verifications collection
         save_as_verificated(self.request, 'norEduPersonNIN',
-                            self.user['_id'], newnin)
+                            self.user.get_id(), newnin)
 
-        # Do the save staff
-        self.request.db.profiles.save(self.user, safe=True)
-
-        self.context.propagate_user_changes(self.user)
-
+        self.user.save(self.request)
         self.request.session.flash(_('Changes saved'),
                                    queue='forms')
 

@@ -6,6 +6,7 @@ from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
+from pyramid.settings import asbool
 
 from deform_bootstrap import Form
 
@@ -47,7 +48,7 @@ def profile_editor(context, request):
     view_context = {
         'tabs': tabs,
         'userid': context.user.get(context.main_attribute),
-        'user': context.user,
+        'user': context.user.get_doc(),
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,
@@ -131,7 +132,7 @@ def home(context, request):
              request_method='GET', permission='edit')
 def session_reload(context, request):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    userid = request.session.get('user', {}).get(main_attribute)
+    userid = request.session.get('user').get(main_attribute)
     user = request.userdb.get_user(userid)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
@@ -152,7 +153,7 @@ def help(context, request):
     locale_name = get_locale_name(request)
     template = 'eduiddashboard:templates/help-%s.jinja2' % locale_name
 
-    return render_to_response(template, {'user':context.user}, request=request)
+    return render_to_response(template, {'user':context.user.get_doc()}, request=request)
 
 
 @view_config(route_name='token-login', request_method='POST')
@@ -196,6 +197,9 @@ def set_language(context, request):
     extra_options = {}
     if cookie_domain is not None:
         extra_options['domain'] = cookie_domain
+
+    extra_options['httponly'] = asbool(settings.get('session.httponly'))
+    extra_options['secure'] = asbool(settings.get('session.secure'))
 
     response.set_cookie(cookie_name, value=lang, **extra_options)
 

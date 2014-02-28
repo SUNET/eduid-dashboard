@@ -15,10 +15,11 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduiddashboard.db import MongoDB
+from eduid_am.db import MongoDB
+from eduid_am.userdb import UserDB
+from eduid_am.user import User
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
-from eduiddashboard.userdb import IUserDB
 from eduiddashboard.msgrelay import MsgRelay
 
 
@@ -169,7 +170,7 @@ class MockedMsgRelay(object):
         return getattr(self, 'retval', {})
 
 
-class MockedUserDB(IUserDB):
+class MockedUserDB(UserDB):
 
     test_users = {
         'johnsmith@example.com': MOCKED_USER_STANDARD,
@@ -189,10 +190,14 @@ class MockedUserDB(IUserDB):
     def get_user(self, userid):
         if userid not in self.test_users:
             raise self.UserDoesNotExist
-        return deepcopy(self.test_users.get(userid))
+        return User(deepcopy(self.test_users.get(userid)))
 
     def all_users(self):
-        for userid, user in self.test_users.items():
+        for user in self.test_users.values():
+            yield User(deepcopy(user))
+
+    def all_userdocs(self):
+        for user in self.test_users.values():
             yield deepcopy(user)
 
 
@@ -207,10 +212,10 @@ def dummy_groups_callback(userid, request):
 def get_db(settings):
     mongo_replicaset = settings.get('mongo_replicaset', None)
     if mongo_replicaset is not None:
-        mongodb = MongoDB(settings['mongo_uri'],
+        mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
     else:
-        mongodb = MongoDB(settings['mongo_uri'])
+        mongodb = MongoDB(db_uri=settings['mongo_uri'])
     return mongodb.get_database()
 
 
@@ -219,7 +224,7 @@ class LoggedInReguestTests(unittest.TestCase):
 
     MockedUserDB = MockedUserDB
 
-    user = MOCKED_USER_STANDARD
+    user = User(MOCKED_USER_STANDARD)
     users = []
 
     def setUp(self, settings={}):
@@ -302,12 +307,12 @@ class LoggedInReguestTests(unittest.TestCase):
             self.db.verifications.insert(verification_data)
         self.amdb.attributes.drop()
 
-        users = []
-        for user in self.userdb.all_users():
-            users.append(user)
+        userdocs = []
+        for userdoc in self.userdb.all_userdocs():
+            userdocs.append(deepcopy(userdoc))
 
-        self.db.profiles.insert(users)
-        self.amdb.attributes.insert(users)
+        self.db.profiles.insert(userdocs)
+        self.amdb.attributes.insert(userdocs)
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
@@ -321,7 +326,7 @@ class LoggedInReguestTests(unittest.TestCase):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduiddashboard.userdb.UserDB.get_user',
+        patcher = patch('eduid_am.userdb.UserDB.get_user',
                         self.dummy_get_user)
         patcher.start()
 

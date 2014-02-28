@@ -7,6 +7,7 @@ import simplejson as json
 import vccs_client
 
 from eduid_am.exceptions import UserDoesNotExist
+from eduid_am.user import User
 
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard import vccs
@@ -220,7 +221,7 @@ class ResetPasswordFormTests(LoggedInReguestTests):
     initial_password = 'old-password'
     MockedUserDB = MockedUserDB
     initial_verifications = TEST_VERIFICATIONS
-    user = TEST_USER
+    user = User(TEST_USER)
     users = []
 
     def setUp(self, settings={}):
