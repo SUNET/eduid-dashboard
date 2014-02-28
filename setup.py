@@ -36,8 +36,9 @@ requires = [
     'deform_bootstrap==0.2.9',
     'pysaml2==1.2.0beta',
     'pycountry==1.2',
-    'waitress==0.8.2',
-    'vccs_client==0.4.0',
+    'eventlet==0.14.0',
+    'gunicorn==18.0',
+    'vccs_client==0.4.1',
     'pwgen==0.4',
     'zxcvbn==1.0',
     # Fix eduid_msg version
@@ -67,9 +68,8 @@ testing_extras = test_requires + [
     'nosexcover==1.0.8',
 ]
 
-gunicorn_extras = requires + [
-    'eventlet==0.14.0',
-    'gunicorn==18.0',
+waitress_extras = requires + [
+    'waitress==0.8.2',
 ]
 
 setup(name='eduid-dashboard',
@@ -95,7 +95,7 @@ setup(name='eduid-dashboard',
       extras_require={
           'testing': testing_extras,
           'docs': docs_extras,
-          'gunicorn': gunicorn_extras,
+          'waitress': waitress_extras,
       },
       test_suite="eduiddashboard",
       entry_points="""\
