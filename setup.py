@@ -95,6 +95,7 @@ setup(name='eduid-dashboard',
       extras_require={
           'testing': testing_extras,
           'docs': docs_extras,
+          'gunicorn': gunicorn_extras,
       },
       test_suite="eduiddashboard",
       entry_points="""\
