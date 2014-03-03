@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = 'lundberg'
 
-from eduiddashboard.db import MongoDB
 from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
