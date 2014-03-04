@@ -173,17 +173,6 @@ class NINResetPassword(colander.MappingSchema):
     )
 
 
-class ResetPasswordEnterCode(colander.MappingSchema):
-
-    code = colander.SchemaNode(
-        colander.String(),
-        title=_('Confirmation code'),
-        validator=colander.All(
-            ResetPasswordCodeExistsValidator(),
-        )
-    )
-
-
 class ResetPasswordStep2(colander.MappingSchema):
     new_password = colander.SchemaNode(colander.String(),
                                        widget=deform.widget.PasswordWidget(size=20),
