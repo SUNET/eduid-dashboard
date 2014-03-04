@@ -225,9 +225,11 @@ def includeme(config):
 
     config.set_request_property(get_db, 'db', reify=True)
 
-    userdb = UserDB(config.registry.settings)
-    config.registry.settings['userdb'] = userdb
-    config.add_request_method(get_userdb, 'userdb', reify=True)
+    # Create userdb instance and store it in our config,
+    # and make a getter lambda for pyramid to retreive it
+    _userdb = UserDB(config.registry.settings)
+    config.registry.settings['userdb'] = _userdb
+    config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
     msgrelay = MsgRelay(config.registry.settings)
     config.registry.settings['msgrelay'] = msgrelay

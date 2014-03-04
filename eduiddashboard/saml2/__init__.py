@@ -82,13 +82,12 @@ def includeme(config):
 
     if settings.get('testing', False):
         from eduiddashboard.saml2.testing import MockedUserDB
+
+        # Create mock userdb instance and store it in our config,
+        # and make a getter lambda for pyramid to retreive it
         userdb = MockedUserDB()
-
-        def get_userdb(request):
-            return config.registry.settings['userdb']
-
         config.registry.settings['userdb'] = userdb
-        config.add_request_method(get_userdb, 'userdb', reify=True)
+        config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
     config = configure_auth(config, settings)
     # saml2 views
