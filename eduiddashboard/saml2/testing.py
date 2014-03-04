@@ -13,6 +13,7 @@ from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
 from eduid_am.userdb import UserDB
+import eduid_am.exceptions
 from eduid_am.user import User
 from eduiddashboard.saml2 import includeme as saml2_includeme
 
@@ -35,11 +36,11 @@ class MockedUserDB(UserDB):
     }
 
     def __init__(self):
-        pass
+        self.exceptions = eduid_am.exceptions
 
     def get_user(self, userid):
         if userid not in self.test_users:
-            raise self.UserDoesNotExist
+            raise self.exceptions.UserDoesNotExist
         return User(self.test_users.get(userid))
 
 
