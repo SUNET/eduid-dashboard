@@ -3,6 +3,9 @@
 from deform import Button
 import json
 
+from datetime import datetime
+from time import time
+
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render, render_to_response
 from pyramid.view import view_config
@@ -32,36 +35,39 @@ def change_password(request, user, old_password, new_password):
 
 def new_reset_password_code(request, user, mechanism='email'):
     hash_code = get_unique_hash()
+    date = datetime.fromtimestamp(time(), None)
     request.db.reset_passwords.insert({
         'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
         'verified': False,
+        'created_at': date,
     }, safe=True)
     reset_password_link = request.route_url(
         "reset-password-step2",
         code=hash_code,
     )
-    return (hash_code, reset_password_link)
+    return reset_password_link
 
 
-def send_reset_password_mail(request, email, user, code, reset_password_link):
+def send_reset_password_mail(request, user, reset_password_link):
     """ Send an email with the instructions for resetting password """
     mailer = get_mailer(request)
 
     site_name = request.registry.settings.get("site.name", "eduID")
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    email = user.get_mail()
 
     context = {
         "email": email,
-        "given_name": user.get_given_name(),
-        "code": code,
         "reset_password_link": reset_password_link,
+        "password_reset_timeout": password_reset_timeout,
         "site_url": request.route_url("home"),
         "site_name": site_name,
     }
 
     message = Message(
-        subject=_("Reset your password in {site_name}").format(
+        subject=_("Reset your {site_name} password").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
         recipients=[email],
@@ -79,10 +85,12 @@ def send_reset_password_mail(request, email, user, code, reset_password_link):
     mailer.send(message)
 
 
-def send_reset_password_gov_message(request, nin, user, code, reset_password_link):
+def send_reset_password_gov_message(request, nin, user, reset_password_link):
     """ Send an message to the gov mailbox with the instructions for resetting password """
     user_language = user.get_preferred_language()
-    request.msgrelay.nin_reset_password(nin, code, reset_password_link, user_language)
+    email = user.get_mail()
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    request.msgrelay.nin_reset_password(nin, email, reset_password_link, password_reset_timeout, user_language)
 
 
 @view_config(route_name='security', permission='edit')
@@ -282,9 +290,8 @@ class ResetPasswordEmailView(BaseResetPasswordView):
             user = None
 
         if user is not None:
-            code, reset_password_link = new_reset_password_code(self.request, user)
-            email = user.get_mail()
-            send_reset_password_mail(self.request, email, user, code, reset_password_link)
+            reset_password_link = new_reset_password_code(self.request, user)
+            send_reset_password_mail(self.request, user, reset_password_link)
 
         self.request.session['_reset_type'] = _('email')
         return HTTPFound(location=self.request.route_url('reset-password-sent'))
@@ -326,8 +333,8 @@ class ResetPasswordNINView(BaseResetPasswordView):
             if nins:
                 nin = nins[-1]
             if nin is not None:
-                code, reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
-                send_reset_password_gov_message(self.request, nin, user, code, reset_password_link)
+                reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
+                send_reset_password_gov_message(self.request, nin, user, reset_password_link)
 
         self.request.session['_reset_type'] = _('Myndighetspost')
         return HTTPFound(location=self.request.route_url('reset-password-sent'))

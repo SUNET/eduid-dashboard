@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-04 13:16+0100\n"
+"POT-Creation-Date: 2014-03-04 14:21+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgid "{site_name} confirmation email"
 msgstr ""
 
 #: eduiddashboard/models.py:25 eduiddashboard/models.py:56
-#: eduiddashboard/views/security.py:289
+#: eduiddashboard/views/security.py:296
 msgid "email"
 msgstr ""
 
@@ -537,11 +537,11 @@ msgid ""
 "  </p>\n"
 msgstr ""
 
-#: eduiddashboard/templates/passwords-form-dialog.jinja2:124
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:151
 msgid "A stronger password is required."
 msgstr ""
 
-#: eduiddashboard/templates/passwords-form-dialog.jinja2:136
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:167
 msgid "Type the same password again"
 msgstr ""
 
@@ -567,7 +567,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:23
 #: eduiddashboard/templates/passwords-form.jinja2:32
-#: eduiddashboard/views/security.py:99
+#: eduiddashboard/views/security.py:107
 msgid "Change password"
 msgstr ""
 
@@ -670,46 +670,35 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"<h2>Dear %(given_name)s,</h2>\n"
-"\n"
-"<p>We are sending this email because we have received a request to reset "
-"the password for your\n"
-"<a href=\"%(site_url)s\">%(site_name)s</a> account %(email)s. If you did "
-"not initiate this request,\n"
-"you may simply disregard this email.\n"
-"</p>\n"
-"\n"
-"<p>Click on the following link to create a new password.</p>\n"
-"\n"
-"<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
-"\n"
-"<p>If clicking on the link above does not work, go to the reset password "
-"page and enter the following code:</p>\n"
-"\n"
-"<p><strong>%(code)s</strong></p>\n"
-"\n"
-"(This is an automated email. Please do not reply.)\n"
+"<h2>Hi,</h2>\n"
+"<p>You recently asked to reset your password for the %(site_name)s "
+"account: %(email)s</p>\n"
+"<p>To change your password, click the link below:</p>\n"
+"<p><a href=\"%(reset_password_link)s\">%(reset_password_link)s</a></p>\n"
+"<p>If clicking the link does not work you can copy and paste it into your"
+" browser.</p>\n"
+"<p>The password reset link is valid for %(password_reset_timeout)s "
+"hours.</p>\n"
+"<p>(This is an automated email. Please do not reply.)</p>\n"
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-email.txt.jinja2:1
 #, python-format
 msgid ""
 "\n"
-"Dear %(given_name)s,\n"
+"Hi,\n"
 "\n"
-"We are sending this email because we have received a request to reset the"
-" password for your\n"
-"%(site_name)s account %(email)s. If you did not initiate this request,\n"
-"you may simply disregard this email.\n"
+"You recently asked to reset your password for the %(site_name)s account: "
+"%(email)s\n"
 "\n"
-"Click on the following link to create a new password.\n"
+"To change your password, click the link below:\n"
 "\n"
 "%(reset_password_link)s\n"
 "\n"
-"If clicking on the link above does not work, go to the reset password "
-"page and enter the following code:\n"
+"If clicking the link does not work you can copy and paste it into your "
+"browser.\n"
 "\n"
-"%(code)s\n"
+"The password reset link is valid for %(password_reset_timeout)s hours.\n"
 "\n"
 "(This is an automated email. Please do not reply.)\n"
 msgstr ""
@@ -1112,58 +1101,58 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: eduiddashboard/views/security.py:64
-msgid "Reset your password in {site_name}"
+#: eduiddashboard/views/security.py:70
+msgid "Reset your {site_name} password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:183
+#: eduiddashboard/views/security.py:191
 msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/security.py:185
+#: eduiddashboard/views/security.py:193
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/security.py:228
+#: eduiddashboard/views/security.py:236
 msgid ""
 "Enter an email address, social security number or phone number associated"
 " with your eduID account, and we'll send you a link to reset your "
 "password."
 msgstr ""
 
-#: eduiddashboard/views/security.py:267 eduiddashboard/views/security.py:306
+#: eduiddashboard/views/security.py:275 eduiddashboard/views/security.py:313
 msgid "Reset password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:268 eduiddashboard/views/security.py:307
+#: eduiddashboard/views/security.py:276 eduiddashboard/views/security.py:314
 msgid "Cancel"
 msgstr ""
 
-#: eduiddashboard/views/security.py:332
+#: eduiddashboard/views/security.py:339
 msgid "Myndighetspost"
 msgstr ""
 
-#: eduiddashboard/views/security.py:350
+#: eduiddashboard/views/security.py:357
 msgid "Complete your password reset"
 msgstr ""
 
-#: eduiddashboard/views/security.py:356
+#: eduiddashboard/views/security.py:363
 msgid "Invalid code."
 msgstr ""
 
-#: eduiddashboard/views/security.py:371
+#: eduiddashboard/views/security.py:378
 msgid "Password has been reset successfully"
 msgstr ""
 
-#: eduiddashboard/views/security.py:373
+#: eduiddashboard/views/security.py:380
 msgid ""
 "An error has occurred while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/security.py:376
+#: eduiddashboard/views/security.py:383
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr ""
 
@@ -1648,26 +1637,6 @@ msgstr ""
 #~ msgid "Enter your email address or your eduID username"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "\n"
-#~ "  <p>You can change your current "
-#~ "password using this form. If you "
-#~ "accept the below\n"
-#~ "  suggested password just click \"Change"
-#~ " password\". Use the checkbox to "
-#~ "choose your\n"
-#~ "  own password.</p>\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "  <p>Your password should follow the below requirements:</p>\n"
-#~ "  <ul>\n"
-#~ "    <li>Should use numbers, letters or other symbols</li>\n"
-#~ "    <li>Not contain known words</li>\n"
-#~ "  </ul>\n"
-#~ msgstr ""
-
 #~ msgid "You have repeated some words."
 #~ msgstr ""
 
@@ -1683,12 +1652,6 @@ msgstr ""
 #~ msgid "Your password looks like a date."
 #~ msgstr ""
 
-#~ msgid ""
-#~ "Your password has characters which are"
-#~ " very close between them in the "
-#~ "keyboard."
-#~ msgstr ""
-
 #~ msgid "Your password looks like a phrase that make sense."
 #~ msgstr ""
 
@@ -1701,22 +1664,64 @@ msgstr ""
 #~ msgid "Email {email} verified"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "An email has been sent to your "
-#~ "${email} inbox.This email will contain "
-#~ "instructions and a link that will "
-#~ "let you reset your password."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "An message has been sent to your"
-#~ " government mailbox with the instructions"
-#~ " to reset your password."
-#~ msgstr ""
-
 #~ msgid "Enter your confirmation code"
 #~ msgstr ""
 
 #~ msgid "Enter code"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "<h2>Dear %(given_name)s,</h2>\n"
+#~ "\n"
+#~ "<p>We are sending this email because "
+#~ "we have received a request to "
+#~ "reset the password for your\n"
+#~ "<a href=\"%(site_url)s\">%(site_name)s</a> account "
+#~ "%(email)s. If you did not initiate "
+#~ "this request,\n"
+#~ "you may simply disregard this email.\n"
+#~ "</p>\n"
+#~ "\n"
+#~ "<p>Click on the following link to create a new password.</p>\n"
+#~ "\n"
+#~ "<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
+#~ "\n"
+#~ "<p>If clicking on the link above "
+#~ "does not work, go to the reset "
+#~ "password page and enter the following"
+#~ " code:</p>\n"
+#~ "\n"
+#~ "<p><strong>%(code)s</strong></p>\n"
+#~ "\n"
+#~ "(This is an automated email. Please do not reply.)\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "Dear %(given_name)s,\n"
+#~ "\n"
+#~ "We are sending this email because "
+#~ "we have received a request to "
+#~ "reset the password for your\n"
+#~ "%(site_name)s account %(email)s. If you "
+#~ "did not initiate this request,\n"
+#~ "you may simply disregard this email.\n"
+#~ "\n"
+#~ "Click on the following link to create a new password.\n"
+#~ "\n"
+#~ "%(reset_password_link)s\n"
+#~ "\n"
+#~ "If clicking on the link above does"
+#~ " not work, go to the reset "
+#~ "password page and enter the following"
+#~ " code:\n"
+#~ "\n"
+#~ "%(code)s\n"
+#~ "\n"
+#~ "(This is an automated email. Please do not reply.)\n"
+#~ msgstr ""
+
+#~ msgid "Reset your password in {site_name}"
 #~ msgstr ""
 

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-04 13:16+0100\n"
-"PO-Revision-Date: 2014-03-04 12:23+0000\n"
+"POT-Creation-Date: 2014-03-04 14:21+0100\n"
+"PO-Revision-Date: 2014-03-04 13:37+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +28,7 @@ msgid "{site_name} confirmation email"
 msgstr "{site_name} bekräftelsemail"
 
 #: eduiddashboard/models.py:25 eduiddashboard/models.py:56
-#: eduiddashboard/views/security.py:289
+#: eduiddashboard/views/security.py:296
 msgid "email"
 msgstr "e-post"
 
@@ -536,11 +536,11 @@ msgid ""
 "  </p>\n"
 msgstr ""
 
-#: eduiddashboard/templates/passwords-form-dialog.jinja2:124
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:151
 msgid "A stronger password is required."
 msgstr ""
 
-#: eduiddashboard/templates/passwords-form-dialog.jinja2:136
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:167
 msgid "Type the same password again"
 msgstr ""
 
@@ -566,7 +566,7 @@ msgstr "Lösenord"
 
 #: eduiddashboard/templates/passwords-form.jinja2:23
 #: eduiddashboard/templates/passwords-form.jinja2:32
-#: eduiddashboard/views/security.py:99
+#: eduiddashboard/views/security.py:107
 msgid "Change password"
 msgstr "Ändra lösenord"
 
@@ -665,44 +665,33 @@ msgstr "Åtkomst nekad"
 #, python-format
 msgid ""
 "\n"
-"<h2>Dear %(given_name)s,</h2>\n"
-"\n"
-"<p>We are sending this email because we have received a request to reset the password for your\n"
-"<a href=\"%(site_url)s\">%(site_name)s</a> account %(email)s. If you did not initiate this request,\n"
-"you may simply disregard this email.\n"
-"</p>\n"
-"\n"
-"<p>Click on the following link to create a new password.</p>\n"
-"\n"
-"<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
-"\n"
-"<p>If clicking on the link above does not work, go to the reset password page and enter the following code:</p>\n"
-"\n"
-"<p><strong>%(code)s</strong></p>\n"
-"\n"
-"(This is an automated email. Please do not reply.)\n"
-msgstr "\n<h2>%(given_name)s,</h2>\n\n<p>Du har fått detta e-postmeddelande eftersom vi mottagit en begäran att återställa ditt lösenord för konto %(email)s i tjänsten <a href=\"%(site_url)s\">%(site_name)s</a>. Om du inte har begärt denna återställning av ditt lösenord ber vi dig bortse från detta e-postmeddelande.\n</p>\n\n<p>För att återställa ditt lösenord klicka på länken nedan:</p>\n\n<p><a href=\"%(reset_password_link)s\">Återställ lösenord</a></p>\n\n<p>Om länken inte fungerar, gå till sidan för att lösenordsåterställning och ange följande bekräftelsekod:</p>\n\n<p><strong>%(code)s</strong></p>\n \n<p>(Detta är ett automatiserat meddelande och det går inte att svara på.)</p>\n"
+"<h2>Hi,</h2>\n"
+"<p>You recently asked to reset your password for the %(site_name)s account: %(email)s</p>\n"
+"<p>To change your password, click the link below:</p>\n"
+"<p><a href=\"%(reset_password_link)s\">%(reset_password_link)s</a></p>\n"
+"<p>If clicking the link does not work you can copy and paste it into your browser.</p>\n"
+"<p>The password reset link is valid for %(password_reset_timeout)s hours.</p>\n"
+"<p>(This is an automated email. Please do not reply.)</p>\n"
+msgstr "\n<h2>Hej,</h2>\n\n<p>Du har bett om att byta ditt lösenord för %(site_name)s kontot: %(email)s</p>\n\n<p>För att byta ditt lösenord klick på länken här nedan:</p>\n\n<p><a href=\"%(reset_password_link)s\">%(reset_password_link)s</a></p>\n\n<p>Om det inte går att klicka på länken kan du kopiera och klistra in den i din webbläsare.</p>\n\n<p>Länken för återställning av ditt lösenord är giltig i %(password_reset_timeout)s timmar.</p>\n\n<p>(Detta är ett automatiserat meddelande och går ej att svara på.)</p>\n"
 
 #: eduiddashboard/templates/reset-password-email.txt.jinja2:1
 #, python-format
 msgid ""
 "\n"
-"Dear %(given_name)s,\n"
+"Hi,\n"
 "\n"
-"We are sending this email because we have received a request to reset the password for your\n"
-"%(site_name)s account %(email)s. If you did not initiate this request,\n"
-"you may simply disregard this email.\n"
+"You recently asked to reset your password for the %(site_name)s account: %(email)s\n"
 "\n"
-"Click on the following link to create a new password.\n"
+"To change your password, click the link below:\n"
 "\n"
 "%(reset_password_link)s\n"
 "\n"
-"If clicking on the link above does not work, go to the reset password page and enter the following code:\n"
+"If clicking the link does not work you can copy and paste it into your browser.\n"
 "\n"
-"%(code)s\n"
+"The password reset link is valid for %(password_reset_timeout)s hours.\n"
 "\n"
 "(This is an automated email. Please do not reply.)\n"
-msgstr "\n%(given_name)s,\n\nDu har fått detta e-postmeddelande eftersom vi mottagit en begäran att återställa ditt lösenord för konto %(email)s i tjänsten %(site_name)s. Om du inte har begärt denna återställning av ditt lösenord ber vi dig bortse från detta e-postmeddelande.\n\nFör att återställa ditt lösenord klicka på länken nedan:\n\n%(reset_password_link)s\n\nOm länken inte fungerar, gå till sidan för att lösenordsåterställning och ange följande bekräftelsekod:\n\n%(code)s\n \n(Detta är ett automatiserat meddelande och det går inte att svara på.)\n"
+msgstr "\nHej,\n\nDu har bett om att byta ditt lösenord för %(site_name)s kontot: %(email)s\n\nFör att byta ditt lösenord klick på länken här nedan:\n\n%(reset_password_link)s\n\nOm det inte går att klicka på länken kan du kopiera och klistra in den i din webbläsare.\n\nLänken för återställning av ditt lösenord är giltig i %(password_reset_timeout)s timmar.\n\n(Detta är ett automatiserat meddelande och går ej att svara på.)\n"
 
 #: eduiddashboard/templates/reset-password-expired.jinja2:7
 msgid "Invalid code for resetting your password"
@@ -1096,57 +1085,57 @@ msgstr "Ändringarna har sparats."
 msgid "Save"
 msgstr "Spara"
 
-#: eduiddashboard/views/security.py:64
-msgid "Reset your password in {site_name}"
-msgstr "Återställ ditt lösenord"
+#: eduiddashboard/views/security.py:70
+msgid "Reset your {site_name} password"
+msgstr "Återställning av ditt {site_name} lösenord"
 
-#: eduiddashboard/views/security.py:183
+#: eduiddashboard/views/security.py:191
 msgid "Your password has been successfully updated"
 msgstr "Ditt lösenord har uppdaterats"
 
-#: eduiddashboard/views/security.py:185
+#: eduiddashboard/views/security.py:193
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/views/security.py:228
+#: eduiddashboard/views/security.py:236
 msgid ""
 "Enter an email address, social security number or phone number associated "
 "with your eduID account, and we'll send you a link to reset your password."
 msgstr "Ange en e-postadress, personnummer eller mobiltelefonnummer associerat med ditt eduID konto så skickar vi en länk för att återställa ditt lösenord."
 
-#: eduiddashboard/views/security.py:267 eduiddashboard/views/security.py:306
+#: eduiddashboard/views/security.py:275 eduiddashboard/views/security.py:313
 msgid "Reset password"
 msgstr "Återställ lösenordet"
 
-#: eduiddashboard/views/security.py:268 eduiddashboard/views/security.py:307
+#: eduiddashboard/views/security.py:276 eduiddashboard/views/security.py:314
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: eduiddashboard/views/security.py:332
+#: eduiddashboard/views/security.py:339
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:350
+#: eduiddashboard/views/security.py:357
 msgid "Complete your password reset"
 msgstr "Återställ lösenord"
 
-#: eduiddashboard/views/security.py:356
+#: eduiddashboard/views/security.py:363
 msgid "Invalid code."
 msgstr "Ogiltig kod."
 
-#: eduiddashboard/views/security.py:371
+#: eduiddashboard/views/security.py:378
 msgid "Password has been reset successfully"
 msgstr "Ditt lösenord har uppdaterats"
 
-#: eduiddashboard/views/security.py:373
+#: eduiddashboard/views/security.py:380
 msgid ""
 "An error has occurred while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/security.py:376
+#: eduiddashboard/views/security.py:383
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr "Du kan nu logga in genom att <a href=\"${homelink}\">klicka här.</a>"
 

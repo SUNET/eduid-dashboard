@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 TEMPLATES_RELATION = {
     'phone-validator': 'dummy',
     'nin-validator': 'nin-confirm',
-    'nin-reset-password': 'dummy',
+    'nin-reset-password': 'nin-reset-password',
 }
 
 
@@ -144,7 +144,7 @@ class MsgRelay(object):
         self._send_message.delay('mm', content, nin,
                                  TEMPLATES_RELATION.get('nin-validator'), lang)
 
-    def nin_reset_password(self, nin, code, link, language):
+    def nin_reset_password(self, nin, email, link, password_reset_timeout, language):
         """
             The template keywords are:
                 * sitename: eduID by default
@@ -155,13 +155,13 @@ class MsgRelay(object):
         """
         content = self.get_content()
         content.update({
-            'nin': nin,
-            'code': code,
-            'link': link,
+            'email': email,
+            'reset_link_password': link,
+            'password_reset_timeout': password_reset_timeout,
         })
         lang = self.get_language(language)
-        logger.debug('SENT nin reset password message code: {0} NIN: {1}'.format(
-                     code, nin))
+        logger.debug('SENT nin reset link message: {0} NIN: {1}'.format(
+                     link, nin))
         self._send_message.delay('mm', content, nin,
                                  TEMPLATES_RELATION.get('nin-reset-password'),
                                  lang)
