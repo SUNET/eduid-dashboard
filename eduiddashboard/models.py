@@ -162,32 +162,14 @@ class EmailResetPassword(colander.MappingSchema):
 
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Enter your email address or your eduID username"),
-        validator=colander.All(
-            EmailOrUsernameExistsValidator(),
-        )
+        title=_("Email, phone or social security number")
     )
 
 
 class NINResetPassword(colander.MappingSchema):
-
-    # norEduPersonNIN = colander.SchemaNode(
-    #     colander.String(),
-    #     title=_('personal identity number (NIN)'),
-    #     validator=colander.All(
-    #         colander.Regex(
-    #             regex=re.compile('[0-9]{12}'),
-    #             msg=_('The personal identity number consists of 12 digits')
-    #         ),
-    #         NINExistsValidator(),
-    #     )
-    # )
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Enter your email address or your eduID username"),
-        validator=colander.All(
-            EmailOrUsernameExistsValidator(),
-        )
+        title=_("Email, phone or social security number")
     )
 
 

@@ -242,11 +242,11 @@ class ResetPasswordFormTests(LoggedInReguestTests):
 
         form['email_or_username'].value = 'notexistingmail@foodomain.com'
         response = form.submit('reset')
-        self.assertIn('No user matching email', response.text)
+        self.assertEqual(response.status, '302 Found')
 
         form['email_or_username'].value = 'johnnysmith3@example.com'
         response = form.submit('reset')
-        self.assertIn('is not verified', response.text)
+        self.assertEqual(response.status, '302 Found')
 
         reset_passwords = list(self.db.reset_passwords.find())
         for email in self.user['mailAliases']:
