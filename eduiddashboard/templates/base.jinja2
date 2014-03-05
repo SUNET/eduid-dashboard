@@ -43,7 +43,12 @@
             {% endif %}
             <li class='nav-separator'></li>
           </ul>
-          <a href="{{ request.route_path('home') }}"><img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/></a>
+          <a href="{{ request.route_path('home') }}">
+              <img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/>
+          </a>
+          <a href="http://www.sunet.se/">
+              <img src="{{'eduiddashboard:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
+          </a>
           <div class="clear-right"></div>
         </div>
 
