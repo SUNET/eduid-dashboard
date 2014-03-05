@@ -20,7 +20,7 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.utils import flash, generate_password, get_unique_hash
+from eduiddashboard.utils import flash, generate_password, get_unique_hash, validate_email_format, normalize_email
 from eduiddashboard import log
 
 
@@ -279,6 +279,11 @@ class ResetPasswordEmailView(BaseResetPasswordView):
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         email_or_username = passwords_data['email_or_username']
+
+        # If input is a mail address we need to normalize it (ie lower case etc)
+        if validate_email_format(email_or_username):
+            email_or_username = normalize_email(email_or_username)
+
         try:
             filter_dict = {'$or': []}
             for field in self.SEARCH_FIELDS:
@@ -317,6 +322,11 @@ class ResetPasswordNINView(BaseResetPasswordView):
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         email_or_username = passwords_data['email_or_username']
+
+        # If input is a mail address we need to normalize it (ie lower case etc)
+        if validate_email_format(email_or_username):
+            email_or_username = normalize_email(email_or_username)
+
         try:
             filter_dict = {'$or': []}
             for field in self.SEARCH_FIELDS:

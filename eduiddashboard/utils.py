@@ -1,5 +1,6 @@
 from hashlib import sha256
 from uuid import uuid4
+import re
 import time
 from pwgen import pwgen
 
@@ -19,6 +20,11 @@ MAX_LOA_ROL = {
     'helpdesk': AVAILABLE_LOA_LEVEL[1],
     'admin': AVAILABLE_LOA_LEVEL[2],
 }
+
+# http://www.regular-expressions.info/email.html
+RFC2822_email = re.compile("(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
+                           "?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\."
+                           ")+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
 
 def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha256):
@@ -159,3 +165,7 @@ def generate_password(length=12):
 
 def normalize_email(addr):
     return addr.lower()
+
+
+def validate_email_format(email):
+    return RFC2822_email.match(email)
