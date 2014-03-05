@@ -73,7 +73,7 @@
     <div id="footer">
         <div class="container">
             <p>
-              &copy; SUNET 2013
+              &copy; SUNET 2013-2014
               <span class="pull-right">
                 {% for lang,label in request.registry.settings.get('available_languages', {}).items() %}
                     <span class="langselector">
@@ -143,12 +143,5 @@
     {% block extrajs %}
     {% endblock %}
 
-    {% if 'example.com' not in request.url %}
-    <div id="getsat-widget-6824"></div>
-    <script type="text/javascript" src="https://loader.engage.gsfn.us/loader.js"></script>
-    <script type="text/javascript">
-      if (typeof GSFN !== "undefined") { GSFN.loadWidget(6824,{"containerId":"getsat-widget-6824"}); }
-    </script>
-    {% endif %}
   </body>
 </html>
