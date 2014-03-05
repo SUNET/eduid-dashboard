@@ -43,6 +43,7 @@ requires = [
     'zxcvbn==1.0',
     # Fix eduid_msg version
     'eduid_msg==0.7.5',
+    'pytz'
 ]
 
 if sys.version_info[0] < 3:

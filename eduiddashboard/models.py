@@ -162,57 +162,30 @@ class EmailResetPassword(colander.MappingSchema):
 
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Enter your email address or your eduID username"),
-        validator=colander.All(
-            EmailOrUsernameExistsValidator(),
-        )
+        title=_("Email, phone or social security number")
     )
 
 
 class NINResetPassword(colander.MappingSchema):
-
-    # norEduPersonNIN = colander.SchemaNode(
-    #     colander.String(),
-    #     title=_('personal identity number (NIN)'),
-    #     validator=colander.All(
-    #         colander.Regex(
-    #             regex=re.compile('[0-9]{12}'),
-    #             msg=_('The personal identity number consists of 12 digits')
-    #         ),
-    #         NINExistsValidator(),
-    #     )
-    # )
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Enter your email address or your eduID username"),
-        validator=colander.All(
-            EmailOrUsernameExistsValidator(),
-        )
-    )
-
-
-class ResetPasswordEnterCode(colander.MappingSchema):
-
-    code = colander.SchemaNode(
-        colander.String(),
-        title=_('Confirmation code'),
-        validator=colander.All(
-            ResetPasswordCodeExistsValidator(),
-        )
+        title=_("Email, phone or social security number")
     )
 
 
 class ResetPasswordStep2(colander.MappingSchema):
     new_password = colander.SchemaNode(colander.String(),
                                        widget=deform.widget.PasswordWidget(size=20),
-                                       validator=PasswordValidator())
+                                       validator=PasswordValidator(),
+                                       title=_("New Password"))
     new_password_repeated = colander.SchemaNode(colander.String(),
-                                                widget=deform.widget.PasswordWidget(size=20))
+                                                widget=deform.widget.PasswordWidget(size=20),
+                                                title=_("Confirm New Password"))
 
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
-                                   _("Passwords don't match"))
+                                   _("Passwords doesn't match"))
 
 
 @colander.deferred

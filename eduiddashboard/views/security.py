@@ -3,8 +3,10 @@
 from deform import Button
 import json
 
-from pyramid.httpexceptions import HTTPFound, HTTPNotFound
-from pyramid.i18n import get_localizer
+from datetime import datetime, timedelta
+import pytz
+
+from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render, render_to_response
 from pyramid.view import view_config
 
@@ -12,16 +14,13 @@ from pyramid_deform import FormView
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
-from eduid_am.exceptions import UserDoesNotExist
-from eduid_am.tasks import update_attributes
-
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
-                                   NINResetPassword, ResetPasswordEnterCode,
+                                   NINResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.utils import flash, get_short_hash, generate_password
+from eduiddashboard.utils import flash, generate_password, get_unique_hash, validate_email_format, normalize_email
 from eduiddashboard import log
 
 
@@ -35,37 +34,42 @@ def change_password(request, user, old_password, new_password):
 
 
 def new_reset_password_code(request, user, mechanism='email'):
-    hash_code = get_short_hash()
+    hash_code = get_unique_hash()
+    date = datetime.now(pytz.utc)
+    request.db.reset_passwords.remove({
+        'email': user.get_mail()
+    })
     request.db.reset_passwords.insert({
         'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
-        'verified': False,
+        'created_at': date,
     }, safe=True)
     reset_password_link = request.route_url(
         "reset-password-step2",
         code=hash_code,
     )
-    return (hash_code, reset_password_link)
+    return reset_password_link
 
 
-def send_reset_password_mail(request, email, user, code, reset_password_link):
+def send_reset_password_mail(request, user, reset_password_link):
     """ Send an email with the instructions for resetting password """
     mailer = get_mailer(request)
 
     site_name = request.registry.settings.get("site.name", "eduID")
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    email = user.get_mail()
 
     context = {
         "email": email,
-        "given_name": user.get_given_name(),
-        "code": code,
         "reset_password_link": reset_password_link,
+        "password_reset_timeout": password_reset_timeout,
         "site_url": request.route_url("home"),
         "site_name": site_name,
     }
 
     message = Message(
-        subject=_("Reset your password in {site_name}").format(
+        subject=_("Reset your {site_name} password").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
         recipients=[email],
@@ -83,10 +87,12 @@ def send_reset_password_mail(request, email, user, code, reset_password_link):
     mailer.send(message)
 
 
-def send_reset_password_gov_message(request, nin, user, code, reset_password_link):
+def send_reset_password_gov_message(request, nin, user, reset_password_link):
     """ Send an message to the gov mailbox with the instructions for resetting password """
     user_language = user.get_preferred_language()
-    request.msgrelay.nin_reset_password(nin, code, reset_password_link, user_language)
+    email = user.get_mail()
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    request.msgrelay.nin_reset_password(nin, email, reset_password_link, password_reset_timeout, user_language)
 
 
 @view_config(route_name='security', permission='edit')
@@ -206,8 +212,32 @@ def reset_password_expired(context, request):
     }
 
 
+@view_config(route_name='reset-password-sent', permission='edit',
+             request_method='GET', renderer='templates/reset-password-sent.jinja2')
+def reset_password_sent(context, request):
+    """
+    Reset password sent confirmation view.
+    """
+    if '_reset_type' in request.session:
+        type = request.session['_reset_type']
+        request.session.invalidate()
+        return {
+            'type': type,
+            'login_url': request.route_url('saml2-login'),
+        }
+
+    return HTTPFound(location=request.route_url('reset-password'))
+
+
 class BaseResetPasswordView(FormView):
-    intro_message = None  # to override in subclasses
+    SEARCH_FIELDS = [
+        'mailAliases.email',
+        'mobile.mobile',
+        'norEduPersonNIN',
+    ]
+    intro_message = _("Enter an email address, social security number or phone number "
+                      "associated with your eduID account, "
+                      "and we'll send you a link to reset your password.")
 
     def __init__(self, context, request):
         super(BaseResetPasswordView, self).__init__(request)
@@ -216,7 +246,7 @@ class BaseResetPasswordView(FormView):
 
         self.form_options = {
             'formid': "{classname}-form".format(classname=self.classname),
-            'bootstrap_form_style': 'form-inline',
+            'bootstrap_form_style': 'form-vertical',
         }
 
     def get_template_context(self):
@@ -243,28 +273,39 @@ class ResetPasswordEmailView(BaseResetPasswordView):
     """
     schema = EmailResetPassword()
     route = 'reset-password-email'
-    intro_message = _('Forgot your password?')
-    buttons = (Button('reset', title=_('Reset password'), css_class='btn-danger'), )
+    buttons = (
+        Button('reset', title=_('Reset password'), css_class='btn-danger'),
+        Button('cancel', _('Cancel')),
+    )
 
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         email_or_username = passwords_data['email_or_username']
-        try:
-            user = self.request.userdb.get_user_by_email(email_or_username)
-        except UserDoesNotExist:
-            user = self.request.userdb.get_user_by_username(email_or_username)
-        code, reset_password_link = new_reset_password_code(self.request, user)
-        email = user.get_mail()
-        send_reset_password_mail(self.request, email, user, code, reset_password_link)
-        msg = _('An email has been sent to your ${email} inbox.'
-                'This email will contain instructions and a link '
-                'that will let you reset your password.', mapping={
-                  'email': email,
-              })
-        msg = get_localizer(self.request).translate(msg)
 
-        flash(self.request, 'info', msg)
-        return HTTPFound(location=self.request.route_url('reset-password-enter-code'))
+        # If input is a mail address we need to normalize it (ie lower case etc)
+        if validate_email_format(email_or_username):
+            email_or_username = normalize_email(email_or_username)
+
+        try:
+            filter_dict = {'$or': []}
+            for field in self.SEARCH_FIELDS:
+                filter_dict['$or'].append({field: email_or_username})
+
+            user = self.request.userdb.get_user_by_filter(filter_dict)
+        except self.request.userdb.exceptions.UserDoesNotExist:
+            log.debug("User {!r} does not exist".format(email_or_username))
+            user = None
+
+        if user is not None:
+            reset_password_link = new_reset_password_code(self.request, user)
+            send_reset_password_mail(self.request, user, reset_password_link)
+
+        self.request.session['_reset_type'] = _('email')
+        return HTTPFound(location=self.request.route_url('reset-password-sent'))
+
+    def cancel_success(self, passwordform):
+        return HTTPFound(location=self.request.route_url('saml2-login'))
+    cancel_failure = cancel_success
 
 
 @view_config(route_name='reset-password-mina', permission='edit',
@@ -275,48 +316,44 @@ class ResetPasswordNINView(BaseResetPasswordView):
     """
     schema = NINResetPassword()
     route = 'reset-password-mina'
-    intro_message = _('Forgot your password?')
-    buttons = (Button('reset', title=_('Reset password'), css_class='btn-success'), )
+    buttons = (
+        Button('reset', title=_('Reset password'), css_class='btn-success'),
+        Button('cancel', _('Cancel')),
+    )
 
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         email_or_username = passwords_data['email_or_username']
+
+        # If input is a mail address we need to normalize it (ie lower case etc)
+        if validate_email_format(email_or_username):
+            email_or_username = normalize_email(email_or_username)
+
         try:
-            user = self.request.userdb.get_user_by_email(email_or_username)
-        except UserDoesNotExist:
-            user = self.request.userdb.get_user_by_username(email_or_username)
-        nin = None
-        nins = user.get_nins()
-        if nins:
-            nin = nins[-1]
-        if nin is None:
-            flash(self.request, 'info', _('Error: missing government mailbox '
-                                          'for %s' % email_or_username))
-            return HTTPFound(location=self.request.route_url('reset-password-mina'))
-        code, reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
-        send_reset_password_gov_message(self.request, nin, user, code, reset_password_link)
-        flash(self.request, 'info', _('An message has been sent to your government mailbox '
-                                      'with the instructions to reset your password.'))
-        return HTTPFound(location=self.request.route_url('reset-password-enter-code'))
+            filter_dict = {'$or': []}
+            for field in self.SEARCH_FIELDS:
+                filter_dict['$or'].append({field: email_or_username})
 
+            user = self.request.userdb.get_user_by_filter(filter_dict)
+        except self.request.userdb.exceptions.UserDoesNotExist:
+            log.debug("User {!r} does not exist".format(email_or_username))
+            user = None
 
-@view_config(route_name='reset-password-enter-code', permission='edit',
-             renderer='templates/reset-password-enter-code-form.jinja2')
-class ResetPasswordEnterCodeView(BaseResetPasswordView):
-    """
-    Reset user password.
-    """
-    schema = ResetPasswordEnterCode()
-    route = 'reset-password-enter-code'
-    intro_message = _('Enter your confirmation code')
-    buttons = (Button('entercode', title=_('Enter code')), )
+        if user is not None:
+            nin = None
+            nins = user.get_nins()
+            if nins:
+                nin = nins[-1]
+            if nin is not None:
+                reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
+                send_reset_password_gov_message(self.request, nin, user, reset_password_link)
 
-    def entercode_success(self, passwordform):
-        reset_password_link = self.request.route_url(
-            "reset-password-step2",
-            code=passwordform['code'],
-        )
-        return HTTPFound(location=reset_password_link)
+        self.request.session['_reset_type'] = _('Myndighetspost')
+        return HTTPFound(location=self.request.route_url('reset-password-sent'))
+
+    def cancel_success(self, passwordform):
+        return HTTPFound(location=self.request.route_url('saml2-login'))
+    cancel_failure = cancel_success
 
 
 @view_config(route_name='reset-password-step2', permission='edit',
@@ -328,28 +365,39 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
     schema = ResetPasswordStep2()
     route = 'reset-password-step2'
-    buttons = ('reset', )
-    intro_message = _('Complete your password reset')
+    buttons = (
+        Button('reset', title=_('Update password'), css_class='btn-success'),
+        Button('cancel', _('Cancel')),
+    )
+    intro_message = _('Please choose a new password for your eduID account.')
 
     def __call__(self):
         hash_code = self.request.matchdict['code']
-        reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
-        if reset_passwords.count() == 0:
-            flash(self.request, 'error', _('Invalid code.'))
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+
+        if password_reset is None:
             return HTTPFound(self.request.route_path('reset-password-expired'))
+
+        date = datetime.now(pytz.utc)
+        reset_timeout = int(self.request.registry.settings['password_reset_timeout'])
+        reset_date = password_reset['created_at'] + timedelta(minutes=reset_timeout)
+        if reset_date < date:
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
+            return HTTPFound(self.request.route_path('reset-password-expired'))
+
         return super(ResetPasswordStep2View, self).__call__()
 
     def reset_success(self, passwordform):
         hash_code = self.request.matchdict['code']
-        reset_password = self.request.db.reset_passwords.find({'hash_code': hash_code})[0]
-        user = self.request.userdb.get_user_by_email(reset_password['email'])
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+        user = self.request.userdb.get_user_by_email(password_reset['email'])
 
         new_password = passwordform['new_password']
         ok = change_password(self.request, user, '', new_password)
         if ok:
-            if reset_password['mechanism'] == 'email':
+            if password_reset['mechanism'] == 'email':
                 pass  # TODO: reset the user LOA
-            self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:
             flash(self.request, 'info', _('An error has occurred while updating your password, '
@@ -358,3 +406,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             'message': _('You can now log in by <a href="${homelink}">clicking here</a>',
                          mapping={'homelink': self.request.route_url('profile-editor')}),
         }
+
+    def cancel_success(self, passwordform):
+        return HTTPFound(location=self.request.route_url('saml2-login'))
+    cancel_failure = cancel_success
