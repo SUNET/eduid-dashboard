@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-04 14:21+0100\n"
+"POT-Creation-Date: 2014-03-05 10:16+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -23,7 +23,7 @@ msgid "{site_name} confirmation email"
 msgstr ""
 
 #: eduiddashboard/models.py:25 eduiddashboard/models.py:56
-#: eduiddashboard/views/security.py:296
+#: eduiddashboard/views/security.py:303
 msgid "email"
 msgstr ""
 
@@ -92,54 +92,56 @@ msgid "Email, phone or social security number"
 msgstr ""
 
 #: eduiddashboard/models.py:180
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:95
-msgid "Confirmation code"
+msgid "New Password"
 msgstr ""
 
-#: eduiddashboard/models.py:197
-msgid "Passwords don't match"
+#: eduiddashboard/models.py:183
+msgid "Confirm New Password"
 msgstr ""
 
-#: eduiddashboard/models.py:208
+#: eduiddashboard/models.py:188
+msgid "Passwords doesn't match"
+msgstr ""
+
+#: eduiddashboard/models.py:199
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr ""
 
-#: eduiddashboard/models.py:209
+#: eduiddashboard/models.py:200
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
-#: eduiddashboard/models.py:210
+#: eduiddashboard/models.py:201
 msgid "Postal code"
 msgstr ""
 
-#: eduiddashboard/models.py:212
+#: eduiddashboard/models.py:203
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:221
+#: eduiddashboard/models.py:212
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
 msgstr ""
 
-#: eduiddashboard/models.py:225
+#: eduiddashboard/models.py:216
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:226
+#: eduiddashboard/models.py:217
 msgid "Mobile phone number"
 msgstr ""
 
-#: eduiddashboard/models.py:240 eduiddashboard/templates/home.jinja2:17
+#: eduiddashboard/models.py:231 eduiddashboard/templates/home.jinja2:17
 msgid "Search for users"
 msgstr ""
 
-#: eduiddashboard/models.py:241
+#: eduiddashboard/models.py:232
 msgid "query"
 msgstr ""
 
@@ -159,15 +161,15 @@ msgstr ""
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 
-#: eduiddashboard/utils.py:49
+#: eduiddashboard/utils.py:55
 msgid "Login token expired, please await confirmation e-mail to log in."
 msgstr ""
 
-#: eduiddashboard/utils.py:53 eduiddashboard/utils.py:61
+#: eduiddashboard/utils.py:59 eduiddashboard/utils.py:67
 msgid "Login token invalid"
 msgstr ""
 
-#: eduiddashboard/utils.py:94 eduiddashboard/templates/passwords-form.jinja2:4
+#: eduiddashboard/utils.py:100 eduiddashboard/templates/passwords-form.jinja2:4
 msgid "Security"
 msgstr ""
 
@@ -567,7 +569,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:23
 #: eduiddashboard/templates/passwords-form.jinja2:32
-#: eduiddashboard/views/security.py:107
+#: eduiddashboard/views/security.py:109
 msgid "Change password"
 msgstr ""
 
@@ -704,29 +706,17 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-expired.jinja2:7
-msgid "Invalid code for resetting your password"
-msgstr ""
-
-#: eduiddashboard/templates/reset-password-expired.jinja2:9
-msgid ""
-"The code you are using is invalid. It may be that it has expired, or that"
-" it has already been used, or perhaps it is simply incorrect."
+msgid "Invalid password reset link"
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-expired.jinja2:11
 msgid ""
-"If you still want to reset your password, please initiate the proccess "
-"afresh."
+"The password reset link you have used is invalid or has expired.\n"
+"                Please click the link below to request a new link."
 msgstr ""
 
-#: eduiddashboard/templates/reset-password-expired.jinja2:16
-#: eduiddashboard/templates/reset-password.jinja2:16
-msgid "Reset password by government mailbox service"
-msgstr ""
-
-#: eduiddashboard/templates/reset-password-expired.jinja2:22
-#: eduiddashboard/templates/reset-password.jinja2:22
-msgid "Reset password by e-mail"
+#: eduiddashboard/templates/reset-password-expired.jinja2:14
+msgid "Request a new password reset link &raquo;"
 msgstr ""
 
 #: eduiddashboard/templates/reset-password-form.jinja2:7
@@ -760,6 +750,14 @@ msgstr ""
 msgid ""
 "<p>We recommend using the more secure goverment mailbox service. The "
 "e-mail based reset will reset also your Assurance Level</p>"
+msgstr ""
+
+#: eduiddashboard/templates/reset-password.jinja2:16
+msgid "Reset password by government mailbox service"
+msgstr ""
+
+#: eduiddashboard/templates/reset-password.jinja2:22
+msgid "Reset password by e-mail"
 msgstr ""
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
@@ -895,6 +893,11 @@ msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:20
 msgid "Confirm identity number"
+msgstr ""
+
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
+#: eduiddashboard/views/__init__.py:95
+msgid "Confirmation code"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:28
@@ -1101,58 +1104,59 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: eduiddashboard/views/security.py:70
+#: eduiddashboard/views/security.py:72
 msgid "Reset your {site_name} password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:191
+#: eduiddashboard/views/security.py:193
 msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/security.py:193
+#: eduiddashboard/views/security.py:195
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/security.py:236
+#: eduiddashboard/views/security.py:238
 msgid ""
 "Enter an email address, social security number or phone number associated"
 " with your eduID account, and we'll send you a link to reset your "
 "password."
 msgstr ""
 
-#: eduiddashboard/views/security.py:275 eduiddashboard/views/security.py:313
+#: eduiddashboard/views/security.py:277 eduiddashboard/views/security.py:320
 msgid "Reset password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:276 eduiddashboard/views/security.py:314
+#: eduiddashboard/views/security.py:278 eduiddashboard/views/security.py:321
+#: eduiddashboard/views/security.py:370
 msgid "Cancel"
 msgstr ""
 
-#: eduiddashboard/views/security.py:339
+#: eduiddashboard/views/security.py:351
 msgid "Myndighetspost"
 msgstr ""
 
-#: eduiddashboard/views/security.py:357
-msgid "Complete your password reset"
+#: eduiddashboard/views/security.py:369
+msgid "Update password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:363
-msgid "Invalid code."
+#: eduiddashboard/views/security.py:372
+msgid "Please choose a new password for your eduID account."
 msgstr ""
 
-#: eduiddashboard/views/security.py:378
+#: eduiddashboard/views/security.py:401
 msgid "Password has been reset successfully"
 msgstr ""
 
-#: eduiddashboard/views/security.py:380
+#: eduiddashboard/views/security.py:403
 msgid ""
 "An error has occurred while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/security.py:383
+#: eduiddashboard/views/security.py:406
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
 msgstr ""
 
@@ -1670,58 +1674,32 @@ msgstr ""
 #~ msgid "Enter code"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "\n"
-#~ "<h2>Dear %(given_name)s,</h2>\n"
-#~ "\n"
-#~ "<p>We are sending this email because "
-#~ "we have received a request to "
-#~ "reset the password for your\n"
-#~ "<a href=\"%(site_url)s\">%(site_name)s</a> account "
-#~ "%(email)s. If you did not initiate "
-#~ "this request,\n"
-#~ "you may simply disregard this email.\n"
-#~ "</p>\n"
-#~ "\n"
-#~ "<p>Click on the following link to create a new password.</p>\n"
-#~ "\n"
-#~ "<a href=\"%(reset_password_link)s\">Create a new password</a>\n"
-#~ "\n"
-#~ "<p>If clicking on the link above "
-#~ "does not work, go to the reset "
-#~ "password page and enter the following"
-#~ " code:</p>\n"
-#~ "\n"
-#~ "<p><strong>%(code)s</strong></p>\n"
-#~ "\n"
-#~ "(This is an automated email. Please do not reply.)\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Dear %(given_name)s,\n"
-#~ "\n"
-#~ "We are sending this email because "
-#~ "we have received a request to "
-#~ "reset the password for your\n"
-#~ "%(site_name)s account %(email)s. If you "
-#~ "did not initiate this request,\n"
-#~ "you may simply disregard this email.\n"
-#~ "\n"
-#~ "Click on the following link to create a new password.\n"
-#~ "\n"
-#~ "%(reset_password_link)s\n"
-#~ "\n"
-#~ "If clicking on the link above does"
-#~ " not work, go to the reset "
-#~ "password page and enter the following"
-#~ " code:\n"
-#~ "\n"
-#~ "%(code)s\n"
-#~ "\n"
-#~ "(This is an automated email. Please do not reply.)\n"
-#~ msgstr ""
-
 #~ msgid "Reset your password in {site_name}"
+#~ msgstr ""
+
+#~ msgid "Passwords don't match"
+#~ msgstr ""
+
+#~ msgid "Invalid code for resetting your password"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The code you are using is invalid."
+#~ " It may be that it has expired,"
+#~ " or that it has already been "
+#~ "used, or perhaps it is simply "
+#~ "incorrect."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "If you still want to reset your"
+#~ " password, please initiate the proccess "
+#~ "afresh."
+#~ msgstr ""
+
+#~ msgid "Complete your password reset"
+#~ msgstr ""
+
+#~ msgid "Invalid code."
 #~ msgstr ""
 

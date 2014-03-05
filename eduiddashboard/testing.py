@@ -274,6 +274,7 @@ class LoggedInReguestTests(unittest.TestCase):
             ''',
             'default_country_code': '+46',
             'vccs_url': 'http://localhost:8550/',
+            'password_reset_timeout': '120',
         }
 
         self.settings.update(settings)

@@ -5,6 +5,7 @@ from copy import deepcopy
 from bson import ObjectId
 import simplejson as json
 import vccs_client
+import pytz
 
 from eduid_am.exceptions import UserDoesNotExist
 from eduid_am.user import User
@@ -187,6 +188,9 @@ TEST_USER = {
         'mail': 'johnnysmith1@example.org',
         'eduPersonEntitlement': [],
         'mailAliases': [{
+            'email': 'johnnysmith1@example.org',
+            'verified': True,
+        }, {
             'email': 'johnnysmith2@example.com',
             'verified': True,
         }, {
@@ -248,7 +252,6 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         response = form.submit('reset')
         self.assertEqual(response.status, '302 Found')
 
-        reset_passwords = list(self.db.reset_passwords.find())
         for email in self.user['mailAliases']:
             if not email['verified']:
                 continue
@@ -256,18 +259,19 @@ class ResetPasswordFormTests(LoggedInReguestTests):
             response = form.submit('reset')
             self.assertEqual(response.status, '302 Found')
         reset_passwords_after = list(self.db.reset_passwords.find())
-        self.assertNotEqual(len(reset_passwords), len(reset_passwords_after))
+        self.assertEqual(len(reset_passwords_after), 1)
 
     def test_reset_password_code(self):
         hash_code = '123456'
+        date = datetime.now(pytz.utc)
         self.db.reset_passwords.insert({
             'email': 'johnnysmith3@example.com',
             'hash_code': hash_code,
             'mechanism': 'email',
-            'verified': False,
+            'created_at': date
         }, safe=True)
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
-        self.assertIn('Complete your password reset', response.text)
+        self.assertIn('Please choose a new password for your eduID account', response.text)
 
     def test_reset_password_invalid_code(self):
         hash_code = '123456'

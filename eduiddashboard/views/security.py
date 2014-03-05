@@ -3,8 +3,8 @@
 from deform import Button
 import json
 
-from datetime import datetime
-from time import time
+from datetime import datetime, timedelta
+import pytz
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render, render_to_response
@@ -16,7 +16,7 @@ from pyramid_mailer.message import Message
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
-                                   NINResetPassword, ResetPasswordEnterCode,
+                                   NINResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
@@ -35,12 +35,14 @@ def change_password(request, user, old_password, new_password):
 
 def new_reset_password_code(request, user, mechanism='email'):
     hash_code = get_unique_hash()
-    date = datetime.fromtimestamp(time(), None)
+    date = datetime.now(pytz.utc)
+    request.db.reset_passwords.remove({
+        'email': user.get_mail()
+    })
     request.db.reset_passwords.insert({
         'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
-        'verified': False,
         'created_at': date,
     }, safe=True)
     reset_password_link = request.route_url(
@@ -363,28 +365,39 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
     schema = ResetPasswordStep2()
     route = 'reset-password-step2'
-    buttons = ('reset', )
-    intro_message = _('Complete your password reset')
+    buttons = (
+        Button('reset', title=_('Update password'), css_class='btn-success'),
+        Button('cancel', _('Cancel')),
+    )
+    intro_message = _('Please choose a new password for your eduID account.')
 
     def __call__(self):
         hash_code = self.request.matchdict['code']
-        reset_passwords = self.request.db.reset_passwords.find({'hash_code': hash_code})
-        if reset_passwords.count() == 0:
-            flash(self.request, 'error', _('Invalid code.'))
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+
+        if password_reset is None:
             return HTTPFound(self.request.route_path('reset-password-expired'))
+
+        date = datetime.now(pytz.utc)
+        reset_timeout = int(self.request.registry.settings['password_reset_timeout'])
+        reset_date = password_reset['created_at'] + timedelta(minutes=reset_timeout)
+        if reset_date < date:
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
+            return HTTPFound(self.request.route_path('reset-password-expired'))
+
         return super(ResetPasswordStep2View, self).__call__()
 
     def reset_success(self, passwordform):
         hash_code = self.request.matchdict['code']
-        reset_password = self.request.db.reset_passwords.find({'hash_code': hash_code})[0]
-        user = self.request.userdb.get_user_by_email(reset_password['email'])
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+        user = self.request.userdb.get_user_by_email(password_reset['email'])
 
         new_password = passwordform['new_password']
         ok = change_password(self.request, user, '', new_password)
         if ok:
-            if reset_password['mechanism'] == 'email':
+            if password_reset['mechanism'] == 'email':
                 pass  # TODO: reset the user LOA
-            self.request.db.reset_passwords.remove({'_id': reset_password['_id']})
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
             flash(self.request, 'info', _('Password has been reset successfully'))
         else:
             flash(self.request, 'info', _('An error has occurred while updating your password, '
@@ -393,3 +406,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             'message': _('You can now log in by <a href="${homelink}">clicking here</a>',
                          mapping={'homelink': self.request.route_url('profile-editor')}),
         }
+
+    def cancel_success(self, passwordform):
+        return HTTPFound(location=self.request.route_url('saml2-login'))
+    cancel_failure = cancel_success

@@ -176,14 +176,16 @@ class NINResetPassword(colander.MappingSchema):
 class ResetPasswordStep2(colander.MappingSchema):
     new_password = colander.SchemaNode(colander.String(),
                                        widget=deform.widget.PasswordWidget(size=20),
-                                       validator=PasswordValidator())
+                                       validator=PasswordValidator(),
+                                       title=_("New Password"))
     new_password_repeated = colander.SchemaNode(colander.String(),
-                                                widget=deform.widget.PasswordWidget(size=20))
+                                                widget=deform.widget.PasswordWidget(size=20),
+                                                title=_("Confirm New Password"))
 
     def validator(self, node, data):
         if data['new_password'] != data['new_password_repeated']:
             raise colander.Invalid(node,
-                                   _("Passwords don't match"))
+                                   _("Passwords doesn't match"))
 
 
 @colander.deferred
