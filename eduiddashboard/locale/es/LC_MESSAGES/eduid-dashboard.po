@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-05 10:16+0100\n"
+"POT-Creation-Date: 2014-03-05 13:46+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -105,19 +105,16 @@ msgstr ""
 
 #: eduiddashboard/models.py:180
 #, fuzzy
-#| msgid "Change password"
 msgid "New Password"
 msgstr "Cambia tu contraseña"
 
 #: eduiddashboard/models.py:183
 #, fuzzy
-#| msgid "Custom password"
 msgid "Confirm New Password"
 msgstr "Cambia tu contraseña"
 
 #: eduiddashboard/models.py:188
 #, fuzzy
-#| msgid "Passwords don't match"
 msgid "Passwords doesn't match"
 msgstr "Las contraseñas no coinciden"
 
@@ -574,12 +571,12 @@ msgstr ""
 msgid ""
 "\n"
 "  </p>\n"
-"  <p>You must enter a strong password. Some tips:</p>\n"
+"  <p>Choose a strong password. Some tips:</p>\n"
 "  <ul>\n"
-"    <li>Use upper- and lowercase numbers (preferably not in the beginning"
-" or end)</li>\n"
+"    <li>Use upper- and lowercase characters (preferably not in the "
+"beginning or end)</li>\n"
 "    <li>Add digits somewhere else than at the end of the password</li>\n"
-"    <li>Add special characters, such as @ $ / } _</li>\n"
+"    <li>Add special characters, such as @ $ / + _ %</li>\n"
 "    <li>Spaces are ignored</li>\n"
 "  </ul>\n"
 "  </p>\n"
@@ -1228,7 +1225,6 @@ msgstr ""
 
 #: eduiddashboard/views/security.py:369
 #, fuzzy
-#| msgid "Repeat the password"
 msgid "Update password"
 msgstr "Cambia tu contraseña"
 
@@ -1685,23 +1681,26 @@ msgstr ""
 #~ msgid "Invalid code for resetting your password"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "The code you are using is invalid."
-#~ " It may be that it has expired,"
-#~ " or that it has already been "
-#~ "used, or perhaps it is simply "
-#~ "incorrect."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If you still want to reset your"
-#~ " password, please initiate the proccess "
-#~ "afresh."
-#~ msgstr ""
-
 #~ msgid "Complete your password reset"
 #~ msgstr "Cambia tu contraseña"
 
 #~ msgid "Invalid code."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "  </p>\n"
+#~ "  <p>You must enter a strong password. Some tips:</p>\n"
+#~ "  <ul>\n"
+#~ "    <li>Use upper- and lowercase numbers"
+#~ " (preferably not in the beginning or"
+#~ " end)</li>\n"
+#~ "    <li>Add digits somewhere else than"
+#~ " at the end of the password</li>\n"
+#~ ""
+#~ "    <li>Add special characters, such as @ $ / } _</li>\n"
+#~ "    <li>Spaces are ignored</li>\n"
+#~ "  </ul>\n"
+#~ "  </p>\n"
 #~ msgstr ""
 
