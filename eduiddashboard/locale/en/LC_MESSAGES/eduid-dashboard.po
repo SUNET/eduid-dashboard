@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-06 09:41+0100\n"
+"POT-Creation-Date: 2014-03-06 10:04+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -48,6 +48,7 @@ msgid "Swedish national identity number"
 msgstr ""
 
 #: eduiddashboard/models.py:89
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:13
 msgid "yyyymmddnnnn"
 msgstr ""
 
@@ -1701,12 +1702,5 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Your National identity number validation request can't be found"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your government inbox. Please click"
-#~ " on \"Pending confirmation\" link below "
-#~ "to enter.your confirmation code"
 #~ msgstr ""
 

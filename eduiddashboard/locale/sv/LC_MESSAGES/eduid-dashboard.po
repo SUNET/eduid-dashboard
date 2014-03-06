@@ -1,8 +1,8 @@
-# Translations template for eduid-dashboard.
+# Swedish translations for eduid-dashboard.
 # Copyright (C) 2014 ORGANIZATION
 # This file is distributed under the same license as the eduid-dashboard
 # project.
-# 
+#
 # Translators:
 # ft, 2013-2014
 # Johan Lundberg <lundberg.johan@gmail.com>, 2014
@@ -10,18 +10,18 @@
 # Ratler <swold@sunet.se>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard\n"
+"Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-06 09:41+0100\n"
+"POT-Creation-Date: 2014-03-06 10:04+0100\n"
 "PO-Revision-Date: 2014-03-06 08:49+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
-"Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
+"Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
+"dashboard/language/sv/)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
-"Language: sv\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: eduiddashboard/emails.py:33
 msgid "{site_name} confirmation email"
@@ -53,6 +53,7 @@ msgid "Swedish national identity number"
 msgstr "Personnummer"
 
 #: eduiddashboard/models.py:89
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:13
 msgid "yyyymmddnnnn"
 msgstr "ååååmmddnnnn"
 
@@ -128,7 +129,9 @@ msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
-msgstr "Felaktigt telefonnummer. Telefonnumret måste börja med \"+\" följt av 10-20 siffror."
+msgstr ""
+"Felaktigt telefonnummer. Telefonnumret måste börja med \"+\" följt av "
+"10-20 siffror."
 
 #: eduiddashboard/models.py:216
 msgid "mobile"
@@ -164,14 +167,15 @@ msgstr ""
 
 #: eduiddashboard/utils.py:55
 msgid "Login token expired, please await confirmation e-mail to log in."
-msgstr "Automatinloggningen har gått ut. Var vänlig invänta bekräftelsebrevet till din e-post för att logga in."
+msgstr ""
+"Automatinloggningen har gått ut. Var vänlig invänta bekräftelsebrevet "
+"till din e-post för att logga in."
 
 #: eduiddashboard/utils.py:59 eduiddashboard/utils.py:67
 msgid "Login token invalid"
 msgstr "Ogiltig automatinloggning"
 
-#: eduiddashboard/utils.py:100
-#: eduiddashboard/templates/passwords-form.jinja2:4
+#: eduiddashboard/utils.py:100 eduiddashboard/templates/passwords-form.jinja2:4
 msgid "Security"
 msgstr "Säkerhet"
 
@@ -231,31 +235,42 @@ msgstr "Personnumret är redan registrerat"
 
 #: eduiddashboard/validators.py:228
 msgid ""
-"Sorry, we are experiencing temporary technical problem with ${service_name},"
-" please try again later."
-msgstr "Vi har för närvarande tekniska problem med ${service_name}, vänligen försök igen senare."
+"Sorry, we are experiencing temporary technical problem with "
+"${service_name}, please try again later."
+msgstr ""
+"Vi har för närvarande tekniska problem med ${service_name}, vänligen "
+"försök igen senare."
 
 #: eduiddashboard/validators.py:234
 msgid ""
-"This national identity number is not registered with \"${service_name}\". "
-"Please register at <a href=\"${service_url}\" "
+"This national identity number is not registered with \"${service_name}\"."
+" Please register at <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
-msgstr "Personnumret finns inte registrerat hos ${service_name}. Registrera dig här <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
+msgstr ""
+"Personnumret finns inte registrerat hos ${service_name}. Registrera dig "
+"här <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
 
 #: eduiddashboard/validators.py:239
 msgid ""
-"Your registration process with \"${service_name}\" is not complete. Please "
-"visit <a href=\"${service_url}\" target=\"_blank\">${service_name}</a> to "
-"complete your registration."
-msgstr "Din registrering med ${service_name} är ej fullbordad. För att slutföra din registrering vänligen besök <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
+"Your registration process with \"${service_name}\" is not complete. "
+"Please visit <a href=\"${service_url}\" "
+"target=\"_blank\">${service_name}</a> to complete your registration."
+msgstr ""
+"Din registrering med ${service_name} är ej fullbordad. För att slutföra "
+"din registrering vänligen besök <a href=\"${service_url}\" "
+"target=\"_blank\">${service_name}</a>."
 
 #: eduiddashboard/validators.py:244
 msgid ""
-"According to \"${service_name}\" you have opted out to receive messages from"
-" SUNET (eduID). In order to receive a confirmation code from us, you need to"
-" accept SUNET (eduID) as a sender at <a href=\"${service_url}\" "
+"According to \"${service_name}\" you have opted out to receive messages "
+"from SUNET (eduID). In order to receive a confirmation code from us, you "
+"need to accept SUNET (eduID) as a sender at <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
-msgstr "SUNET (eduID) är blockerad som avsändare till ${service_name} av dig. För att ta emot bekräftelsekoder från SUNET (eduID) behöver du ta bort blockeringen hos <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
+msgstr ""
+"SUNET (eduID) är blockerad som avsändare till ${service_name} av dig. För"
+" att ta emot bekräftelsekoder från SUNET (eduID) behöver du ta bort "
+"blockeringen hos <a href=\"${service_url}\" "
+"target=\"_blank\">${service_name}</a>."
 
 #: eduiddashboard/validators.py:264
 msgid "The entered code does not exist"
@@ -331,8 +346,7 @@ msgid "You are in assurance level %(loa)s"
 msgstr "Din tillitsnivå är %(loa)s"
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:32
-msgid ""
-"<p>You have reached max level of assurance available for your profile</p>"
+msgid "<p>You have reached max level of assurance available for your profile</p>"
 msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:34
@@ -348,9 +362,14 @@ msgstr "E-postadresser"
 
 #: eduiddashboard/templates/emails-form.jinja2:5
 msgid ""
-"<p>Below you can add additional email addresses connected to your eduID account and also change your\n"
+"<p>Below you can add additional email addresses connected to your eduID "
+"account and also change your\n"
 "    primary email address. For more information see the help section.</p>"
-msgstr "<p>Här nedan kan du lägga till fler e-postadresser till ditt eduID konto. Genom att lägga till fler adresser går det även att ändra den primära adressen.\nFör mer information se hjälp sidan.</p>"
+msgstr ""
+"<p>Här nedan kan du lägga till fler e-postadresser till ditt eduID konto."
+" Genom att lägga till fler adresser går det även att ändra den primära "
+"adressen.\n"
+"För mer information se hjälp sidan.</p>"
 
 #: eduiddashboard/templates/emails-form.jinja2:21
 #: eduiddashboard/templates/mobiles-form.jinja2:22
@@ -385,7 +404,10 @@ msgid ""
 "\n"
 "  <p>Sorry, but the requested page doesn't exists.</p>\n"
 "  <p>Error code 404</p>\n"
-msgstr "\n<p>Sidan du försökte nå finns inte.</p>\n<p>Felkod 404</p>\n"
+msgstr ""
+"\n"
+"<p>Sidan du försökte nå finns inte.</p>\n"
+"<p>Felkod 404</p>\n"
 
 #: eduiddashboard/templates/error500.jinja2:8
 msgid "An error happened."
@@ -394,10 +416,15 @@ msgstr "Ett oväntat fel har uppståt"
 #: eduiddashboard/templates/error500.jinja2:10
 msgid ""
 "\n"
-"  <p>Sorry, but the requested page is unavailable due to a server hiccup.</p>\n"
+"  <p>Sorry, but the requested page is unavailable due to a server "
+"hiccup.</p>\n"
 "  <p>Our engineers have been notified, so check back later.</p>\n"
 "  <p>Error code 500</p>\n"
-msgstr "\n<p>Sidan kunde inte nås på grund av tekniska problem.</p>\n<p>Våra tekniker har informerats, prova igen lite senare.</p>\n<p>Felkod 500</p>\n"
+msgstr ""
+"\n"
+"<p>Sidan kunde inte nås på grund av tekniska problem.</p>\n"
+"<p>Våra tekniker har informerats, prova igen lite senare.</p>\n"
+"<p>Felkod 500</p>\n"
 
 #: eduiddashboard/templates/home.jinja2:7
 #, python-format
@@ -479,7 +506,9 @@ msgstr "Mobiltelefonnummer"
 msgid ""
 "<p>Below you can add phone numbers connected to your eduID account.\n"
 "    For more information see the help section.</p>"
-msgstr "<p>Här nedan kan du lägga till mobiltelefonnummer till ditt eduID konto.\nFör mer information se hjälpsidan.</p>"
+msgstr ""
+"<p>Här nedan kan du lägga till mobiltelefonnummer till ditt eduID konto.\n"
+"För mer information se hjälpsidan.</p>"
 
 #: eduiddashboard/templates/mobiles-form.jinja2:42
 msgid "Add a mobile phone number by clicking on the button below."
@@ -492,9 +521,15 @@ msgstr "Personnummer"
 
 #: eduiddashboard/templates/nins-form.jinja2:5
 msgid ""
-"<p>Certain service providers (e.g. antagning.se) require eduID users to be confirmed to log in. You can\n"
-"   confirm your eduID account using the below methods. For more information see the help section.</p>"
-msgstr "<p>Vissa tjänster (t.ex. antagning.se) kräver att en användares eduID är bekräftad för att få logga in. Du kan bekräfta sitt eduID konto med metoderna nedan.\nFör mer information se hjälpsidan.</p>"
+"<p>Certain service providers (e.g. antagning.se) require eduID users to "
+"be confirmed to log in. You can\n"
+"   confirm your eduID account using the below methods. For more "
+"information see the help section.</p>"
+msgstr ""
+"<p>Vissa tjänster (t.ex. antagning.se) kräver att en användares eduID är "
+"bekräftad för att få logga in. Du kan bekräfta sitt eduID konto med "
+"metoderna nedan.\n"
+"För mer information se hjälpsidan.</p>"
 
 #: eduiddashboard/templates/nins-form.jinja2:19
 msgid "Active"
@@ -504,22 +539,34 @@ msgstr "Aktiv"
 #, python-format
 msgid ""
 "\n"
-"        You can access your governmental inbox using <a href=\"%(nin_service_url)s\" target=\"_blank\">%(nin_service_name)s</a>\n"
+"        You can access your governmental inbox using <a "
+"href=\"%(nin_service_url)s\" target=\"_blank\">%(nin_service_name)s</a>\n"
 "  "
-msgstr "\nDu når din myndighetspost genom <a href=\"%(nin_service_url)s\">%(nin_service_name)s</a>"
+msgstr ""
+"\n"
+"Du når din myndighetspost genom <a "
+"href=\"%(nin_service_url)s\">%(nin_service_name)s</a>"
 
 #: eduiddashboard/templates/nins-form.jinja2:65
-msgid ""
-"We are verifying that the provided identity number is valid, please wait."
+msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:8
 msgid ""
 "\n"
-"  <p>You can change your current password using this form. A strong password\n"
-"      has been generated for you. You can accept the generated password by clicking\n"
-"      \"Change password\" or you can opt to choose your own password using the checkbox.</p>\n"
-msgstr "\n<p>Du kan använda detta formulär för att ändra ditt lösenord. Ett säkert lösenord\nhar genererats åt dig. Du kan acceptera det med knappen \"Byt lösenord\", eller så kan du välja att använda ett eget lösenord med hjälp av kryssrutan.</p>\n"
+"  <p>You can change your current password using this form. A strong "
+"password\n"
+"      has been generated for you. You can accept the generated password "
+"by clicking\n"
+"      \"Change password\" or you can opt to choose your own password "
+"using the checkbox.</p>\n"
+msgstr ""
+"\n"
+"<p>Du kan använda detta formulär för att ändra ditt lösenord. Ett säkert "
+"lösenord\n"
+"har genererats åt dig. Du kan acceptera det med knappen \"Byt lösenord\","
+" eller så kan du välja att använda ett eget lösenord med hjälp av "
+"kryssrutan.</p>\n"
 
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:15
 msgid ""
@@ -527,13 +574,25 @@ msgid ""
 "  </p>\n"
 "  <p>Choose a strong password. Some tips:</p>\n"
 "  <ul>\n"
-"    <li>Use upper- and lowercase characters (preferably not in the beginning or end)</li>\n"
+"    <li>Use upper- and lowercase characters (preferably not in the "
+"beginning or end)</li>\n"
 "    <li>Add digits somewhere else than at the end of the password</li>\n"
 "    <li>Add special characters, such as @ $ / + _ %</li>\n"
 "    <li>Spaces are ignored</li>\n"
 "  </ul>\n"
 "  </p>\n"
-msgstr "\n</p>\n<p>Välj ett säkert lösenord. Några tips:</p>\n<ul>\n<li>Använd stora och små bokstäver (inte bara första bokstaven)</li>\n<li>Lägg till en eller flera siffror någonstans i mitten av lösenordet</li>\n<li>Använd specialtecken som @ $ / + _ %</li>\n<li>Blanksteg (mellanslag) ignoreras</li>\n</ul>\n</p>\n"
+msgstr ""
+"\n"
+"</p>\n"
+"<p>Välj ett säkert lösenord. Några tips:</p>\n"
+"<ul>\n"
+"<li>Använd stora och små bokstäver (inte bara första bokstaven)</li>\n"
+"<li>Lägg till en eller flera siffror någonstans i mitten av "
+"lösenordet</li>\n"
+"<li>Använd specialtecken som @ $ / + _ %</li>\n"
+"<li>Blanksteg (mellanslag) ignoreras</li>\n"
+"</ul>\n"
+"</p>\n"
 
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:151
 msgid "A stronger password is required."
@@ -584,9 +643,15 @@ msgstr "Personlig information"
 
 #: eduiddashboard/templates/personaldata-form.jinja2:5
 msgid ""
-"<p>The personal information stored in eduID is sent to service providers you log in to using eduID in\n"
-"    order to personalize those services for you. For more information see the help section.</p>"
-msgstr "<p>Den personliga informationen sparad i eduID skickas till andra tjänster du loggar in på med ditt eduID konto för att personifiera din vistelse där.\nFör mer information se hjälpsidan.</p>"
+"<p>The personal information stored in eduID is sent to service providers "
+"you log in to using eduID in\n"
+"    order to personalize those services for you. For more information see"
+" the help section.</p>"
+msgstr ""
+"<p>Den personliga informationen sparad i eduID skickas till andra "
+"tjänster du loggar in på med ditt eduID konto för att personifiera din "
+"vistelse där.\n"
+"För mer information se hjälpsidan.</p>"
 
 #: eduiddashboard/templates/postaladdress-form.jinja2:4
 #: eduiddashboard/views/postal_address.py:45
@@ -596,9 +661,11 @@ msgstr "Postadress"
 #: eduiddashboard/templates/postaladdress-form.jinja2:9
 msgid ""
 "If you do not have a record in the Swedish population register\n"
-"      or if you live somewhere Else you may manually add a postal address by\n"
+"      or if you live somewhere Else you may manually add a postal address"
+" by\n"
 "      clikcing on the button below. If you are registered please click\n"
-"      <a href=\"#nins\">here</a> to enter your national identity number to\n"
+"      <a href=\"#nins\">here</a> to enter your national identity number "
+"to\n"
 "      automatically fetch your postal address.\n"
 "    "
 msgstr ""
@@ -648,9 +715,11 @@ msgstr "Varning!"
 
 #: eduiddashboard/templates/profile.jinja2:123
 msgid ""
-"An error has occurred, please try again or contact support if the problem "
-"persists."
-msgstr "Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om problemet kvarstår."
+"An error has occurred, please try again or contact support if the problem"
+" persists."
+msgstr ""
+"Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om "
+"problemet kvarstår."
 
 #: eduiddashboard/templates/profile.jinja2:130
 msgid "Error!"
@@ -665,13 +734,33 @@ msgstr "Åtkomst nekad"
 msgid ""
 "\n"
 "<h2>Hi,</h2>\n"
-"<p>You recently asked to reset your password for the %(site_name)s account: %(email)s</p>\n"
+"<p>You recently asked to reset your password for the %(site_name)s "
+"account: %(email)s</p>\n"
 "<p>To change your password, click the link below:</p>\n"
 "<p><a href=\"%(reset_password_link)s\">%(reset_password_link)s</a></p>\n"
-"<p>If clicking the link does not work you can copy and paste it into your browser.</p>\n"
-"<p>The password reset link is valid for %(password_reset_timeout)s hours.</p>\n"
+"<p>If clicking the link does not work you can copy and paste it into your"
+" browser.</p>\n"
+"<p>The password reset link is valid for %(password_reset_timeout)s "
+"hours.</p>\n"
 "<p>(This is an automated email. Please do not reply.)</p>\n"
-msgstr "\n<h2>Hej,</h2>\n\n<p>Du har bett om att byta ditt lösenord för %(site_name)s kontot: %(email)s</p>\n\n<p>För att byta ditt lösenord klick på länken här nedan:</p>\n\n<p><a href=\"%(reset_password_link)s\">%(reset_password_link)s</a></p>\n\n<p>Om det inte går att klicka på länken kan du kopiera och klistra in den i din webbläsare.</p>\n\n<p>Länken för återställning av ditt lösenord är giltig i %(password_reset_timeout)s timmar.</p>\n\n<p>(Detta är ett automatiserat meddelande och går ej att svara på.)</p>\n"
+msgstr ""
+"\n"
+"<h2>Hej,</h2>\n"
+"\n"
+"<p>Du har bett om att byta ditt lösenord för %(site_name)s kontot: "
+"%(email)s</p>\n"
+"\n"
+"<p>För att byta ditt lösenord klick på länken här nedan:</p>\n"
+"\n"
+"<p><a href=\"%(reset_password_link)s\">%(reset_password_link)s</a></p>\n"
+"\n"
+"<p>Om det inte går att klicka på länken kan du kopiera och klistra in den"
+" i din webbläsare.</p>\n"
+"\n"
+"<p>Länken för återställning av ditt lösenord är giltig i "
+"%(password_reset_timeout)s timmar.</p>\n"
+"\n"
+"<p>(Detta är ett automatiserat meddelande och går ej att svara på.)</p>\n"
 
 #: eduiddashboard/templates/reset-password-email.txt.jinja2:1
 #, python-format
@@ -679,18 +768,37 @@ msgid ""
 "\n"
 "Hi,\n"
 "\n"
-"You recently asked to reset your password for the %(site_name)s account: %(email)s\n"
+"You recently asked to reset your password for the %(site_name)s account: "
+"%(email)s\n"
 "\n"
 "To change your password, click the link below:\n"
 "\n"
 "%(reset_password_link)s\n"
 "\n"
-"If clicking the link does not work you can copy and paste it into your browser.\n"
+"If clicking the link does not work you can copy and paste it into your "
+"browser.\n"
 "\n"
 "The password reset link is valid for %(password_reset_timeout)s hours.\n"
 "\n"
 "(This is an automated email. Please do not reply.)\n"
-msgstr "\nHej,\n\nDu har bett om att byta ditt lösenord för %(site_name)s kontot: %(email)s\n\nFör att byta ditt lösenord klick på länken här nedan:\n\n%(reset_password_link)s\n\nOm det inte går att klicka på länken kan du kopiera och klistra in den i din webbläsare.\n\nLänken för återställning av ditt lösenord är giltig i %(password_reset_timeout)s timmar.\n\n(Detta är ett automatiserat meddelande och går ej att svara på.)\n"
+msgstr ""
+"\n"
+"Hej,\n"
+"\n"
+"Du har bett om att byta ditt lösenord för %(site_name)s kontot: %(email)s"
+"\n"
+"\n"
+"För att byta ditt lösenord klick på länken här nedan:\n"
+"\n"
+"%(reset_password_link)s\n"
+"\n"
+"Om det inte går att klicka på länken kan du kopiera och klistra in den i "
+"din webbläsare.\n"
+"\n"
+"Länken för återställning av ditt lösenord är giltig i "
+"%(password_reset_timeout)s timmar.\n"
+"\n"
+"(Detta är ett automatiserat meddelande och går ej att svara på.)\n"
 
 #: eduiddashboard/templates/reset-password-expired.jinja2:7
 msgid "Invalid password reset link"
@@ -700,7 +808,10 @@ msgstr "Länken för återställning av lösenord är ogiltig"
 msgid ""
 "The password reset link you have used is invalid or has expired.\n"
 "                Please click the link below to request a new link."
-msgstr "Länken för återställning av ditt lösenord är felaktig eller inte längre giltig.\nKlicka på länken nedan för att begära en ny länk. "
+msgstr ""
+"Länken för återställning av ditt lösenord är felaktig eller inte längre "
+"giltig.\n"
+"Klicka på länken nedan för att begära en ny länk. "
 
 #: eduiddashboard/templates/reset-password-expired.jinja2:14
 msgid "Request a new password reset link &raquo;"
@@ -714,9 +825,13 @@ msgstr "Återställ ditt lösenord"
 #: eduiddashboard/templates/reset-password-sent.jinja2:11
 #, python-format
 msgid ""
-"We have sent you a password reset message. Check your %(type)s for a message from eduID,\n"
+"We have sent you a password reset message. Check your %(type)s for a "
+"message from eduID,\n"
 "            then click the verification link to reset your password."
-msgstr "Vi har skickat dig ett meddelande om återställning av ditt lösenord. Kolla din %(type)s efter ett meddelande från eduID, klicka på länken för att återställa ditt lösenord."
+msgstr ""
+"Vi har skickat dig ett meddelande om återställning av ditt lösenord. "
+"Kolla din %(type)s efter ett meddelande från eduID, klicka på länken för "
+"att återställa ditt lösenord."
 
 #: eduiddashboard/templates/reset-password-sent.jinja2:14
 msgid "Return to login page &raquo;"
@@ -730,13 +845,20 @@ msgstr "Glömt bort ditt lösenord?"
 msgid ""
 "<p>Password reset is possible using either your government inbox or "
 "e-mail.</p>"
-msgstr "<p>Återställning av ditt lösenord är möjligt antingen via \"Mina Meddelanden\" eller via e-post.</p>"
+msgstr ""
+"<p>Återställning av ditt lösenord är möjligt antingen via \"Mina "
+"Meddelanden\" eller via e-post.</p>"
 
 #: eduiddashboard/templates/reset-password.jinja2:10
 msgid ""
-"<p>The recommended method to reset your password is by using your government inbox. If e-mail is used\n"
-"  to reset your password your eduID account status will be reset to unconfirmed.</p>"
-msgstr "<p>Den rekommenderade metoden för att återställa ditt lösenord är genom \"Mina meddelanden\". Om återställning av ditt lösenord sker via e-post återställs även din kontostatus till obekräftad.</p>"
+"<p>The recommended method to reset your password is by using your "
+"government inbox. If e-mail is used\n"
+"  to reset your password your eduID account status will be reset to "
+"unconfirmed.</p>"
+msgstr ""
+"<p>Den rekommenderade metoden för att återställa ditt lösenord är genom "
+"\"Mina meddelanden\". Om återställning av ditt lösenord sker via e-post "
+"återställs även din kontostatus till obekräftad.</p>"
 
 #: eduiddashboard/templates/reset-password.jinja2:16
 msgid "Reset password by government mailbox service"
@@ -762,18 +884,35 @@ msgstr "Verifierad"
 #, python-format
 msgid ""
 "\n"
-"<p>Thank you for registering with <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"<p>Thank you for registering with <a "
+"href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
 "\n"
-"<p>To confirm that you own this email address, simply click on the following link:\n"
+"<p>To confirm that you own this email address, simply click on the "
+"following link:\n"
 "\n"
 "<a href=\"%(verification_link)s\">%(verification_link)s</a></p>\n"
 "\n"
-"<p>If clicking on the link above does not work, go to your profile and emails section. Click on the\n"
+"<p>If clicking on the link above does not work, go to your profile and "
+"emails section. Click on the\n"
 "confirmation icon and enter the following code:</p>\n"
 "\n"
 "<p><strong>%(code)s</strong></p>\n"
 "\n"
-msgstr "\n<p>Tack för din registrering med <a href=\"%(site_url)s\">%(site_name)s</a>.</p>\n\n<p>För att bekräfta att du äger denna e-postadress klicka på länken nedan:</p>\n\n<p><a href=\"%(verification_link)s\">%(verification_link)s</a></p>\n\n<p>Om länken ovan inte fungerar, gå till din profilsida och välj e-post. Klicka på bekräftelsekoden och ange följande bekräftelsekod:</p>\n\n<p><strong>%(code)s</strong></p>\n\n"
+msgstr ""
+"\n"
+"<p>Tack för din registrering med <a "
+"href=\"%(site_url)s\">%(site_name)s</a>.</p>\n"
+"\n"
+"<p>För att bekräfta att du äger denna e-postadress klicka på länken "
+"nedan:</p>\n"
+"\n"
+"<p><a href=\"%(verification_link)s\">%(verification_link)s</a></p>\n"
+"\n"
+"<p>Om länken ovan inte fungerar, gå till din profilsida och välj e-post. "
+"Klicka på bekräftelsekoden och ange följande bekräftelsekod:</p>\n"
+"\n"
+"<p><strong>%(code)s</strong></p>\n"
+"\n"
 
 #: eduiddashboard/templates/verification_email.txt.jinja2:1
 #, python-format
@@ -781,16 +920,31 @@ msgid ""
 "\n"
 "Thank you for registering with %(site_name)s.\n"
 "\n"
-"To confirm that you own this email address, simply click on the following link:\n"
+"To confirm that you own this email address, simply click on the following"
+" link:\n"
 "\n"
 "%(verification_link)s\n"
 "\n"
-"If clicking on the link above does not work, go to your profile and emails section. Click on the\n"
+"If clicking on the link above does not work, go to your profile and "
+"emails section. Click on the\n"
 "verification icon and enter the following code:\n"
 "\n"
 "%(code)s\n"
 "\n"
-msgstr "\nTack för din registrering med %(site_name)s.\n\nFör att bekräfta att du äger denna e-postadress klicka på länken nedan:\n\n%(verification_link)s\n\nOm länken ovan inte fungerar, gå till din profilsida och välj e-post. Klicka på bekräftelsekoden och ange följande bekräftelsekod:\n\n%(code)s\n\n\n"
+msgstr ""
+"\n"
+"Tack för din registrering med %(site_name)s.\n"
+"\n"
+"För att bekräfta att du äger denna e-postadress klicka på länken nedan:\n"
+"\n"
+"%(verification_link)s\n"
+"\n"
+"Om länken ovan inte fungerar, gå till din profilsida och välj e-post. "
+"Klicka på bekräftelsekoden och ange följande bekräftelsekod:\n"
+"\n"
+"%(code)s\n"
+"\n"
+"\n"
 
 #: eduiddashboard/templates/wayf.jinja2:5
 msgid "Where are you from?"
@@ -823,9 +977,11 @@ msgstr "Ange din bekräftelseskod som har skickats till \"Min myndighetspost\"."
 
 #: eduiddashboard/templates/wizards/basewizard.jinja2:30
 msgid ""
-"<p>Congratulations, you're almost done. Please verify that the information "
-"below is correct and then click submit.</p>"
-msgstr "<p>Du är nästan färdig, vänligen verifiera att nedanstående information är rätt och klicka sedan på Klar.</p>"
+"<p>Congratulations, you're almost done. Please verify that the "
+"information below is correct and then click submit.</p>"
+msgstr ""
+"<p>Du är nästan färdig, vänligen verifiera att nedanstående information "
+"är rätt och klicka sedan på Klar.</p>"
 
 #: eduiddashboard/templates/wizards/basewizard.jinja2:39
 msgid ""
@@ -833,7 +989,10 @@ msgid ""
 "          <strong>There was a problem</strong> with your submission.\n"
 "          Please correct any errors and re-submit.\n"
 "          "
-msgstr "\n<strong>Det finns ett problem</strong> i ditt formulär.\nVänligen rätta eventuella fel och prova igen."
+msgstr ""
+"\n"
+"<strong>Det finns ett problem</strong> i ditt formulär.\n"
+"Vänligen rätta eventuella fel och prova igen."
 
 #: eduiddashboard/templates/wizards/basewizard.jinja2:50
 msgid ""
@@ -841,7 +1000,10 @@ msgid ""
 "          <strong>There was a problem</strong> submitting the form.\n"
 "          Please try again.\n"
 "          "
-msgstr "\n<strong>Det finns ett problem</strong> i ditt formulär.\nVänligen rätta eventuella fel och prova igen."
+msgstr ""
+"\n"
+"<strong>Det finns ett problem</strong> i ditt formulär.\n"
+"Vänligen rätta eventuella fel och prova igen."
 
 #: eduiddashboard/templates/wizards/basewizard.jinja2:61
 msgid "The wizard is completed"
@@ -909,7 +1071,9 @@ msgstr "En ny bekräftelsekod har skickats till dig"
 msgid ""
 "The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
-msgstr "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en ny."
+msgstr ""
+"Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en"
+" ny."
 
 #: eduiddashboard/views/__init__.py:265
 msgid "The wizard was dismissed"
@@ -924,9 +1088,10 @@ msgid "Email address has been confirmed"
 msgstr "E-postadressen är bekräftad"
 
 #: eduiddashboard/views/emails.py:58 eduiddashboard/views/nins.py:121
-msgid ""
-"The confirmation code is invalid, please try again or request a new code"
-msgstr "Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny bekräftelsekod"
+msgid "The confirmation code is invalid, please try again or request a new code"
+msgstr ""
+"Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny "
+"bekräftelsekod"
 
 #: eduiddashboard/views/emails.py:59
 msgid "Check your email inbox for {data} for further instructions"
@@ -942,7 +1107,9 @@ msgstr "En ny bekräftelsekod har skickats till din e-postadress"
 
 #: eduiddashboard/views/emails.py:69
 msgid "You need to confirm your email address before it can become primary"
-msgstr "Du måste bekräfta din e-postadress innan den kan sättas som primär e-postadress"
+msgstr ""
+"Du måste bekräfta din e-postadress innan den kan sättas som primär "
+"e-postadress"
 
 #: eduiddashboard/views/emails.py:75
 msgid "Your primary email address was successfully changed"
@@ -967,10 +1134,13 @@ msgstr "Ändringarna har sparats"
 
 #: eduiddashboard/views/emails.py:159
 msgid ""
-"A confirmation email has been sent to your email address. Please enter your "
-"confirmation code <a href=\"#\" class=\"verifycode\" data-"
+"A confirmation email has been sent to your email address. Please enter "
+"your confirmation code <a href=\"#\" class=\"verifycode\" data-"
 "identifier=\"${id}\">here</a>."
-msgstr "En bekräftelseskod har skickats till din e-postadress. Ange din bekräftelsekod <a href=\"#\" class=\"verifycode\" data-identifier=\"${id}\">här</a>."
+msgstr ""
+"En bekräftelseskod har skickats till din e-postadress. Ange din "
+"bekräftelsekod <a href=\"#\" class=\"verifycode\" data-"
+"identifier=\"${id}\">här</a>."
 
 #: eduiddashboard/views/mobiles.py:27 eduiddashboard/views/mobiles.py:149
 msgid "Add mobile phone number"
@@ -988,7 +1158,9 @@ msgstr "Mobiltelefonnumret är bekräftat"
 msgid ""
 "The confirmation code used is invalid, please try again or request a new "
 "code"
-msgstr "Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny bekräftelsekod"
+msgstr ""
+"Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny "
+"bekräftelsekod"
 
 #: eduiddashboard/views/mobiles.py:79
 msgid "A confirmation code has been sent to the mobile phone number {data}"
@@ -1012,7 +1184,8 @@ msgstr "Mobiltelefonnumret kunde inte hittas"
 
 #: eduiddashboard/views/mobiles.py:113
 msgid ""
-"You need to verify that mobile phone number before be able to set as primary"
+"You need to verify that mobile phone number before be able to set as "
+"primary"
 msgstr "Du behöver verifiera ditt mobilnummer innan det går att ange som primärt"
 
 #: eduiddashboard/views/mobiles.py:129
@@ -1021,9 +1194,11 @@ msgstr "Mobiltelefonnumret är "
 
 #: eduiddashboard/views/mobiles.py:177
 msgid ""
-"A confirmation code has been sent to your mobile phone. Please click on the "
-"\"Pending confirmation\" link below and enter your confirmation code."
-msgstr "En bekräftelsekod har skickats till ditt mobiltelefonnummer. Vänligen ange din bekräftelsekod genom att klicka på \"Bekräfta\" här nedan."
+"A confirmation code has been sent to your mobile phone. Please click on "
+"the \"Pending confirmation\" link below and enter your confirmation code."
+msgstr ""
+"En bekräftelsekod har skickats till ditt mobiltelefonnummer. Vänligen "
+"ange din bekräftelsekod genom att klicka på \"Bekräfta\" här nedan."
 
 #: eduiddashboard/views/nins.py:40 eduiddashboard/views/nins.py:190
 msgid "Add national identity number"
@@ -1055,7 +1230,9 @@ msgstr "En ny bekräftelsekod har skickats till din inlåda hos \"Mina Meddeland
 
 #: eduiddashboard/views/nins.py:144
 msgid "The provided nin can't be verified. You only can verify the last one"
-msgstr "Personnumret kan inte verifieras. Endast det första personnumret kan verifiers."
+msgstr ""
+"Personnumret kan inte verifieras. Endast det första personnumret kan "
+"verifiers."
 
 #: eduiddashboard/views/nins.py:170
 msgid "National identity number has been removed"
@@ -1063,9 +1240,12 @@ msgstr "Personnumret har tagits bort"
 
 #: eduiddashboard/views/nins.py:235
 msgid ""
-"A confirmation code has been sent to your government inbox. Please click on "
-"\"Pending confirmation\" link below to enter your confirmation code."
-msgstr "En bekräftelsekod har skickats till din inkorg hos \"Mina Meddelanden\". Vänligen ange din bekräftelsekod genom att klicka på \"Bekräfta\" här nedan."
+"A confirmation code has been sent to your government inbox. Please click "
+"on \"Pending confirmation\" link below to enter your confirmation code."
+msgstr ""
+"En bekräftelsekod har skickats till din inkorg hos \"Mina Meddelanden\". "
+"Vänligen ange din bekräftelsekod genom att klicka på \"Bekräfta\" här "
+"nedan."
 
 #: eduiddashboard/views/nins.py:325
 msgid "Your national identity number confirmation request can not be found"
@@ -1097,14 +1277,18 @@ msgstr "Ditt lösenord har uppdaterats"
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
-msgstr "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen eller kontakta supporten om problemet kvarstår."
+msgstr ""
+"Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen "
+"eller kontakta supporten om problemet kvarstår."
 
 #: eduiddashboard/views/security.py:238
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
-"associated with your eduID account, and we'll send you a link to reset your "
-"password."
-msgstr "Ange e-postadress, personnummer eller mobiltelefonnummer associerat med ditt eduID konto så skickar vi en länk för att återställa ditt lösenord."
+"associated with your eduID account, and we'll send you a link to reset "
+"your password."
+msgstr ""
+"Ange e-postadress, personnummer eller mobiltelefonnummer associerat med "
+"ditt eduID konto så skickar vi en länk för att återställa ditt lösenord."
 
 #: eduiddashboard/views/security.py:277 eduiddashboard/views/security.py:320
 msgid "Reset password"
@@ -1135,7 +1319,9 @@ msgstr "Ditt lösenord har uppdaterats"
 msgid ""
 "An error has occurred while updating your password, please try again or "
 "contact support if the problem persists."
-msgstr "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen eller kontakta supporten om problemet kvarstår."
+msgstr ""
+"Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen "
+"eller kontakta supporten om problemet kvarstår."
 
 #: eduiddashboard/views/security.py:406
 msgid "You can now log in by <a href=\"${homelink}\">clicking here</a>"
@@ -1144,3 +1330,4 @@ msgstr "Du kan nu logga in genom att <a href=\"${homelink}\">klicka här.</a>"
 #: eduiddashboard/views/verifications.py:24
 msgid "Can't locate the code in the active session"
 msgstr ""
+
