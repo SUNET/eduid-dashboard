@@ -232,9 +232,9 @@ class NinsView(BaseFormView):
 
         self.addition_with_code_validation(ninform)
 
-        msg = _('A confirmation code has been sent to your govt inbox. '
-                'Please click on "Pending confirmation" link below to enter.'
-                'your confirmation code')
+        msg = _('A confirmation code has been sent to your government inbox. '
+                'Please click on "Pending confirmation" link below to enter '
+                'your confirmation code.')
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
@@ -322,8 +322,8 @@ class NinsWizard(BaseWizard):
     def resendcode(self):
 
         if self.datakey is None:
-            message = _("Your National identity number validation request "
-                        "can't be found")
+            message = _("Your national identity number confirmation request "
+                        "can not be found")
             message = get_localizer(self.request).translate(message)
             return {
                 'status': 'failure',
