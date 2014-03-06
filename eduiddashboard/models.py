@@ -162,14 +162,14 @@ class EmailResetPassword(colander.MappingSchema):
 
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Email, phone or social security number")
+        title=""
     )
 
 
 class NINResetPassword(colander.MappingSchema):
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Email, phone or social security number")
+        title=""
     )
 
 
