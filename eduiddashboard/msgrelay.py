@@ -156,7 +156,7 @@ class MsgRelay(object):
         content = self.get_content()
         content.update({
             'email': email,
-            'reset_link_password': link,
+            'reset_password_link': link,
             'password_reset_timeout': password_reset_timeout,
         })
         lang = self.get_language(language)
