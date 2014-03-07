@@ -4,14 +4,13 @@
 
 {% block wizard_cards %}
   <div class="wizard-card" data-cardname="step0">
-
     <h3>{{ _("Identity number") }}</h3>
     <div class="wizard-input-section">
       <p>{{ _("Please enter your national identity number.") }}</p>
       <div class="control-group">
         <input id="nin" name="norEduPersonNIN" type="text" 
               {% if datakey %}value="{{ datakey }}"{% endif %}
-               placeholder="yyyymmdd-xxxx" data-validate="validateNIN" />
+               placeholder="{{ _('yyyymmddnnnn') }}" data-validate="validateNIN" />
       </div>
     </div>
   </div>
@@ -19,7 +18,7 @@
   <div class="wizard-card" data-cardname="step1">
     <h3>{{ _("Confirm identity number") }}</h3>
     <div class="wizard-input-section">
-      <p>{{ _("Please enter your confirmation code recieved from my messages.") }}</p>
+      <p>{{ _("Please enter your confirmation code sent to your government inbox.") }}</p>
       <div class="control-group">
         <input id="mm-confirm" name="code" type="text"
               placeholder="{{_("Confirmation code") }}" />

@@ -235,7 +235,7 @@ class BaseResetPasswordView(FormView):
         'mobile.mobile',
         'norEduPersonNIN',
     ]
-    intro_message = _("Enter an email address, social security number or phone number "
+    intro_message = _("Please enter e-mail address, national identity number or phone number "
                       "associated with your eduID account, "
                       "and we'll send you a link to reset your password.")
 

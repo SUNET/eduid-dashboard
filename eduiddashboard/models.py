@@ -59,7 +59,7 @@ class Email(colander.MappingSchema):
 
 NINFormatValidator = colander.Regex(
     regex=re.compile(r'^(18|19|20)\d{2}(0[1-9]|1[0-2])\d{2}[-\s]?\d{4}$'),
-    msg=_('The Swedish national identity number should be entered as yyyymmdd-xxxx')
+    msg=_('The Swedish national identity number should be entered as yyyymmddnnnn')
 )
 
 
@@ -86,7 +86,7 @@ class NIN(colander.MappingSchema):
             NINUniqueValidator(),
             NINReachableValidator()
         ),
-        widget=deform.widget.TextInputWidget(mask=_('yyyymmdd-xxxx'))
+        widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'))
     )
 
 
@@ -162,14 +162,14 @@ class EmailResetPassword(colander.MappingSchema):
 
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Email, phone or social security number")
+        title=""
     )
 
 
 class NINResetPassword(colander.MappingSchema):
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=_("Email, phone or social security number")
+        title=""
     )
 
 

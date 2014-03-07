@@ -232,19 +232,19 @@ class NINReachableValidator(object):
 
         if reachable is False:
             msg = _('This national identity number is '
-                    'not registered with ${service_name}. Please register '
-                    'at <a href="${service_url}">${service_name}</a>.')
+                    'not registered with "${service_name}". Please register '
+                    'at <a href="${service_url}" target="_blank">${service_name}</a>.')
 
         elif reachable is 'Anonymous':
             msg = _('Your registration process with '
-                    '${service_name} is not completed. Please visit <a href='
-                    '"${service_url}">${service_name}</a> to complete your registration.')
+                    '"${service_name}" is not complete. Please visit <a href='
+                    '"${service_url}" target="_blank">${service_name}</a> to complete your registration.')
 
         elif reachable is 'Sender_not':
-            msg = _('The ${service_name} service is '
-                    'telling us that SUNET (eduID) has been blocked by you. In'
+            msg = _('According to "${service_name}"'
+                    ' you have opted out to receive messages from SUNET (eduID). In'
                     ' order to receive a confirmation code from us, you need to'
-                    ' accept SUNET (eduID) as a sender at <a href="${service_url}">'
+                    ' accept SUNET (eduID) as a sender at <a href="${service_url}" target="_blank">'
                     '${service_name}</a>.')
 
         if msg:
