@@ -174,16 +174,39 @@ class NINResetPassword(colander.MappingSchema):
 
 
 class ResetPasswordStep2(colander.MappingSchema):
-    new_password = colander.SchemaNode(colander.String(),
-                                       widget=deform.widget.PasswordWidget(size=20),
-                                       validator=PasswordValidator(),
-                                       title=_("New Password"))
-    new_password_repeated = colander.SchemaNode(colander.String(),
-                                                widget=deform.widget.PasswordWidget(size=20),
-                                                title=_("Confirm New Password"))
+    use_custom_password = colander.SchemaNode(
+        colander.Boolean(),
+        widget=deform.widget.CheckboxWidget(),
+        title=_('Use my own password'),
+        missing='false')
+
+    suggested_password = colander.SchemaNode(
+        colander.String(),
+        title=_('Suggested password'),
+        widget=deform.widget.TextInputWidget(
+            readonly=True,
+            css_class='suggested-password'
+        ),
+        missing=password_readonly)
+
+
+    custom_password = colander.SchemaNode(colander.String(),
+                                          widget=deform.widget.PasswordWidget(
+                                              size=20,
+                                              css_class='custom-password'
+                                          ),
+                                          validator=PasswordValidator(),
+                                          title=_("New Password"),
+                                          missing='')
+    repeated_password = colander.SchemaNode(colander.String(),
+                                            widget=deform.widget.PasswordWidget(
+                                                size=20,
+                                                css_class='custom-password'),
+                                            title=_("Confirm New Password"),
+                                            missing='')
 
     def validator(self, node, data):
-        if data['new_password'] != data['new_password_repeated']:
+        if data['custom_password'] != data['repeated_password']:
             raise colander.Invalid(node,
                                    _("Passwords doesn't match"))
 

@@ -357,7 +357,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
 
 
 @view_config(route_name='reset-password-step2', permission='edit',
-             renderer='templates/reset-password-form.jinja2')
+             renderer='templates/reset-password-form2.jinja2')
 class ResetPasswordStep2View(BaseResetPasswordView):
     """
     Form to finish user password reset.
@@ -370,6 +370,16 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         Button('cancel', _('Cancel')),
     )
     intro_message = _('Please choose a new password for your eduID account.')
+
+    def __init__(self, context, request):
+        super(ResetPasswordStep2View, self).__init__(context, request)
+        self._password = None
+
+    def appstruct(self):
+        passwords_dict = {
+            'suggested_password': self.get_suggested_password()
+        }
+        return self.schema.serialize(passwords_dict)
 
     def __call__(self):
         hash_code = self.request.matchdict['code']
@@ -387,24 +397,62 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
         return super(ResetPasswordStep2View, self).__call__()
 
+    def get_template_context(self):
+        context = super(ResetPasswordStep2View, self).get_template_context()
+        context.update({
+            'suggested_password': self.get_suggested_password()
+        })
+        return context
+
+    def get_suggested_password(self):
+        """
+        The suggested password is saved in session to avoid form hijacking
+        """
+        if self._password is not None:
+            return self._password
+        password_length = self.request.registry.settings.get('password_length', 12)
+
+        if self.request.method == 'GET':
+            self._password = generate_password(length=password_length)
+            self._password = ' '.join([self._password[i*4: i*4+4]
+                                       for i in range(0, len(self._password)/4)])
+
+            self.request.session['last_generated_password'] = self._password
+
+        elif self.request.method == 'POST':
+            self._password = self.request.session.get('last_generated_password', generate_password(length=password_length))
+
+        return self._password
+
     def reset_success(self, passwordform):
+        form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
         user = self.request.userdb.get_user_by_email(password_reset['email'])
 
-        new_password = passwordform['new_password']
+        if form_data.get('use_custom_password') == 'true':
+            log.debug("Password change for user {!r} (custom password).".format(user.get_id()))
+            new_password = form_data.get('custom_password')
+        else:
+            log.debug("Password change for user {!r} (suggested password).".format(user.get_id()))
+            new_password = self.get_suggested_password()
+
+        new_password = new_password.replace(' ', '')
+
+        self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
         ok = change_password(self.request, user, '', new_password)
+
         if ok:
             if password_reset['mechanism'] == 'email':
                 pass  # TODO: reset the user LOA
-            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
-            flash(self.request, 'info', _('Password has been reset successfully'))
+            url = self.request.route_url('profile-editor')
+            reset = True
         else:
-            flash(self.request, 'info', _('An error has occurred while updating your password, '
-                                          'please try again or contact support if the problem persists.'))
+            url = self.request.route_url('reset-password')
+            reset = False
         return {
-            'message': _('You can now log in by <a href="${homelink}">clicking here</a>',
-                         mapping={'homelink': self.request.route_url('profile-editor')}),
+            'url': url,
+            'reset': reset
         }
 
     def cancel_success(self, passwordform):

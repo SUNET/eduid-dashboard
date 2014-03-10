@@ -339,7 +339,7 @@ table.passwords {
   max-width: 510px;
 }
 
-#changePasswordDialog .suggested-password {
+#changePasswordDialog .suggested-password, #resetPassword .suggested-password {
   background-color: #fff;
   color: #555;
   border: none;
@@ -357,7 +357,20 @@ table.passwords {
   margin: 5px;
 }
 
+.reset-password-form-container .form-actions {
+  right: 10px;
+  background: none;
+  padding: 0;
+  border: none;
+}
 
+.reset-password-form-container label.control-label {
+    font-weight: 700;
+}
+
+.reset-password-form-container .intro {
+    padding-bottom: 10px;
+}
 /* End of reset password view styles
 -------------------------------------------------- */
 
