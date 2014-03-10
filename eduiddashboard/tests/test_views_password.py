@@ -209,7 +209,7 @@ TEST_VERIFICATIONS = [{
     'verified': False,
 }]
 
-from eduiddashboard.testing import MockedUserDB as MUDB
+from eduid_am.testing import MockedUserDB as MUDB
 
 
 class MockedUserDB(MUDB):

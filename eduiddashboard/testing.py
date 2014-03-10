@@ -1,8 +1,6 @@
-from datetime import datetime
 from os import path
 from copy import deepcopy
 
-from bson import ObjectId
 from mock import patch
 import pymongo
 
@@ -15,9 +13,8 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_am.db import MongoDB
-from eduid_am.userdb import UserDB
 from eduid_am.user import User
+from eduid_am import testing as am
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
@@ -27,88 +24,9 @@ MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
 MONGO_URI_AM_TEST = 'mongodb://localhost:27017/eduid_am_test'
 MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:27017/eduid_idp_authninfo_test'
 
-MOCKED_USER_STANDARD = {
-    '_id': ObjectId('012345678901234567890123'),
-    'givenName': 'John',
-    'sn': 'Smith',
-    'displayName': 'John Smith',
-    'norEduPersonNIN': ['123456789013'],
-    'photo': 'https://pointing.to/your/photo',
-    'preferredLanguage': 'en',
-    'eduPersonEntitlement': [
-        'urn:mace:eduid.se:role:admin',
-        'urn:mace:eduid.se:role:student',
-    ],
-    'maxReachedLoa': 3,
-    'mobile': [{
-        'mobile': '609609609',
-        'verified': True
-    }, {
-        'mobile': '+34 6096096096',
-        'verified': False
-    }],
-    'mail': 'johnsmith@example.com',
-    'mailAliases': [{
-        'email': 'johnsmith@example.com',
-        'verified': True,
-    }, {
-        'email': 'johnsmith2@example.com',
-        'verified': True,
-    }],
-    'passwords': [{
-        'id': ObjectId('112345678901234567890123'),
-        'salt': '$NDNv1H1$9c810d852430b62a9a7c6159d5d64c41c3831846f81b6799b54e1e8922f11545$32$32$',
-    }],
-    'postalAddress': [{
-        'type': 'home',
-        'country': 'SE',
-        'address': "Long street, 48",
-        'postalCode': "123456",
-        'locality': "Stockholm",
-        'verified': True,
-    }, {
-        'type': 'work',
-        'country': 'ES',
-        'address': "Calle Ancha, 49",
-        'postalCode': "123456",
-        'locality': "Punta Umbria",
-        'verified': False,
-    }],
-}
 
-INITIAL_VERIFICATIONS = [{
-    '_id': ObjectId('234567890123456789012301'),
-    'code': '9d392c',
-    'model_name': 'mobile',
-    'obj_id': '+34 6096096096',
-    'user_oid': ObjectId("012345678901234567890123"),
-    'timestamp': datetime.utcnow(),
-    'verified': False,
-}, {
-    '_id': ObjectId(),
-    'code': '123123',
-    'model_name': 'norEduPersonNIN',
-    'obj_id': '210987654321',
-    'user_oid': ObjectId("012345678901234567890123"),
-    'timestamp': datetime.utcnow(),
-    'verified': False,
-}, {
-    '_id': ObjectId(),
-    'code': '123124',
-    'model_name': 'norEduPersonNIN',
-    'obj_id': '123456789013',
-    'user_oid': ObjectId("012345678901234567890123"),
-    'timestamp': datetime.utcnow(),
-    'verified': True,
-}, {
-    '_id': ObjectId(),
-    'code': '123124',
-    'model_name': 'norEduPersonNIN',
-    'obj_id': '123456789050',
-    'user_oid': ObjectId("012345678901234567890123"),
-    'timestamp': datetime.utcnow(),
-    'verified': False,
-}]
+def loa(index):                                                                                                                                             
+    return AVAILABLE_LOA_LEVEL[index-1]
 
 
 class MockedResult(object):
@@ -171,61 +89,12 @@ class MockedMsgRelay(object):
         return getattr(self, 'retval', {})
 
 
-class MockedUserDB(UserDB):
-
-    test_users = {
-        'johnsmith@example.com': MOCKED_USER_STANDARD,
-        'johnsmith@example.org': deepcopy(MOCKED_USER_STANDARD),
-    }
-    test_users['johnsmith@example.org']['mail'] = 'johnsmith@example.org'
-    test_users['johnsmith@example.org']['mailAliases'][0]['email'] = 'johnsmith@example.org'
-    test_users['johnsmith@example.org']['mailAliases'][1]['email'] = 'johnsmith2@example.org'
-    test_users['johnsmith@example.org']['_id'] = ObjectId('901234567890123456789012')
-    test_users['johnsmith@example.org']['norEduPersonNIN'] = []
-
-    def __init__(self, users=[]):
-        for user in users:
-            if user.get('mail', '') in self.test_users:
-                self.test_users[user['mail']].update(user)
-
-    def get_user(self, userid):
-        if userid not in self.test_users:
-            raise self.UserDoesNotExist
-        return User(deepcopy(self.test_users.get(userid)))
-
-    def all_users(self):
-        for user in self.test_users.values():
-            yield User(deepcopy(user))
-
-    def all_userdocs(self):
-        for user in self.test_users.values():
-            yield deepcopy(user)
-
-
-def loa(index):
-    return AVAILABLE_LOA_LEVEL[index-1]
-
-
-def dummy_groups_callback(userid, request):
-    return [request.context.workmode]
-
-
-def get_db(settings):
-    mongo_replicaset = settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'])
-    return mongodb.get_database()
-
-
 class LoggedInReguestTests(unittest.TestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
-    MockedUserDB = MockedUserDB
+    MockedUserDB = am.MockedUserDB
 
-    user = User(MOCKED_USER_STANDARD)
+    user = User(am.MOCKED_USER_STANDARD)
     users = []
 
     def setUp(self, settings={}):
@@ -294,8 +163,8 @@ class LoggedInReguestTests(unittest.TestCase):
         self.config.registry.registerUtility(self, IDebugLogger)
         mongo_replicaset = self.settings.get('mongo_replicaset', None)
 
-        self.db = get_db(self.settings)
-        self.amdb = get_db({
+        self.db = am.get_db(self.settings)
+        self.amdb = am.get_db({
             'mongo_replicaset': mongo_replicaset,
             'mongo_uri': self.settings.get('mongo_uri_am'),
         })
@@ -305,7 +174,7 @@ class LoggedInReguestTests(unittest.TestCase):
         self.db.profiles.drop()
         self.db.verifications.drop()
         self.initial_verifications = (getattr(self, 'initial_verifications', None)
-                                      or INITIAL_VERIFICATIONS)
+                                      or am.INITIAL_VERIFICATIONS)
         for verification_data in self.initial_verifications:
             self.db.verifications.insert(verification_data)
         self.amdb.attributes.drop()
