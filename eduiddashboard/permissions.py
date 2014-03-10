@@ -28,6 +28,9 @@ class RootFactory(object):
     def get_groups(self, userid, request):
         return []
 
+    def propagate_user_changes(self, newuser):
+        pass
+
 
 def is_logged(request):
     user = authenticated_userid(request)
