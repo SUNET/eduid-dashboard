@@ -20,8 +20,6 @@ from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
 
 
-MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
-MONGO_URI_AM_TEST = 'mongodb://localhost:27017/eduid_am_test'
 MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:27017/eduid_idp_authninfo_test'
 
 
@@ -89,7 +87,7 @@ class MockedMsgRelay(object):
         return getattr(self, 'retval', {})
 
 
-class LoggedInReguestTests(unittest.TestCase):
+class LoggedInReguestTests(am.MongoTestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
     MockedUserDB = am.MockedUserDB
@@ -117,8 +115,8 @@ class LoggedInReguestTests(unittest.TestCase):
             #'session.lock_dir': '/tmp',
             #'session.webtest_varname': 'session',
             # 'session.secret': '1234',
-            'mongo_uri': MONGO_URI_TEST,
-            'mongo_uri_am': MONGO_URI_AM_TEST,
+            'mongo_uri': am.MONGO_URI_TEST,
+            'mongo_uri_am': am.MONGO_URI_AM_TEST,
             'mongo_uri_authninfo': MONGO_URI_AUTHNINFO_TEST,
             'testing': True,
             'jinja2.directories': [
@@ -161,37 +159,11 @@ class LoggedInReguestTests(unittest.TestCase):
         self.config = testing.setUp()
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
-        mongo_replicaset = self.settings.get('mongo_replicaset', None)
 
-        self.db = am.get_db(self.settings)
-        self.amdb = am.get_db({
-            'mongo_replicaset': mongo_replicaset,
-            'mongo_uri': self.settings.get('mongo_uri_am'),
-        })
-
-        self.userdb = self.MockedUserDB(self.users)
-
-        self.db.profiles.drop()
-        self.db.verifications.drop()
-        self.initial_verifications = (getattr(self, 'initial_verifications', None)
-                                      or am.INITIAL_VERIFICATIONS)
-        for verification_data in self.initial_verifications:
-            self.db.verifications.insert(verification_data)
-        self.amdb.attributes.drop()
-
-        userdocs = []
-        for userdoc in self.userdb.all_userdocs():
-            userdocs.append(deepcopy(userdoc))
-
-        self.db.profiles.insert(userdocs)
-        self.amdb.attributes.insert(userdocs)
+        super(LoggedInReguestTests, self).setUp()
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
-        self.db.profiles.drop()
-        self.db.verifications.drop()
-        self.db.reset_passwords.drop()
-        self.amdb.attributes.drop()
         self.testapp.reset()
 
     def dummy_get_user(self, userid=''):
