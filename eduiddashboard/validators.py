@@ -9,6 +9,8 @@ from eduid_am.userdb import UserDB
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 
+from eduiddashboard import log
+
 
 class OldPasswordValidator(object):
 
@@ -262,3 +264,17 @@ class ResetPasswordCodeExistsValidator(object):
         if not request.db.reset_passwords.find_one({'hash_code': value}):
             raise colander.Invalid(node,
                                    _("The entered code does not exist"))
+
+
+class CSRFTokenValidator(object):
+    """
+    Validator that verify that a form submission contains a valid CSRF token
+    to foil cross-site request forgery attacks.
+    """
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        token = request.session.get_csrf_token()
+
+        log.debug("CSRF Form {!r} = Session {!r}".format(value, token))
+        if value != token:
+            raise colander.Invalid(node, _("Invalid CSRF token"))

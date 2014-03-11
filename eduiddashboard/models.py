@@ -1,23 +1,19 @@
 import re
 
-import pycountry
-
 import colander
 import deform
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.preparers import EmailNormalizer
 from eduiddashboard.validators import (EmailUniqueValidator,
-                                       EmailOrUsernameExistsValidator,
-                                       ResetPasswordCodeExistsValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
                                        NINUniqueValidator,
                                        NINReachableValidator,
-                                       MobilePhoneUniqueValidator)
+                                       MobilePhoneUniqueValidator,
+                                       CSRFTokenValidator)
 
-from eduiddashboard import read_mapping
 from eduiddashboard.widgets import permissions_widget
 
 
@@ -26,6 +22,22 @@ SEARCHER_ATTTRIBUTE_TYPES = [
     (u'mobile', _('phone mobile number')),
     (u'norEduPersonNIN', _('NIN')),
 ]
+
+
+@colander.deferred
+def csrf_token(node, kw):
+    request = kw.get('request')
+    token = request.session.get_csrf_token()
+    return token
+
+
+class CSRFTokenSchema(colander.MappingSchema):
+    csrf = colander.SchemaNode(
+        colander.String(),
+        widget=deform.widget.HiddenWidget(),
+        validator=CSRFTokenValidator(),
+        default=csrf_token,
+    )
 
 
 class BooleanMongo(colander.Boolean):
@@ -48,7 +60,7 @@ class All_StopOnFirst(colander.All):
                 raise colander.Invalid(node, e.msg)
 
 
-class Email(colander.MappingSchema):
+class Email(CSRFTokenSchema):
     mail = colander.SchemaNode(colander.String(),
                                preparer=EmailNormalizer(),
                                validator=colander.All(colander.Email(),
@@ -70,7 +82,7 @@ def normalize_nin(nin):
     return newnin
 
 
-class NIN(colander.MappingSchema):
+class NIN(CSRFTokenSchema):
     """
         Allowed NIN input format:
 
@@ -97,7 +109,7 @@ def preferred_language_widget(node, kw):
     return deform.widget.SelectWidget(values=lang_choices)
 
 
-class Person(colander.MappingSchema):
+class Person(CSRFTokenSchema):
     givenName = colander.SchemaNode(colander.String(),
                                     readonly=True,
                                     title=_('Given name'))
@@ -117,7 +129,7 @@ def password_readonly(node, kw):
     return request.session.get('last_generated_password')
 
 
-class Passwords(colander.MappingSchema):
+class Passwords(CSRFTokenSchema):
 
     old_password = colander.SchemaNode(
         colander.String(),
@@ -158,7 +170,7 @@ class Passwords(colander.MappingSchema):
         missing='')
 
 
-class EmailResetPassword(colander.MappingSchema):
+class EmailResetPassword(CSRFTokenSchema):
 
     email_or_username = colander.SchemaNode(
         colander.String(),
@@ -166,14 +178,14 @@ class EmailResetPassword(colander.MappingSchema):
     )
 
 
-class NINResetPassword(colander.MappingSchema):
+class NINResetPassword(CSRFTokenSchema):
     email_or_username = colander.SchemaNode(
         colander.String(),
         title=""
     )
 
 
-class ResetPasswordStep2(colander.MappingSchema):
+class ResetPasswordStep2(CSRFTokenSchema):
     use_custom_password = colander.SchemaNode(
         colander.Boolean(),
         widget=deform.widget.CheckboxWidget(),
@@ -188,7 +200,6 @@ class ResetPasswordStep2(colander.MappingSchema):
             css_class='suggested-password'
         ),
         missing=password_readonly)
-
 
     custom_password = colander.SchemaNode(colander.String(),
                                           widget=deform.widget.PasswordWidget(
@@ -227,7 +238,7 @@ class PostalAddress(colander.MappingSchema):
                                   default=postal_address_default_country)
 
 
-class Mobile(colander.MappingSchema):
+class Mobile(CSRFTokenSchema):
     mobile = colander.SchemaNode(colander.String(),
                                  validator=colander.All(
                                      colander.Regex(
