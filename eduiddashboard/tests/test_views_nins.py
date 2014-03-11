@@ -149,13 +149,49 @@ class NinsFormTests(LoggedInReguestTests):
             status=404
         )
 
+    def test_steal_verified_nin(self):
+        self.set_logged(user='johnsmith@example.org')
+
+        response_form = self.testapp.get('/profile/nins/')
+
+        form = response_form.forms[self.formname]
+        nin = '197801011234'
+        form['norEduPersonNIN'].value = nin
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+                
+            response = form.submit('add')
+
+        self.assertEqual(response.status, '200 OK')
+
+        self.set_logged(user='johnsmith@example.com')
+        response_form = self.testapp.get('/profile/nins/')
+
+        self.assertIn('197801011234', response.body)
+
+        self.set_logged(user='johnsmith@example.org')
+        response = self.testapp.post(
+            '/profile/nins-actions/',
+            {'identifier': 0, 'action': 'verify'}
+        )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'getcode')
+
+        self.set_logged(user='johnsmith@example.com')
+        response_form = self.testapp.get('/profile/nins/')
+
+        self.assertNotIn('197801011234', response.body)
+
 
 class NinWizardTests(LoggedInReguestTests):
 
     users = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
-        'norEduPersonNIN': ['123456789013']
+        'norEduPersonNIN': ['197801011234']
     }, {
         'mail': 'johnsmith@example.org',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
@@ -220,7 +256,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
     users = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
-        'norEduPersonNIN': ['123456789013']
+        'norEduPersonNIN': ['197801011234']
     }, {
         'mail': 'johnsmith@example.org',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],

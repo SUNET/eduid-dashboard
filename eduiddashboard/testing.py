@@ -13,6 +13,7 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
+from eduid_am.db import MongoDB
 from eduid_am.user import User
 from eduid_am import testing as am
 from eduiddashboard import main as eduiddashboard_main
@@ -87,6 +88,17 @@ class MockedMsgRelay(object):
         return getattr(self, 'retval', {})
 
 
+def get_db(settings):
+    mongo_replicaset = settings.get('mongo_replicaset', None)
+    if mongo_replicaset is not None:
+        mongodb = MongoDB(db_uri=settings['mongo_uri'],
+                          replicaSet=mongo_replicaset)
+    else:
+        mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    return mongodb.get_database()
+
+
+
 class LoggedInReguestTests(am.MongoTestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
@@ -145,6 +157,8 @@ class LoggedInReguestTests(am.MongoTestCase):
             'vccs_url': 'http://localhost:8550/',
             'password_reset_timeout': '120',
         }
+        
+        super(LoggedInReguestTests, self).setUp()
 
         self.settings.update(settings)
 
@@ -160,10 +174,23 @@ class LoggedInReguestTests(am.MongoTestCase):
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
 
-        super(LoggedInReguestTests, self).setUp()
+        self.db = get_db(self.settings)
+        self.db.profiles.drop()
+        self.db.verifications.drop()
+        for verification_data in self.initial_verifications:
+            self.db.verifications.insert(verification_data)
+
+        userdocs = []
+        for userdoc in self.userdb.all_userdocs():
+            userdocs.append(deepcopy(userdoc))
+        self.db.profiles.insert(userdocs)
+
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
+        self.db.profiles.drop()
+        self.db.verifications.drop()
+        self.db.reset_passwords.drop()
         self.testapp.reset()
 
     def dummy_get_user(self, userid=''):

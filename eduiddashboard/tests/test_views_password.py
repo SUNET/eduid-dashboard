@@ -182,7 +182,7 @@ TEST_USER = {
         'givenName': 'John',
         'sn': 'Smith',
         'displayName': 'John Smith',
-        'norEduPersonNIN': ['123456789013'],
+        'norEduPersonNIN': ['197801011234'],
         'photo': 'https://pointing.to/your/photo',
         'preferredLanguage': 'en',
         'mail': 'johnnysmith1@example.org',

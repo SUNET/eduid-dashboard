@@ -9,7 +9,7 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
-                                       NINUniqueValidator,
+                                       #NINUniqueValidator,
                                        NINReachableValidator,
                                        MobilePhoneUniqueValidator,
                                        CSRFTokenValidator)
@@ -95,7 +95,7 @@ class NIN(CSRFTokenSchema):
         title=_('Swedish national identity number'),
         validator=All_StopOnFirst(
             NINFormatValidator,
-            NINUniqueValidator(),
+            #NINUniqueValidator(),
             NINReachableValidator()
         ),
         widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'))
