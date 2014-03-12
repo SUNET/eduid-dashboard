@@ -484,7 +484,7 @@ msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:5
 msgid ""
-"<p>Certain service providers (e.g. antagning.se) require eduID users to be "
+"<p>Certain service providers (e.g. Antagning.se) require eduID users to be "
 "confirmed to log in. You can\n"
 "   confirm your eduID account using the below methods. For more information "
 "see the help section.</p>"

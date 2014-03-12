@@ -493,9 +493,9 @@ msgstr "Personnummer"
 
 #: eduiddashboard/templates/nins-form.jinja2:5
 msgid ""
-"<p>Certain service providers (e.g. antagning.se) require eduID users to be confirmed to log in. You can\n"
+"<p>Certain service providers (e.g. Antagning.se) require eduID users to be confirmed to log in. You can\n"
 "   confirm your eduID account using the below methods. For more information see the help section.</p>"
-msgstr "<p>Vissa tjänster (t.ex. antagning.se) kräver att en användares eduID är bekräftad för att få logga in. Du kan bekräfta sitt eduID konto med metoderna nedan.\nFör mer information se hjälpsidan.</p>"
+msgstr "<p>Vissa tjänster (t.ex. Antagning.se) kräver att en användares eduID är bekräftad för att få logga in. Du kan bekräfta sitt eduID konto med metoderna nedan.\nFör mer information se hjälpsidan.</p>"
 
 #: eduiddashboard/templates/nins-form.jinja2:19
 msgid "Active"
