@@ -275,6 +275,6 @@ class CSRFTokenValidator(object):
         request = node.bindings.get('request')
         token = request.session.get_csrf_token()
 
-        log.debug("CSRF Form {!r} = Session {!r}".format(value, token))
         if value != token:
+            log.debug("CSRF token validation failed: Form {!r} != Session {!r}".format(value, token))
             raise colander.Invalid(node, _("Invalid CSRF token"))
