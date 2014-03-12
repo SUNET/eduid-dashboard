@@ -223,7 +223,7 @@ def includeme(config):
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
-    config.set_request_property(get_db, 'db', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
