@@ -95,6 +95,24 @@ def send_reset_password_gov_message(request, nin, user, reset_password_link):
     request.msgrelay.nin_reset_password(nin, email, reset_password_link, password_reset_timeout, user_language)
 
 
+def generate_suggested_password(request):
+    """
+    The suggested password is saved in session to avoid form hijacking
+    """
+    password_length = request.registry.settings.get('password_length', 12)
+
+    if request.method == 'GET':
+        password = generate_password(length=password_length)
+        password = ' '.join([password[i*4: i*4+4] for i in range(0, len(password)/4)])
+
+        request.session['last_generated_password'] = password
+
+    elif request.method == 'POST':
+        password = request.session.get('last_generated_password', generate_password(length=password_length))
+
+    return password
+
+
 @view_config(route_name='security', permission='edit')
 class PasswordsView(BaseFormView):
     """
@@ -146,22 +164,10 @@ class PasswordsView(BaseFormView):
 
     def get_suggested_password(self):
         """
-            The suggested password is saved in session to avoid form hijacking
+        The suggested password is saved in session to avoid form hijacking
         """
-        if self._password is not None:
-            return self._password
-        password_length = self.request.registry.settings.get('password_length', 12)
-
-        if self.request.method == 'GET':
-            self._password = generate_password(length=password_length)
-            self._password = ' '.join([self._password[i*4: i*4+4]
-                                       for i in range(0, len(self._password)/4)])
-
-            self.request.session['last_generated_password'] = self._password
-
-        elif self.request.method == 'POST':
-            self._password = self.request.session.get('last_generated_password', generate_password(length=password_length))
-
+        if self._password is None:
+            self._password = generate_suggested_password(self.request)
         return self._password
 
     def save_success(self, passwordform):
@@ -397,31 +403,12 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
         return super(ResetPasswordStep2View, self).__call__()
 
-    def get_template_context(self):
-        context = super(ResetPasswordStep2View, self).get_template_context()
-        context.update({
-            'suggested_password': self.get_suggested_password()
-        })
-        return context
-
     def get_suggested_password(self):
         """
         The suggested password is saved in session to avoid form hijacking
         """
-        if self._password is not None:
-            return self._password
-        password_length = self.request.registry.settings.get('password_length', 12)
-
-        if self.request.method == 'GET':
-            self._password = generate_password(length=password_length)
-            self._password = ' '.join([self._password[i*4: i*4+4]
-                                       for i in range(0, len(self._password)/4)])
-
-            self.request.session['last_generated_password'] = self._password
-
-        elif self.request.method == 'POST':
-            self._password = self.request.session.get('last_generated_password', generate_password(length=password_length))
-
+        if self._password is None:
+            self._password = generate_suggested_password(self.request)
         return self._password
 
     def reset_success(self, passwordform):

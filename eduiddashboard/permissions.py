@@ -28,8 +28,8 @@ class RootFactory(object):
     def get_groups(self, userid, request):
         return []
 
-    def propagate_user_changes(self, newuser):
-        pass
+    def propagate_user_changes(self, user):
+        update_attributes.delay('eduid_dashboard', str(user['_id']))
 
 
 def is_logged(request):
