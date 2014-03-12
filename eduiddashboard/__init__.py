@@ -13,7 +13,7 @@ from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
-from eduid_am.db import MongoDB, get_db
+from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
