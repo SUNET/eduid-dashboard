@@ -34,7 +34,7 @@ requires = [
     'colander==1.0b1',
     'deform==0.9.8',
     'deform_bootstrap==0.2.9',
-    'pysaml2==1.2.0beta',
+    'pysaml2==1.2.0beta2',
     'pycountry==1.2',
     'eventlet==0.14.0',
     'gunicorn==18.0',
