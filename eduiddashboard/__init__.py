@@ -218,12 +218,17 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
+        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
     else:
         mongodb = MongoDB(db_uri=settings['mongo_uri'])
+        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+
     config.registry.settings['mongodb'] = mongodb
+    config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
     config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database(), 'authninfodb', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
@@ -310,6 +315,7 @@ def main(global_config, **settings):
         'site.name',
         'auth_shared_secret',
         'mongo_uri_am',
+        'mongo_uri_authninfo',
         'personal_dashboard_base_url',
         'vccs_url',
         'nin_service_name',

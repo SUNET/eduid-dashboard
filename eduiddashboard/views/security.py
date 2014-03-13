@@ -4,6 +4,7 @@ from deform import Button
 import json
 
 from datetime import datetime, timedelta
+from bson import ObjectId
 import pytz
 
 from pyramid.httpexceptions import HTTPFound
@@ -113,6 +114,29 @@ def generate_suggested_password(request):
     return password
 
 
+def get_authn_info(request):
+    """
+    Get credential information for the current user.
+
+    :param request: the request object
+    :return: a list of dicts [{'type': string, 'created_ts': timestamp, 'success_ts': timestamp }]
+    """
+    user = request.session['user']
+
+    authninfo = []
+
+    for credential in user.get_passwords():
+        auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential['id'])})
+        log.debug("cred id: {!r} auth entry: {!r}".format(credential['id'], auth_entry))
+        if auth_entry:
+            data = {'type': _('Password'),
+                    'created_ts': credential['created_ts'].strftime('%Y-%b-%d %H:%M'),
+                    'success_ts': auth_entry['success_ts'].strftime('%Y-%b-%d %H:%M')}
+            authninfo.append(data)
+
+    return authninfo
+
+
 @view_config(route_name='security', permission='edit')
 class PasswordsView(BaseFormView):
     """
@@ -156,9 +180,11 @@ class PasswordsView(BaseFormView):
 
     def get_template_context(self):
         context = super(PasswordsView, self).get_template_context()
+
         context.update({
             'message': getattr(self, 'message', ''),
             'changed': getattr(self, 'changed', False),
+            'authninfo': get_authn_info(self.request)
         })
         return context
 

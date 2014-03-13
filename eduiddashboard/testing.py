@@ -25,6 +25,7 @@ from eduiddashboard.msgrelay import MsgRelay
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_dashboard_test'
 MONGO_URI_AM_TEST = 'mongodb://localhost:27017/eduid_am_test'
+MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:27017/eduid_idp_authninfo_test'
 
 MOCKED_USER_STANDARD = {
     '_id': ObjectId('012345678901234567890123'),
@@ -249,6 +250,7 @@ class LoggedInReguestTests(unittest.TestCase):
             # 'session.secret': '1234',
             'mongo_uri': MONGO_URI_TEST,
             'mongo_uri_am': MONGO_URI_AM_TEST,
+            'mongo_uri_authninfo': MONGO_URI_AUTHNINFO_TEST,
             'testing': True,
             'jinja2.directories': [
                 'eduiddashboard:saml2/templates',
