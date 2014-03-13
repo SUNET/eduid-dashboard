@@ -4,6 +4,7 @@ from bson import ObjectId
 from datetime import datetime
 
 from eduid_am.userdb import UserDB
+from eduid_am.user import User
 from eduiddashboard.testing import LoggedInReguestTests, MockedMsgRelay
 
 
@@ -167,23 +168,37 @@ class NinsFormTests(LoggedInReguestTests):
 
         self.assertEqual(response.status, '200 OK')
 
-        self.set_logged(user='johnsmith@example.com')
-        response_form = self.testapp.get('/profile/nins/')
+        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+        old_user = User(old_user)
 
-        self.assertIn('197801011234', response.body)
+        self.assertIn(nin, old_user.get_nins())
 
-        self.set_logged(user='johnsmith@example.org')
-        response = self.testapp.post(
-            '/profile/nins-actions/',
-            {'identifier': 0, 'action': 'verify'}
-        )
+        nin_doc = self.db.verifications.find_one({
+            'model_name': 'norEduPersonNIN',
+            'user_oid': ObjectId('901234567890123456789012'),
+            'obj_id': nin
+        })
+
+        with patch.object(MsgRelay, 'get_postal_address', clear=True):
+
+            MsgRelay.get_postal_address.return_value = {
+                    'Address2': u'StreetName 104',
+                    'PostalCode': u'74142',
+                    'City': u'STOCKHOLM',
+                }
+
+            response = self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': 0, 'action': 'verify', 'code': nin_doc['code']}
+            )
+
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'getcode')
+        self.assertEqual(response_json['result'], 'ok')
 
-        self.set_logged(user='johnsmith@example.com')
-        response_form = self.testapp.get('/profile/nins/')
+        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+        old_user = User(old_user)
 
-        self.assertNotIn('197801011234', response.body)
+        self.assertNotIn(nin, old_user.get_nins())
 
 
 class NinWizardTests(LoggedInReguestTests):

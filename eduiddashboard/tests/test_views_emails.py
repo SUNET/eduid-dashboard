@@ -1,9 +1,11 @@
 import json
+from bson import ObjectId
 import re
 
 from mock import patch
 
 from eduid_am.userdb import UserDB
+from eduid_am.user import User
 from eduiddashboard.testing import LoggedInReguestTests
 
 
@@ -80,7 +82,6 @@ class MailsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('johnsmith2@example.com', response.body)
-            self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_nonnormal_existant_email(self):
@@ -102,7 +103,6 @@ class MailsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('johnsmith2@example.com', response.body)
-            self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_email(self):
@@ -179,3 +179,44 @@ class MailsFormTests(LoggedInReguestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'ok')
         self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
+
+    def test_steal_verified_mail(self):
+        self.set_logged(user='johnsmith@example.org')
+
+        response_form = self.testapp.get('/profile/emails/')
+
+        form = response_form.forms[self.formname]
+
+        mail = 'johnsmith2@example.com'
+        form['mail'].value = mail
+
+        with patch.object(UserDB, 'exists_by_field', clear=True):
+
+            UserDB.exists_by_field.return_value = True
+                
+            response = form.submit('add')
+            self.assertEqual(response.status, '200 OK')
+
+        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+        old_user = User(old_user)
+
+        self.assertIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
+
+        email_doc = self.db.verifications.find_one({
+            'model_name': 'mailAliases',
+            'user_oid': ObjectId('901234567890123456789012'),
+            'obj_id': mail
+        })
+
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': 2, 'action': 'verify', 'code': email_doc['code']}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'ok')
+
+        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+        old_user = User(old_user)
+
+        self.assertNotIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])

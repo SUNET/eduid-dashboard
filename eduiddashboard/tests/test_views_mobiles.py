@@ -1,8 +1,10 @@
 import json
+from bson import ObjectId
 
 from mock import patch
 
 from eduid_am.userdb import UserDB
+from eduid_am.user import User
 from eduiddashboard.testing import LoggedInReguestTests
 from eduiddashboard.msgrelay import MsgRelay
 
@@ -137,3 +139,49 @@ class MobilesFormTests(LoggedInReguestTests):
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
         verified_mobile = userdb_after['mobile'][1]
         self.assertEqual(verified_mobile['verified'], True)
+
+    def test_steal_verified_mobile(self):
+        self.set_logged(user='johnsmith@example.org')
+
+        response_form = self.testapp.get('/profile/mobiles/')
+
+        form = response_form.forms[self.formname]
+
+        mobile = '+34609609609'
+        form['mobile'].value = mobile
+
+        with patch.object(MsgRelay, 'mobile_validator', clear=True):
+            MsgRelay.mobile_validator.return_value = True
+                
+            response = form.submit('add')
+
+            self.assertEqual(response.status, '200 OK')
+
+        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+        old_user = User(old_user)
+
+        self.assertIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])
+
+        mobile_doc = self.db.verifications.find_one({
+            'model_name': 'mobile',
+            'user_oid': ObjectId('901234567890123456789012'),
+            'obj_id': mobile
+        })
+
+        with patch.object(MsgRelay, 'mobile_validator', clear=True):
+            with patch.object(UserDB, 'exists_by_field', clear=True):
+                UserDB.exists_by_field.return_value = False
+                MsgRelay.mobile_validator.return_value = True
+
+                response = self.testapp.post(
+                    '/profile/mobiles-actions/',
+                    {'identifier': 0, 'action': 'verify', 'code': mobile_doc['code']}
+                )
+
+                response_json = json.loads(response.body)
+                self.assertEqual(response_json['result'], 'ok')
+
+        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+        old_user = User(old_user)
+
+        self.assertNotIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])
