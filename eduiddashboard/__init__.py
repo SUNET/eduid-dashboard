@@ -218,7 +218,8 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'],
+                              replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(db_uri=settings['mongo_uri'])
         authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
