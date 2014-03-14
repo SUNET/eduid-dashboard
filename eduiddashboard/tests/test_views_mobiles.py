@@ -24,6 +24,21 @@ class MobilesFormTests(LoggedInReguestTests):
         response = self.testapp.get('/profile/mobiles/')
         self.assertEqual(response.status, '302 Found')
 
+    def test_add_existent_mobile(self):
+        self.set_logged()
+
+        response_form = self.testapp.get('/profile/mobiles/')
+
+        form = response_form.forms[self.formname]
+
+        form['mobile'].value = '+34609609609'
+
+        response = form.submit('add')
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertIn('alert-error', response.body)
+        self.assertIsNotNone(getattr(response, 'form', None))
+
     def test_add_valid_mobile(self):
         self.set_logged()
 
