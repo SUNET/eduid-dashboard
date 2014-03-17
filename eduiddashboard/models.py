@@ -5,10 +5,13 @@ import deform
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.preparers import EmailNormalizer
-from eduiddashboard.validators import (PasswordValidator,
+from eduiddashboard.validators import (EmailUniqueValidator,
+                                       PasswordValidator,
                                        OldPasswordValidator,
                                        PermissionsValidator,
                                        NINReachableValidator,
+                                       NINUniqueValidator,
+                                       MobilePhoneUniqueValidator,
                                        CSRFTokenValidator)
 
 from eduiddashboard.widgets import permissions_widget
@@ -60,7 +63,8 @@ class All_StopOnFirst(colander.All):
 class Email(CSRFTokenSchema):
     mail = colander.SchemaNode(colander.String(),
                                preparer=EmailNormalizer(),
-                               validator=colander.All(colander.Email()),
+                               validator=colander.All(colander.Email(),
+                                                      EmailUniqueValidator()),
                                title=_('email'),
                                widget=deform.widget.TextInputWidget(mask=_('Email address')))
 
@@ -91,6 +95,7 @@ class NIN(CSRFTokenSchema):
         title=_('Swedish national identity number'),
         validator=All_StopOnFirst(
             NINFormatValidator,
+            NINUniqueValidator(),
             NINReachableValidator()
         ),
         widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'))
@@ -240,6 +245,7 @@ class Mobile(CSRFTokenSchema):
                                          r'^\+\d{10,20}$|^07[0236]\d{7}$',
                                          msg=_('Invalid telephone number. It must be a valid Swedish number, or written using international notation, starting with "+" and followed by 10-20 digits.'),
                                      ),
+                                     MobilePhoneUniqueValidator()
                                  ),
                                  title=_('mobile'),
                                  widget=deform.widget.TextInputWidget(mask=_('Mobile phone number')))

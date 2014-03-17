@@ -76,19 +76,14 @@ class NinsFormTests(LoggedInReguestTests):
         self.set_logged()
 
         response_form = self.testapp.get('/profile/nins/')
-
         form = response_form.forms[self.formname]
+        for nin in ('123456789012', '197801011234'):
 
-        form['norEduPersonNIN'].value = '123456789012'
-
-        with patch.object(UserDB, 'exists_by_filter', clear=True):
-
-            UserDB.exists_by_filter.return_value = True
-
+            form['norEduPersonNIN'].value = nin
             response = form.submit('add')
 
             self.assertEqual(response.status, '200 OK')
-            self.assertIn('123456789012', response.body)
+            self.assertIn(nin, response.body)
             self.assertIn('alert-error', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 

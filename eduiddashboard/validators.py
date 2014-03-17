@@ -86,32 +86,20 @@ class EmailUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
+        user = request.context.user
+        user_emails = [e['email'] for e in user.get_mail_aliases()]
+        user_emails.append(user.get_mail())
 
         if 'add' in request.POST:
-            if request.userdb.exists_by_field('mailAliases.email', value):
+            if value in user_emails:
                 raise colander.Invalid(node,
-                                       _("This email address is already in use"))
+                                       _("You already have this email address"))
 
-        elif 'verify' in request.POST or 'setprimary' in request.POST:
-            if not request.userdb.exists_by_field('mailAliases.email', value):
+        elif set(['verify', 'setprimary', 'remove']).intersection(set(request.POST)):
+            if value not in user_emails:
                 raise colander.Invalid(node,
-                                       _("This email address is available"
+                                       _("This email address is unavailable"
                                          ))
-
-        elif 'remove' in request.POST:
-            email_discovered = False
-            emails = request.session['user'].get_mail_aliases()
-            for emaildict in emails:
-                if emaildict['email'] == value:
-                    email_discovered = True
-                    break
-            if not email_discovered:
-                raise colander.Invalid(node,
-                                       _("Email address does not exist"))
-
-            if len(emails) <= 0:
-                raise colander.Invalid(node,
-                                       _("At least one email is required"))
 
 
 class EmailExistsValidator(object):
@@ -130,9 +118,11 @@ class MobilePhoneUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
+        user = request.context.user
+        user_mobiles = [m['mobile'] for m in user.get_mobiles()]
 
         if 'add' in request.POST:
-            if request.userdb.exists_by_field('mobile.mobile', value):
+            if value in user_mobiles:
                 raise colander.Invalid(node,
                                        _("This mobile phone was already registered"))
 
@@ -192,22 +182,21 @@ class NINUniqueValidator(object):
         value = normalize_nin(copy(value))
 
         request = node.bindings.get('request')
+        user = request.context.user
+        user_nins = user.get_nins()
 
-        if request.userdb.exists_by_filter({
-            'norEduPersonNIN': value,
-        }):
-            raise colander.Invalid(
-                node,
-                _("This national identity number is already in use"))
-
-        verifications = request.db.verifications
-
-        if verifications.find({
+        unverified_user_nins = request.db.verifications.find({
             'obj_id': value,
             'model_name': 'norEduPersonNIN',
+            'user_id': user.get_id(),
             'verified': False
-        }).count() > 0:
-            raise colander.Invalid(node, _('This national identity number is already in use'))
+        })
+
+        if 'add' in request.POST:
+            if unverified_user_nins.count() > 0 or value in user_nins:
+                raise colander.Invalid(
+                    node,
+                    _("This national identity number is already in use"))
 
 
 class NINReachableValidator(object):
