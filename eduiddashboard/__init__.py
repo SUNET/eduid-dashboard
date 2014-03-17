@@ -278,6 +278,10 @@ def includeme(config):
                         view='eduiddashboard.views.portal.not_found_view',
                         renderer='templates/error404.jinja2')
 
+    # Favicon
+    config.add_route('favicon', '/favicon.ico')
+    config.add_view('eduiddashboard.views.static.favicon_view', route_name='favicon')
+
 
 def main(global_config, **settings):
     """ This function returns a WSGI application.
