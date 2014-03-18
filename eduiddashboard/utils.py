@@ -155,7 +155,7 @@ def get_unique_hash():
     return text_type(uuid4())
 
 
-def get_short_hash(entropy=6):
+def get_short_hash(entropy=10):
     return uuid4().hex[:entropy]
 
 
