@@ -308,6 +308,7 @@ class BaseWizard(object):
             'path': self.request.route_path(self.route),
             'model': self.model,
             'datakey': self.datakey or '',
+            'csrftoken': self.request.session.get_csrf_token(),
         }
 
     def get(self):
