@@ -15,6 +15,8 @@ from pyramid_deform import FormView
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 
+from eduid_am.tasks import update_attributes
+
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    NINResetPassword,
@@ -457,7 +459,17 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
         if ok:
             if password_reset['mechanism'] == 'email':
-                pass  # TODO: reset the user LOA
+                # TODO: Re-send verification code in advance?
+                nins = user.get_nins()
+                if nins:
+                    nin = nins[-1]
+                    if nin is not None:
+                        user.save()
+                        self.request.db.profiles.update({"_id": user.get_id()}, {"$set": {"norEduPersonNIN": []}})
+                        self.request.db.verifications.remove({"user_oid": user.get_id(),
+                                                              "model_name": "norEduPersonNIN",
+                                                              "obj_id": nin})
+                        update_attributes('eduid_dashboard', str(user['_id']))
             url = self.request.route_url('profile-editor')
             reset = True
         else:
