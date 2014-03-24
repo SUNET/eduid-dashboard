@@ -41,8 +41,7 @@ requires = [
     'vccs_client==0.4.1',
     'pwgen==0.4',
     'zxcvbn==1.0',
-    # Fix eduid_msg version
-    'eduid_msg==0.7.5',
+    'eduid_msg==0.7.7',
     'pytz'
 ]
 
@@ -74,7 +73,7 @@ waitress_extras = requires + [
 ]
 
 setup(name='eduid-dashboard',
-      version='0.1.1',
+      version='0.1.2',
       description='eduid-dashboard',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
