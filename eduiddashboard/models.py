@@ -20,7 +20,7 @@ from eduiddashboard.widgets import permissions_widget
 SEARCHER_ATTTRIBUTE_TYPES = [
     (u'mail', _('email')),
     (u'mobile', _('phone mobile number')),
-    (u'norEduPersonNIN', _('NIN')),
+    (u'norEduPersonNIN', _('national identity number')),
 ]
 
 
