@@ -169,3 +169,10 @@ def normalize_email(addr):
 
 def validate_email_format(email):
     return RFC2822_email.match(email)
+
+
+def convert_to_e_164(request, mobile):
+    """ convert a mobile to international notation +XX XXXXXXXX """
+    if mobile['mobile'].startswith(u'0'):
+        country_code = request.registry.settings.get('default_country_code')
+        mobile['mobile'] = country_code + mobile['mobile'].lstrip(u'0')

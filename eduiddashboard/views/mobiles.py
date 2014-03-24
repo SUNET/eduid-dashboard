@@ -7,7 +7,7 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
-from eduiddashboard.utils import get_icon_string, get_short_hash
+from eduiddashboard.utils import get_icon_string, get_short_hash, convert_to_e_164
 from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
@@ -61,13 +61,6 @@ def send_verification_code(request, user, mobile_number, code=None):
     user_language = request.context.get_preferred_language()
 
     request.msgrelay.mobile_validator(mobile_number, code, user_language)
-
-
-def convert_to_e_164(request, mobile):
-    """ convert a mobile to international notation +XX XXXXXXXX """
-    if mobile['mobile'].startswith(u'0'):
-        country_code = request.registry.settings.get('default_country_code')
-        mobile['mobile'] = country_code + mobile['mobile'].lstrip(u'0')
 
 
 @view_config(route_name='mobiles-actions', permission='edit')
