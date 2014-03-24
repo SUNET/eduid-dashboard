@@ -464,7 +464,6 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                 if nins:
                     nin = nins[-1]
                     if nin is not None:
-                        user.save()
                         self.request.db.profiles.update({"_id": user.get_id()}, {"$set": {"norEduPersonNIN": []}})
                         self.request.db.verifications.remove({"user_oid": user.get_id(),
                                                               "model_name": "norEduPersonNIN",
