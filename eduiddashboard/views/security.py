@@ -23,7 +23,8 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.utils import flash, generate_password, get_unique_hash, validate_email_format, normalize_email
+from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
+    convert_to_localtime
 from eduiddashboard import log
 
 
@@ -131,9 +132,11 @@ def get_authn_info(request):
         auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential['id'])})
         log.debug("cred id: {!r} auth entry: {!r}".format(credential['id'], auth_entry))
         if auth_entry:
+            created_dt = convert_to_localtime(credential['created_ts'])
+            success_dt = convert_to_localtime(auth_entry['success_ts'])
             data = {'type': _('Password'),
-                    'created_ts': credential['created_ts'].strftime('%Y-%b-%d %H:%M'),
-                    'success_ts': auth_entry['success_ts'].strftime('%Y-%b-%d %H:%M')}
+                    'created_ts': created_dt.strftime('%Y-%b-%d %H:%M'),
+                    'success_ts': success_dt.strftime('%Y-%b-%d %H:%M')}
             authninfo.append(data)
 
     return authninfo

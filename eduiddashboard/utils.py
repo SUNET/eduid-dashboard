@@ -2,6 +2,7 @@ from hashlib import sha256
 from uuid import uuid4
 import re
 import time
+import pytz
 from pwgen import pwgen
 
 from pyramid.i18n import TranslationString as _
@@ -176,3 +177,18 @@ def convert_to_e_164(request, mobile):
     if mobile['mobile'].startswith(u'0'):
         country_code = request.registry.settings.get('default_country_code')
         mobile['mobile'] = country_code + mobile['mobile'].lstrip(u'0')
+
+
+def convert_to_localtime(dt):
+    """
+    Convert UTC datetime to localtime timezone ('Europe/Stockholm')
+
+    @param dt: datetime utc object
+    @type dt: datetime
+    @return: datetime object converted to timezone Europe/Stockholm
+    @rtype: datetime
+    """
+    tz = pytz.timezone('Europe/Stockholm')
+    dt = dt.replace(tzinfo=pytz.utc)
+    dt = dt.astimezone(tz)
+    return dt
