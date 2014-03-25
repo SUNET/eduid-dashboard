@@ -15,6 +15,7 @@ from pyramid.i18n import get_locale_name
 from eduid_am.celery import celery
 from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
+from eduid_am.config import read_setting_from_env, read_mapping, read_list
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -67,50 +68,6 @@ def groups_callback(userid, request):
         return request.context.get_groups(userid, request)
     else:
         return []
-
-
-def read_setting_from_env(settings, key, default=None):
-    env_variable = key.upper()
-    if env_variable in os.environ:
-        return os.environ[env_variable]
-    else:
-        return settings.get(key, default)
-
-
-def read_mapping(settings, prop, available_keys=None, default=None, required=True):
-    raw = read_setting_from_env(settings, prop, '')
-
-    if raw.strip() == '':
-        return default
-
-    rows = raw.strip('\n ').split('\n')
-
-    mapping = {}
-
-    for row in rows:
-        splitted_row = row.split('=')
-        key = row.split('=')[0].strip()
-        if len(splitted_row) > 1:
-            value = row.split('=')[1].strip()
-        else:
-            value = ''
-        if available_keys is None or key in available_keys:
-            mapping[key] = value
-
-    if available_keys is not None:
-        if (len(mapping.keys()) != len(available_keys) and
-                not 'testing' in settings):
-            return None
-
-    return mapping
-
-
-def read_list(settings, prop, default=[]):
-    raw = read_setting_from_env(settings, prop, None)
-    if raw is None or raw.strip() == '':
-        return default
-
-    return [e for e in raw.split('\n') if e is not None and e.strip() != '']
 
 
 def jinja2_settings(settings):
