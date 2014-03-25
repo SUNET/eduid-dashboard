@@ -22,7 +22,7 @@ README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
-    'eduid_am==0.4.2',
+    'eduid_am==0.4.3',
     'pymongo==2.6.3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
@@ -73,7 +73,7 @@ waitress_extras = requires + [
 ]
 
 setup(name='eduid-dashboard',
-      version='0.1.3',
+      version='0.1.4',
       description='eduid-dashboard',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
