@@ -23,6 +23,7 @@ from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
 
 from eduiddashboard import log
 
+
 class HTTPXRelocate(HTTPOk):
 
     empty_body = True
@@ -36,25 +37,13 @@ class HTTPXRelocate(HTTPOk):
 
 def _set_name_id(session, name_id):
     """
-    Store SAML2 session info.
-
-    This is a dict like
-
-    {'authn_info': [('http://www.swamid.se/policy/assurance/al1',
-                    ['https://dev.idp.eduid.se/idp.xml'])],
-     'name_id': <saml2.saml.NameID object at 0x7fc4800a65d0>,
-     'not_on_or_after': 1389621811,
-     'came_from': u'/',
-     'ava': {'mail': ['ft@example.net'],
-             'givenName': ['Fredrik'],
-             'displayName': ['Fredrik Thulin'],
-             'sn': ['Thulin']},
-      'issuer': 'https://dev.idp.eduid.se/idp.xml'
-    }
+    Store SAML2 name id info.
 
     :param session: The current session object
-    :param name_id: SAML2 session info
+    :param name_id: saml2.saml.NameID object
     :return: None
+
+    :type name_id: saml2.saml.NameID
     """
     session['_saml2_session_name_id'] = name_id
 
