@@ -120,7 +120,6 @@ class LoggedInReguestTests(am.MongoTestCase):
             'saml2.login_redirect_url': '/',
             'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
-            'saml2.attribute_mapping': "mail = mail",
             # Required only if not dont want mongodb
             # 'groups_callback': dummy_groups_callback,
             #'session.type': 'memory',

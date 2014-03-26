@@ -101,7 +101,6 @@ class Saml2RequestTests(unittest.TestCase):
             'saml2.login_redirect_url': '/',
             'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
-            'saml2.attribute_mapping': "mail = mail",
             'auth_tk_secret': '123456',
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',

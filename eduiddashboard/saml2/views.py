@@ -166,8 +166,6 @@ def login_view(request):
 
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
-    attribute_mapping = request.registry.settings['saml2.attribute_mapping']
-
     if 'SAMLResponse' not in request.POST:
         return HTTPBadRequest(
             'Couldn\'t find "SAMLResponse" in POST data.')
@@ -203,7 +201,7 @@ def assertion_consumer_service(request):
     log.debug('Trying to authenticate the user')
     log.debug('Session info : {!r}'.format(session_info))
 
-    user = authenticate(request, session_info, attribute_mapping)
+    user = authenticate(request, session_info)
     if user is None:
         log.error('The user is None')
         return HTTPUnauthorized("Access not authorized")

@@ -76,11 +76,7 @@ def get_loa(available_loa, session_info):
     return default_loa
 
 
-def authenticate(request, session_info, attribute_mapping):
-
-    if session_info is None or attribute_mapping is None:
-        logger.error('Session info or attribute mapping are None')
-        return None
+def authenticate(request, session_info):
 
     if not 'ava' in session_info:
         logger.error('"ava" key not found in session_info')
@@ -93,6 +89,8 @@ def authenticate(request, session_info, attribute_mapping):
     attributes = session_info['ava']
     if not attributes:
         logger.error('The attributes dictionary is empty')
+    if session_info is None:
+        raise TypeError('Session info is None')
 
     user_main_attribute = request.registry.settings.get(
         'saml2.user_main_attribute').lower()
@@ -101,17 +99,6 @@ def authenticate(request, session_info, attribute_mapping):
     logger.debug('Local attribute_mapping: %s' % attribute_mapping)
     saml_user = None
 
-    # Check if user_main_attribute is mapped to something else
-    for saml_attr, local_fields in attribute_mapping.items():
-        if user_main_attribute in local_fields:
-            logger.debug("user_main_attribute {!r} mapped to {!r}".format(
-                user_main_attribute, saml_attr))
-            user_main_attribute = saml_attr
-
-    # Look for the canonicalized attribute in the SAML assertion attributes
-    for saml_attr, local_fields in attributes.items():
-        if saml_attr.lower() == user_main_attribute:
-            saml_user = attributes[saml_attr][0]
 
     if saml_user is None:
         logger.error('Could not find attribute {!r} in the SAML assertion'.format(user_main_attribute))
