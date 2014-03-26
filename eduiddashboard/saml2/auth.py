@@ -86,27 +86,38 @@ def authenticate(request, session_info, attribute_mapping):
         logger.error('"ava" key not found in session_info')
         return None
 
+    # Get attributes we received from the SAML IdP. This is a dictionary like
+    # {'mail': ['user@example.edu'],
+    #  'eduPersonPrincipalName': ['gadaj-fifib@idp.example.edu']
+    # }
     attributes = session_info['ava']
     if not attributes:
         logger.error('The attributes dictionary is empty')
 
     user_main_attribute = request.registry.settings.get(
-        'saml2.user_main_attribute')
+        'saml2.user_main_attribute').lower()
 
-    logger.debug('attributes: %s' % attributes)
-    logger.debug('attribute_mapping: %s' % attribute_mapping)
+    logger.debug('SAML attributes received: %s' % attributes)
+    logger.debug('Local attribute_mapping: %s' % attribute_mapping)
     saml_user = None
 
+    # Check if user_main_attribute is mapped to something else
     for saml_attr, local_fields in attribute_mapping.items():
-        if (user_main_attribute in local_fields
-                and saml_attr in attributes):
+        if user_main_attribute in local_fields:
+            logger.debug("user_main_attribute {!r} mapped to {!r}".format(
+                user_main_attribute, saml_attr))
+            user_main_attribute = saml_attr
+
+    # Look for the canonicalized attribute in the SAML assertion attributes
+    for saml_attr, local_fields in attributes.items():
+        if saml_attr.lower() == user_main_attribute:
             saml_user = attributes[saml_attr][0]
 
     if saml_user is None:
-        logger.error('Could not find saml_user value')
+        logger.error('Could not find attribute {!r} in the SAML assertion'.format(user_main_attribute))
         return None
 
-    logger.debug('Retrieving existing user "%s"' % saml_user)
+    logger.debug('Retrieving existing user {!r} (from SAML attribute {!r})'.format(saml_user, user_main_attribute))
     try:
         user = request.userdb.get_user(saml_user)
         return user
