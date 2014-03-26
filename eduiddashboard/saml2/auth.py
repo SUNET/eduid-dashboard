@@ -128,6 +128,7 @@ def login(request, session_info, user):
     :return:
     """
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
+    log.info("User {!r} logging in ({!r}: {!r})".format(user['_id'], main_attribute, user[main_attribute]))
     request.session[main_attribute] = user[main_attribute]
     request.session['user'] = user
     request.session['eduPersonAssurance'] = get_loa(
@@ -145,6 +146,8 @@ def logout(request):
     :param request:
     :return:
     """
+    user = request.session['user']
+    log.info("User {!r} logging out".format(user['_id']))
     if request.session is not None:
         request.session.delete()
     headers = forget(request)
