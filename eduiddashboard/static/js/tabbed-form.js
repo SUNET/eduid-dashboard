@@ -20,6 +20,7 @@ var TabbedForm = function (container) {
                       document.location = loc;
                 };
                 target.html(data);
+                $('div.tab-pane.active button.btn-primary').enable(false);
                 if (deform.callbacks !== undefined &&
                         deform.callbacks.length === 0) {
                     $('form script').each(function (i, e) {
@@ -28,6 +29,7 @@ var TabbedForm = function (container) {
                     });
                 }
                 deform.processCallbacks();
+                $('div.tab-pane.active button.btn-primary').enable(true);
 
                 container.find("a[data-toggle=tooltip]").tooltip();
                 container.find("button[data-toggle=tooltip]").tooltip();
