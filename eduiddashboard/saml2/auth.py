@@ -22,6 +22,7 @@ import logging
 from pyramid.security import remember, forget
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
+from eduiddashboard.saml2.utils import get_SAML_attribute
 
 logger = logging.getLogger(__name__)
 
@@ -78,31 +79,18 @@ def get_loa(available_loa, session_info):
 
 def authenticate(request, session_info):
 
-    if not 'ava' in session_info:
-        logger.error('"ava" key not found in session_info')
-        return None
-
-    # Get attributes we received from the SAML IdP. This is a dictionary like
-    # {'mail': ['user@example.edu'],
-    #  'eduPersonPrincipalName': ['gadaj-fifib@idp.example.edu']
-    # }
-    attributes = session_info['ava']
-    if not attributes:
-        logger.error('The attributes dictionary is empty')
     if session_info is None:
         raise TypeError('Session info is None')
 
     user_main_attribute = request.registry.settings.get(
-        'saml2.user_main_attribute').lower()
+        'saml2.user_main_attribute')
 
-    logger.debug('SAML attributes received: %s' % attributes)
-    logger.debug('Local attribute_mapping: %s' % attribute_mapping)
-    saml_user = None
-
-
-    if saml_user is None:
+    attribute_values = get_SAML_attribute(session_info, user_main_attribute)
+    if not attribute_values:
         logger.error('Could not find attribute {!r} in the SAML assertion'.format(user_main_attribute))
         return None
+
+    saml_user = attribute_values[0]
 
     logger.debug('Retrieving existing user {!r} (from SAML attribute {!r})'.format(saml_user, user_main_attribute))
     try:
