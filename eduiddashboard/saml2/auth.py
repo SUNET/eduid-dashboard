@@ -100,7 +100,15 @@ def authenticate(request, session_info):
 
     saml_user = attribute_values[0]
 
-    log.debug('Retrieving existing user {!r} (from SAML attribute {!r})'.format(saml_user, user_main_attribute))
+    # If user_main_attribute is eduPersonPrincipalName, there value might be scoped
+    # and the scope (e.g. "@example.com") might have to be removed before looking
+    # for the user in the database.
+    strip_suffix = request.registry.settings.get('saml2.strip_saml_user_suffix')
+    if strip_suffix:
+        if saml_user.endswith(strip_suffix):
+            saml_user = saml_user[:-len(strip_suffix)]
+
+    log.debug('Looking for user with {!r} == {!r}'.format(user_main_attribute, saml_user))
     try:
         return request.userdb.get_user(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:

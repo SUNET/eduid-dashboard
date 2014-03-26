@@ -54,6 +54,8 @@ def includeme(config):
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
 
+    settings['saml2.strip_saml_user_suffix'] = read_setting_from_env(settings, 'saml2.strip_saml_user_suffix', '')
+
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
 
