@@ -17,14 +17,12 @@
 # limitations under the License.
 
 
-import logging
-
 from pyramid.security import remember, forget
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
-from eduiddashboard.saml2.utils import get_SAML_attribute
+from eduiddashboard.saml2.utils import get_saml_attribute
 
-logger = logging.getLogger(__name__)
+from eduiddashboard import log
 
 
 def get_authn_ctx(session_info):
@@ -78,32 +76,49 @@ def get_loa(available_loa, session_info):
 
 
 def authenticate(request, session_info):
+    """
+    Locate a user using the identity found in the SAML assertion.
 
+    :param request: Request object
+    :param session_info: Session info received by pysaml2 client
+
+    :returns: User dict
+
+    :type request: Request()
+    :type session_info: dict()
+    :rtype: dict() or None
+    """
     if session_info is None:
         raise TypeError('Session info is None')
 
-    user_main_attribute = request.registry.settings.get(
-        'saml2.user_main_attribute')
+    user_main_attribute = request.registry.settings.get('saml2.user_main_attribute')
 
-    attribute_values = get_SAML_attribute(session_info, user_main_attribute)
+    attribute_values = get_saml_attribute(session_info, user_main_attribute)
     if not attribute_values:
-        logger.error('Could not find attribute {!r} in the SAML assertion'.format(user_main_attribute))
+        log.error('Could not find attribute {!r} in the SAML assertion'.format(user_main_attribute))
         return None
 
     saml_user = attribute_values[0]
 
-    logger.debug('Retrieving existing user {!r} (from SAML attribute {!r})'.format(saml_user, user_main_attribute))
+    log.debug('Retrieving existing user {!r} (from SAML attribute {!r})'.format(saml_user, user_main_attribute))
     try:
-        user = request.userdb.get_user(saml_user)
-        return user
+        return request.userdb.get_user(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:
-        logger.error('The user "%s" does not exist' % saml_user)
+        log.error('No user with {!r} = {!r} found'.format(user_main_attribute, saml_user))
     except request.userdb.exceptions.MultipleUsersReturned:
-        logger.error("There are more than one user with %s = %s" %
-                     (user_main_attribute, saml_user))
+        log.error("There are more than one user with {!r} = {!r}".format(user_main_attribute, saml_user))
+    return None
 
 
 def login(request, session_info, user):
+    """
+    Update session with information about a user that has just logged in.
+
+    :param request: Request object
+    :param session_info: Session info received by pysaml2 client
+    :param user: Information about user as returned by authenticate()
+    :return:
+    """
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     request.session[main_attribute] = user[main_attribute]
     request.session['user'] = user
@@ -116,6 +131,12 @@ def login(request, session_info, user):
 
 
 def logout(request):
+    """
+    Destroy session information when a user logs out.
+
+    :param request:
+    :return:
+    """
     if request.session is not None:
         request.session.delete()
     headers = forget(request)

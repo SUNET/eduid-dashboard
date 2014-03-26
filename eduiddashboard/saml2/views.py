@@ -1,3 +1,5 @@
+import pprint
+
 from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
@@ -167,8 +169,7 @@ def login_view(request):
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
     if 'SAMLResponse' not in request.POST:
-        return HTTPBadRequest(
-            'Couldn\'t find "SAMLResponse" in POST data.')
+        return HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
                          identity_cache=IdentityCache(request.session))
@@ -198,12 +199,12 @@ def assertion_consumer_service(request):
     # authenticate the remote user
     session_info = response.session_info()
 
-    log.debug('Trying to authenticate the user')
-    log.debug('Session info : {!r}'.format(session_info))
+    log.debug('Trying to locate the user authenticated by the IdP')
+    log.debug('Session info:\n{!s}\n\n'.format(pprint.pformat(session_info)))
 
     user = authenticate(request, session_info)
     if user is None:
-        log.error('The user is None')
+        log.error('Could not find the user identified by the IdP')
         return HTTPUnauthorized("Access not authorized")
 
     headers = login(request, session_info, user)

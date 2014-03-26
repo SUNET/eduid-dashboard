@@ -1,9 +1,7 @@
 from saml2.config import SPConfig
 import imp
 
-import logging
-logger = logging.getLogger(__name__)
-
+from eduiddashboard import log
 
 
 def get_saml2_config(module_path):
@@ -30,17 +28,30 @@ def get_location(http_info):
     assert header_name == 'Location'
     return header_value
 
-def get_SAML_attribute(session_info, attr_name):
-    # Get attributes we received from the SAML IdP. This is a dictionary like
-    # {'mail': ['user@example.edu'],
-    #  'eduPersonPrincipalName': ['gadaj-fifib@idp.example.edu']
-    # }
+
+def get_saml_attribute(session_info, attr_name):
+    """
+    Get value from a SAML attribute received from the SAML IdP.
+
+    session_info is a pysaml2 response.session_info(). This is a dictionary like
+        {'mail': ['user@example.edu'],
+         'eduPersonPrincipalName': ['gadaj-fifib@idp.example.edu']
+      }
+
+    :param session_info: SAML attributes received by pysaml2 client.
+    :param attr_name: The attribute to look up
+    :returns: Attribute values
+
+    :type session_info: dict()
+    :type attr_name: string()
+    :rtype: [string()]
+    """
     if not 'ava' in session_info:
         raise ValueError('SAML attributes (ava) not found in session_info')
 
     attributes = session_info['ava']
 
-    logger.debug('SAML attributes received: %s' % attributes)
+    log.debug('SAML attributes received: %s' % attributes)
 
     attr_name = attr_name.lower()
     # Look for the canonicalized attribute in the SAML assertion attributes
