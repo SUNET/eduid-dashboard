@@ -22,12 +22,14 @@ class MockedUserDB(UserDB):
 
     test_users = {
         'user1@example.com': {
+            '_id': 1,
             'mail': 'user1@example.com',
             'first_name': 'User',
             'last_name': '1',
             'screen_name': 'user1',
         },
         'user2@example.com': {
+            '_id': 2,
             'mail': 'user2@example.com',
             'first_name': 'User',
             'last_name': '2',
@@ -101,7 +103,6 @@ class Saml2RequestTests(unittest.TestCase):
             'saml2.login_redirect_url': '/',
             'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
-            'saml2.attribute_mapping': "mail = mail",
             'auth_tk_secret': '123456',
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',

@@ -1,3 +1,5 @@
+import pprint
+
 from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
@@ -21,6 +23,7 @@ from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
 
 from eduiddashboard import log
 
+
 class HTTPXRelocate(HTTPOk):
 
     empty_body = True
@@ -34,25 +37,13 @@ class HTTPXRelocate(HTTPOk):
 
 def _set_name_id(session, name_id):
     """
-    Store SAML2 session info.
-
-    This is a dict like
-
-    {'authn_info': [('http://www.swamid.se/policy/assurance/al1',
-                    ['https://dev.idp.eduid.se/idp.xml'])],
-     'name_id': <saml2.saml.NameID object at 0x7fc4800a65d0>,
-     'not_on_or_after': 1389621811,
-     'came_from': u'/',
-     'ava': {'mail': ['ft@example.net'],
-             'givenName': ['Fredrik'],
-             'displayName': ['Fredrik Thulin'],
-             'sn': ['Thulin']},
-      'issuer': 'https://dev.idp.eduid.se/idp.xml'
-    }
+    Store SAML2 name id info.
 
     :param session: The current session object
-    :param name_id: SAML2 session info
+    :param name_id: saml2.saml.NameID object
     :return: None
+
+    :type name_id: saml2.saml.NameID
     """
     session['_saml2_session_name_id'] = name_id
 
@@ -166,11 +157,8 @@ def login_view(request):
 
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
-    attribute_mapping = request.registry.settings['saml2.attribute_mapping']
-
     if 'SAMLResponse' not in request.POST:
-        return HTTPBadRequest(
-            'Couldn\'t find "SAMLResponse" in POST data.')
+        return HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
                          identity_cache=IdentityCache(request.session))
@@ -200,12 +188,12 @@ def assertion_consumer_service(request):
     # authenticate the remote user
     session_info = response.session_info()
 
-    log.debug('Trying to authenticate the user')
-    log.debug('Session info : {!r}'.format(session_info))
+    log.debug('Trying to locate the user authenticated by the IdP')
+    log.debug('Session info:\n{!s}\n\n'.format(pprint.pformat(session_info)))
 
-    user = authenticate(request, session_info, attribute_mapping)
+    user = authenticate(request, session_info)
     if user is None:
-        log.error('The user is None')
+        log.error('Could not find the user identified by the IdP')
         return HTTPUnauthorized("Access not authorized")
 
     headers = login(request, session_info, user)

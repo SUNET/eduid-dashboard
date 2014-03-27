@@ -54,28 +54,7 @@ def includeme(config):
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
 
-    attribute_mapping_raw = read_setting_from_env(settings,
-                                                  'saml2.attribute_mapping',
-                                                  "")
-
-    attribute_mapping = {}
-    for raw_line in attribute_mapping_raw.split('\n'):
-        if '=' in raw_line:
-            (from_saml2, to_local) = raw_line.split('=')
-            from_saml2 = from_saml2.strip()
-            to_local = to_local.strip()
-            if from_saml2 not in attribute_mapping:
-                attribute_mapping[from_saml2] = [to_local]
-            else:
-                attribute_mapping[from_saml2].append(to_local)
-
-    if attribute_mapping == {}:
-        raise ConfigurationError(
-            'The saml2.attribute_mapping configuration option is required. '
-            'Remember you must use one line per attribute with the follow '
-            'format: saml_attribute=local_attribute')
-
-    settings['saml2.attribute_mapping'] = attribute_mapping
+    settings['saml2.strip_saml_user_suffix'] = read_setting_from_env(settings, 'saml2.strip_saml_user_suffix', '')
 
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)

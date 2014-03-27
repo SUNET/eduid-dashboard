@@ -40,37 +40,22 @@ class AuthTests(Saml2RequestTests):
     def test_authenticate(self):
         request = self.dummy_request()
 
-        attribute_mapping = {
-            'mail': 'mail',
-        }
         session_info = self.get_fake_session_info()
 
-        user = authenticate(request, session_info, attribute_mapping)
+        user = authenticate(request, session_info)
 
         # The user provide exists
         self.assertEqual([user['mail']], session_info['ava']['mail'])
 
-        user = authenticate(request,
-                            self.get_fake_session_info('notexists@example.com'),
-                            attribute_mapping)
+        user = authenticate(request, self.get_fake_session_info('notexists@example.com'))
         # The user does not exist
-        self.assertIsNone(user)
-
-        user = authenticate(request,
-                            self.get_fake_session_info('notexists@example.com'),
-                            {'NOTmail': 'mail'})
-        # The main_attribute not in attribute_mapping or ava
         self.assertIsNone(user)
 
     def test_login(self):
         session_info = self.get_fake_session_info()
         request = self.get_request_with_session()
 
-        attribute_mapping = {
-            'mail': 'mail',
-        }
-
-        user = authenticate(request, session_info, attribute_mapping)
+        user = authenticate(request, session_info)
 
         headers = login(request, session_info, user)
         self.assertEqual(headers, True)
