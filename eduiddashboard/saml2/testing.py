@@ -22,12 +22,14 @@ class MockedUserDB(UserDB):
 
     test_users = {
         'user1@example.com': {
+            '_id': 1,
             'mail': 'user1@example.com',
             'first_name': 'User',
             'last_name': '1',
             'screen_name': 'user1',
         },
         'user2@example.com': {
+            '_id': 2,
             'mail': 'user2@example.com',
             'first_name': 'User',
             'last_name': '2',

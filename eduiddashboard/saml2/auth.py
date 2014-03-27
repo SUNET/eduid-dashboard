@@ -146,8 +146,10 @@ def logout(request):
     :param request:
     :return:
     """
-    user = request.session['user']
-    log.info("User {!r} logging out".format(user['_id']))
+    if 'user' in request.session:
+        user = request.session['user']
+        log.info("User {!r} logging out".format(user['_id']))
+
     if request.session is not None:
         request.session.delete()
     headers = forget(request)
