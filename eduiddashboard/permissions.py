@@ -172,7 +172,11 @@ class BaseFactory(object):
 
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':
-            self.request.session['user'] = User(newuser)
+            # Only update session if user is the same as currently in session
+            user = self.request.session.get('user')
+            newuser = User(newuser)
+            if user.get_id() == newuser.get_id():
+                self.request.session['user'] = newuser
         else:
             user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
