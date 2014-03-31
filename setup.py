@@ -73,7 +73,7 @@ waitress_extras = requires + [
 ]
 
 setup(name='eduid-dashboard',
-      version='0.1.9-dev',
+      version='0.1.9',
       description='eduid-dashboard',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
