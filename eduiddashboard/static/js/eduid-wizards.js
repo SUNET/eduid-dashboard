@@ -58,6 +58,7 @@ var EduidWizard = function (container_path, active_card, options) {
         if (currentCard.index === (this._cards.length - 1)) {
             // This is the last card
             this.reset().close();
+            location.reload();
 
         } else if (currentCard.validate()) {
             jsondata = wizard.el.find('input, select').serializeObject();
