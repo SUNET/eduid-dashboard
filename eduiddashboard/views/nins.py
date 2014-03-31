@@ -11,6 +11,7 @@ from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
+from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verificated)
@@ -267,7 +268,7 @@ class NinsView(BaseFormView):
 
         newnin = normalize_nin(newnin)
 
-        old_user = request.db.profiles.find_one({
+        old_user = self.request.db.profiles.find_one({
             'norEduPersonNIN': newnin
             })
 
