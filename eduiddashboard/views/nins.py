@@ -174,6 +174,23 @@ class NINsActionsView(BaseActionsView):
     def send_verification_code(self, data_id, code):
         send_verification_code(self.request, self.user, data_id, code)
 
+    def resend_code_action(self, index, post_data):
+        nins = get_not_verified_nins_list(self.request, self.user)
+
+        if len(nins) > index:
+            nin = nins[index]
+        else:
+            raise HTTPNotFound(_("No pending national identity numbers found."))
+
+        message = self.verify_messages['new_code_sent']
+        message = get_localizer(self.request).translate(message)
+        send_verification_code(self.request, self.context.user, nin)
+
+        return {
+            'result': 'ok',
+            'message': message,
+        }
+
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')
