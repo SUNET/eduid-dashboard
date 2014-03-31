@@ -116,6 +116,10 @@ def verificate_code(request, model_name, code):
                 old_user.set_addresses(addresses)
             user.add_verified_nin(obj_id)
             user.retrieve_address(request, obj_id)
+
+            # Reset session eduPersonIdentityProofing on NIN verification
+            request.session['eduPersonIdentityProofing'] = None
+
             msg = _('National identity number {obj} verified')
 
         elif model_name == 'mobile':

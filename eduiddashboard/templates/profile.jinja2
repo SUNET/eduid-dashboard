@@ -238,7 +238,12 @@ $(document).ready(function () {
 
     $("#askDialog .cancel-button, #askDialog .finish-button").click( function (e) {
       e.preventDefault();
-      closeAskDialog();
+      if ($("div.ninsview-form-container").length > 0) {
+          $(this).hide();
+          location.reload();
+      } else {
+          closeAskDialog();
+      }
     });
 
     $("#askDialog .ok-button").click( function (e) {
