@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-31 13:46+0200\n"
-"PO-Revision-Date: 2014-03-31 11:48+0000\n"
+"POT-Creation-Date: 2014-03-31 14:37+0200\n"
+"PO-Revision-Date: 2014-03-31 12:40+0000\n"
 "Last-Translator: Ratler <swold@sunet.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-dashboard/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -568,9 +568,9 @@ msgstr "Användes senast"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:35
-#: eduiddashboard/views/security.py:156
+#: eduiddashboard/views/security.py:156 eduiddashboard/views/security.py:406
 msgid "Change password"
-msgstr "Ändra lösenord"
+msgstr "Byt lösenord"
 
 #: eduiddashboard/templates/permissions-form.jinja2:8
 msgid "Available permissions for this user"
@@ -1172,10 +1172,6 @@ msgstr "Avbryt"
 #: eduiddashboard/views/security.py:388
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
-
-#: eduiddashboard/views/security.py:406
-msgid "Update password"
-msgstr "Uppdatera lösenord"
 
 #: eduiddashboard/views/security.py:409
 msgid "Please choose a new password for your eduID account."

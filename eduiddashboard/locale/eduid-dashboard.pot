@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.1.8-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-31 13:46+0200\n"
+"POT-Creation-Date: 2014-03-31 14:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -564,7 +564,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:35
-#: eduiddashboard/views/security.py:156
+#: eduiddashboard/views/security.py:156 eduiddashboard/views/security.py:406
 msgid "Change password"
 msgstr ""
 
@@ -1180,10 +1180,6 @@ msgstr ""
 
 #: eduiddashboard/views/security.py:388
 msgid "Myndighetspost"
-msgstr ""
-
-#: eduiddashboard/views/security.py:406
-msgid "Update password"
 msgstr ""
 
 #: eduiddashboard/views/security.py:409

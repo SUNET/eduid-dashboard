@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-31 13:46+0200\n"
+"POT-Creation-Date: 2014-03-31 14:37+0200\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -569,7 +569,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:35
-#: eduiddashboard/views/security.py:156
+#: eduiddashboard/views/security.py:156 eduiddashboard/views/security.py:406
 msgid "Change password"
 msgstr ""
 
@@ -1199,10 +1199,6 @@ msgstr ""
 msgid "Myndighetspost"
 msgstr ""
 
-#: eduiddashboard/views/security.py:406
-msgid "Update password"
-msgstr ""
-
 #: eduiddashboard/views/security.py:409
 msgid "Please choose a new password for your eduID account."
 msgstr ""
@@ -1773,5 +1769,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "A new confirmation code has been sent to your govt mailbox"
+#~ msgstr ""
+
+#~ msgid "Update password"
 #~ msgstr ""
 

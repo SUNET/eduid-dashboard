@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-31 13:46+0200\n"
+"POT-Creation-Date: 2014-03-31 14:37+0200\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -615,7 +615,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:35
-#: eduiddashboard/views/security.py:156
+#: eduiddashboard/views/security.py:156 eduiddashboard/views/security.py:406
 #, fuzzy
 msgid "Change password"
 msgstr "Cambia tu contraseña"
@@ -1217,7 +1217,6 @@ msgstr "números de identificación personal"
 
 #: eduiddashboard/views/nins.py:183
 #, fuzzy
-#| msgid "Swedish national identity number"
 msgid "No pending national identity numbers found."
 msgstr "números de identificación personal"
 
@@ -1286,11 +1285,6 @@ msgstr ""
 #: eduiddashboard/views/security.py:388
 msgid "Myndighetspost"
 msgstr ""
-
-#: eduiddashboard/views/security.py:406
-#, fuzzy
-msgid "Update password"
-msgstr "Cambia tu contraseña"
 
 #: eduiddashboard/views/security.py:409
 msgid "Please choose a new password for your eduID account."
@@ -1763,4 +1757,7 @@ msgstr ""
 
 #~ msgid "A new confirmation code has been sent to your govt mailbox"
 #~ msgstr ""
+
+#~ msgid "Update password"
+#~ msgstr "Cambia tu contraseña"
 

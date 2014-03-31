@@ -403,7 +403,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
     schema = ResetPasswordStep2()
     route = 'reset-password-step2'
     buttons = (
-        Button('reset', title=_('Update password'), css_class='btn-success'),
+        Button('reset', title=_('Change password'), css_class='btn-success'),
         Button('cancel', _('Cancel')),
     )
     intro_message = _('Please choose a new password for your eduID account.')
