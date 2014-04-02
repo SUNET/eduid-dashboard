@@ -24,7 +24,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 version = '0.1.11-dev'
 
 requires = [
-    'eduid_am==0.4.3',
+    'eduid_am==0.4.5',
     'pymongo==2.6.3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
