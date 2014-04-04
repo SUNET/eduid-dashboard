@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard 0.1.8-dev\n"
+"Project-Id-Version: eduid-dashboard 0.1.11-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-03-31 14:37+0200\n"
+"POT-Creation-Date: 2014-04-04 15:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,101 +43,101 @@ msgstr ""
 msgid "The Swedish national identity number should be entered as yyyymmddnnnn"
 msgstr ""
 
-#: eduiddashboard/models.py:95
-msgid "Swedish national identity number"
-msgstr ""
-
-#: eduiddashboard/models.py:101
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:14
-msgid "yyyymmddnnnn"
-msgstr ""
-
-#: eduiddashboard/models.py:115
-msgid "Given name"
-msgstr ""
-
-#: eduiddashboard/models.py:117 eduiddashboard/templates/home.jinja2:29
-msgid "Surname"
-msgstr ""
-
-#: eduiddashboard/models.py:119
-msgid "Display name"
-msgstr ""
-
-#: eduiddashboard/models.py:121
-msgid "Preferred language"
-msgstr ""
-
-#: eduiddashboard/models.py:136
-msgid "Current password"
-msgstr ""
-
-#: eduiddashboard/models.py:143 eduiddashboard/models.py:192
-msgid "Use my own password"
-msgstr ""
-
-#: eduiddashboard/models.py:148 eduiddashboard/models.py:197
-msgid "Suggested password"
-msgstr ""
-
-#: eduiddashboard/models.py:157
-msgid "Custom password"
-msgstr ""
-
-#: eduiddashboard/models.py:166
-msgid "Repeat the password"
-msgstr ""
-
-#: eduiddashboard/models.py:210
-msgid "New Password"
-msgstr ""
-
-#: eduiddashboard/models.py:216
-msgid "Confirm New Password"
-msgstr ""
-
-#: eduiddashboard/models.py:222
-msgid "Passwords doesn't match"
-msgstr ""
-
-#: eduiddashboard/models.py:233
-#: eduiddashboard/templates/postaladdress-form.jinja2:22
-msgid "Address"
-msgstr ""
-
-#: eduiddashboard/models.py:234
-#: eduiddashboard/templates/postaladdress-form.jinja2:29
-msgid "City"
-msgstr ""
-
-#: eduiddashboard/models.py:235
-msgid "Postal code"
-msgstr ""
-
-#: eduiddashboard/models.py:237
-#: eduiddashboard/templates/postaladdress-form.jinja2:43
-msgid "Country"
-msgstr ""
-
-#: eduiddashboard/models.py:246
+#: eduiddashboard/models.py:79
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written using"
 " international notation, starting with \"+\" and followed by 10-20 digits."
 msgstr ""
 
+#: eduiddashboard/models.py:101
+msgid "Swedish national identity number"
+msgstr ""
+
+#: eduiddashboard/models.py:107
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:14
+msgid "yyyymmddnnnn"
+msgstr ""
+
+#: eduiddashboard/models.py:121
+msgid "Given name"
+msgstr ""
+
+#: eduiddashboard/models.py:123 eduiddashboard/templates/home.jinja2:29
+msgid "Surname"
+msgstr ""
+
+#: eduiddashboard/models.py:125
+msgid "Display name"
+msgstr ""
+
+#: eduiddashboard/models.py:127
+msgid "Preferred language"
+msgstr ""
+
+#: eduiddashboard/models.py:142
+msgid "Current password"
+msgstr ""
+
+#: eduiddashboard/models.py:149 eduiddashboard/models.py:208
+msgid "Use my own password"
+msgstr ""
+
+#: eduiddashboard/models.py:154 eduiddashboard/models.py:213
+msgid "Suggested password"
+msgstr ""
+
+#: eduiddashboard/models.py:163
+msgid "Custom password"
+msgstr ""
+
+#: eduiddashboard/models.py:172
+msgid "Repeat the password"
+msgstr ""
+
+#: eduiddashboard/models.py:226
+msgid "New Password"
+msgstr ""
+
+#: eduiddashboard/models.py:232
+msgid "Confirm New Password"
+msgstr ""
+
+#: eduiddashboard/models.py:238
+msgid "Passwords doesn't match"
+msgstr ""
+
+#: eduiddashboard/models.py:249
+#: eduiddashboard/templates/postaladdress-form.jinja2:22
+msgid "Address"
+msgstr ""
+
 #: eduiddashboard/models.py:250
-msgid "mobile"
+#: eduiddashboard/templates/postaladdress-form.jinja2:29
+msgid "City"
 msgstr ""
 
 #: eduiddashboard/models.py:251
+msgid "Postal code"
+msgstr ""
+
+#: eduiddashboard/models.py:253
+#: eduiddashboard/templates/postaladdress-form.jinja2:43
+msgid "Country"
+msgstr ""
+
+#: eduiddashboard/models.py:263
+msgid "mobile"
+msgstr ""
+
+#: eduiddashboard/models.py:264
 msgid "Mobile phone number"
 msgstr ""
 
-#: eduiddashboard/models.py:265 eduiddashboard/templates/home.jinja2:17
+#: eduiddashboard/models.py:278 eduiddashboard/templates/home.jinja2:17
 msgid "Search for users"
 msgstr ""
 
-#: eduiddashboard/models.py:266
+#: eduiddashboard/models.py:279
 msgid "query"
 msgstr ""
 
@@ -251,6 +251,13 @@ msgstr ""
 
 #: eduiddashboard/validators.py:271
 msgid "Invalid CSRF token"
+msgstr ""
+
+#: eduiddashboard/validators.py:286
+msgid ""
+"Valid input formats are:<ul><li>National identity number: "
+"yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
+"07</li><li>E-mail address: user@example.edu</li></ul>"
 msgstr ""
 
 #: eduiddashboard/verifications.py:123
@@ -564,7 +571,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:35
-#: eduiddashboard/views/security.py:156 eduiddashboard/views/security.py:406
+#: eduiddashboard/views/security.py:156 eduiddashboard/views/security.py:408
 msgid "Change password"
 msgstr ""
 
@@ -768,12 +775,14 @@ msgstr ""
 #: eduiddashboard/templates/reset-password-sent.jinja2:11
 #, python-format
 msgid ""
-"We have sent you a password reset message. Check your %(type)s for a message "
-"from eduID,\n"
+"If an eduID account was found using your search criteria a password reset "
+"message should have\n"
+"                been sent to you. Check your %(type)s for a message from "
+"eduID,\n"
 "            then click the verification link to reset your password."
 msgstr ""
 
-#: eduiddashboard/templates/reset-password-sent.jinja2:14
+#: eduiddashboard/templates/reset-password-sent.jinja2:15
 msgid "Return to login page &raquo;"
 msgstr ""
 
@@ -1174,15 +1183,15 @@ msgid "Reset password"
 msgstr ""
 
 #: eduiddashboard/views/security.py:315 eduiddashboard/views/security.py:358
-#: eduiddashboard/views/security.py:407
+#: eduiddashboard/views/security.py:409
 msgid "Cancel"
 msgstr ""
 
-#: eduiddashboard/views/security.py:388
+#: eduiddashboard/views/security.py:390
 msgid "Myndighetspost"
 msgstr ""
 
-#: eduiddashboard/views/security.py:409
+#: eduiddashboard/views/security.py:411
 msgid "Please choose a new password for your eduID account."
 msgstr ""
 
