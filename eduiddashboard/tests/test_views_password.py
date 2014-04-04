@@ -261,6 +261,17 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         response = form.submit('reset')
         self.assertEqual(response.status, '302 Found')
 
+        self.db.reset_passwords.remove()
+        form['email_or_username'].value = '0701234567'
+        from eduiddashboard.msgrelay import MsgRelay
+        with patch.multiple(MsgRelay, nin_validator=return_true, nin_reachable=return_true,
+                            nin_reset_password=return_true):
+            response = form.submit('reset')
+        self.assertEqual(response.status, '302 Found')
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertEqual(len(reset_passwords_after), 1)
+        self.db.reset_passwords.remove()
+
         for email in self.user['mailAliases']:
             if not email['verified']:
                 continue
