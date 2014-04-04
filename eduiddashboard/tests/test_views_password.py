@@ -187,6 +187,11 @@ TEST_USER = {
         'preferredLanguage': 'en',
         'mail': 'johnnysmith1@example.org',
         'eduPersonEntitlement': [],
+        'mobile': [{
+            'mobile': '+46701234567',
+            'verified': True,
+            'primary': True,
+        }],
         'mailAliases': [{
             'email': 'johnnysmith1@example.org',
             'verified': True,
@@ -210,6 +215,10 @@ TEST_VERIFICATIONS = [{
 }]
 
 from eduid_am.testing import MockedUserDB as MUDB
+
+
+def return_true(*args, **kwargs):
+    return True
 
 
 class MockedUserDB(MUDB):
@@ -261,6 +270,36 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         reset_passwords_after = list(self.db.reset_passwords.find())
         self.assertEqual(len(reset_passwords_after), 1)
 
+    def test_reset_password_mina(self):
+        response_form = self.testapp.get('/profile/reset-password/mina/')
+
+        form = response_form.forms['resetpasswordninview-form']
+
+        form['email_or_username'].value = 'notexistingmail@foodomain.com'
+        response = form.submit('reset')
+        self.assertEqual(response.status, '302 Found')
+
+        self.db.reset_passwords.remove()
+        form['email_or_username'].value = 'johnnysmith3@example.com'
+        from eduiddashboard.msgrelay import MsgRelay
+        with patch.multiple(MsgRelay, nin_validator=return_true, nin_reachable=return_true,
+                            nin_reset_password=return_true):
+            response = form.submit('reset')
+        self.assertEqual(response.status, '302 Found')
+
+        self.db.reset_passwords.remove()
+        form['email_or_username'].value = '0701234567'
+        with patch.multiple(MsgRelay, nin_validator=return_true, nin_reachable=return_true,
+                            nin_reset_password=return_true):
+            response = form.submit('reset')
+        self.assertEqual(response.status, '302 Found')
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertEqual(len(reset_passwords_after), 1)
+
+        form['email_or_username'].value = 'notexistingmail@foodomain'
+        response = form.submit('reset')
+        self.assertIn('Valid input formats are:', response.body)
+
     def test_reset_password_code(self):
         hash_code = '123456'
         date = datetime.now(pytz.utc)
@@ -284,6 +323,23 @@ class ResetPasswordFormTests(LoggedInReguestTests):
         }, safe=True)
         response = self.testapp.get('/profile/reset-password/{0}/'.format(wrong_code))
         self.assertEqual(response.status, '302 Found')
+
+    def test_reset_password_invalid_input(self):
+        response_form = self.testapp.get('/profile/reset-password/email/')
+
+        form = response_form.forms['resetpasswordemailview-form']
+
+        form['email_or_username'].value = 'notexistingmail@foodomain'
+        response = form.submit('reset')
+        self.assertIn('Valid input formats are:', response.body)
+
+        form['email_or_username'].value = '1601010000'
+        response = form.submit('reset')
+        self.assertIn('Valid input formats are:', response.body)
+
+        form['email_or_username'].value = '+14'
+        response = form.submit('reset')
+        self.assertIn('Valid input formats are:', response.body)
 
     def tearDown(self):
         super(ResetPasswordFormTests, self).tearDown()

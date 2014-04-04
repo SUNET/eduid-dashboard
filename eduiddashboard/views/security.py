@@ -24,7 +24,7 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
-    convert_to_localtime
+    convert_to_localtime, normalize_to_e_164
 from eduiddashboard import log
 
 
@@ -365,6 +365,8 @@ class ResetPasswordNINView(BaseResetPasswordView):
         # If input is a mail address we need to normalize it (ie lower case etc)
         if validate_email_format(email_or_username):
             email_or_username = normalize_email(email_or_username)
+        elif email_or_username.startswith(u'0'):
+            email_or_username = normalize_to_e_164(self.request, email_or_username)
 
         try:
             filter_dict = {'$or': []}

@@ -269,3 +269,21 @@ class CSRFTokenValidator(object):
         if value != token:
             log.debug("CSRF token validation failed: Form {!r} != Session {!r}".format(value, token))
             raise colander.Invalid(node, _("Invalid CSRF token"))
+
+
+class ResetPasswordFormValidator(colander.All):
+    """
+    Succeed if at least one of its subvalidators does not raise an exception.
+    """
+    def __call__(self, node, value):
+        try:
+            return super(ResetPasswordFormValidator, self).__call__(node, value)
+        except colander.Invalid as e:
+            if len(e.msg) < len(self.validators):
+                # At least one validator did not fail:
+                return
+            raise colander.Invalid(node,
+                                   _("Valid input formats are:<ul>"
+                                     "<li>National identity number: yyyymmddnnnn</li>"
+                                     "<li>Mobile phone number that begin with + or 07</li>"
+                                     "<li>E-mail address: user@example.edu</li></ul>"))

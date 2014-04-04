@@ -12,8 +12,8 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        NINReachableValidator,
                                        NINUniqueValidator,
                                        MobilePhoneUniqueValidator,
-                                       CSRFTokenValidator)
-
+                                       CSRFTokenValidator,
+                                       ResetPasswordFormValidator)
 from eduiddashboard.widgets import permissions_widget
 
 
@@ -72,6 +72,12 @@ class Email(CSRFTokenSchema):
 NINFormatValidator = colander.Regex(
     regex=re.compile(r'^(18|19|20)\d{2}(0[1-9]|1[0-2])\d{2}[-\s]?\d{4}$'),
     msg=_('The Swedish national identity number should be entered as yyyymmddnnnn')
+)
+
+MobileFormatValidator = colander.Regex(
+    r'^\+\d{10,20}$|^07[0236]\d{7}$',
+    msg=_('Invalid telephone number. It must be a valid Swedish number, or written using international notation,'
+          ' starting with "+" and followed by 10-20 digits.'),
 )
 
 
@@ -174,14 +180,24 @@ class EmailResetPassword(CSRFTokenSchema):
 
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=""
+        title="",
+        validator=ResetPasswordFormValidator(
+            NINFormatValidator,
+            MobileFormatValidator,
+            colander.Email(),
+        )
     )
 
 
 class NINResetPassword(CSRFTokenSchema):
     email_or_username = colander.SchemaNode(
         colander.String(),
-        title=""
+        title="",
+        validator=ResetPasswordFormValidator(
+            NINFormatValidator,
+            MobileFormatValidator,
+            colander.Email(),
+        )
     )
 
 
@@ -241,10 +257,7 @@ class PostalAddress(colander.MappingSchema):
 class Mobile(CSRFTokenSchema):
     mobile = colander.SchemaNode(colander.String(),
                                  validator=colander.All(
-                                     colander.Regex(
-                                         r'^\+\d{10,20}$|^07[0236]\d{7}$',
-                                         msg=_('Invalid telephone number. It must be a valid Swedish number, or written using international notation, starting with "+" and followed by 10-20 digits.'),
-                                     ),
+                                     MobileFormatValidator,
                                      MobilePhoneUniqueValidator()
                                  ),
                                  title=_('mobile'),
