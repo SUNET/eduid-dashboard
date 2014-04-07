@@ -116,8 +116,8 @@ def add_credentials(vccs_url, old_password, new_password, user):
             revoked.append(vccs_client.VCCSRevokeFactor(str(password['id']), 'reset password', reference='dashboard'))
             log.debug("Revoked old credential (password reset) {!s} (user {!s})".format(
                 password['id'], user.get_id()))
-
-        vccs.revoke_credentials(str(user.get_id()), revoked)
+        if revoked:
+            vccs.revoke_credentials(str(user.get_id()), revoked)
         del passwords[:]
 
     passwords.append({
