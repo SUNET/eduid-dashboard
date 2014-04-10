@@ -9,7 +9,7 @@ from eduiddashboard.utils import (calculate_filled_profile,
 @view_config(route_name='userstatus', permission='edit', renderer='json')
 def userstatus(context, request):
     user = context.user
-    tabs = get_available_tabs(context)
+    tabs = get_available_tabs(context, request)
     profile_filled = calculate_filled_profile(context.user, tabs)
     return {
         'loa': request.session.get('loa', 1),

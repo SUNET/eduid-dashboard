@@ -75,9 +75,10 @@ class PermissionsValidator(object):
         available_permissions = request.registry.settings.get('available_permissions')
         for item in value:
             if item not in available_permissions:
+                err = _('The permission selected is not available')
                 raise colander.Invalid(
                     node,
-                    _('The permission selected is not available')
+                    get_localizer(request).translate(err)
                 )
 
 
@@ -89,17 +90,17 @@ class EmailUniqueValidator(object):
         user = request.context.user
         user_emails = [e['email'] for e in user.get_mail_aliases()]
         user_emails.append(user.get_mail())
+        localizer = get_localizer(request)
 
         if 'add' in request.POST:
             if value in user_emails:
-                raise colander.Invalid(node,
-                                       _("You already have this email address"))
+                err = _("You already have this email address")
+                raise colander.Invalid(node, localizer.translate(err))
 
         elif set(['verify', 'setprimary', 'remove']).intersection(set(request.POST)):
             if value not in user_emails:
-                raise colander.Invalid(node,
-                                       _("This email address is unavailable"
-                                         ))
+                err = _("This email address is unavailable")
+                raise colander.Invalid(node, localizer.translate(err))
 
 
 class EmailExistsValidator(object):
@@ -109,8 +110,8 @@ class EmailExistsValidator(object):
         try:
             request.userdb.get_user_by_email(value)
         except UserDoesNotExist:
-            raise colander.Invalid(node,
-                                   _("Email address does not exist"))
+            err = _("Email address does not exist")
+            raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class MobilePhoneUniqueValidator(object):
@@ -125,8 +126,8 @@ class MobilePhoneUniqueValidator(object):
 
         if 'add' in request.POST:
             if mobile['mobile'] in user_mobiles:
-                raise colander.Invalid(node,
-                                       _("This mobile phone was already registered"))
+                err = _("This mobile phone was already registered")
+                raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class EmailOrUsernameExistsValidator(object):
@@ -134,15 +135,16 @@ class EmailOrUsernameExistsValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         is_email = '@' in value
+        localizer = get_localizer(request)
         if not is_email:
             try:
                 request.userdb.get_user_by_username(value)
             except UserDB.UserDoesNotExist:
-                raise colander.Invalid(node,
-                                       _("Username does not exist"))
+                err = _("Username does not exist")
+                raise colander.Invalid(node, localizer.translate(err))
             except UserDB.MultipleUsersReturned:
-                raise colander.Invalid(node,
-                                       _("There is more than one user for that username"))
+                err = _("There is more than one user for that username")
+                raise colander.Invalid(node, localizer.translate(err))
         else:
             try:
                 request.userdb.get_user_by_email(value)
@@ -150,11 +152,13 @@ class EmailOrUsernameExistsValidator(object):
                 if e.args:
                     msg = e.args[0]
                 else:
-                    msg = _("email address {} does not exist or is unverified".format(value))
+                    msg = _("email address ${val} does not exist "
+                            "or is unverified")
+                    msg = localizer.translate(msg, mapping={'val': value})
                 raise colander.Invalid(node, msg)
             except MultipleUsersReturned:
-                raise colander.Invalid(node,
-                                       _("There is more than one user for that email"))
+                msg = _("There is more than one user for that email")
+                raise colander.Invalid(node, localizer.translate(msg))
 
 
 class NINExistsValidator(object):
@@ -167,8 +171,9 @@ class NINExistsValidator(object):
         try:
             request.userdb.get_user_by_nin(value)
         except UserDB.UserDoesNotExist:
-            raise colander.Invalid(node,
-                                   _("This national identity number does not exist, is not verified or is not active"))
+            err = _("This national identity number does not exist, "
+                    "is not verified or is not active")
+            raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class NINUniqueValidator(object):
@@ -196,9 +201,9 @@ class NINUniqueValidator(object):
 
         if 'add' in request.POST:
             if unverified_user_nins.count() > 0 or value in user_nins:
-                raise colander.Invalid(
-                    node,
-                    _("This national identity number is already in use"))
+                err = _("This national identity number is already in use")
+                raise colander.Invalid(node,
+                        get_localizer(request).translate(err))
 
 
 class NINReachableValidator(object):
@@ -253,8 +258,8 @@ class ResetPasswordCodeExistsValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         if not request.db.reset_passwords.find_one({'hash_code': value}):
-            raise colander.Invalid(node,
-                                   _("The entered code does not exist"))
+            err = _("The entered code does not exist")
+            raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class CSRFTokenValidator(object):
@@ -268,7 +273,8 @@ class CSRFTokenValidator(object):
 
         if value != token:
             log.debug("CSRF token validation failed: Form {!r} != Session {!r}".format(value, token))
-            raise colander.Invalid(node, _("Invalid CSRF token"))
+            err = _("Invalid CSRF token")
+            raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class ResetPasswordFormValidator(colander.All):
@@ -282,8 +288,9 @@ class ResetPasswordFormValidator(colander.All):
             if len(e.msg) < len(self.validators):
                 # At least one validator did not fail:
                 return
-            raise colander.Invalid(node,
-                                   _("Valid input formats are:<ul>"
-                                     "<li>National identity number: yyyymmddnnnn</li>"
-                                     "<li>Mobile phone number that begin with + or 07</li>"
-                                     "<li>E-mail address: user@example.edu</li></ul>"))
+            request = node.bindings.get('request')
+            err = _("Valid input formats are:<ul>"
+                    "<li>National identity number: yyyymmddnnnn</li>"
+                    "<li>Mobile phone number that begin with + or 07</li>"
+                    "<li>E-mail address: user@example.edu</li></ul>")
+            raise colander.Invalid(node, get_localizer(request).translate(err))

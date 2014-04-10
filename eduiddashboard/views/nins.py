@@ -48,6 +48,7 @@ def get_status(request, user):
         'completed': (completed_fields, 1)
     }
     if pending_actions:
+        pending_actions = get_localizer(request).translate(pending_actions)
         status.update({
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
@@ -73,10 +74,11 @@ def send_verification_code(request, user, nin, code=None):
     request.msgrelay.nin_validator(nin, code, language)
 
 
-def get_tab():
+def get_tab(request):
+    label = _('Confirm Identity')
     return {
         'status': get_status,
-        'label': _('Confirm Identity'),
+        'label': get_localizer(request).translate(label),
         'id': 'nins',
     }
 
@@ -140,10 +142,11 @@ class NINsActionsView(BaseActionsView):
             raise HTTPNotFound("The index provided can't be found")
 
         if index != len(nins) - 1:
+            message = _("The provided nin can't be verified. You only "
+                        'can verify the last one')
             return {
                 'result': 'bad',
-                'message': _("The provided nin can't be verified. You only "
-                             'can verify the last one'),
+                'message': get_localizer(self.request).translate(message),
             }
 
         return super(NINsActionsView, self)._verify_action(verify_nin,
@@ -166,9 +169,10 @@ class NINsActionsView(BaseActionsView):
             'verified': False,
         })
 
+        message = _('National identity number has been removed')
         return {
             'result': 'ok',
-            'message': _('National identity number has been removed'),
+            'message': get_localizer(self.request).translate(message),
         }
 
     def send_verification_code(self, data_id, code):
@@ -182,10 +186,9 @@ class NINsActionsView(BaseActionsView):
         else:
             raise HTTPNotFound(_("No pending national identity numbers found."))
 
-        message = self.verify_messages['new_code_sent']
-        message = get_localizer(self.request).translate(message)
         send_verification_code(self.request, self.context.user, nin)
 
+        message = self.verify_messages['new_code_sent']
         return {
             'result': 'ok',
             'message': message,
@@ -306,8 +309,10 @@ class NinsView(BaseFormView):
                             self.user.get_id(), newnin)
 
         self.user.save(self.request)
-        self.request.session.flash(_('Changes saved'),
-                                   queue='forms')
+        message = _('Changes saved')
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
 
     def add_success(self, ninform):
         if self.context.workmode == 'personal':
@@ -357,10 +362,9 @@ class NinsWizard(BaseWizard):
                 'status': 'failure',
                 'text': message
             }
-        message = NINsActionsView.verify_messages['new_code_sent']
-        message = get_localizer(self.request).translate(message)
         send_verification_code(self.request, self.context.user, self.datakey)
 
+        message = NINsActionsView.verify_messages['new_code_sent']
         return {
             'status': 'ok',
             'text': message,

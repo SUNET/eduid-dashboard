@@ -10,6 +10,7 @@ import pytz
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render, render_to_response
 from pyramid.view import view_config
+from pyramid.i18n import get_localizer
 
 from pyramid_deform import FormView
 from pyramid_mailer import get_mailer
@@ -134,7 +135,8 @@ def get_authn_info(request):
         if auth_entry:
             created_dt = convert_to_localtime(credential['created_ts'])
             success_dt = convert_to_localtime(auth_entry['success_ts'])
-            data = {'type': _('Password'),
+            data_type = _('Password')
+            data = {'type': get_localizer(request).translate(data_type),
                     'created_ts': created_dt.strftime('%Y-%b-%d %H:%M'),
                     'success_ts': success_dt.strftime('%Y-%b-%d %H:%M')}
             authninfo.append(data)
@@ -227,10 +229,11 @@ class PasswordsView(BaseFormView):
 
         self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
-            self.message = _('Your password has been successfully updated')
+            message = _('Your password has been successfully updated')
         else:
-            self.message = _('An error has occured while updating your password, '
-                             'please try again or contact support if the problem persists.')
+            message = _('An error has occured while updating your password, '
+                        'please try again or contact support if the problem persists.')
+        self.message = get_localizer(self.request).translate(message)
 
 
 @view_config(route_name='reset-password', renderer='templates/reset-password.jinja2',

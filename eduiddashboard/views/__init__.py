@@ -104,7 +104,11 @@ class BaseActionsView(object):
         self.user = context.user
         for msgid, msg in self.default_verify_messages.items():
             if msgid not in self.verify_messages:
-                self.verify_messages[msgid] = msg
+                self.verify_messages[msgid] = get_localizer(
+                        request).translate(msg)
+            else:
+                self.verify_messages[msgid] = get_localizer(
+                        request).translate(self.verify_messages[msgid])
 
     def __call__(self):
         action = self.request.POST['action']
@@ -174,7 +178,6 @@ class BaseActionsView(object):
         self.send_verification_code(data_id, code)
 
         msg = self.verify_messages['new_code_sent']
-        msg = get_localizer(self.request).translate(msg)
 
         return {
             'result': 'ok',
@@ -258,11 +261,12 @@ class BaseWizard(object):
             self.obj['_id'] = obj_id
         else:
             self.collection.update(self.object_filter, {'$set': {
-                'dismisseed': True
+                'dismissed': True
             }})
+        message = _('The wizard was dismissed')
         return {
             'status': 'ok',
-            'message': _('The wizard was dismissed'),
+            'message': get_localizer(self.request).translate(message),
         }
 
     def is_open_wizard(self):
@@ -294,9 +298,10 @@ class BaseWizard(object):
             response = getattr(self, self.request.POST['action'])()
 
         else:
+            message = _('Unexpected error')
             response = {
                 'status': 'error',
-                'text': 'Unexpected error',
+                'text': get_localizer(self.request).translate(message),
             }
 
         return response
