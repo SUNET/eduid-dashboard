@@ -119,7 +119,7 @@ def get_active_nin(self):
 class NINsActionsView(BaseActionsView):
 
     data_attribute = 'norEduPersonNIN'
-    verify_messages = {
+    special_verify_messages = {
         'ok': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to your "Min myndighetspost" mailbox.'),

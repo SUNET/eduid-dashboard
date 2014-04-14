@@ -87,7 +87,6 @@ class BaseFormView(FormView):
 
 class BaseActionsView(object):
     data_attribute = None
-    verify_messages = {}
     default_verify_messages = {
         'ok': _('The data has been verified'),
         'error': _('Confirmation code is invalid'),
@@ -102,13 +101,14 @@ class BaseActionsView(object):
         self.request = request
         self.context = context
         self.user = context.user
+        self.verify_messages = {}
         for msgid, msg in self.default_verify_messages.items():
-            if msgid not in self.verify_messages:
+            if msgid not in self.special_verify_messages:
                 self.verify_messages[msgid] = get_localizer(
                         request).translate(msg)
             else:
                 self.verify_messages[msgid] = get_localizer(
-                        request).translate(self.verify_messages[msgid])
+                        request).translate(self.special_verify_messages[msgid])
 
     def __call__(self):
         action = self.request.POST['action']

@@ -10,7 +10,7 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
-from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.views import BaseFormView
 
 logger = logging.getLogger(__name__)
 

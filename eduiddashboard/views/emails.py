@@ -57,7 +57,7 @@ def get_tab(request):
 class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
-    verify_messages = {
+    special_verify_messages = {
         'ok': _('Email address has been confirmed'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('Check your email inbox for {data} for further instructions'),
