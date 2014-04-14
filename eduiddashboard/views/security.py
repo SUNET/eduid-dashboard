@@ -296,18 +296,24 @@ class BaseResetPasswordView(FormView):
         context.update(self.get_template_context())
         return context
 
-    def _search_filter(self, text):
+    def _search_user(self, text):
+        """
+        Find a user matching email, mobile or NIN.
+
+        @param text: search string
+        @return: user object
+        """
         if validate_email_format(text):
-            text = normalize_email(text)
+            user = self.request.userdb.get_user_by_email(normalize_email(text))
         elif text.startswith(u'0'):
             text = normalize_to_e_164(self.request, text)
+            user = self.request.userdb.get_user_by_filter(
+                {'mobile': {'$elemMatch': {'mobile': text, 'verified': True}}}
+            )
+        else:
+            user = self.request.userdb.get_user_by_nin(text)
 
-        search_filter = {'$or': []}
-        search_filter['$or'].append({'mailAliases': {'$elemMatch': {'email': text, 'verified': True}}})
-        search_filter['$or'].append({'mobile': {'$elemMatch': {'mobile': text, 'verified': True}}})
-        search_filter['$or'].append({'norEduPersonNIN': text})
-
-        return search_filter
+        return user
 
 
 @view_config(route_name='reset-password-email', permission='edit',
@@ -328,8 +334,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         email_or_username = passwords_data['email_or_username']
 
         try:
-            filter_dict = self._search_filter(email_or_username)
-            user = self.request.userdb.get_user_by_filter(filter_dict)
+            user = self._search_user(email_or_username)
         except self.request.userdb.exceptions.UserDoesNotExist:
             log.debug("User {!r} does not exist".format(email_or_username))
             user = None
@@ -364,8 +369,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
         email_or_username = passwords_data['email_or_username']
 
         try:
-            filter_dict = self._search_filter(email_or_username)
-            user = self.request.userdb.get_user_by_filter(filter_dict)
+            user = self._search_user(email_or_username)
         except self.request.userdb.exceptions.UserDoesNotExist:
             log.debug("User {!r} does not exist".format(email_or_username))
             user = None
