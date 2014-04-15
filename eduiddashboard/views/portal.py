@@ -34,7 +34,7 @@ def profile_editor(context, request):
 
     view_context = {}
 
-    tabs = get_available_tabs(context)
+    tabs = get_available_tabs(context, request)
 
     profile_filled = calculate_filled_profile(context.user, tabs)
 

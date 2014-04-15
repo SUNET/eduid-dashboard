@@ -2,6 +2,7 @@
 
 from deform import Button
 from pyramid.view import view_config
+from pyramid.i18n import get_localizer
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
@@ -16,11 +17,8 @@ def get_status(request, user):
     return msg and icon
     """
     schema = Person()
-
     completed_fields = 0
-    pending_actions = None
 
-    ## If there are required fields, then return a pending action message
     for field in schema.children:
         if user.get(field.name, None) is not None:
             completed_fields += 1
@@ -28,20 +26,14 @@ def get_status(request, user):
     status = {
         'completed': (completed_fields, len(schema.children))
     }
-    if pending_actions:
-        status.update({
-            'icon': get_icon_string('warning-sign'),
-            'pending_actions': pending_actions,
-            'verification_needed': -1,
-            'pending_action_type': '',
-        })
     return status
 
 
-def get_tab():
+def get_tab(request):
+    label = _('Personal information')
     return {
         'status': get_status,
-        'label': _('Personal information'),
+        'label': get_localizer(request).translate(label),
         'id': 'personaldata',
     }
 
@@ -76,8 +68,10 @@ class PersonalDataView(BaseFormView):
         self.user.get_doc().update(person)
         self.user.save(self.request)
 
-        self.request.session.flash(_('Changes saved'),
-                                   queue='forms')
+        message = _('Changes saved')
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
 
         if new_preferred_language != old_preferred_language:
             self.full_page_reload()

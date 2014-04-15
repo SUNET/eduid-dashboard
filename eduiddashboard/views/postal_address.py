@@ -10,7 +10,7 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
-from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.views import BaseFormView
 
 logger = logging.getLogger(__name__)
 
@@ -39,10 +39,11 @@ def get_status(request, user):
     }
 
 
-def get_tab():
+def get_tab(request):
+    label = _('Postal address')
     return {
         'status': get_status,
-        'label': _('Postal address'),
+        'label': get_localizer(request).translate(label),
         'id': 'postaladdress',
     }
 
@@ -125,7 +126,10 @@ class PostalAddressView(BaseFormView):
         self.user.set_addresses(addresses)
         self.user.save(self.request)
 
-        self.request.session.flash(_('Changes saved.'), queue='forms')
+        message = _('Changes saved.')
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
 
     def failure(self, e):
         context = super(PostalAddressView, self).failure(e)

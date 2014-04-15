@@ -25,12 +25,16 @@ def get_status(request, user):
 
     if not mobiles:
         pending_actions = _('Add mobile phone number')
+        pending_actions = get_localizer(request).translate(pending_actions)
     else:
         for n, mobile in enumerate(mobiles):
             if not mobile['verified']:
                 verification_needed = n
                 pending_action_type = 'verify'
-                pending_actions = _('A mobile phone number is pending confirmation')
+                pending_actions = _('A mobile phone number is pending '
+                                    'confirmation')
+                pending_actions = get_localizer(request).translate(
+                                                        pending_actions)
 
     if pending_actions:
         return {
@@ -45,10 +49,11 @@ def get_status(request, user):
     }
 
 
-def get_tab():
+def get_tab(request):
+    label = _('Mobile phone numbers')
     return {
         'status': get_status,
-        'label': _('Mobile phone numbers'),
+        'label': get_localizer(request).translate(label),
         'id': 'mobiles',
     }
 
@@ -66,7 +71,7 @@ def send_verification_code(request, user, mobile_number, code=None):
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
     data_attribute = 'mobile'
-    verify_messages = {
+    special_verify_messages = {
         'ok': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to the mobile phone number {data}'),
@@ -86,25 +91,28 @@ class MobilesActionsView(BaseActionsView):
 
         self.user.save(self.request)
 
+        message = _('Mobile phone number was successfully removed')
         return {
             'result': 'ok',
-            'message': _('Mobile phone number was successfully removed'),
+            'message': get_localizer(self.request).translate(message),
         }
 
     def setprimary_action(self, index, post_data):
         mobiles = self.user.get_mobiles()
 
         if index > len(mobiles):
+            message = _("That mobile phone number doesn't exists")
             return {
                 'result': 'bad',
-                'message': _("That mobile phone number doesn't exists"),
+                'message': get_localizer(self.request).translate(message),
             }
 
         if index > len(mobiles):
+            message = _("You need to verify that mobile phone number "
+                        "before be able to set as primary")
             return {
                 'result': 'bad',
-                'message': _("You need to verify that mobile phone number "
-                             "before be able to set as primary"),
+                'message': get_localizer(self.request).translate(message),
             }
 
         # set all to False, and then set the new primary to True using the index
@@ -117,9 +125,10 @@ class MobilesActionsView(BaseActionsView):
         self.user.set_mobiles(mobiles)
         self.user.save(self.request)
 
+        message = _('Mobile phone number was successfully made primary')
         return {
             'result': 'ok',
-            'message': _('Mobile phone number was successfully made primary'),
+            'message': get_localizer(self.request).translate(message),
         }
 
     def send_verification_code(self, data_id, code):

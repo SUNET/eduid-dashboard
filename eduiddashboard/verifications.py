@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 from bson.tz_util import utc
 
+from pyramid.i18n import get_localizer
+
 from eduid_am.user import User
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
@@ -150,6 +152,7 @@ def verificate_code(request, model_name, code):
             user.add_verified_email(obj_id)
             msg = _('Email {obj} verified')
 
+        msg = get_localizer(request).translate(msg)
         request.session.flash(msg.format(obj=obj_id),
                           queue='forms')
         user.save(request)

@@ -3,6 +3,7 @@
 import deform
 
 from pyramid.view import view_config
+from pyramid.i18n import get_localizer
 
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
@@ -24,6 +25,7 @@ def get_status(request, user):
     for n, email in enumerate(user.get_mail_aliases()):
         if not email['verified']:
             pending_actions = _('An email address is pending confirmation')
+            pending_actions = get_localizer(request).translate(pending_actions)
             pending_action_type = 'verify'
             verification_needed = n
             break
@@ -41,10 +43,12 @@ def get_status(request, user):
     }
 
 
-def get_tab():
+def get_tab(request):
+    label = _('Email addresses')
+    label = get_localizer(request).translate(label)
     return {
         'status': get_status,
-        'label': _('Email addresses'),
+        'label': label,
         'id': 'emails',
     }
 
@@ -53,7 +57,7 @@ def get_tab():
 class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
-    verify_messages = {
+    special_verify_messages = {
         'ok': _('Email address has been confirmed'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('Check your email inbox for {data} for further instructions'),
@@ -63,25 +67,31 @@ class EmailsActionsView(BaseActionsView):
 
     def setprimary_action(self, index, post_data):
         mail = self.user.get_mail_aliases()[index]
+
         if not mail.get('verified', False):
+            message = _('You need to confirm your email address '
+                        'before it can become primary')
             return {
                 'result': 'bad',
-                'message': _("You need to confirm your email address before it can become primary"),
+                'message': get_localizer(self.request).translate(message),
             }
 
         self.user.set_mail(mail['email'])
         self.user.save(self.request)
 
-        return {'result': 'ok', 'message': _('Your primary email address was '
-                                             'successfully changed')}
+        message = _('Your primary email address was '
+                    'successfully changed')
+        return {'result': 'ok',
+                'message': get_localizer(self.request).translate(message)}
 
     def remove_action(self, index, post_data):
         emails = self.user.get_mail_aliases()
         if len(emails) == 1:
+            message = _('Error: You only have one email address and it  '
+                        'can not be removed')
             return {
                 'result': 'error',
-                'message': _('Error: You only have one email address and it  '
-                             'can not be removed'),
+                'message': get_localizer(self.request).translate(message),
             }
         remove_email = emails[index]['email']
         emails.remove(emails[index])
@@ -94,9 +104,10 @@ class EmailsActionsView(BaseActionsView):
 
         self.user.save(self.request)
 
+        message = _('Email address was successfully removed')
         return {
             'result': 'ok',
-            'message': _('Email address was successfully removed'),
+            'message': get_localizer(self.request).translate(message),
         }
 
     def get_verification_data_id(self, data_to_verify):
@@ -151,12 +162,18 @@ class EmailsView(BaseFormView):
         self.user.set_mail_aliases(emails)
         self.user.save(self.request)
 
-        self.request.session.flash(_('Changes saved'),
-                                   queue='forms')
+        message = _('Changes saved')
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
 
         send_verification_mail(self.request, newemail['mail'])
 
-        self.request.session.flash(_('A confirmation email has been sent to your email address. '
-                                     'Please enter your confirmation code <a href="#" class="verifycode" data-identifier="${id}">here</a>.',
-                                     mapping={'id': len(emails)}),
-                                   queue='forms')
+        second_msg = _('A confirmation email has been sent to your email '
+                'address. Please enter your confirmation code '
+                '<a href="#" class="verifycode" '
+                'data-identifier="${id}">here</a>.',
+                                     mapping={'id': len(emails)})
+        self.request.session.flash(
+                get_localizer(self.request).translate(second_msg),
+                queue='forms')

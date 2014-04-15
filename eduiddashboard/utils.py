@@ -85,18 +85,18 @@ def filter_tabs(tabs, remove_tabs):
     return filter(lambda tab: tab['id'] not in remove_tabs, tabs)
 
 
-def get_available_tabs(context):
+def get_available_tabs(context, request):
 
     from eduiddashboard.views import (emails, personal, postal_address,
                                       mobiles, nins, permissions,
                                       get_dummy_status)
     default_tabs = [
-        personal.get_tab(),
-        nins.get_tab(),
-        emails.get_tab(),
-        permissions.get_tab(),
-        mobiles.get_tab(),
-        # postal_address.get_tab(),
+        personal.get_tab(request),
+        nins.get_tab(request),
+        emails.get_tab(request),
+        permissions.get_tab(request),
+        mobiles.get_tab(request),
+        # postal_address.get_tab(request),
         {
             'label': _('Security'),
             'status': get_dummy_status,

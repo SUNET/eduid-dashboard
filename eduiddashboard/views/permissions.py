@@ -1,6 +1,7 @@
 ## Permissions form (eduPersonEntitlement)
 
 from pyramid.view import view_config
+from pyramid.i18n import get_localizer
 
 from eduid_am.user import User
 from eduiddashboard.i18n import TranslationString as _
@@ -9,10 +10,11 @@ from eduiddashboard.models import Permissions
 from eduiddashboard.views import BaseFormView, get_dummy_status
 
 
-def get_tab():
+def get_tab(request):
+    label = _('Permissions')
     return {
         'status': get_dummy_status,
-        'label': _('Permissions'),
+        'label': get_localizer(request).translate(label),
         'id': 'permissions',
     }
 
@@ -46,4 +48,7 @@ class PermissionsView(BaseFormView):
         self.user.get_doc().update(new_entitletments)
         self.user.save(self.request)
 
-        self.request.session.flash(_('Changes saved.'), queue='forms')
+        message = _('Changes saved.')
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
