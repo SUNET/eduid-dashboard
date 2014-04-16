@@ -155,9 +155,11 @@ def verificate_code(request, model_name, code):
         msg = get_localizer(request).translate(msg)
         request.session.flash(msg.format(obj=obj_id),
                           queue='forms')
-        user.save(request)
+
         if old_user:
             old_user.save(request)
+
+        user.save(request)
         request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
     return obj_id
 
