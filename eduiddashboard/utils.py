@@ -114,13 +114,12 @@ def get_available_tabs(context, request):
     return tabs
 
 
-def calculate_filled_profile(user, tabs):
+def calculate_filled_profile(tabs):
     tuples = []
     for tab in tabs:
-        if tab['status'] is not None:
-            status = tab['status']
-            if status is not None:
-                tuples.append(status.get('completed'))
+        status = tab['status']
+        if status is not None:
+            tuples.append(status.get('completed'))
 
     filled_profile = [sum(a) for a in zip(*tuples)]
     return int((float(filled_profile[0]) / float(filled_profile[1])) * 100)

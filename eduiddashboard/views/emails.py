@@ -22,24 +22,26 @@ def get_status(request, user):
     pending_actions = None
     pending_action_type = ''
     verification_needed = -1
+    completed = 0
     for n, email in enumerate(user.get_mail_aliases()):
-        if not email['verified']:
+        if email['verified']:
+            completed = 1
+        elif pending_actions is None:
             pending_actions = _('An email address is pending confirmation')
             pending_actions = get_localizer(request).translate(pending_actions)
             pending_action_type = 'verify'
             verification_needed = n
-            break
 
     if pending_actions:
         return {
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
             'pending_action_type': pending_action_type,
-            'completed': (0, 1),
+            'completed': (completed, 1),
             'verification_needed': verification_needed,
         }
     return {
-        'completed': (1, 1),
+        'completed': (completed, 1),
     }
 
 

@@ -20,11 +20,11 @@ def get_status(request, user):
     completed_fields = 0
 
     for field in schema.children:
-        if user.get(field.name, None) is not None:
+        if field.name != 'csrf' and user.get(field.name, None) is not None:
             completed_fields += 1
 
     status = {
-        'completed': (completed_fields, len(schema.children))
+        'completed': (completed_fields, len(schema.children) - 1)
     }
     return status
 

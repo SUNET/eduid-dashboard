@@ -22,13 +22,16 @@ def get_status(request, user):
     pending_actions = None
     pending_action_type = ''
     verification_needed = -1
+    completed = 0
 
     if not mobiles:
         pending_actions = _('Add mobile phone number')
         pending_actions = get_localizer(request).translate(pending_actions)
     else:
         for n, mobile in enumerate(mobiles):
-            if not mobile['verified']:
+            if mobile['verified']:
+                completed = 1
+            else:
                 verification_needed = n
                 pending_action_type = 'verify'
                 pending_actions = _('A mobile phone number is pending '
@@ -41,11 +44,11 @@ def get_status(request, user):
             'icon': get_icon_string('warning-sign'),
             'pending_actions': pending_actions,
             'pending_action_type': pending_action_type,
-            'completed': (0, 1),
+            'completed': (completed, 1),
             'verification_needed': verification_needed,
         }
     return {
-        'completed': (1, 1),
+        'completed': (completed, 1),
     }
 
 
