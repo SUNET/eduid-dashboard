@@ -308,7 +308,7 @@ class BaseResetPasswordView(FormView):
         """
         if validate_email_format(text):
             user = self.request.userdb.get_user_by_email(normalize_email(text))
-        elif text.startswith(u'0'):
+        elif text.startswith(u'0') or text.startswith(u'+'):
             text = normalize_to_e_164(self.request, text)
             user = self.request.userdb.get_user_by_filter(
                 {'mobile': {'$elemMatch': {'mobile': text, 'verified': True}}}
