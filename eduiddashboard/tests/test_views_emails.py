@@ -211,7 +211,7 @@ class MailsFormTests(LoggedInReguestTests):
 
         response = self.testapp.post(
             '/profile/emails-actions/',
-            {'identifier': 2, 'action': 'verify', 'code': email_doc['code']}
+            {'identifier': 3, 'action': 'verify', 'code': email_doc['code']}
         )
 
         response_json = json.loads(response.body)
