@@ -65,6 +65,9 @@ class PersonalDataView(BaseFormView):
         old_preferred_language = self.user.get_preferred_language()
 
         # Insert the new user object
+        if person['displayName'] == '':
+            person['displayName'] = u'{} {}'.format(person['givenName'],
+                                                   person['sn'])
         self.user.get_doc().update(person)
         self.user.save(self.request)
 

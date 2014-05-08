@@ -122,7 +122,8 @@ class Person(CSRFTokenSchema):
     sn = colander.SchemaNode(colander.String(),
                              title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
-                                      title=_('Display name'))
+                                      title=_('Display name'),
+                                      missing='')
     preferredLanguage = colander.SchemaNode(colander.String(),
                                             title=_('Preferred language'),
                                             missing='',
