@@ -1,3 +1,15 @@
+/* No javascript */
+div#no-script {
+    text-align: center;
+    color: #CC3732;
+}
+
+div#content-block {
+    display: none;
+}
+/* End no javascript */
+
+
 /* Main marketing message and sign up button */
 .jumbotron {
     margin: 60px 0;

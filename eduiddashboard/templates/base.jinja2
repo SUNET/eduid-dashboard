@@ -64,14 +64,16 @@
          </div>
        </div>
 
-        <div class='clearfix'></div>
+        <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
+        <div id="content-block">
+          <div class='clearfix'></div>
           {% block title %}
           {% endblock %}
-        <div class='clearfix'></div>
+          <div class='clearfix'></div>
+          {% block contents %}
 
-        {% block contents %}
-
-        {% endblock %}
+          {% endblock %}
+        </div>
       </div>
       <div class='push'></div>
     </div>
@@ -140,6 +142,7 @@
       };
 
       $(document).ready(function () {
+        $(document).ready(function () {$('div#content-block').show()});
         $('a.null-link').click(function (e) {
             e.preventDefault();
         });
