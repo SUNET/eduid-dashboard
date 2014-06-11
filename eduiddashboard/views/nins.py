@@ -84,27 +84,29 @@ def get_tab(request):
 
 
 def get_not_verified_nins_list(request, user):
-    active_nins = user.get_nins()
-    nins = []
+    """
+    Return a list of all non-verified NINs.
+
+    These come from the verifications mongodb collection, but we also double-check
+    that anything in there that looks un-verified is not also found in user.get_nins().
+
+    :param request:
+    :param user:
+    :return: List of NINs pending confirmation
+    :rtype: [string]
+    """
+    verified_nins = user.get_nins()
     verifications = request.db.verifications
-    not_verified_nins = verifications.find({
+    all_nins = verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
-    if active_nins:
-        active_nin = active_nins[-1]
-        nin_found = False
-        for nin in not_verified_nins:
-            if active_nin == nin['obj_id']:
-                nin_found = True
-            elif nin_found and not nin['verified']:
-                nins.append(nin['obj_id'])
-    else:
-        for nin in not_verified_nins:
-            if not nin['verified']:
-                nins.append(nin['obj_id'])
 
-    return nins
+    res = []
+    for nin in all_nins:
+        if not nin['verified'] and not nin['obj_id'] in verified_nins:
+            res.append(nin['obj_id'])
+    return res
 
 
 def get_active_nin(self):
