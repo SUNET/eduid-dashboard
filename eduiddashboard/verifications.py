@@ -92,32 +92,9 @@ def verify_code(request, model_name, code):
     log.debug("Processing {!r} code {!r} ({!s})".format(model_name, code, str(data)))
 
     user = request.userdb.get_user_by_oid(unverified['user_oid'])
-    old_verified = request.db.verifications.find_and_modify(
-        {
-            "model_name": model_name,
-            "obj_id": data,
-            "verified": True,
-        },
-        remove=True)
-
-    old_user = None
-    if old_verified:
-        old_user = request.userdb.get_user_by_oid(old_verified['user_oid'])
 
     if model_name == 'norEduPersonNIN':
-        if not old_user:
-            old_user_doc = request.db.profiles.find_one({
-                'norEduPersonNIN': data
-            })
-            if old_user_doc:
-                old_user = User(old_user_doc)
-        if old_user:
-            log.debug("Removing NIN {!r} from old_user {!r}".format(User.get_id()))
-            nins = [nin for nin in old_user.get_nins() if nin != data]
-            old_user.set_nins(nins)
-            # Remove postal address too, since that is based on the NIN
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
+        _remove_nin_from_others(data, request)
         user.add_verified_nin(data)
         user.retrieve_address(request, data)
 
@@ -127,46 +104,25 @@ def verify_code(request, model_name, code):
         msg = _('National identity number {obj} verified')
 
     elif model_name == 'mobile':
-        if not old_user:
-            old_user_doc = request.db.profiles.find_one({
-                'mobile': {'$elemMatch': {'mobile': data, 'verified': True}}
-            })
-            if old_user_doc:
-                old_user = User(old_user_doc)
-        if old_user:
-            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != data]
-            old_user.set_mobiles(mobiles)
+        _remove_mobile_from_others(data, request)
         user.add_verified_mobile(data)
         msg = _('Mobile {obj} verified')
 
     elif model_name == 'mailAliases':
-        if not old_user:
-            old_user_doc = request.db.profiles.find_one({
-                'mailAliases': {'email': data, 'verified': True}
-            })
-            if old_user_doc:
-                old_user = User(old_user_doc)
-        if old_user:
-            if old_user.get_mail() == data:
-                old_user.set_mail('')
-            mails = [m for m in old_user.get_mail_aliases() if m['email'] != data]
-            old_user.set_mail_aliases(mails)
+        _remove_email_from_others(data, request)
         user.add_verified_email(data)
         msg = _('Email {obj} verified')
 
-    msg = get_localizer(request).translate(msg)
-    request.session.flash(msg.format(obj=data),
-                          queue='forms')
-
-    if old_user:
-        old_user.save(request)
-
     user.save(request)
+
     log.debug("Marking {!r} code {!r} ({!s}) as verified".format(model_name, code, str(data)))
     request.db.verifications.update({'_id': unverified['_id']},
                                     {'$set': {'verified': True,
                                               'verified_timestamp': datetime.utcnow(),
                                               }})
+
+    msg = get_localizer(request).translate(msg)
+    request.session.flash(msg.format(obj=data), queue='forms')
 
     return data
 
@@ -214,3 +170,80 @@ def save_as_verificated(request, model_name, user_oid, obj_id):
 def generate_verification_link(request, code, model):
     link = request.context.safe_route_url("verifications", model=model, code=code)
     return link
+
+
+def _remove_nin_from_others(nin, request):
+    """
+    When someone successfully validates a NIN, the NIN should be removed from
+    any other user(s).
+
+    NOTE: since this just removes *all* verified addresses from old_user,
+    this will break if there are more methods to validate postal addresses
+    than through the lookup-NIN-in-Navet source.
+
+    :param nin: The NIN
+    :param request: the HTTP request
+    :type nin: string
+    :type request: webob.request.BaseRequest
+    :return:
+    """
+    db_users = request.db.profiles.find({
+        'norEduPersonNIN': nin
+    })
+    for this in db_users:
+        old_user = User(this)
+        log.debug("Removing NIN {!r} from old_user {!r}".format(User.get_id()))
+        nins = [this for this in old_user.get_nins() if this != nin]
+        old_user.set_nins(nins)
+        # Remove verified postal address too, since that is based on the NIN
+        addresses = [a for a in old_user.get_addresses() if not a['verified']]
+        old_user.set_addresses(addresses)
+        old_user.save(request)
+
+
+def _remove_mobile_from_others(number, request):
+    """
+    When someone successfully validates a NIN, the NIN should be removed from
+    any other user(s).
+
+    :param number: The mobile phone number
+    :param request: the HTTP request
+    :type number: string
+    :type request: webob.request.BaseRequest
+    :return:
+    """
+    old_user_doc = request.db.profiles.find_one({
+        'mobile': {'$elemMatch': {'mobile': number,
+                                  'verified': True,
+                                  }}
+    })
+    if old_user_doc:
+        old_user = User(old_user_doc)
+        mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != number]
+        old_user.set_mobiles(mobiles)
+        old_user.save(request)
+
+
+def _remove_email_from_others(email, request):
+    """
+    When someone successfully validates a NIN, the NIN should be removed from
+    any other user(s).
+
+    :param email: The e-mail address
+    :param request: the HTTP request
+    :type email: string
+    :type request: webob.request.BaseRequest
+    :return:
+    """
+    old_user_doc = request.db.profiles.find_one({
+        'mailAliases': {'email': email,
+                        'verified': True,
+                        }
+    })
+    if old_user_doc:
+        old_user = User(old_user_doc)
+        if old_user.get_mail() == email:
+            old_user.set_mail('')
+        mails = [m for m in old_user.get_mail_aliases() if m['email'] != email]
+        old_user.set_mail_aliases(mails)
+        old_user.save(request)
