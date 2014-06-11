@@ -14,7 +14,7 @@ from eduiddashboard import log
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verified)
+                                          save_as_verified, remove_nin_from_others)
 
 
 def get_status(request, user):
@@ -290,17 +290,7 @@ class NinsView(BaseFormView):
 
         newnin = normalize_nin(newnin)
 
-        old_user = self.request.db.profiles.find_one({
-            'norEduPersonNIN': newnin
-            })
-
-        if old_user:
-            old_user = User(old_user)
-            nins = [nin for nin in old_user.get_nins() if nin != newnin]
-            old_user.set_nins(nins)
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
-            old_user.save(self.request)
+        remove_nin_from_others(newnin, self.request)
 
         nins = self.user.get_nins()
         nins.append(newnin)

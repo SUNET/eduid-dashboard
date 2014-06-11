@@ -106,7 +106,7 @@ def verify_code(request, model_name, code):
     user = request.userdb.get_user_by_oid(this_verification['user_oid'])
 
     if model_name == 'norEduPersonNIN':
-        _remove_nin_from_others(data, request)
+        remove_nin_from_others(data, request)
         user.add_verified_nin(data)
         user.retrieve_address(request, data)
 
@@ -156,7 +156,6 @@ def save_as_verified(request, model_name, user_oid, obj_id):
         },
         remove=True)
 
-
     result = request.db.verifications.find_and_modify(
         {
             "model_name": model_name,
@@ -184,7 +183,7 @@ def generate_verification_link(request, code, model):
     return link
 
 
-def _remove_nin_from_others(nin, request):
+def remove_nin_from_others(nin, request):
     """
     When someone successfully validates a NIN, the NIN should be removed from
     any other user(s).
@@ -199,11 +198,15 @@ def _remove_nin_from_others(nin, request):
     :type request: webob.request.BaseRequest
     :return:
     """
-    db_users = request.db.profiles.find({
-        'norEduPersonNIN': nin
-    })
-    for this in db_users:
+    query = {'norEduPersonNIN': {'$in': [nin]}, }
+    users = {}
+    for this in request.db.profiles.find(query):
         old_user = User(this)
+        users[old_user.get_id()] = old_user
+    for this in request.userdb.get_users(query):
+        users[this.get_id()] = this
+
+    for old_user in users.values():
         log.debug("Removing NIN {!r} from old_user {!r}".format(User.get_id()))
         nins = [this for this in old_user.get_nins() if this != nin]
         old_user.set_nins(nins)
@@ -224,13 +227,19 @@ def _remove_mobile_from_others(number, request):
     :type request: webob.request.BaseRequest
     :return:
     """
-    old_user_doc = request.db.profiles.find_one({
+    query = {
         'mobile': {'$elemMatch': {'mobile': number,
                                   'verified': True,
                                   }}
-    })
-    if old_user_doc:
-        old_user = User(old_user_doc)
+    }
+    users = {}
+    for this in request.db.profiles.find(query):
+        old_user = User(this)
+        users[old_user.get_id()] = old_user
+    for this in request.userdb.get_users(query):
+        users[this.get_id()] = this
+
+    for old_user in users.values():
         mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != number]
         old_user.set_mobiles(mobiles)
         old_user.save(request)
@@ -247,13 +256,19 @@ def _remove_email_from_others(email, request):
     :type request: webob.request.BaseRequest
     :return:
     """
-    old_user_doc = request.db.profiles.find_one({
+    query = {
         'mailAliases': {'email': email,
                         'verified': True,
                         }
-    })
-    if old_user_doc:
-        old_user = User(old_user_doc)
+    }
+    users = {}
+    for this in request.db.profiles.find(query):
+        old_user = User(this)
+        users[old_user.get_id()] = old_user
+    for this in request.userdb.get_users(query):
+        users[this.get_id()] = this
+
+    for old_user in users.values():
         if old_user.get_mail() == email:
             old_user.set_mail('')
         mails = [m for m in old_user.get_mail_aliases() if m['email'] != email]
