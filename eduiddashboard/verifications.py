@@ -162,7 +162,11 @@ def verify_code(request, model_name, code):
         old_user.save(request)
 
     user.save(request)
-    request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+    log.debug("Marking {!r} code {!r} ({!s}) as verified".format(model_name, code, str(data)))
+    request.db.verifications.update({'_id': unverified['_id']},
+                                    {'$set': {'verified': True,
+                                              'verified_timestamp': datetime.utcnow(),
+                                              }})
 
     return data
 
