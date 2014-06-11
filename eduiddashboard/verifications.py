@@ -79,88 +79,89 @@ def verificate_code(request, model_name, code):
             "model_name": model_name,
             "code": code,
         })
-    
+
     if not unverified:
-        msg = "Could not find un-verified code {!r}, model {!r}"
-        log.debug(msg.format(code, model_name))
+        log.debug("Could not find un-verified code {!r}, model {!r}".format(code, model_name))
         return
 
     obj_id = unverified['obj_id']
 
-    if obj_id:
-        msg = "Code {!r} ({!s}) marked as verified"
-        log.debug(msg.format(code, str(obj_id)))
+    if not obj_id:
+        return
 
-        user = request.userdb.get_user_by_oid(unverified['user_oid'])
-        old_verified = request.db.verifications.find_and_modify(
-            {
-                "model_name": model_name,
-                "obj_id": unverified['obj_id'],
-                "verified": True
-            },
-            remove=True)
+    log.debug("Code {!r} ({!s}) marked as verified".format(code, str(obj_id)))
 
-        old_user = None
-        if old_verified:
-            old_user = request.userdb.get_user_by_oid(old_verified['user_oid'])
+    user = request.userdb.get_user_by_oid(unverified['user_oid'])
+    old_verified = request.db.verifications.find_and_modify(
+        {
+            "model_name": model_name,
+            "obj_id": unverified['obj_id'],
+            "verified": True
+        },
+        remove=True)
 
-        if model_name == 'norEduPersonNIN':
-            if not old_user:
-                old_user_doc = request.db.profiles.find_one({
-                    'norEduPersonNIN': obj_id
-                })
-                if old_user_doc:
-                    old_user = User(old_user_doc)
-            if old_user:
-                nins = [nin for nin in old_user.get_nins() if nin != obj_id]
-                old_user.set_nins(nins)
-                addresses = [a for a in old_user.get_addresses() if not a['verified']]
-                old_user.set_addresses(addresses)
-            user.add_verified_nin(obj_id)
-            user.retrieve_address(request, obj_id)
+    old_user = None
+    if old_verified:
+        old_user = request.userdb.get_user_by_oid(old_verified['user_oid'])
 
-            # Reset session eduPersonIdentityProofing on NIN verification
-            request.session['eduPersonIdentityProofing'] = None
+    if model_name == 'norEduPersonNIN':
+        if not old_user:
+            old_user_doc = request.db.profiles.find_one({
+                'norEduPersonNIN': obj_id
+            })
+            if old_user_doc:
+                old_user = User(old_user_doc)
+        if old_user:
+            nins = [nin for nin in old_user.get_nins() if nin != obj_id]
+            old_user.set_nins(nins)
+            addresses = [a for a in old_user.get_addresses() if not a['verified']]
+            old_user.set_addresses(addresses)
+        user.add_verified_nin(obj_id)
+        user.retrieve_address(request, obj_id)
 
-            msg = _('National identity number {obj} verified')
+        # Reset session eduPersonIdentityProofing on NIN verification
+        request.session['eduPersonIdentityProofing'] = None
 
-        elif model_name == 'mobile':
-            if not old_user:
-                old_user_doc = request.db.profiles.find_one({
-                    'mobile': {'$elemMatch': {'mobile': obj_id, 'verified': True}}
-                })
-                if old_user_doc:
-                    old_user = User(old_user_doc)
-            if old_user:
-                mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != obj_id]
-                old_user.set_mobiles(mobiles)
-            user.add_verified_mobile(obj_id)
-            msg = _('Mobile {obj} verified')
+        msg = _('National identity number {obj} verified')
 
-        elif model_name == 'mailAliases':
-            if not old_user:
-                old_user_doc = request.db.profiles.find_one({
-                    'mailAliases': {'email': obj_id, 'verified': True}
-                })
-                if old_user_doc:
-                    old_user = User(old_user_doc)
-            if old_user:
-                if old_user.get_mail() == obj_id:
-                    old_user.set_mail('')
-                mails = [m for m in old_user.get_mail_aliases() if m['email'] != obj_id]
-                old_user.set_mail_aliases(mails)
-            user.add_verified_email(obj_id)
-            msg = _('Email {obj} verified')
+    elif model_name == 'mobile':
+        if not old_user:
+            old_user_doc = request.db.profiles.find_one({
+                'mobile': {'$elemMatch': {'mobile': obj_id, 'verified': True}}
+            })
+            if old_user_doc:
+                old_user = User(old_user_doc)
+        if old_user:
+            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != obj_id]
+            old_user.set_mobiles(mobiles)
+        user.add_verified_mobile(obj_id)
+        msg = _('Mobile {obj} verified')
 
-        msg = get_localizer(request).translate(msg)
-        request.session.flash(msg.format(obj=obj_id),
+    elif model_name == 'mailAliases':
+        if not old_user:
+            old_user_doc = request.db.profiles.find_one({
+                'mailAliases': {'email': obj_id, 'verified': True}
+            })
+            if old_user_doc:
+                old_user = User(old_user_doc)
+        if old_user:
+            if old_user.get_mail() == obj_id:
+                old_user.set_mail('')
+            mails = [m for m in old_user.get_mail_aliases() if m['email'] != obj_id]
+            old_user.set_mail_aliases(mails)
+        user.add_verified_email(obj_id)
+        msg = _('Email {obj} verified')
+
+    msg = get_localizer(request).translate(msg)
+    request.session.flash(msg.format(obj=obj_id),
                           queue='forms')
 
-        if old_user:
-            old_user.save(request)
+    if old_user:
+        old_user.save(request)
 
-        user.save(request)
-        request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+    user.save(request)
+    request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+
     return obj_id
 
 
