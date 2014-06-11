@@ -8,7 +8,6 @@ from eduid_am.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
-from eduiddashboard.utils import convert_to_e_164
 from eduiddashboard import log
 
 

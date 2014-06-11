@@ -60,11 +60,12 @@ class PersonalDataView(BaseFormView):
 
     def save_success(self, user_modified):
         person = self.schema.serialize(user_modified)
+        del(person['csrf'])  # Don't save the CSRF token in the user database
 
         new_preferred_language = person.get('preferredLanguage')
         old_preferred_language = self.user.get_preferred_language()
 
-        # Insert the new user object
+        # Insert the new/updated user object
         self.user.get_doc().update(person)
         self.user.save(self.request)
 
