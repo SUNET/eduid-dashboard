@@ -72,7 +72,7 @@ def get_not_verificated_objects(request, model_name, user):
     })
 
 
-def verificate_code(request, model_name, code):
+def verify_code(request, model_name, code):
 
     unverified = request.db.verifications.find_one(
         {
