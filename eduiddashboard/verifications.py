@@ -84,19 +84,19 @@ def verify_code(request, model_name, code):
         log.debug("Could not find un-verified code {!r}, model {!r}".format(code, model_name))
         return
 
-    obj_id = unverified['obj_id']
+    data = unverified['obj_id']
 
-    if not obj_id:
+    if not data:
         return
 
-    log.debug("Code {!r} ({!s}) marked as verified".format(code, str(obj_id)))
+    log.debug("Processing {!r} code {!r} ({!s})".format(model_name, code, str(data)))
 
     user = request.userdb.get_user_by_oid(unverified['user_oid'])
     old_verified = request.db.verifications.find_and_modify(
         {
             "model_name": model_name,
-            "obj_id": unverified['obj_id'],
-            "verified": True
+            "obj_id": data,
+            "verified": True,
         },
         remove=True)
 
@@ -107,17 +107,19 @@ def verify_code(request, model_name, code):
     if model_name == 'norEduPersonNIN':
         if not old_user:
             old_user_doc = request.db.profiles.find_one({
-                'norEduPersonNIN': obj_id
+                'norEduPersonNIN': data
             })
             if old_user_doc:
                 old_user = User(old_user_doc)
         if old_user:
-            nins = [nin for nin in old_user.get_nins() if nin != obj_id]
+            log.debug("Removing NIN {!r} from old_user {!r}".format(User.get_id()))
+            nins = [nin for nin in old_user.get_nins() if nin != data]
             old_user.set_nins(nins)
+            # Remove postal address too, since that is based on the NIN
             addresses = [a for a in old_user.get_addresses() if not a['verified']]
             old_user.set_addresses(addresses)
-        user.add_verified_nin(obj_id)
-        user.retrieve_address(request, obj_id)
+        user.add_verified_nin(data)
+        user.retrieve_address(request, data)
 
         # Reset session eduPersonIdentityProofing on NIN verification
         request.session['eduPersonIdentityProofing'] = None
@@ -127,33 +129,33 @@ def verify_code(request, model_name, code):
     elif model_name == 'mobile':
         if not old_user:
             old_user_doc = request.db.profiles.find_one({
-                'mobile': {'$elemMatch': {'mobile': obj_id, 'verified': True}}
+                'mobile': {'$elemMatch': {'mobile': data, 'verified': True}}
             })
             if old_user_doc:
                 old_user = User(old_user_doc)
         if old_user:
-            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != obj_id]
+            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != data]
             old_user.set_mobiles(mobiles)
-        user.add_verified_mobile(obj_id)
+        user.add_verified_mobile(data)
         msg = _('Mobile {obj} verified')
 
     elif model_name == 'mailAliases':
         if not old_user:
             old_user_doc = request.db.profiles.find_one({
-                'mailAliases': {'email': obj_id, 'verified': True}
+                'mailAliases': {'email': data, 'verified': True}
             })
             if old_user_doc:
                 old_user = User(old_user_doc)
         if old_user:
-            if old_user.get_mail() == obj_id:
+            if old_user.get_mail() == data:
                 old_user.set_mail('')
-            mails = [m for m in old_user.get_mail_aliases() if m['email'] != obj_id]
+            mails = [m for m in old_user.get_mail_aliases() if m['email'] != data]
             old_user.set_mail_aliases(mails)
-        user.add_verified_email(obj_id)
+        user.add_verified_email(data)
         msg = _('Email {obj} verified')
 
     msg = get_localizer(request).translate(msg)
-    request.session.flash(msg.format(obj=obj_id),
+    request.session.flash(msg.format(obj=data),
                           queue='forms')
 
     if old_user:
@@ -162,7 +164,7 @@ def verify_code(request, model_name, code):
     user.save(request)
     request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
 
-    return obj_id
+    return data
 
 
 def save_as_verificated(request, model_name, user_oid, obj_id):
