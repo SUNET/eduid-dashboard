@@ -167,7 +167,7 @@ class MobilesView(BaseFormView):
 
     def add_success(self, mobileform):
         mobile_number = self.schema.serialize(mobileform)['mobile']
-        mobile = {'mobile': normalize_to_e_164(mobile_number),
+        mobile = {'mobile': normalize_to_e_164(self.request, mobile_number),
                   'verified': False,
                   'primary': False,
                   }

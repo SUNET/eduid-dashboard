@@ -208,7 +208,7 @@ def remove_nin_from_others(nin, request):
         users[old_user.get_id()] = old_user
 
     for old_user in users.values():
-        log.debug("Removing NIN {!r} from old_user {!r}".format(User.get_id()))
+        log.debug("Removing NIN {!r} from old_user {!r}".format(nin, old_user.get_id()))
         nins = [this for this in old_user.get_nins() if this != nin]
         old_user.set_nins(nins)
         # Remove verified postal address too, since that is based on the NIN
