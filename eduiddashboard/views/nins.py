@@ -14,7 +14,7 @@ from eduiddashboard import log
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verificated)
+                                          save_as_verified)
 
 
 def get_status(request, user):
@@ -307,7 +307,7 @@ class NinsView(BaseFormView):
         self.user.set_nins(nins)
 
         # Save the state in the verifications collection
-        save_as_verificated(self.request, 'norEduPersonNIN',
+        save_as_verified(self.request, 'norEduPersonNIN',
                             self.user.get_id(), newnin)
 
         self.user.save(self.request)

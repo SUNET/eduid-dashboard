@@ -73,25 +73,37 @@ def get_not_verificated_objects(request, model_name, user):
 
 
 def verify_code(request, model_name, code):
+    """
+    Verify a code and act accordingly to the model_name ('norEduPersonNIN', 'mobile', or 'mailAliases').
 
-    unverified = request.db.verifications.find_one(
+    This is what turns an unconfirmed NIN/mobile/e-mail into a confirmed one.
+
+    :param request: The HTTP request
+    :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
+    :param code: The user supplied code
+    :type request: webob.request.BaseRequest
+
+
+    :return:
+    """
+    this_verification = request.db.verifications.find_one(
         {
             "model_name": model_name,
             "code": code,
         })
 
-    if not unverified:
-        log.debug("Could not find un-verified code {!r}, model {!r}".format(code, model_name))
+    if not this_verification:
+        log.debug("Could not find verification record for code {!r}, model {!r}".format(code, model_name))
         return
 
-    data = unverified['obj_id']
+    data = this_verification['obj_id']
 
     if not data:
         return
 
     log.debug("Processing {!r} code {!r} ({!s})".format(model_name, code, str(data)))
 
-    user = request.userdb.get_user_by_oid(unverified['user_oid'])
+    user = request.userdb.get_user_by_oid(this_verification['user_oid'])
 
     if model_name == 'norEduPersonNIN':
         _remove_nin_from_others(data, request)
@@ -116,7 +128,7 @@ def verify_code(request, model_name, code):
     user.save(request)
 
     log.debug("Marking {!r} code {!r} ({!s}) as verified".format(model_name, code, str(data)))
-    request.db.verifications.update({'_id': unverified['_id']},
+    request.db.verifications.update({'_id': this_verification['_id']},
                                     {'$set': {'verified': True,
                                               'verified_timestamp': datetime.utcnow(),
                                               }})
@@ -127,7 +139,7 @@ def verify_code(request, model_name, code):
     return data
 
 
-def save_as_verificated(request, model_name, user_oid, obj_id):
+def save_as_verified(request, model_name, user_oid, obj_id):
 
     old_verified = request.db.verifications.find(
         {
