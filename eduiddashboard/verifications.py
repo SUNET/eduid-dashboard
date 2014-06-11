@@ -204,7 +204,8 @@ def remove_nin_from_others(nin, request):
         old_user = User(this)
         users[old_user.get_id()] = old_user
     for this in request.userdb.get_users(query):
-        users[this.get_id()] = this
+        old_user = User(this)
+        users[old_user.get_id()] = old_user
 
     for old_user in users.values():
         log.debug("Removing NIN {!r} from old_user {!r}".format(User.get_id()))
@@ -237,7 +238,8 @@ def _remove_mobile_from_others(number, request):
         old_user = User(this)
         users[old_user.get_id()] = old_user
     for this in request.userdb.get_users(query):
-        users[this.get_id()] = this
+        old_user = User(this)
+        users[old_user.get_id()] = old_user
 
     for old_user in users.values():
         mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != number]
@@ -266,7 +268,8 @@ def _remove_email_from_others(email, request):
         old_user = User(this)
         users[old_user.get_id()] = old_user
     for this in request.userdb.get_users(query):
-        users[this.get_id()] = this
+        old_user = User(this)
+        users[old_user.get_id()] = old_user
 
     for old_user in users.values():
         if old_user.get_mail() == email:
