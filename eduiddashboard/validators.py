@@ -194,7 +194,7 @@ class NINUniqueValidator(object):
         unverified_user_nins = request.db.verifications.find({
             'obj_id': value,
             'model_name': 'norEduPersonNIN',
-            'user_id': user.get_id(),
+            'user_oid': user.get_id(),
             'verified': False
         })
 
