@@ -109,14 +109,6 @@ def get_not_verified_nins_list(request, user):
     return res
 
 
-def get_active_nin(self):
-    active_nins = self.user.get_nins()
-    if active_nins:
-        return active_nins[-1]
-    else:
-        return None
-
-
 @view_config(route_name='nins-actions', permission='edit')
 class NINsActionsView(BaseActionsView):
 
@@ -129,39 +121,29 @@ class NINsActionsView(BaseActionsView):
         'new_code_sent': _('A new confirmation code has been sent to your "Min myndighetspost" mailbox'),
     }
 
-    get_active_nin = get_active_nin
-
     def get_verification_data_id(self, data_to_verify):
         return data_to_verify[self.data_attribute]
 
     def verify_action(self, index, post_data):
-        """ Only the active (the last one) NIN can be verified """
         nins = get_not_verified_nins_list(self.request, self.user)
 
-        if len(nins) > index:
+        try:
             verify_nin = nins[index]
-        else:
-            raise HTTPNotFound("The index provided can't be found")
+        except IndexError:
+            # XXX Could happen with more than one dashboard, should ideally not use index?
+            raise HTTPNotFound("Something went wrong. Please reload the page.")
 
-        if index != len(nins) - 1:
-            message = _("The provided nin can't be verified. You only "
-                        'can verify the last one')
-            return {
-                'result': 'bad',
-                'message': get_localizer(self.request).translate(message),
-            }
-
-        return super(NINsActionsView, self)._verify_action(verify_nin,
-                                                           post_data)
+        return super(NINsActionsView, self)._verify_action(verify_nin, post_data)
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
         nins = get_not_verified_nins_list(self.request, self.user)
 
-        if len(nins) > index:
+        try:
             remove_nin = nins[index]
-        else:
-            raise HTTPNotFound("The index provides can't be found")
+        except IndexError:
+            # XXX Could happen with more than one dashboard, should ideally not use index?
+            raise HTTPNotFound("Something went wrong. Please reload the page.")
 
         verifications = self.request.db.verifications
         verifications.remove({
@@ -214,29 +196,18 @@ class NinsView(BaseFormView):
 
     bootstrap_form_style = 'form-inline'
 
-    get_active_nin = get_active_nin
-
     def appstruct(self):
         return {}
 
     def get_template_context(self):
-        """
-            Take active NIN (on am profile)
-            Take NINs from verifications, sorted by older and compared with
-            the present active NIN.
-            If they are older, then don't take it.
-            If there are not verified nins newer than the active NIN, then
-            take them as not verified NINs
-        """
         context = super(NinsView, self).get_template_context()
 
         settings = self.request.registry.settings
 
         context.update({
-            'nins': self.user.get_nins(),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
-            'active_nin': self.get_active_nin(),
+            'verified_nins': self.user.get_nins(),
             'nin_service_url': settings.get('nin_service_url'),
             'nin_service_name': settings.get('nin_service_name'),
         })
