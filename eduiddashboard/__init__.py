@@ -15,7 +15,7 @@ from pyramid.i18n import get_locale_name
 from eduid_am.celery import celery
 from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
-from eduid_am.config import read_setting_from_env, read_mapping, read_list
+from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -336,7 +336,7 @@ def main(global_config, **settings):
         'available_loa',
         default=AVAILABLE_LOA_LEVEL)
 
-    settings['enable_postal_address_retrieve'] = read_setting_from_env(
+    settings['enable_postal_address_retrieve'] = read_setting_from_env_bool(
         settings, 'enable_postal_address_retrieve', True
     )
 
