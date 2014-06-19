@@ -43,7 +43,7 @@ requires = [
     'vccs_client==0.4.1',
     'pwgen==0.4',
     'zxcvbn==1.0',
-    'eduid_msg==0.7.11',
+    'eduid_msg==0.7.12-dev',
     'pytz'
 ]
 
