@@ -1,0 +1,49 @@
+FROM enriquepablo/python2:0.1
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+RUN apt-get update && apt-get install -y \
+  sed \
+  git \
+  xmlsec1 \
+  libxmlsec1 \
+  libxmlsec1-openssl \
+  swig \
+  wget \
+  rabbitmq-server
+
+RUN ln -s /usr/lib/libxmlsec1-openssl.so.1 /usr/lib/libxmlsec1-openssl.so
+
+RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python2
+
+RUN easy_install m2crypto
+
+RUN cd /opt \
+  && git clone git://github.com/SUNET/eduid-am.git \
+  && cd eduid-am \
+  && python setup.py develop \
+  && sed "s/localhost:27017/mongo:27017/" <config-templates/development.ini >eduid_am.ini \
+  && echo "#!/bin/sh" > start.sh \
+  && echo "" >> start.sh \
+  && echo "service rabbitmq-server start" >> start.sh \
+  && echo "" >> start.sh \
+  && echo "rabbitmqctl add_user eduid eduid" >> start.sh \
+  && echo "rabbitmqctl add_vhost eduid_vhost" >> start.sh \
+  && echo "rabbitmqctl set_permissions -p eduid_vhost eduid \".*\" \".*\" \".*\"" >> start.sh \
+  && echo "" >> start.sh \
+  && echo "celery worker --app=eduid_am -E --loglevel INFO" >> start.sh
+
+RUN cd /opt \
+  && git clone git://github.com/SUNET/eduid-dashboard-amp.git \
+  && cd eduid-dashboard-amp \
+  && python setup.py develop \
+  && cd .. \
+  && git clone git://github.com/SUNET/eduid-signup-amp.git \
+  && cd eduid-signup-amp \
+  && python setup.py develop
+
+WORKDIR /opt/eduid-am
+
+ENV C_FORCE_ROOT 1
+
+CMD ["bash", "start.sh"]
