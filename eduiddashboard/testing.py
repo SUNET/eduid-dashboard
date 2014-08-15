@@ -70,24 +70,6 @@ class MockedTask(object):
         return MockedResult(self.retval, self.failed)
 
 
-class MockedMsgRelay(object):
-
-    def __init__(self, settings):
-        pass
-
-    def mobile_validator(self, targetphone, code, language):
-        pass
-
-    def nin_reachable(self, nin):
-        return getattr(self, 'retval', True)
-
-    def nin_validator(self, nin, code, language):
-        pass
-
-    def get_postal_address(self, nin):
-        return getattr(self, 'retval', {})
-
-
 def get_db(settings):
     mongo_replicaset = settings.get('mongo_replicaset', None)
     if mongo_replicaset is not None:

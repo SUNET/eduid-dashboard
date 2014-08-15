@@ -5,7 +5,7 @@ from datetime import datetime
 
 from eduid_am.userdb import UserDB
 from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests, MockedMsgRelay
+from eduiddashboard.testing import LoggedInReguestTests
 
 
 def return_true(*args, **kwargs):
