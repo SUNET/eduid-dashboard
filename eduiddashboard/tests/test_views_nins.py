@@ -73,19 +73,30 @@ class NinsFormTests(LoggedInReguestTests):
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_existant_nin(self):
-        self.set_logged()
-
+        from eduiddashboard.msgrelay import MsgRelay
+        self.set_logged(user='johnsmith@example.org')
         response_form = self.testapp.get('/profile/nins/')
         form = response_form.forms[self.formname]
-        for nin in ('123456789012', '197801011234'):
+        nin = '200010100001'
+        # First we add a nin...
+        with patch.object(UserDB, 'exists_by_filter', clear=True):
+            with patch.multiple(MsgRelay, nin_validator=return_true,
+                                nin_reachable=return_true):
+                UserDB.exists_by_filter.return_value = True
+                form['norEduPersonNIN'].value = nin
+                form.submit('add')
+        # ...and then we try to add it again.
+        with patch.object(UserDB, 'exists_by_filter', clear=True):
+            with patch.multiple(MsgRelay, nin_validator=return_true,
+                                nin_reachable=return_true):
+                UserDB.exists_by_filter.return_value = True
+                form['norEduPersonNIN'].value = nin
+                response = form.submit('add')
 
-            form['norEduPersonNIN'].value = nin
-            response = form.submit('add')
-
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn(nin, response.body)
-            self.assertIn('alert-error', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
+                self.assertEqual(response.status, '200 OK')
+                self.assertIn(nin, response.body)
+                self.assertIn('alert-error', response.body)
+                self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):
         self.set_logged(user='johnsmith@example.org')
