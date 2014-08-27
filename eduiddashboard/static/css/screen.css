@@ -33,7 +33,7 @@ div#content-block {
     border-radius: 0 5px 5px 0;
 }
 
-.input-append .help-block {
+.input-group .help-block {
     font-size: 14px;
 }
 
@@ -451,7 +451,7 @@ table.passwords {
     width: 10px;
 }
 
-.has-spinner.btn-small.active .spinner {
+.has-spinner.btn-sm.active .spinner {
     width: 13px;
 }
 
@@ -459,7 +459,7 @@ table.passwords {
     width: 16px;
 }
 
-.has-spinner.btn-large.loading .spinner {
+.has-spinner.btn-lg.loading .spinner {
     width: 19px;
 }
 

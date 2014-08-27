@@ -85,12 +85,12 @@ var EduidWizard = function (container_path, active_card, options) {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
-                        currentCard.el.find('.control-group').toggleClass("error", false);
+                        currentCard.el.find('.form-group').toggleClass("error", false);
                         currentCard.el.find('select, input, textarea').popover("destroy");
                         for (input in data.data) {
                             el = currentCard.el.find('[name=' + input + ']');
                             wizard.errorPopover(el, data.data[input], true);
-                            el.parent(".control-group").toggleClass("error", true);
+                            el.parent(".form-group").toggleClass("error", true);
                         }
                     }
                     wizard.el.find('.btn.wizard-next').

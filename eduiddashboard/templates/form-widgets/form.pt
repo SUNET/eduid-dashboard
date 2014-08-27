@@ -19,7 +19,7 @@
   <input type="hidden" name="__formid__" value="${field.formid}"/>
 
 
-  <div class="alert alert-block alert-error" tal:condition="field.error">
+  <div class="alert alert-block alert-danger" tal:condition="field.error">
     <span class="errorMsgLbl" i18n:translate="">
       There was a problem with your submission
     </span>
@@ -80,7 +80,7 @@
   </div>
 
   <!-- Append the buttons at the end -->
-  <div tal:condition="field.buttons" tal:omit-tag="inline" class="form-actions">
+  <div tal:condition="field.buttons" tal:omit-tag="inline">
     <tal:block repeat="button field.buttons">
       <button
           tal:attributes="disabled button.disabled"

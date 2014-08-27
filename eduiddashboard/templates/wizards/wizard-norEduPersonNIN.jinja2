@@ -7,7 +7,7 @@
     <h3>{{ _("Identity number") }}</h3>
     <div class="wizard-input-section">
       <p>{{ _("Please enter your national identity number.") }}</p>
-      <div class="control-group">
+      <div class="form-group">
         <input type="hidden" name="csrf" value="{{ csrftoken }}" />
         <input id="nin" name="norEduPersonNIN" type="text" 
               {% if datakey %}value="{{ datakey }}"{% endif %}
@@ -20,7 +20,7 @@
     <h3>{{ _("Confirm identity number") }}</h3>
     <div class="wizard-input-section">
       <p>{{ _("Please enter your confirmation code sent to your government inbox.") }}</p>
-      <div class="control-group">
+      <div class="form-group">
         <input id="mm-confirm" name="code" type="text"
               placeholder="{{_("Confirmation code") }}" />
       </div>
