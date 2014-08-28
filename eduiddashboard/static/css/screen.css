@@ -273,6 +273,11 @@ form.form-horizontal label {
   font-weight: 400;
 }
 
+form.form-horizontal .btn-primary {
+  margin-left: 35%;
+  margin-top: 20px;
+}
+
 .table-thin {
   width: 50%;
 }
