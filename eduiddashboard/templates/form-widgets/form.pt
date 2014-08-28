@@ -7,6 +7,7 @@
   enctype="multipart/form-data"
   accept-charset="utf-8"
   i18n:domain="deform"
+  role="form"
   tal:define="inline getattr(field, 'bootstrap_form_style', None) == 'form-inline';
               tabify_form import: deform_bootstrap.utils.tabify_form;
               fields_list python: tabify_form(field);
@@ -49,7 +50,7 @@
   </tal:block>
 
   <!-- Populate the tabs -->
-  <div tal:omit-tag='inline' class="tab-content" >
+  <div tal:omit-tag='python: inline or fields_list.only_one' class="tab-content" >
     <!-- If we have a basic tab, this should be active -->
     <fieldset
       tal:omit-tag="inline"

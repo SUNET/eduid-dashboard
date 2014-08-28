@@ -269,6 +269,9 @@ form.form-inline div.alert {
   display: block;
 }
 
+form.form-horizontal label {
+  font-weight: 400;
+}
 
 .table-thin {
   width: 50%;

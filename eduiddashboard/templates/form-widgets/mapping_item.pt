@@ -7,21 +7,18 @@
      i18n:domain="deform">
 
   <label for="${field.oid}"
-         class="control-label"
+         class="control-label col-md-3"
          tal:condition="not structural">
     ${field.title}<span tal:condition="field.required"
           class="req" id="req-${field.oid}"></span>
   </label>
 
-  <div class="controls"
-       tal:omit-tag="structural">
-
     <div tal:define="input_prepend field.widget.input_prepend | None;
                      input_append field.widget.input_append  | None;
                      prepend_class input_prepend and 'input-group' or '';
                      append_class input_append and 'input-group' or ''"
-         tal:omit-tag="not (input_prepend or input_append)"
-         class="${prepend_class + ' ' + append_class}">
+         tal:omit-tag="structural"
+         class="col-md-6 ${prepend_class + ' ' + append_class}">
 
       <span class="input-group-addon" tal:condition="input_prepend">${input_prepend}</span
       ><span tal:replace="structure field.serialize(cstruct).strip()"
@@ -44,5 +41,4 @@
       </span>
     </div>
 
-  </div>
 </div>
