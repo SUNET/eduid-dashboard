@@ -78,7 +78,9 @@
                     identifier: value
                 },
                 function(data, statusText, xhr) {
-                    if (data.result == 'getcode') {
+                    if (data.result === 'stale') {
+                        document.location.reload(true);
+                    } else if (data.result == 'getcode') {
                         askCode(actions_url, action, container, value, data.message, data.placeholder);
                     } else {
                         sendInfo(container, data.result, data.message);
