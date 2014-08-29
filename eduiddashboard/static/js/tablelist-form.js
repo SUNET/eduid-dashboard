@@ -7,6 +7,7 @@
 
     var sendInfo = function(container, cls, msg) {
             var alert_class = cls === 'error' ? 'danger' : cls;
+            alert_class = cls === 'ok' ? 'success' : alert_class;
             var messageHTML = '<div class="alert alert-' + alert_class +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
