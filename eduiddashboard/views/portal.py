@@ -158,7 +158,7 @@ def help(context, request):
 
 @view_config(route_name='token-login', request_method='POST')
 def token_login(context, request):
-    email = request.POST.get('email')
+    eppn = request.POST.get('eppn')
     token = request.POST.get('token')
     nonce = request.POST.get('nonce')
     timestamp = request.POST.get('ts')
@@ -166,16 +166,16 @@ def token_login(context, request):
 
     next_url = request.POST.get('next_url', '/')
 
-    if verify_auth_token(shared_key, email, token, nonce, timestamp):
+    if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
-        user = request.userdb.get_user(email)
-        request.session['mail'] = email
+        user = request.userdb.get_user(eppn)
+        request.session['mail'] = user.get('email'),
         request.session['user'] = user
         request.session['loa'] = 1
-        remember_headers = remember(request, email)
+        remember_headers = remember(request, user.get('email'))
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
-        logger.info("Token authentication failed (email: {!r})".format(email))
+        logger.info("Token authentication failed (eppn: {!r})".format(eppn))
         # Show and error, the user can't be logged
         return HTTPBadRequest()
 

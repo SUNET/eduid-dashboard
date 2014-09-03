@@ -10,28 +10,25 @@
 
   {{ safe_actions_url('nins-actions') }}
 
-
     <table class='table table-striped table-thin table-form nins'>
-    {% if active_nin %}
-      <tr class='ninrow' data-identifier="0">
-          <td class='identifier'>{{ active_nin }}</td>
-          <td><span class='nobutton'>{{_("Verified")}}</span></td>
-          <td><span class='nobutton'>{{_("Active")}}</span></td>
-          <td></td>
-      </tr>
+    {% if verified_nins %}
+      {% for nin in verified_nins %}
+        <tr class='ninrow' data-identifier="0">
+            <td class='identifier'>{{ nin }}</td>
+            <td><span class='nobutton'>{{_("Verified")}}</span></td>
+            <td><span class='nobutton'>{{_("Active")}}</span></td>
+            <td></td>
+        </tr>
+      {% endfor %}
     {% endif %}
     {% if not_verified_nins %}
       {% for nin in not_verified_nins %}
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
-          {% if loop.last %}
           <td>
             <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
                  data-index='{{ loop.index0 }}' name='verify'>
           </td>
-          {% else %}
-          <td><span class='muted'>{{ _('Pending confirmation')}}</span></td>
-          {% endif %}
           <td>
             <input type='button' class='btn btn-link' value="{{_('Remove')}}"
                  data-index='{{ loop.index0 }}' name='remove'>
@@ -40,15 +37,17 @@
       {% endfor %}
     {% endif %}
     </table>
-
-
+    {% if verified_nins %}
+        <p>{% trans %}Your identity is already confirmed. No further action is required here.{% endtrans %}</p>
+    {% endif %}
 {% endblock %}
 
-
 {% block form_generic_form %}
-  <div class='form-content'>
-    {{ form|safe }}
-  </div>
+  {% if not verified_nins %}
+    <div class='form-content'>
+      {{ form|safe }}
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block askdialog_extra_info %}
