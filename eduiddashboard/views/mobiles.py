@@ -7,7 +7,7 @@ from pyramid.view import view_config
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
-from eduiddashboard.utils import get_icon_string, get_short_hash, convert_to_e_164
+from eduiddashboard.utils import get_icon_string, get_short_hash, normalize_to_e_164
 from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
 
@@ -166,12 +166,11 @@ class MobilesView(BaseFormView):
         return context
 
     def add_success(self, mobileform):
-        mobile = self.schema.serialize(mobileform)
-        convert_to_e_164(self.request, mobile)
-        mobile_number = mobile['mobile']
-        mobile['verified'] = False
-        mobile['primary'] = False
-
+        mobile_number = self.schema.serialize(mobileform)['mobile']
+        mobile = {'mobile': normalize_to_e_164(self.request, mobile_number),
+                  'verified': False,
+                  'primary': False,
+                  }
         self.user.add_mobile(mobile)
         self.user.save(self.request)
 

@@ -3,7 +3,7 @@
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 
-from eduiddashboard.verifications import verificate_code, get_verification_code
+from eduiddashboard.verifications import verify_code, get_verification_code
 from eduiddashboard.i18n import TranslationString as _
 
 from eduiddashboard import log
@@ -23,7 +23,7 @@ def verifications(context, request):
             code, request.session.get('verifications', [])))
         raise HTTPNotFound(_("Can't locate the code in the active session"))
 
-    obj_id = verificate_code(request, model_name, code)
+    obj_id = verify_code(request, model_name, code)
 
     if obj_id is not None:
         return HTTPFound(location=request.route_url('home'))

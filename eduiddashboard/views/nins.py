@@ -14,7 +14,7 @@ from eduiddashboard import log
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verificated)
+                                          save_as_verified, remove_nin_from_others)
 
 
 def get_status(request, user):
@@ -84,27 +84,29 @@ def get_tab(request):
 
 
 def get_not_verified_nins_list(request, user):
-    active_nins = user.get_nins()
-    nins = []
+    """
+    Return a list of all non-verified NINs.
+
+    These come from the verifications mongodb collection, but we also double-check
+    that anything in there that looks un-verified is not also found in user.get_nins().
+
+    :param request:
+    :param user:
+    :return: List of NINs pending confirmation
+    :rtype: [string]
+    """
+    verified_nins = user.get_nins()
     verifications = request.db.verifications
-    not_verified_nins = verifications.find({
+    all_nins = verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
-    if active_nins:
-        active_nin = active_nins[-1]
-        nin_found = False
-        for nin in not_verified_nins:
-            if active_nin == nin['obj_id']:
-                nin_found = True
-            elif nin_found and not nin['verified']:
-                nins.append(nin['obj_id'])
-    else:
-        for nin in not_verified_nins:
-            if not nin['verified']:
-                nins.append(nin['obj_id'])
 
-    return nins
+    res = []
+    for nin in all_nins:
+        if not nin['verified'] and not nin['obj_id'] in verified_nins:
+            res.append(nin['obj_id'])
+    return res
 
 
 def get_active_nin(self):
@@ -288,24 +290,14 @@ class NinsView(BaseFormView):
 
         newnin = normalize_nin(newnin)
 
-        old_user = self.request.db.profiles.find_one({
-            'norEduPersonNIN': newnin
-            })
-
-        if old_user:
-            old_user = User(old_user)
-            nins = [nin for nin in old_user.get_nins() if nin != newnin]
-            old_user.set_nins(nins)
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
-            old_user.save(self.request)
+        remove_nin_from_others(newnin, self.request)
 
         nins = self.user.get_nins()
         nins.append(newnin)
         self.user.set_nins(nins)
 
         # Save the state in the verifications collection
-        save_as_verificated(self.request, 'norEduPersonNIN',
+        save_as_verified(self.request, 'norEduPersonNIN',
                             self.user.get_id(), newnin)
 
         self.user.save(self.request)
