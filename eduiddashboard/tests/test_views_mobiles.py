@@ -36,7 +36,7 @@ class MobilesFormTests(LoggedInReguestTests):
         response = form.submit('add')
 
         self.assertEqual(response.status, '200 OK')
-        self.assertIn('alert-error', response.body)
+        self.assertIn('alert-danger', response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_valid_mobile(self):
@@ -84,7 +84,7 @@ class MobilesFormTests(LoggedInReguestTests):
                 response = form.submit('add')
 
                 self.assertEqual(response.status, '200 OK')
-                self.assertIn('alert-error', response.body)
+                self.assertIn('alert-danger', response.body)
                 self.assertIn('Invalid telephone number', response.body)
                 self.assertIsNotNone(getattr(response, 'form', None))
 

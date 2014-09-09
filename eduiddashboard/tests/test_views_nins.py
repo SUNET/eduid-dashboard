@@ -68,7 +68,7 @@ class NinsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn(nin, response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIn('error-deformField', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
@@ -84,7 +84,7 @@ class NinsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn(nin, response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):

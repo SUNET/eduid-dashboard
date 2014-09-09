@@ -59,7 +59,7 @@ class MailsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('user@exa mple.com', response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIn('Invalid email address', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
@@ -82,7 +82,7 @@ class MailsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('johnsmith2@example.com', response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_nonnormal_existant_email(self):

@@ -34,7 +34,7 @@
         },
 
         initialize = function (container, url) {
-            if (container.find('.form-content .alert-error').length > 0){
+            if (container.find('.form-content .alert-danger').length > 0){
                 container.find('.form-content').show();
             }
 
