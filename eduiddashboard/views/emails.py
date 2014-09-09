@@ -60,7 +60,7 @@ class EmailsActionsView(BaseActionsView):
 
     data_attribute = 'mailAliases'
     special_verify_messages = {
-        'ok': _('Email address has been confirmed'),
+        'success': _('Email address has been confirmed'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('Check your email inbox for {data} for further instructions'),
         'placeholder': _('Email confirmation code'),
@@ -83,7 +83,7 @@ class EmailsActionsView(BaseActionsView):
 
         message = _('Your primary email address was '
                     'successfully changed')
-        return {'result': 'ok',
+        return {'result': 'success',
                 'message': get_localizer(self.request).translate(message)}
 
     def remove_action(self, index, post_data):
@@ -108,7 +108,7 @@ class EmailsActionsView(BaseActionsView):
 
         message = _('Email address was successfully removed')
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 

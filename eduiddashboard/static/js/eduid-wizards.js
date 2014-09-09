@@ -81,7 +81,7 @@ var EduidWizard = function (container_path, active_card, options) {
                 type: 'POST',
                 success: function (data, textStatus, jqXHR) {
                     var el, input;
-                    if (data.status === 'ok') {
+                    if (data.status === 'success') {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
@@ -144,7 +144,7 @@ var EduidWizard = function (container_path, active_card, options) {
             data: jsondata,
             type: 'POST',
             success: function (data, textStatus, jqXHR){
-                if (data.status === 'ok') {
+                if (data.status === 'success') {
                     // show a successs message
                     show_alert(data.text, 'success');
                 }

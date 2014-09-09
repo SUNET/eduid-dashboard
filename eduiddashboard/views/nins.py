@@ -120,7 +120,7 @@ class NINsActionsView(BaseActionsView):
 
     data_attribute = 'norEduPersonNIN'
     special_verify_messages = {
-        'ok': _('National identity number verified'),
+        'success': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to your "Min myndighetspost" mailbox.'),
         'placeholder': _('National identity number confirmation code'),
@@ -171,7 +171,7 @@ class NINsActionsView(BaseActionsView):
 
         message = _('National identity number has been removed')
         return {
-            'result': 'ok',
+            'result': 'successs',
             'message': get_localizer(self.request).translate(message),
         }
 
@@ -190,7 +190,7 @@ class NINsActionsView(BaseActionsView):
 
         message = self.verify_messages['new_code_sent']
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': message,
         }
 
@@ -279,7 +279,7 @@ class NinsView(BaseFormView):
         self.addition_with_code_validation(validated)
 
         return {
-            'status': 'ok'
+            'status': 'success'
         }
 
     def add_success_other(self, ninform):
@@ -340,9 +340,9 @@ class NinsWizard(BaseWizard):
 
         result = nins_action_view._verify_action(normalize_nin(self.datakey), data)
 
-        if result['result'] == 'ok':
+        if result['result'] == 'success':
             return {
-                'status': 'ok',
+                'status': 'success',
             }
         else:
             return {
@@ -366,7 +366,7 @@ class NinsWizard(BaseWizard):
 
         message = NINsActionsView.verify_messages['new_code_sent']
         return {
-            'status': 'ok',
+            'status': 'success',
             'text': message,
         }
 

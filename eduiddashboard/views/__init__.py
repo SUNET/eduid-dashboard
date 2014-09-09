@@ -88,7 +88,7 @@ class BaseFormView(FormView):
 class BaseActionsView(object):
     data_attribute = None
     default_verify_messages = {
-        'ok': _('The data has been verified'),
+        'success': _('The data has been verified'),
         'error': _('Confirmation code is invalid'),
         'request': _('Check your email for further instructions'),
         'placeholder': _('Confirmation code'),
@@ -150,8 +150,8 @@ class BaseActionsView(object):
                         verificate_code(self.request, self.data_attribute,
                                         code_sent)
                         return {
-                            'result': 'ok',
-                            'message': self.verify_messages['ok'],
+                            'result': 'success',
+                            'message': self.verify_messages['success'],
                         }
                 else:
                     log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
@@ -180,7 +180,7 @@ class BaseActionsView(object):
         msg = self.verify_messages['new_code_sent']
 
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': msg,
         }
 
@@ -265,7 +265,7 @@ class BaseWizard(object):
             }})
         message = _('The wizard was dismissed')
         return {
-            'status': 'ok',
+            'status': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 
@@ -288,7 +288,7 @@ class BaseWizard(object):
             post_data = self.request.POST
             response = action_method(post_data)
 
-            if response and response['status'] == 'ok':
+            if response and response['status'] == 'success':
                 self.next_step()
 
         elif self.request.POST['action'] == 'dismissed':

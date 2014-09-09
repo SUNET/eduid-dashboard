@@ -24,7 +24,7 @@
                     $('#askDialog .ok-button.has-spinner').removeClass('loading').removeAttr('disabled');
                     var dialog = $('#askDialog');
                     sendInfo(dialog, data.result, data.message);
-                    if (data.result == 'ok') {
+                    if (data.result == 'success') {
                         dialog.find('.btn').hide();
                         dialog.find('.divDialogElements').hide();
                         dialog.find('.finish-button').show();

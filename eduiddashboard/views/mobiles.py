@@ -75,7 +75,7 @@ def send_verification_code(request, user, mobile_number, code=None):
 class MobilesActionsView(BaseActionsView):
     data_attribute = 'mobile'
     special_verify_messages = {
-        'ok': _('The mobile phone number has been verified'),
+        'success': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to the mobile phone number {data}'),
         'placeholder': _('Mobile phone code'),
@@ -96,7 +96,7 @@ class MobilesActionsView(BaseActionsView):
 
         message = _('Mobile phone number was successfully removed')
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 
@@ -130,7 +130,7 @@ class MobilesActionsView(BaseActionsView):
 
         message = _('Mobile phone number was successfully made primary')
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 
