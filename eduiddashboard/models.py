@@ -140,12 +140,12 @@ class Passwords(CSRFTokenSchema):
     old_password = colander.SchemaNode(
         colander.String(),
         title=_('Current password'),
-        widget=deform.widget.PasswordWidget(size=20),
+        widget=deform.widget.PasswordWidget(size=20, css_class="form-control"),
         validator=OldPasswordValidator())
 
     use_custom_password = colander.SchemaNode(
         colander.Boolean(),
-        widget=deform.widget.CheckboxWidget(),
+        widget=deform.widget.CheckboxWidget(css_class="form-control"),
         title=_('Use my own password'),
         missing='false')
 
@@ -154,7 +154,7 @@ class Passwords(CSRFTokenSchema):
         title=_('Suggested password'),
         widget=deform.widget.TextInputWidget(
             readonly=True,
-            css_class='suggested-password'
+            css_class='suggested-password form-control'
         ),
         missing=password_readonly)
 
@@ -163,7 +163,7 @@ class Passwords(CSRFTokenSchema):
         title=_('Custom password'),
         widget=deform.widget.PasswordWidget(
             size=20,
-            css_class='custom-password'),
+            css_class='custom-password form-control'),
         validator=PasswordValidator(),
         missing='')
 
@@ -172,7 +172,7 @@ class Passwords(CSRFTokenSchema):
         title=_('Repeat the password'),
         widget=deform.widget.PasswordWidget(
             size=20,
-            css_class='custom-password'),
+            css_class='custom-password form-control'),
         missing='')
 
 
