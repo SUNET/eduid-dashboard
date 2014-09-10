@@ -66,7 +66,9 @@ class Email(CSRFTokenSchema):
                                validator=colander.All(colander.Email(),
                                                       EmailUniqueValidator()),
                                title=_('email'),
-                               widget=deform.widget.TextInputWidget(mask=_('Email address')))
+                               widget=deform.widget.TextInputWidget(
+                                   mask=_('Email address'),
+                                   css_class='form-control'))
 
 
 NINFormatValidator = colander.Regex(
@@ -104,7 +106,8 @@ class NIN(CSRFTokenSchema):
             NINUniqueValidator(),
             NINReachableValidator()
         ),
-        widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'))
+        widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'),
+                                             css_class='form-control')
     )
 
 
@@ -145,7 +148,7 @@ class Passwords(CSRFTokenSchema):
 
     use_custom_password = colander.SchemaNode(
         colander.Boolean(),
-        widget=deform.widget.CheckboxWidget(css_class="form-control"),
+        widget=deform.widget.CheckboxWidget(),
         title=_('Use my own password'),
         missing='false')
 
@@ -213,7 +216,7 @@ class ResetPasswordStep2(CSRFTokenSchema):
         title=_('Suggested password'),
         widget=deform.widget.TextInputWidget(
             readonly=True,
-            css_class='suggested-password'
+            css_class='suggested-password form-control'
         ),
         missing=password_readonly)
 
@@ -261,7 +264,9 @@ class Mobile(CSRFTokenSchema):
                                      MobilePhoneUniqueValidator()
                                  ),
                                  title=_('mobile'),
-                                 widget=deform.widget.TextInputWidget(mask=_('Mobile phone number')))
+                                 widget=deform.widget.TextInputWidget(
+                                     mask=_('Mobile phone number'),
+                                     css_class='form-control'))
 
 
 class Permissions(colander.Schema):

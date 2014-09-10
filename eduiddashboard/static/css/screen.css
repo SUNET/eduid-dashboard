@@ -345,6 +345,8 @@ table.passwords {
 
 #changePasswordDialog .modal-body {
   max-height: 500px;
+  overflow-y: auto;
+  margin-bottom: 3px;
 }
 
 #changePasswordDialog .modal-body p {

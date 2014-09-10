@@ -18,7 +18,7 @@
                      prepend_class input_prepend and 'input-group' or '';
                      append_class input_append and 'input-group' or ''"
          tal:omit-tag="structural"
-         class="col-md-6 ${prepend_class + ' ' + append_class}">
+         class="controls col-md-6 ${prepend_class + ' ' + append_class}">
 
       <span class="input-group-addon" tal:condition="input_prepend">${input_prepend}</span
       ><span tal:replace="structure field.serialize(cstruct).strip()"
