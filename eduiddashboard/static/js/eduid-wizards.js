@@ -31,7 +31,7 @@ var EduidWizard = function (container_path, active_card, options) {
             var currentCard = wizard.getActiveCard();
 
             if (level === undefined) {
-                level = 'error';
+                level = 'danger';
             }
             if (currentCard.el.find('div.alert.alert-' + level).length > 0) {
                 currentCard.el.find('div.alert.alert-' + level).html(message);
@@ -85,12 +85,12 @@ var EduidWizard = function (container_path, active_card, options) {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
-                        currentCard.el.find('.form-group').toggleClass("error", false);
+                        currentCard.el.find('.form-group').toggleClass("has-error", false);
                         currentCard.el.find('select, input, textarea').popover("destroy");
                         for (input in data.data) {
                             el = currentCard.el.find('[name=' + input + ']');
                             wizard.errorPopover(el, data.data[input], true);
-                            el.parent(".form-group").toggleClass("error", true);
+                            el.parent(".form-group").toggleClass("has-error", true);
                         }
                     }
                     wizard.el.find('.btn.wizard-next').

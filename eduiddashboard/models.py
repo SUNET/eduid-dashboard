@@ -123,6 +123,9 @@ class Person(CSRFTokenSchema):
                                     readonly=True,
                                     title=_('Given name'))
     sn = colander.SchemaNode(colander.String(),
+                                    widget=deform.widget.TextInputWidget(
+                                        error_class='text-danger',
+                                        css_class='form-control'),
                              title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
                                       title=_('Display name'))
