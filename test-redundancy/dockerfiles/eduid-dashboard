@@ -50,4 +50,4 @@ RUN cd /opt/eduid-dashboard \
 
 WORKDIR /opt/eduid-dashboard
 
-CMD ["pserve", "development.ini"]
+CMD ["pserve", "development.ini", "--reload"]

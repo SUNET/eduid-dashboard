@@ -31,7 +31,7 @@ RUN cd /opt \
   && echo "rabbitmqctl add_vhost eduid_vhost" >> start.sh \
   && echo "rabbitmqctl set_permissions -p eduid_vhost eduid \".*\" \".*\" \".*\"" >> start.sh \
   && echo "" >> start.sh \
-  && echo "celery worker --app=eduid_am -E --loglevel INFO" >> start.sh
+  && echo "celery worker --app=eduid_am --autoscale=3,1 -E --loglevel INFO" >> start.sh
 
 RUN cd /opt \
   && git clone git://github.com/SUNET/eduid-dashboard-amp.git \

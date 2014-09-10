@@ -1,2 +1,5 @@
 selenium==2.42.1
 nose==1.3.3
+pymongo==2.7.1
+
+-e git://github.com/signalfuse/maestro-ng@1499602ef53aaed7ada1798db8d9c42ee6ccca9b#egg=maestro-ng
