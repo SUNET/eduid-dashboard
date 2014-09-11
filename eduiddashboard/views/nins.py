@@ -171,7 +171,7 @@ class NINsActionsView(BaseActionsView):
 
         message = _('National identity number has been removed')
         return {
-            'result': 'successs',
+            'result': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 

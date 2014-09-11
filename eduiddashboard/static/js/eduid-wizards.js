@@ -145,7 +145,7 @@ var EduidWizard = function (container_path, active_card, options) {
             type: 'POST',
             success: function (data, textStatus, jqXHR){
                 if (data.status === 'success') {
-                    // show a successs message
+                    // show a success message
                     show_alert(data.text, 'success');
                 }
                 else if (data.status === 'error') {
