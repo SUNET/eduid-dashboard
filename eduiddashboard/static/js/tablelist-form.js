@@ -6,7 +6,8 @@
     "use strict";
 
     var sendInfo = function(container, cls, msg) {
-            var messageHTML = '<div class="alert alert-' + cls +
+            var alert_class = cls === 'error' ? 'danger' : cls;
+            var messageHTML = '<div class="alert alert-' + alert_class +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
             container.find('.info-container').prepend(messageHTML);

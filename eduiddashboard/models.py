@@ -68,6 +68,7 @@ class Email(CSRFTokenSchema):
                                title=_('email'),
                                widget=deform.widget.TextInputWidget(
                                    mask=_('Email address'),
+                                   error_class='text-danger',
                                    css_class='form-control'))
 
 
@@ -107,7 +108,8 @@ class NIN(CSRFTokenSchema):
             NINReachableValidator()
         ),
         widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'),
-                                             css_class='form-control')
+                                             css_class='form-control',
+                                             error_class='text-danger')
     )
 
 
@@ -115,19 +117,26 @@ class NIN(CSRFTokenSchema):
 def preferred_language_widget(node, kw):
     request = kw.get('request')
     lang_choices = request.registry.settings['available_languages'].items()
-    return deform.widget.SelectWidget(values=lang_choices)
+    return deform.widget.SelectWidget(values=lang_choices,
+                                      error_class='text-danger')
 
 
 class Person(CSRFTokenSchema):
     givenName = colander.SchemaNode(colander.String(),
+                                    widget=deform.widget.TextInputWidget(
+                                        error_class='text-danger',
+                                        css_class='form-control'),
                                     readonly=True,
                                     title=_('Given name'))
     sn = colander.SchemaNode(colander.String(),
-                                    widget=deform.widget.TextInputWidget(
+                             widget=deform.widget.TextInputWidget(
                                         error_class='text-danger',
                                         css_class='form-control'),
                              title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
+                                      widget=deform.widget.TextInputWidget(
+                                        error_class='text-danger',
+                                        css_class='form-control'),
                                       title=_('Display name'))
     preferredLanguage = colander.SchemaNode(colander.String(),
                                             title=_('Preferred language'),
@@ -146,7 +155,9 @@ class Passwords(CSRFTokenSchema):
     old_password = colander.SchemaNode(
         colander.String(),
         title=_('Current password'),
-        widget=deform.widget.PasswordWidget(size=20, css_class="form-control"),
+        widget=deform.widget.PasswordWidget(size=20,
+                                            error_class='text-danger',
+                                            css_class="form-control"),
         validator=OldPasswordValidator())
 
     use_custom_password = colander.SchemaNode(
@@ -169,6 +180,7 @@ class Passwords(CSRFTokenSchema):
         title=_('Custom password'),
         widget=deform.widget.PasswordWidget(
             size=20,
+            error_class='text-danger',
             css_class='custom-password form-control'),
         validator=PasswordValidator(),
         missing='')
@@ -178,6 +190,7 @@ class Passwords(CSRFTokenSchema):
         title=_('Repeat the password'),
         widget=deform.widget.PasswordWidget(
             size=20,
+            error_class='text-danger',
             css_class='custom-password form-control'),
         missing='')
 
@@ -187,6 +200,10 @@ class EmailResetPassword(CSRFTokenSchema):
     email_or_username = colander.SchemaNode(
         colander.String(),
         title="",
+        widget=deform.widget.TextInputWidget(
+            error_class='text-danger',
+            css_class='form-control'
+        ),
         validator=ResetPasswordFormValidator(
             NINFormatValidator,
             MobileFormatValidator,
@@ -199,6 +216,10 @@ class NINResetPassword(CSRFTokenSchema):
     email_or_username = colander.SchemaNode(
         colander.String(),
         title="",
+        widget=deform.widget.TextInputWidget(
+            error_class='text-danger',
+            css_class='form-control'
+        ),
         validator=ResetPasswordFormValidator(
             NINFormatValidator,
             MobileFormatValidator,
@@ -226,6 +247,7 @@ class ResetPasswordStep2(CSRFTokenSchema):
     custom_password = colander.SchemaNode(colander.String(),
                                           widget=deform.widget.PasswordWidget(
                                               size=20,
+                                              error_class='text-danger',
                                               css_class='custom-password'
                                           ),
                                           validator=PasswordValidator(),
@@ -234,6 +256,7 @@ class ResetPasswordStep2(CSRFTokenSchema):
     repeated_password = colander.SchemaNode(colander.String(),
                                             widget=deform.widget.PasswordWidget(
                                                 size=20,
+                                                error_class='text-danger',
                                                 css_class='custom-password'),
                                             title=_("Confirm New Password"),
                                             missing='')
@@ -252,11 +275,29 @@ def postal_address_default_country(node, kw):
 
 
 class PostalAddress(colander.MappingSchema):
-    address = colander.SchemaNode(colander.String(), title=_('Address'))
-    locality = colander.SchemaNode(colander.String(), title=_('City'))
-    postalCode = colander.SchemaNode(colander.String(), title=_('Postal code'),
+    address = colander.SchemaNode(colander.String(),
+                                  title=_('Address'),
+                                  widget=deform.widget.TextInputWidget(
+                                     error_class='text-danger',
+                                     css_class='form-control'),
+                                  )
+    locality = colander.SchemaNode(colander.String(),
+                                   title=_('City'),
+                                   widget=deform.widget.TextInputWidget(
+                                     error_class='text-danger',
+                                     css_class='form-control'),
+                                   )
+    postalCode = colander.SchemaNode(colander.String(),
+                                     title=_('Postal code'),
+                                     widget=deform.widget.TextInputWidget(
+                                        error_class='text-danger',
+                                        css_class='form-control'),
                                      validator=colander.Length(min=5, max=6))
-    country = colander.SchemaNode(colander.String(), title=_('Country'),
+    country = colander.SchemaNode(colander.String(),
+                                  title=_('Country'),
+                                  widget=deform.widget.TextInputWidget(
+                                        error_class='text-danger',
+                                        css_class='form-control'),
                                   default=postal_address_default_country)
 
 
@@ -269,6 +310,7 @@ class Mobile(CSRFTokenSchema):
                                  title=_('mobile'),
                                  widget=deform.widget.TextInputWidget(
                                      mask=_('Mobile phone number'),
+                                     error_class='text-danger',
                                      css_class='form-control'))
 
 
@@ -285,4 +327,6 @@ class UserSearcher(colander.MappingSchema):
     query = colander.SchemaNode(colander.String(),
                                 description=_('Search for users'),
                                 title=_('query'),
-                                widget=deform.widget.TextInputWidget())
+                                widget=deform.widget.TextInputWidget(
+                                    error_class='text-danger'
+                                    ))
