@@ -248,7 +248,7 @@ class ResetPasswordStep2(CSRFTokenSchema):
                                           widget=deform.widget.PasswordWidget(
                                               size=20,
                                               error_class='text-danger',
-                                              css_class='custom-password'
+                                              css_class='form-control custom-password'
                                           ),
                                           validator=PasswordValidator(),
                                           title=_("New Password"),
@@ -257,7 +257,7 @@ class ResetPasswordStep2(CSRFTokenSchema):
                                             widget=deform.widget.PasswordWidget(
                                                 size=20,
                                                 error_class='text-danger',
-                                                css_class='custom-password'),
+                                                css_class='form-control custom-password'),
                                             title=_("Confirm New Password"),
                                             missing='')
 

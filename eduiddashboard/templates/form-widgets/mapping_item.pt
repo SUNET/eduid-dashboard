@@ -24,7 +24,7 @@
       ><span tal:replace="structure field.serialize(cstruct).strip()"
       /><span class="input-group-addon" tal:condition="input_append">${input_append}</span>
 
-      <span class="help-inline"
+      <span class="help-block"
             tal:condition="field.error and not field.widget.hidden and not field.typ.__class__.__name__=='Mapping'">
         <p
             tal:define="errstr 'error-%s' % field.oid"

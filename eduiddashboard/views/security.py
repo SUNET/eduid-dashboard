@@ -281,7 +281,7 @@ class BaseResetPasswordView(FormView):
 
         self.form_options = {
             'formid': "{classname}-form".format(classname=self.classname),
-            'bootstrap_form_style': 'form-vertical',
+            'bootstrap_form_style': 'form-horizontal',
         }
 
     def get_template_context(self):
