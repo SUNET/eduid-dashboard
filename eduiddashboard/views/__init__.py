@@ -13,7 +13,7 @@ from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_short_hash
 from eduiddashboard.verifications import (get_verification_code,
-                                          verificate_code,
+                                          verify_code,
                                           new_verification_code)
 
 from eduiddashboard import log
@@ -147,7 +147,7 @@ class BaseActionsView(object):
                             'message': self.verify_messages['expired'],
                         }
                     else:
-                        verificate_code(self.request, self.data_attribute,
+                        verify_code(self.request, self.data_attribute,
                                         code_sent)
                         return {
                             'result': 'success',

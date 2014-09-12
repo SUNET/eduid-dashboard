@@ -14,7 +14,7 @@ from eduiddashboard import log
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verificated)
+                                          save_as_verified, remove_nin_from_others)
 
 
 def get_status(request, user):
@@ -84,35 +84,29 @@ def get_tab(request):
 
 
 def get_not_verified_nins_list(request, user):
-    active_nins = user.get_nins()
-    nins = []
+    """
+    Return a list of all non-verified NINs.
+
+    These come from the verifications mongodb collection, but we also double-check
+    that anything in there that looks un-verified is not also found in user.get_nins().
+
+    :param request:
+    :param user:
+    :return: List of NINs pending confirmation
+    :rtype: [string]
+    """
+    verified_nins = user.get_nins()
     verifications = request.db.verifications
-    not_verified_nins = verifications.find({
+    all_nins = verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
-    if active_nins:
-        active_nin = active_nins[-1]
-        nin_found = False
-        for nin in not_verified_nins:
-            if active_nin == nin['obj_id']:
-                nin_found = True
-            elif nin_found and not nin['verified']:
-                nins.append(nin['obj_id'])
-    else:
-        for nin in not_verified_nins:
-            if not nin['verified']:
-                nins.append(nin['obj_id'])
 
-    return nins
-
-
-def get_active_nin(self):
-    active_nins = self.user.get_nins()
-    if active_nins:
-        return active_nins[-1]
-    else:
-        return None
+    res = []
+    for nin in all_nins:
+        if not nin['verified'] and not nin['obj_id'] in verified_nins:
+            res.append(nin['obj_id'])
+    return res
 
 
 @view_config(route_name='nins-actions', permission='edit')
@@ -127,39 +121,29 @@ class NINsActionsView(BaseActionsView):
         'new_code_sent': _('A new confirmation code has been sent to your "Min myndighetspost" mailbox'),
     }
 
-    get_active_nin = get_active_nin
-
     def get_verification_data_id(self, data_to_verify):
         return data_to_verify[self.data_attribute]
 
     def verify_action(self, index, post_data):
-        """ Only the active (the last one) NIN can be verified """
         nins = get_not_verified_nins_list(self.request, self.user)
 
-        if len(nins) > index:
+        try:
             verify_nin = nins[index]
-        else:
-            raise HTTPNotFound("The index provided can't be found")
+        except IndexError:
+            # XXX Could happen with more than one dashboard, should ideally not use index?
+            raise HTTPNotFound("Something went wrong. Please reload the page.")
 
-        if index != len(nins) - 1:
-            message = _("The provided nin can't be verified. You only "
-                        'can verify the last one')
-            return {
-                'result': 'bad',
-                'message': get_localizer(self.request).translate(message),
-            }
-
-        return super(NINsActionsView, self)._verify_action(verify_nin,
-                                                           post_data)
+        return super(NINsActionsView, self)._verify_action(verify_nin, post_data)
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
         nins = get_not_verified_nins_list(self.request, self.user)
 
-        if len(nins) > index:
+        try:
             remove_nin = nins[index]
-        else:
-            raise HTTPNotFound("The index provides can't be found")
+        except IndexError:
+            # XXX Could happen with more than one dashboard, should ideally not use index?
+            raise HTTPNotFound("Something went wrong. Please reload the page.")
 
         verifications = self.request.db.verifications
         verifications.remove({
@@ -212,29 +196,18 @@ class NinsView(BaseFormView):
 
     bootstrap_form_style = 'form-inline'
 
-    get_active_nin = get_active_nin
-
     def appstruct(self):
         return {}
 
     def get_template_context(self):
-        """
-            Take active NIN (on am profile)
-            Take NINs from verifications, sorted by older and compared with
-            the present active NIN.
-            If they are older, then don't take it.
-            If there are not verified nins newer than the active NIN, then
-            take them as not verified NINs
-        """
         context = super(NinsView, self).get_template_context()
 
         settings = self.request.registry.settings
 
         context.update({
-            'nins': self.user.get_nins(),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
-            'active_nin': self.get_active_nin(),
+            'verified_nins': self.user.get_nins(),
             'nin_service_url': settings.get('nin_service_url'),
             'nin_service_name': settings.get('nin_service_name'),
         })
@@ -288,24 +261,14 @@ class NinsView(BaseFormView):
 
         newnin = normalize_nin(newnin)
 
-        old_user = self.request.db.profiles.find_one({
-            'norEduPersonNIN': newnin
-            })
-
-        if old_user:
-            old_user = User(old_user)
-            nins = [nin for nin in old_user.get_nins() if nin != newnin]
-            old_user.set_nins(nins)
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
-            old_user.save(self.request)
+        remove_nin_from_others(newnin, self.request)
 
         nins = self.user.get_nins()
         nins.append(newnin)
         self.user.set_nins(nins)
 
         # Save the state in the verifications collection
-        save_as_verificated(self.request, 'norEduPersonNIN',
+        save_as_verified(self.request, 'norEduPersonNIN',
                             self.user.get_id(), newnin)
 
         self.user.save(self.request)
