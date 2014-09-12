@@ -68,7 +68,7 @@ class NinsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn(nin, response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIn('error-deformField', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
@@ -93,10 +93,10 @@ class NinsFormTests(LoggedInReguestTests):
                 form['norEduPersonNIN'].value = nin
                 response = form.submit('add')
 
-                self.assertEqual(response.status, '200 OK')
-                self.assertIn(nin, response.body)
-                self.assertIn('alert-error', response.body)
-                self.assertIsNotNone(getattr(response, 'form', None))
+            self.assertEqual(response.status, '200 OK')
+            self.assertIn(nin, response.body)
+            self.assertIn('alert-danger', response.body)
+            self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):
         self.set_logged(user='johnsmith@example.org')
@@ -144,7 +144,7 @@ class NinsFormTests(LoggedInReguestTests):
         }).count()
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
         self.assertEqual(nins_before - 1, nins_after)
 
     def test_remove_not_existant_nin(self):
@@ -199,7 +199,7 @@ class NinsFormTests(LoggedInReguestTests):
             )
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = User(old_user)
@@ -311,7 +311,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                 'norEduPersonNIN': '12341234-1234',
                 'code': '1234',
             }, status=200)
-            self.assertEqual(response.json['status'], 'ok')
+            self.assertEqual(response.json['status'], 'success')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')

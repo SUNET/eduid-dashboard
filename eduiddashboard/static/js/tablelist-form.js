@@ -6,7 +6,9 @@
     "use strict";
 
     var sendInfo = function(container, cls, msg) {
-            var messageHTML = '<div class="alert alert-' + cls +
+            var alert_class = cls === 'error' ? 'danger' : cls;
+            alert_class = cls === 'ok' ? 'success' : alert_class;
+            var messageHTML = '<div class="alert alert-' + alert_class +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
             container.find('.info-container').prepend(messageHTML);
@@ -24,7 +26,7 @@
                     $('#askDialog .ok-button.has-spinner').removeClass('loading').removeAttr('disabled');
                     var dialog = $('#askDialog');
                     sendInfo(dialog, data.result, data.message);
-                    if (data.result == 'ok') {
+                    if (data.result == 'success') {
                         dialog.find('.btn').hide();
                         dialog.find('.divDialogElements').hide();
                         dialog.find('.finish-button').show();
@@ -34,7 +36,7 @@
         },
 
         initialize = function (container, url) {
-            if (container.find('.form-content .alert-error').length > 0){
+            if (container.find('.form-content .alert-danger').length > 0){
                 container.find('.form-content').show();
             }
 

@@ -5,7 +5,10 @@ FLASH_SEPARATOR = '|'
 
 
 def get_flash_message_type(message):
-    return message.split(FLASH_SEPARATOR)[0]
+    typ = message.split(FLASH_SEPARATOR)[0]
+    if typ == 'error':
+        return 'danger'
+    return typ
 
 
 def get_flash_message_text(message):

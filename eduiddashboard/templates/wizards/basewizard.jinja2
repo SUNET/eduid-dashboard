@@ -7,7 +7,7 @@
       <h3>{% trans %}National identity number{% endtrans %}</h3>
       <div class="wizard-input-section">
         <p>{% trans %}Please enter your national identity number.{% endtrans %}</p>
-        <div class="control-group">
+        <div class="form-group">
           <input id="nin" name="nin" type="text" 
                  placeholder="yyyymmddnnnn" data-validate="validateNiN" />
         </div>
@@ -18,7 +18,7 @@
       <h3>{% trans %}Confirm national identity number{% endtrans %}</h3>
       <div class="wizard-input-section">
         <p>{% trans %}Please enter your confirmation code sent to your government inbox.{% endtrans %}</p>
-        <div class="control-group">
+        <div class="form-group">
           <input id="mm-confirm" name="code" type="text" placeholder="Confirmation code" />
         </div>
       </div>
@@ -34,7 +34,7 @@
     {% endblock %}
 
     <div class="wizard-error">
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
         {% block wizard_error %}
           {% trans %}
           <strong>There was a problem</strong> with your submission.
@@ -45,7 +45,7 @@
     </div>
 
     <div class="wizard-failure">
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
         {% block wizard_failure %}
           {% trans %}
           <strong>There was a problem</strong> submitting the form.
@@ -61,7 +61,7 @@
           {% trans %}The wizard is completed{% endtrans %}
         {% endblock %}
         </div>
-        <a class="btn im-done">Done</a>
+        <a class="btn btn-default im-done">Done</a>
       </div>
     </div>
 <div>

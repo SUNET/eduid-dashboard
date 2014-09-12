@@ -36,7 +36,7 @@ class MobilesFormTests(LoggedInReguestTests):
         response = form.submit('add')
 
         self.assertEqual(response.status, '200 OK')
-        self.assertIn('alert-error', response.body)
+        self.assertIn('alert-danger', response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_valid_mobile(self):
@@ -84,7 +84,7 @@ class MobilesFormTests(LoggedInReguestTests):
                 response = form.submit('add')
 
                 self.assertEqual(response.status, '200 OK')
-                self.assertIn('alert-error', response.body)
+                self.assertIn('alert-danger', response.body)
                 self.assertIn('Invalid telephone number', response.body)
                 self.assertIsNotNone(getattr(response, 'form', None))
 
@@ -99,7 +99,7 @@ class MobilesFormTests(LoggedInReguestTests):
         )
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
         self.assertEqual(mobiles_number - 1, len(userdb_after['mobile']))
 
     def test_remove_not_existant_mobile(self):
@@ -194,7 +194,7 @@ class MobilesFormTests(LoggedInReguestTests):
                 )
 
                 response_json = json.loads(response.body)
-                self.assertEqual(response_json['result'], 'ok')
+                self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = User(old_user)

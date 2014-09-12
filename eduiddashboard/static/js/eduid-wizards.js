@@ -31,7 +31,7 @@ var EduidWizard = function (container_path, active_card, options) {
             var currentCard = wizard.getActiveCard();
 
             if (level === undefined) {
-                level = 'error';
+                level = 'danger';
             }
             if (currentCard.el.find('div.alert.alert-' + level).length > 0) {
                 currentCard.el.find('div.alert.alert-' + level).html(message);
@@ -81,16 +81,16 @@ var EduidWizard = function (container_path, active_card, options) {
                 type: 'POST',
                 success: function (data, textStatus, jqXHR) {
                     var el, input;
-                    if (data.status === 'ok') {
+                    if (data.status === 'success') {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
-                        currentCard.el.find('.control-group').toggleClass("error", false);
+                        currentCard.el.find('.form-group').toggleClass("has-error", false);
                         currentCard.el.find('select, input, textarea').popover("destroy");
                         for (input in data.data) {
                             el = currentCard.el.find('[name=' + input + ']');
                             wizard.errorPopover(el, data.data[input], true);
-                            el.parent(".control-group").toggleClass("error", true);
+                            el.parent(".form-group").toggleClass("has-error", true);
                         }
                     }
                     wizard.el.find('.btn.wizard-next').
@@ -144,8 +144,8 @@ var EduidWizard = function (container_path, active_card, options) {
             data: jsondata,
             type: 'POST',
             success: function (data, textStatus, jqXHR){
-                if (data.status === 'ok') {
-                    // show a successs message
+                if (data.status === 'success') {
+                    // show a success message
                     show_alert(data.text, 'success');
                 }
                 else if (data.status === 'error') {

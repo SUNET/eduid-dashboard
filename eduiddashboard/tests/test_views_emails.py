@@ -59,7 +59,7 @@ class MailsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('user@exa mple.com', response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIn('Invalid email address', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
@@ -82,7 +82,7 @@ class MailsFormTests(LoggedInReguestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('johnsmith2@example.com', response.body)
-            self.assertIn('alert-error', response.body)
+            self.assertIn('alert-danger', response.body)
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_nonnormal_existant_email(self):
@@ -141,7 +141,7 @@ class MailsFormTests(LoggedInReguestTests):
         )
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
         self.assertEqual(emails_number - 1, len(userdb_after['mailAliases']))
 
     def test_remove_not_existant_email(self):
@@ -178,7 +178,7 @@ class MailsFormTests(LoggedInReguestTests):
         )
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
         self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
 
     def test_steal_verified_mail(self):
@@ -215,7 +215,7 @@ class MailsFormTests(LoggedInReguestTests):
         )
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = User(old_user)

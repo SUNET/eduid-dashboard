@@ -7,6 +7,7 @@
   enctype="multipart/form-data"
   accept-charset="utf-8"
   i18n:domain="deform"
+  role="form"
   tal:define="inline getattr(field, 'bootstrap_form_style', None) == 'form-inline';
               tabify_form import: deform_bootstrap.utils.tabify_form;
               fields_list python: tabify_form(field);
@@ -19,7 +20,7 @@
   <input type="hidden" name="__formid__" value="${field.formid}"/>
 
 
-  <div class="alert alert-block alert-error" tal:condition="field.error">
+  <div class="alert alert-block alert-danger" tal:condition="field.error">
     <span class="errorMsgLbl" i18n:translate="">
       There was a problem with your submission
     </span>
@@ -49,7 +50,7 @@
   </tal:block>
 
   <!-- Populate the tabs -->
-  <div tal:omit-tag='inline' class="tab-content" >
+  <div tal:omit-tag='python: inline or fields_list.only_one' class="tab-content" >
     <!-- If we have a basic tab, this should be active -->
     <fieldset
       tal:omit-tag="inline"
@@ -80,7 +81,7 @@
   </div>
 
   <!-- Append the buttons at the end -->
-  <div tal:condition="field.buttons" tal:omit-tag="inline" class="form-actions">
+  <div tal:condition="field.buttons" tal:omit-tag="inline">
     <tal:block repeat="button field.buttons">
       <button
           tal:attributes="disabled button.disabled"
@@ -136,13 +137,13 @@
         var alreadySelected = false;
 
         // If we get some errors, remove the active classes
-        if($("div.tab-content fieldset div.error").length !== 0){
+        if($("div.tab-content fieldset div.has-error").length !== 0){
           $("ul.form-tabs li.active").removeClass('active');
           $("div.tab-content fieldset.active").removeClass('active in');
         }
         // Go through the errors, set first one to active and focus the field,
         // and add an 'error' class to all of the tabs with errors in them
-        $("div.tab-content fieldset div.error").each( function() {
+        $("div.tab-content fieldset div.has-error").each( function() {
           var errorId = $(this.parentNode).attr('id');
           if(!alreadySelected){
             $("ul.form-tabs li#" + errorId + '-list').addClass('active');
@@ -150,7 +151,7 @@
             $("#" + $(this).attr('id') + " div.controls input").focus();
             alreadySelected = true;
           }
-          $("ul.form-tabs li#" +errorId + '-list').addClass('error');
+          $("ul.form-tabs li#" +errorId + '-list').addClass('text-danger');
         });
     });
   </script>

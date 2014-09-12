@@ -18,31 +18,31 @@
   <div class='well'>
     <h5>{% trans %}Swedish population register address{% endtrans %}</h5>
     <div class="form form-horizontal">
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label">{{ _("Address") }}</label>
         <div class="controls">
-          <span class="input-xlarge uneditable-input">{{ postal_address.address }}</span>
+          <span class="uneditable-input">{{ postal_address.address }}</span>
         </div>
       </div>
 
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label">{{ _("City") }}</label>
         <div class="controls">
-          <span class="input-xlarge uneditable-input">{{ postal_address.locality }}</span>
+          <span class="uneditable-input">{{ postal_address.locality }}</span>
         </div>
       </div>
 
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label">{{ _("Postal Code") }}</label>
         <div class="controls">
-          <span class="input-xlarge uneditable-input">{{ postal_address.postalCode }}</span>
+          <span class="uneditable-input">{{ postal_address.postalCode }}</span>
         </div>
       </div>
 
-      <div class="control-group">
+      <div class="form-group">
         <label class="control-label">{{ _("Country") }}</label>
         <div class="controls">
-          <span class="input-xlarge uneditable-input">{{ postal_address.country }}</span>
+          <span class="uneditable-input">{{ postal_address.country }}</span>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
 
 {% block form_generic_form %}
 {% if not alternative_postal_address %}
-  <button class="btn alternative-postal-address-button">Add postal address</button>
+  <button class="btn btn-default alternative-postal-address-button">Add postal address</button>
 {% endif %}
 <div class='well alternative-postal-address-form {% if not alternative_postal_address and not form_errors is defined %}hide{% endif %}'>
   <h5>{% trans %}Alternative postal address{% endtrans %}</h5>
