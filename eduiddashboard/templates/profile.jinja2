@@ -32,27 +32,26 @@
 
 {% block contents %}
 
-  <div class='clearfix'></div>
-
   <div class='profile-combo tabbable well row'>
     <div class="tabs-left col-md-3 col-sm-12">
-      <ul class='nav nav-tabs nav-stacked'>
-        {% for tab in tabs %}
-          <li>
-              <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
-          </li>
-        {% endfor %}
-          <li>
-      <div class='profile-filled' style='padding-top:80px'>
-        <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
-        <div class="progress progress-striped">
-          <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+      <div>
+        <ul class='nav nav-tabs nav-stacked'>
+          {% for tab in tabs %}
+            <li>
+                <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
+            </li>
+          {% endfor %}
+            <li>
+        <div class='profile-filled' style='padding-top:80px'>
+          <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+          <div class="progress progress-striped">
+            <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+          </div>
         </div>
+            </li>
+
+        </ul>
       </div>
-          </li>
-
-      </ul>
-
     </div>
 
     <div class='tab-content info-container col-md-9 col-sm-12'>
