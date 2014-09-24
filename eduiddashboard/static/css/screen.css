@@ -523,6 +523,8 @@ div.messages-wrapper {
   border-color: transparent #ddd #ddd #ddd;
 }
 
+@media only screen and (min-width: 992px) {
+
 .tabs-left > .nav-tabs > li,
 .tabs-right > .nav-tabs > li {
   float: none;
@@ -583,4 +585,6 @@ div.messages-wrapper {
 .tabs-right > .nav-tabs .active > a:focus {
   border-color: #ddd #ddd #ddd transparent;
   *border-left-color: #ffffff;
+}
+
 }
