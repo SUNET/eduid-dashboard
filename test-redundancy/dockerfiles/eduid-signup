@@ -24,6 +24,7 @@ RUN cd /opt/eduid-signup \
          -e "s/^\(reset_password_link =\).\+/\1 http:\/\/eduid_dashboard\/reset_password/" \
          -e "s/^\(broker_url =\).\+/\1 amqp:\/\/rabbitmq\//" \
          -e "s/^\(mail.host =\).\+/\1 smtp-debug/" \
+         -e "s/^\(mail.port =\).\+/\1 2525/" \
          -e "s/mongodb:\/\/localhost/mongodb:\/\/mongo/" \
          -e "s/^\(vccs_url =\).\+/\1 http:\/\/eduid_vccs:8550\//" \
           <config-templates/development.ini >development.ini

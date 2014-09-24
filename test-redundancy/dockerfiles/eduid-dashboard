@@ -44,6 +44,7 @@ RUN cd /opt/eduid-dashboard \
          -e "s/127.0.0.1:5672\/eduid_vhost/rabbitmq:5672\/eduid_vhost/" \
          -e "s/127.0.0.1:5672\/eduid_msg/rabbitmq:5672\/eduid_msg/" \
          -e "s/^\(mail.host =\).\+/\1 smtp-debug/" \
+         -e "s/^\(mail.port =\).\+/\1 2525/" \
          -e "s/mongodb:\/\/localhost/mongodb:\/\/mongo/" \
          -e "s/^\(vccs_url =\).\+/\1 http:\/\/eduid_vccs:8550\//" \
           <config-templates/development.ini >development.ini \
