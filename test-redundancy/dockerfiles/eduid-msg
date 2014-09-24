@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y \
   libxmlsec1 \
   libxmlsec1-openssl \
   swig \
-  wget \
-  rabbitmq-server
+  wget
 
 RUN ln -s /usr/lib/libxmlsec1-openssl.so.1 /usr/lib/libxmlsec1-openssl.so
 
@@ -29,18 +28,12 @@ RUN apt-get install libxml2-dev libxslt-dev \
   && python2.7 setup.py develop
 
 RUN cd /opt/eduid_msg \
-  && sed -e "s/^\(broker_url =\).\+$/\1 amqp:\/\/eduid:eduid@127.0.0.1:5672\/eduid_msg/" \
+  && sed -e "s/^\(broker_url =\).\+$/\1 amqp:\/\/eduid:eduid@rabbitmq:5672\/eduid_msg/" \
          -e "s/^\(mongo_uri =\).\+$/\1 mongodb:\/\/mongo\/eduid_msg/" \
              <config-templates/development.ini >eduid_msg.ini
 
 RUN cd /opt/eduid_msg \
   && echo "#!/bin/sh" > start.sh \
-  && echo "" >> start.sh \
-  && echo "service rabbitmq-server start" >> start.sh \
-  && echo "" >> start.sh \
-  && echo "rabbitmqctl add_user eduid eduid" >> start.sh \
-  && echo "rabbitmqctl add_vhost eduid_msg" >> start.sh \
-  && echo "rabbitmqctl set_permissions -p eduid_msg eduid \".*\" \".*\" \".*\"" >> start.sh \
   && echo "" >> start.sh \
   && echo "celery worker --app=eduid_msg -E --loglevel INFO" >> start.sh
 

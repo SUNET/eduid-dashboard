@@ -9,12 +9,11 @@ RUN apt-get update && apt-get install -y \
   libxmlsec1 \
   libxmlsec1-openssl \
   swig \
-  wget \
-  rabbitmq-server
+  wget
 
 RUN ln -s /usr/lib/libxmlsec1-openssl.so.1 /usr/lib/libxmlsec1-openssl.so
 
-RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python2
+RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python
 
 RUN easy_install m2crypto
 
@@ -22,14 +21,10 @@ RUN cd /opt \
   && git clone git://github.com/SUNET/eduid-am.git \
   && cd eduid-am \
   && python setup.py develop \
-  && sed "s/localhost:27017/mongo:27017/" <config-templates/development.ini >eduid_am.ini \
+  && sed -e "s/127.0.0.1:5672/rabbitmq:5672/" \
+         -e "s/localhost:27017/mongo:27017/" \
+      <config-templates/development.ini >eduid_am.ini \
   && echo "#!/bin/sh" > start.sh \
-  && echo "" >> start.sh \
-  && echo "service rabbitmq-server start" >> start.sh \
-  && echo "" >> start.sh \
-  && echo "rabbitmqctl add_user eduid eduid" >> start.sh \
-  && echo "rabbitmqctl add_vhost eduid_vhost" >> start.sh \
-  && echo "rabbitmqctl set_permissions -p eduid_vhost eduid \".*\" \".*\" \".*\"" >> start.sh \
   && echo "" >> start.sh \
   && echo "celery worker --app=eduid_am --autoscale=3,1 -E --loglevel INFO" >> start.sh
 

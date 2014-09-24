@@ -1,0 +1,15 @@
+FROM enriquepablo/rabbitmq:0.1
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+RUN echo "#!/bin/sh" > start.sh \
+  && echo "" >> start.sh \
+  && echo "service rabbitmq-server start" >> start.sh \
+  && echo "rabbitmqctl add_user eduid eduid" >> start.sh \
+  && echo "rabbitmqctl add_vhost eduid_msg" >> start.sh \
+  && echo "rabbitmqctl set_permissions -p eduid_msg eduid \".*\" \".*\" \".*\"" >> start.sh \
+  && echo "rabbitmqctl add_vhost eduid_vhost" >> start.sh \
+  && echo "rabbitmqctl set_permissions -p eduid_vhost eduid \".*\" \".*\" \".*\"" >> start.sh \
+  && echo "tail -f /var/log/rabbitmq/*" >> start.sh
+
+CMD ["bash", "/start.sh"]

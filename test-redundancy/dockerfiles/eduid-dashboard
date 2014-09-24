@@ -41,9 +41,11 @@ RUN cd /opt/eduid-dashboard \
 RUN cd /opt/eduid-dashboard \
   && cp eduiddashboard/saml2/tests/data/remote_metadata.xml . \
   && sed -e "s/^\(.*debugtoolbar.*\)$/# \1/" \
-         -e "s/127.0.0.1:5672\/eduid_vhost/eduid_am:5672\/eduid_vhost/" \
-         -e "s/127.0.0.1:5672\/eduid_msg/eduid_msg:5672\/eduid_msg/" \
+         -e "s/127.0.0.1:5672\/eduid_vhost/rabbitmq:5672\/eduid_vhost/" \
+         -e "s/127.0.0.1:5672\/eduid_msg/rabbitmq:5672\/eduid_msg/" \
+         -e "s/^\(mail.host =\).\+/\1 smtp-debug/" \
          -e "s/mongodb:\/\/localhost/mongodb:\/\/mongo/" \
+         -e "s/^\(vccs_url =\).\+/\1 http:\/\/eduid_vccs:8550\//" \
           <config-templates/development.ini >development.ini \
   && sed "s|^\(BASE_URL =\).\+$|import os\n\1 os.environ\['EDUID_DASHBOARD_BASE_URL'\]|" \
           <config-templates/saml2_settings.py >saml2_settings.py
