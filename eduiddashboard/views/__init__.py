@@ -1,8 +1,6 @@
 import json
-from bson import json_util
 from copy import deepcopy
 from bson import ObjectId
-import hashlib
 
 from pyramid.httpexceptions import HTTPOk, HTTPMethodNotAllowed
 from pyramid.i18n import get_localizer
@@ -103,12 +101,6 @@ class BaseActionsView(object):
         self.request = request
         self.context = context
         self.user = context.user
-        if self.check_user_changed():
-            msg = _('warning|Your user data has changed since you '
-                    'loaded the page. Please try again.')
-            self.request.session.flash(msg)
-            data = json.dumps({'result': 'stale'})
-            raise HTTPOk(body=data, content_type='application/json')
         self.verify_messages = {}
         for msgid, msg in self.default_verify_messages.items():
             if msgid not in self.special_verify_messages:
@@ -194,21 +186,6 @@ class BaseActionsView(object):
 
     def send_verification_code(self, data_id, code):
         raise NotImplementedError()
-
-    def check_user_changed(self):
-        oid = self.user.get_id()
-        current = self.user.get_doc()
-        current_str = json.dumps(current, sort_keys=True,
-                                 default=json_util.default)
-        current_sum = hashlib.md5(current_str).digest()
-        stored = self.request.userdb.get_user_by_oid(oid)
-        stored_str = json.dumps(stored.get_doc(), sort_keys=True,
-                                 default=json_util.default)
-        stored_sum = hashlib.md5(stored_str).digest()
-        changed = current_sum != stored_sum
-        if changed:
-            self.request.session['user'] = stored
-        return changed
 
 
 class HTTPXRelocate(HTTPOk):
