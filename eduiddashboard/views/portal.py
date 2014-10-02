@@ -134,6 +134,7 @@ def session_reload(context, request):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     userid = request.session.get('user').get(main_attribute)
     user = request.userdb.get_user(userid)
+    user.retrieve_modified_ts(request.db.profiles)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
 
@@ -169,6 +170,7 @@ def token_login(context, request):
     if verify_auth_token(shared_key, email, token, nonce, timestamp):
         # Do the auth
         user = request.userdb.get_user(email)
+        user.retrieve_modified_ts(request.db.profiles)
         request.session['mail'] = email
         request.session['user'] = user
         request.session['loa'] = 1

@@ -166,7 +166,7 @@ def verificate_code(request, model_name, code):
                 msg = _('The user was out of sync. Please try again.')
                 msg = get_localizer(request).translate(msg)
                 request.session.flash(msg),
-                raise HTTPFound(request.route_url('profile-editor'))
+                raise HTTPFound(request.context.route_url('profile-editor'))
 
         try:
             user.save(request)
@@ -174,7 +174,7 @@ def verificate_code(request, model_name, code):
             msg = _('The user was out of sync. Please try again.')
             msg = get_localizer(request).translate(msg)
             request.session.flash(msg),
-            raise HTTPFound(request.route_url('profile-editor'))
+            raise HTTPFound(request.context.route_url('profile-editor'))
         request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
     return obj_id
 
