@@ -414,7 +414,7 @@ def main(global_config, **settings):
     else:
         config.include('eduiddashboard.saml2')
 
-    if 'testing' in settings and asbool(settings['testing']):
+    if 'testing' in settings and asbool(settings['testing']) or 'development' in settings and asbool(settings['development']):
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')

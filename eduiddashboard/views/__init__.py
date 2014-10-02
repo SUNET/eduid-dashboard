@@ -171,11 +171,11 @@ class BaseActionsView(object):
         data = self.user.get(self.data_attribute, [])
         data_to_resend = data[index]
         data_id = self.get_verification_data_id(data_to_resend)
-        code = new_verification_code(
+        reference, code = new_verification_code(
             self.request, self.data_attribute, data_id,
             self.user, hasher=get_short_hash,
         )
-        self.send_verification_code(data_id, code)
+        self.send_verification_code(data_id, reference, code)
 
         msg = self.verify_messages['new_code_sent']
 
@@ -184,7 +184,7 @@ class BaseActionsView(object):
             'message': msg,
         }
 
-    def send_verification_code(self, data_id, code):
+    def send_verification_code(self, data_id, reference, code):
         raise NotImplementedError()
 
 

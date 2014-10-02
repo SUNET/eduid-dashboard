@@ -1,6 +1,7 @@
 ## Emails form
 
 import deform
+from datetime import datetime
 
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
@@ -115,8 +116,8 @@ class EmailsActionsView(BaseActionsView):
     def get_verification_data_id(self, data_to_verify):
         return data_to_verify['email']
 
-    def send_verification_code(self, data_id, code):
-        send_verification_mail(self.request, data_id, code)
+    def send_verification_code(self, data_id, reference, code):
+        send_verification_mail(self.request, data_id, reference, code)
 
 
 @view_config(route_name='emails', permission='edit',
@@ -157,6 +158,7 @@ class EmailsView(BaseFormView):
         mailsubdoc = {
             'email': newemail['mail'],
             'verified': False,
+            'added_timestamp': datetime.utcnow()
         }
 
         emails.append(mailsubdoc)
@@ -165,17 +167,12 @@ class EmailsView(BaseFormView):
         self.user.save(self.request)
 
         message = _('Changes saved')
-        self.request.session.flash(
-                get_localizer(self.request).translate(message),
-                queue='forms')
+        self.request.session.flash(get_localizer(self.request).translate(message), queue='forms')
 
         send_verification_mail(self.request, newemail['mail'])
 
         second_msg = _('A confirmation email has been sent to your email '
                 'address. Please enter your confirmation code '
                 '<a href="#" class="verifycode" '
-                'data-identifier="${id}">here</a>.',
-                                     mapping={'id': len(emails)})
-        self.request.session.flash(
-                get_localizer(self.request).translate(second_msg),
-                queue='forms')
+                'data-identifier="${id}">here</a>.', mapping={'id': len(emails)})
+        self.request.session.flash(get_localizer(self.request).translate(second_msg), queue='forms')

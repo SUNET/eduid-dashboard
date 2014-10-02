@@ -87,7 +87,7 @@ class MsgRelay(object):
             'sitelink': self.settings.get('personal_dashboard_base_url'),
         }
 
-    def mobile_validator(self, targetphone, code, language):
+    def mobile_validator(self, reference, targetphone, code, language):
         """
             The template keywords are:
                 * sitename: (eduID by default)
@@ -104,7 +104,7 @@ class MsgRelay(object):
 
         logger.debug('SENT mobile validator message code: {0} phone number: {1}'.format(
                      code, targetphone))
-        self._send_message.delay('sms', content, targetphone,
+        self._send_message.delay('sms', reference, content, targetphone,
                                  TEMPLATES_RELATION.get('phone-validator'),
                                  lang)
 
@@ -124,7 +124,7 @@ class MsgRelay(object):
         else:
             raise self.TaskFailed('Something goes wrong')
 
-    def nin_validator(self, nin, code, language):
+    def nin_validator(self, reference, nin, code, language):
         """
             The template keywords are:
                 * sitename: eduID by default
@@ -139,9 +139,9 @@ class MsgRelay(object):
             'nin': nin,
         })
         lang = self.get_language(language)
-        logger.debug('SENT nin message code: {0} NIN: {1}'.format(
-                     code, nin))
-        self._send_message.delay('mm', content, nin,
+        logger.debug('SENT nin message reference: {0}, code: {1}, NIN: {2}'.format(
+                     reference, code, nin))
+        self._send_message.delay('mm', reference, content, nin,
                                  TEMPLATES_RELATION.get('nin-validator'), lang)
 
     def nin_reset_password(self, nin, email, link, password_reset_timeout, language):

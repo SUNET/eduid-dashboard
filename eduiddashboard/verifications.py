@@ -46,7 +46,7 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
         "obj_id": obj_id,
         "user_oid": user.get_id(),
     }
-    request.db.verifications.find_and_modify(
+    doc = request.db.verifications.find_and_modify(
         obj,
         {"$set": {
             "code": code,
@@ -55,13 +55,15 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
         }},
         upsert=True,
         safe=True,
+        new=True
     )
 
+    reference = unicode(doc['_id'])
     session_verifications = request.session.get('verifications', [])
     session_verifications.append(code)
     request.session['verifications'] = session_verifications
 
-    return code
+    return reference, code
 
 
 def get_not_verificated_objects(request, model_name, user):
@@ -96,6 +98,7 @@ def verify_code(request, model_name, code):
         log.debug("Could not find verification record for code {!r}, model {!r}".format(code, model_name))
         return
 
+    reference = unicode(this_verification['_id'])
     data = this_verification['obj_id']
 
     if not data:
@@ -107,7 +110,7 @@ def verify_code(request, model_name, code):
 
     if model_name == 'norEduPersonNIN':
         remove_nin_from_others(data, request)
-        user.add_verified_nin(data)
+        user.add_verified_nin(reference, data)
         user.retrieve_address(request, data)
 
         # Reset session eduPersonIdentityProofing on NIN verification
@@ -117,21 +120,18 @@ def verify_code(request, model_name, code):
 
     elif model_name == 'mobile':
         _remove_mobile_from_others(data, request)
-        user.add_verified_mobile(data)
+        user.add_verified_mobile(reference, data)
         msg = _('Mobile {obj} verified')
 
     elif model_name == 'mailAliases':
         _remove_email_from_others(data, request)
-        user.add_verified_email(data)
+        user.add_verified_email(reference, data)
         msg = _('Email {obj} verified')
 
     user.save(request)
 
     log.debug("Marking {!r} code {!r} ({!s}) as verified".format(model_name, code, str(data)))
-    request.db.verifications.update({'_id': this_verification['_id']},
-                                    {'$set': {'verified': True,
-                                              'verified_timestamp': datetime.utcnow(),
-                                              }})
+    request.db.verifications.remove({'_id': this_verification['_id']})
 
     msg = get_localizer(request).translate(msg)
     request.session.flash(msg.format(obj=data), queue='forms')
@@ -183,6 +183,7 @@ def generate_verification_link(request, code, model):
     return link
 
 
+# TODO: Rework but make backwards compatible
 def remove_nin_from_others(nin, request):
     """
     When someone successfully validates a NIN, the NIN should be removed from

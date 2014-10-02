@@ -13,7 +13,7 @@
     <table class='table table-striped table-thin table-form nins'>
     {% if verified_nins %}
       {% for nin in verified_nins %}
-        <tr class='ninrow' data-identifier="0">
+        <tr class='ninrow'>
             <td class='identifier'>{{ nin }}</td>
             <td><span class='nobutton'>{{_("Verified")}}</span></td>
             <td><span class='nobutton'>{{_("Active")}}</span></td>
@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block form_generic_form %}
-  {% if not verified_nins %}
+  {% if not verified_nins or not_verified_nins %}
     <div class='form-content'>
       {{ form|safe }}
     </div>
