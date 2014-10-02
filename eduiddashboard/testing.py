@@ -180,8 +180,11 @@ class LoggedInReguestTests(am.MongoTestCase):
             self.db.verifications.insert(verification_data)
 
         userdocs = []
+        ts = datetime.datetime.utcnow()
         for userdoc in self.userdb.all_userdocs():
-            userdocs.append(deepcopy(userdoc))
+            newdoc = deepcopy(userdoc)
+            newdoc['modified_ts'] = ts
+            userdocs.append(newdoc)
         self.db.profiles.insert(userdocs)
 
 
