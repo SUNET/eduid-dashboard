@@ -5,6 +5,7 @@ from bson.tz_util import utc
 from pyramid.i18n import get_localizer
 
 from eduid_am.user import User
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard import log
@@ -92,6 +93,7 @@ def verificate_code(request, model_name, code):
         log.debug(msg.format(code, str(obj_id)))
 
         user = request.userdb.get_user_by_oid(unverified['user_oid'])
+        user.retrieve_modified_ts(request.db.profiles)
         old_verified = request.db.verifications.find_and_modify(
             {
                 "model_name": model_name,
@@ -103,6 +105,7 @@ def verificate_code(request, model_name, code):
         old_user = None
         if old_verified:
             old_user = request.userdb.get_user_by_oid(old_verified['user_oid'])
+            old_user.retrieve_modified_ts(request.db.profiles)
 
         if model_name == 'norEduPersonNIN':
             if not old_user:
@@ -157,9 +160,21 @@ def verificate_code(request, model_name, code):
                           queue='forms')
 
         if old_user:
-            old_user.save(request)
+            try:
+                old_user.save(request)
+            except UserOutOfSync:
+                msg = _('The user was out of sync. Please try again.')
+                msg = get_localizer(request).translate(msg)
+                request.session.flash(msg),
+                raise HTTPFound(request.route_url('profile-editor'))
 
-        user.save(request)
+        try:
+            user.save(request)
+        except UserOutOfSync:
+            msg = _('The user was out of sync. Please try again.')
+            msg = get_localizer(request).translate(msg)
+            request.session.flash(msg),
+            raise HTTPFound(request.route_url('profile-editor'))
         request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
     return obj_id
 
@@ -199,8 +214,15 @@ def save_as_verificated(request, model_name, user_oid, obj_id):
     obj_id = result['obj_id']
     if obj_id and model_name == 'norEduPersonNIN':
         user = request.userdb.get_user_by_oid(result['user_oid'])
+        user.retrieve_modified_ts(request.db.profiles)
         user.retrieve_address(request, obj_id)
-        user.save(request)
+        try:
+            user.save(request)
+        except UserOutOfSync:
+            msg = _('The user was out of sync. Please try again.')
+            msg = get_localizer(request).translate(msg)
+            request.session.flash(msg),
+            raise HTTPFound(request.context.route_url('profile-editor'))
     return obj_id
 
 

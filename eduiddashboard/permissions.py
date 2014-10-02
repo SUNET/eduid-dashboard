@@ -139,6 +139,7 @@ class BaseFactory(object):
                 user = self.request.userdb.get_user_by_oid(userid)
             if not user:
                 raise HTTPNotFound()
+        user.retrieve_modified_ts(self.request.db.profiles)
         self._user = user
         return self._user
 
@@ -163,11 +164,13 @@ class BaseFactory(object):
     def update_context_user(self):
         userid = self.user.get(self.main_attribute)
         self.user = self.request.userdb.get_user(userid)
+        self.user.retrieve_modified_ts(self.request.db.profiles)
 
     def update_session_user(self):
         user = self.request.session.get('user', User({}))
         userid = user.get(self.main_attribute, None)
         self.user = self.request.userdb.get_user(userid)
+        self.user.retrieve_modified_ts(self.request.db.profiles)
         self.request.session['user'] = self.user
 
     def propagate_user_changes(self, newuser):
@@ -175,12 +178,15 @@ class BaseFactory(object):
             # Only update session if user is the same as currently in session
             user = self.request.session.get('user')
             newuser = User(newuser)
+            newuser.retrieve_modified_ts(self.request.db.profiles)
             if user.get_id() == newuser.get_id():
                 self.request.session['user'] = newuser
         else:
             user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
-                self.request.session['user'] = User(newuser)
+                newuser = User(newuser)
+                newuser.retrieve_modified_ts(self.request.db.profiles)
+                self.request.session['user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
@@ -332,7 +338,9 @@ class VerificationsFactory(BaseFactory):
         })
         if verification_code is None:
             raise HTTPNotFound()
-        return self.request.userdb.get_user_by_oid(verification_code['user_oid'])
+        user = self.request.userdb.get_user_by_oid(verification_code['user_oid'])
+        user.retrieve_modified_ts(self.request.db.profiles)
+        return user
 
 
 class StatusFactory(BaseFactory):

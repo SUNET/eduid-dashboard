@@ -226,6 +226,7 @@ class PasswordsView(BaseFormView):
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
         user = self.request.userdb.get_user_by_oid(user.get_id())
+        user.retrieve_modified_ts(self.request.db.profiles)
 
         self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
@@ -316,6 +317,7 @@ class BaseResetPasswordView(FormView):
         else:
             user = self.request.userdb.get_user_by_nin(text)
 
+        user.retrieve_modified_ts(self.request.db.profiles)
         return user
 
 

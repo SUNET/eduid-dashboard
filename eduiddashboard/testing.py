@@ -1,4 +1,5 @@
 from os import path
+import datetime
 from copy import deepcopy
 
 from mock import patch
@@ -105,6 +106,7 @@ class LoggedInReguestTests(am.MongoTestCase):
     MockedUserDB = am.MockedUserDB
 
     user = User(am.MOCKED_USER_STANDARD)
+    user.set_modified_ts(datetime.datetime.utcnow())
     users = []
 
     def setUp(self, settings={}):

@@ -8,6 +8,7 @@ import pycountry
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
 from eduiddashboard.views import BaseFormView
@@ -124,9 +125,12 @@ class PostalAddressView(BaseFormView):
 
         # update the session data
         self.user.set_addresses(addresses)
-        self.user.save(self.request)
-
-        message = _('Changes saved.')
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            message = _('User data out of sync. Please try again.')
+        else:
+            message = _('Changes saved.')
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')

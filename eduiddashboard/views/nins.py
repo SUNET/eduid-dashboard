@@ -6,6 +6,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
@@ -298,7 +299,14 @@ class NinsView(BaseFormView):
             old_user.set_nins(nins)
             addresses = [a for a in old_user.get_addresses() if not a['verified']]
             old_user.set_addresses(addresses)
-            old_user.save(self.request)
+            try:
+                old_user.save(self.request)
+            except UserOutOfSync:
+                message = _('User data out of sync. Please try again.')
+                self.request.session.flash(
+                        get_localizer(self.request).translate(message),
+                        queue='forms')
+                return
 
         nins = self.user.get_nins()
         nins.append(newnin)
@@ -308,8 +316,12 @@ class NinsView(BaseFormView):
         save_as_verificated(self.request, 'norEduPersonNIN',
                             self.user.get_id(), newnin)
 
-        self.user.save(self.request)
-        message = _('Changes saved')
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            message = _('User data out of sync. Please try again.')
+        else:
+            message = _('Changes saved')
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')

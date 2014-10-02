@@ -187,6 +187,7 @@ TEST_USER = {
         'preferredLanguage': 'en',
         'mail': 'johnnysmith1@example.org',
         'eduPersonEntitlement': [],
+        'modified_ts': datetime.utcnow(),
         'mobile': [{
             'mobile': '+46701234567',
             'verified': True,

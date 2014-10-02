@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 import unittest
 from os import path
 
@@ -27,6 +28,7 @@ class MockedUserDB(UserDB):
             'first_name': 'User',
             'last_name': '1',
             'screen_name': 'user1',
+            'modified_ts': datetime.utcnow(),
         },
         'user2@example.com': {
             '_id': 2,
@@ -34,6 +36,7 @@ class MockedUserDB(UserDB):
             'first_name': 'User',
             'last_name': '2',
             'screen_name': 'user2',
+            'modified_ts': datetime.utcnow(),
         },
     }
 
