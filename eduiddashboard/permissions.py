@@ -177,14 +177,12 @@ class BaseFactory(object):
             # Only update session if user is the same as currently in session
             user = self.request.session.get('user')
             newuser = User(newuser)
-            newuser.retrieve_modified_ts(self.request.db.profiles)
             if user.get_id() == newuser.get_id():
                 self.request.session['user'] = newuser
         else:
             user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
                 newuser = User(newuser)
-                newuser.retrieve_modified_ts(self.request.db.profiles)
                 self.request.session['user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
