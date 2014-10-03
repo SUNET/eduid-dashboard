@@ -83,10 +83,15 @@ class EmailsActionsView(BaseActionsView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            msg = _('The user was out of sync. Please try again.')
-            msg = get_localizer(self.request).translate(msg)
-            self.request.session.flash(msg),
-            raise HTTPFound(self.context.route_url('profile-editor'))
+            self.user = self.request.userdb.get_user_by_oid(self.user.get_id())
+            self.user.retrieve_modified_ts(self.request.db.profiles)
+            if self.context.workmode == 'personal':
+                self.request.session['user'] = self.user
+            message = _('The user was out of sync. Please try again.')
+            return {
+                'result': 'error',
+                'message': get_localizer(self.request).translate(message),
+            }
 
         message = _('Your primary email address was '
                     'successfully changed')

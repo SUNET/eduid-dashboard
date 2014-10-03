@@ -58,7 +58,7 @@ class BaseFactory(object):
         ],
     }
 
-    _user = None
+    user = None
 
     def __init__(self, request):
         try:
@@ -121,8 +121,8 @@ class BaseFactory(object):
     def get_user(self):
 
         # Cache user until the request is completed
-        if self._user is not None:
-            return self._user
+        if self.user is not None:
+            return self.user
 
         user = None
         if self.workmode == 'personal':
@@ -139,9 +139,8 @@ class BaseFactory(object):
                 user = self.request.userdb.get_user_by_oid(userid)
             if not user:
                 raise HTTPNotFound()
-        user.retrieve_modified_ts(self.request.db.profiles)
-        self._user = user
-        return self._user
+            user.retrieve_modified_ts(self.request.db.profiles)
+        return user
 
     def route_url(self, route, **kw):
         if self.workmode == 'personal':
