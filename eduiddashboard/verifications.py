@@ -211,19 +211,7 @@ def save_as_verificated(request, model_name, user_oid, obj_id):
         new=True,
         safe=True
     )
-    obj_id = result['obj_id']
-    if obj_id and model_name == 'norEduPersonNIN':
-        user = request.userdb.get_user_by_oid(result['user_oid'])
-        user.retrieve_modified_ts(request.db.profiles)
-        user.retrieve_address(request, obj_id)
-        try:
-            user.save(request)
-        except UserOutOfSync:
-            msg = _('The user was out of sync. Please try again.')
-            msg = get_localizer(request).translate(msg)
-            request.session.flash(msg),
-            raise HTTPFound(request.context.route_url('profile-editor'))
-    return obj_id
+    return result['obj_id']
 
 
 def generate_verification_link(request, code, model):

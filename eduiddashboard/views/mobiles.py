@@ -96,11 +96,7 @@ class MobilesActionsView(BaseActionsView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User was out of sync. Please try again.')
-            return {
-                'result': 'error',
-                'message': get_localizer(self.request).translate(message),
-            }
+            return self.sync_user()
 
         message = _('Mobile phone number was successfully removed')
         return {
@@ -137,11 +133,8 @@ class MobilesActionsView(BaseActionsView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User was out of sync. Please try again.')
-            return {
-                'result': 'error',
-                'message': get_localizer(self.request).translate(message),
-            }
+            return self.sync_user()
+
 
         message = _('Mobile phone number was successfully made primary')
         return {
@@ -191,9 +184,7 @@ class MobilesView(BaseFormView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User was out of sync. Please try again.')
-            message = get_localizer(self.request).translate(message)
-            self.request.session.flash(message, queue='forms')
+            self.sync_user()
             
         else:
             send_verification_code(self.request, self.user, mobile_number)

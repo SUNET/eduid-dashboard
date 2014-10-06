@@ -32,6 +32,8 @@ def profile_editor(context, request):
         Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
 
+    context.user.retrieve_modified_ts(request.db.profiles)
+
     view_context = {}
 
     tabs = get_available_tabs(context, request)

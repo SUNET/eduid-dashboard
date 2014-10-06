@@ -110,14 +110,11 @@ def authenticate(request, session_info):
 
     log.debug('Looking for user with {!r} == {!r}'.format(user_main_attribute, saml_user))
     try:
-        user = request.userdb.get_user(saml_user)
+        return request.userdb.get_user(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:
         log.error('No user with {!r} = {!r} found'.format(user_main_attribute, saml_user))
     except request.userdb.exceptions.MultipleUsersReturned:
         log.error("There are more than one user with {!r} = {!r}".format(user_main_attribute, saml_user))
-    else:
-        user.retrieve_modified_ts(request.db.profiles)
-        return user
     return None
 
 

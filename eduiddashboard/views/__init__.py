@@ -84,6 +84,16 @@ class BaseFormView(FormView):
         location = self.request.route_path(self.base_route)
         raise HTTPXRelocate(location)
 
+    def sync_user(self):
+        self.user = self.request.userdb.get_user_by_oid(self.user.get_id())
+        self.user.retrieve_modified_ts(self.request.db.profiles)
+        if self.context.workmode == 'personal':
+            self.request.session['user'] = self.user
+        message = _('The user was out of sync. Please try again.')
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
+
 
 class BaseActionsView(object):
     data_attribute = None
@@ -186,6 +196,17 @@ class BaseActionsView(object):
 
     def send_verification_code(self, data_id, code):
         raise NotImplementedError()
+
+    def sync_user(self):
+        self.user = self.request.userdb.get_user_by_oid(self.user.get_id())
+        self.user.retrieve_modified_ts(self.request.db.profiles)
+        if self.context.workmode == 'personal':
+            self.request.session['user'] = self.user
+        message = _('The user was out of sync. Please try again.')
+        return {
+            'result': 'error',
+            'message': get_localizer(self.request).translate(message),
+        }
 
 
 class HTTPXRelocate(HTTPOk):

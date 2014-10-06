@@ -50,11 +50,7 @@ class PermissionsView(BaseFormView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User data out of sync. Please try again')
-            self.request.session.flash(
-                    get_localizer(self.request).translate(message),
-                    queue='forms')
-
+            self.sync_user()
         else:
             message = _('Changes saved.')
             self.request.session.flash(

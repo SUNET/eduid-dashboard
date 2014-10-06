@@ -83,15 +83,7 @@ class EmailsActionsView(BaseActionsView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            self.user = self.request.userdb.get_user_by_oid(self.user.get_id())
-            self.user.retrieve_modified_ts(self.request.db.profiles)
-            if self.context.workmode == 'personal':
-                self.request.session['user'] = self.user
-            message = _('The user was out of sync. Please try again.')
-            return {
-                'result': 'error',
-                'message': get_localizer(self.request).translate(message),
-            }
+            return self.sync_user()
 
         message = _('Your primary email address was '
                     'successfully changed')
@@ -119,11 +111,7 @@ class EmailsActionsView(BaseActionsView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User data was out of sync. Please try again.')
-            return {
-                'result': 'error',
-                'message': get_localizer(self.request).translate(message),
-            }
+            return self.sync_user()
 
         message = _('Email address was successfully removed')
         return {
@@ -135,6 +123,11 @@ class EmailsActionsView(BaseActionsView):
         return data_to_verify['email']
 
     def send_verification_code(self, data_id, code):
+        in_sync = self.request.db.profiles.find({
+            '_id': self.user.get_id(),
+            'modified_ts': self.user.get_modified_ts()})
+        if in_sync.count() == 0:
+            return self.sync_user()
         send_verification_mail(self.request, data_id, code)
 
 
@@ -184,10 +177,7 @@ class EmailsView(BaseFormView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User data was out of sync. Please try again.')
-            self.request.session.flash(
-                    get_localizer(self.request).translate(message),
-                    queue='forms')
+            self.sync_user()
 
         else:
             message = _('Changes saved')

@@ -295,6 +295,7 @@ class NinsView(BaseFormView):
 
         if old_user:
             old_user = User(old_user)
+            old_user.retrieve_modified_ts(self.request.db.profiles)
             nins = [nin for nin in old_user.get_nins() if nin != newnin]
             old_user.set_nins(nins)
             addresses = [a for a in old_user.get_addresses() if not a['verified']]
@@ -302,19 +303,12 @@ class NinsView(BaseFormView):
             try:
                 old_user.save(self.request)
             except UserOutOfSync:
-                message = _('User data out of sync. Please try again.')
-                self.request.session.flash(
-                        get_localizer(self.request).translate(message),
-                        queue='forms')
+                self.sync_user()
                 return
 
         nins = self.user.get_nins()
         nins.append(newnin)
         self.user.set_nins(nins)
-
-        # Save the state in the verifications collection
-        save_as_verificated(self.request, 'norEduPersonNIN',
-                            self.user.get_id(), newnin)
 
         try:
             self.user.save(self.request)
@@ -322,6 +316,9 @@ class NinsView(BaseFormView):
             message = _('User data out of sync. Please try again.')
         else:
             message = _('Changes saved')
+            # Save the state in the verifications collection
+            save_as_verificated(self.request, 'norEduPersonNIN',
+                                self.user.get_id(), newnin)
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')

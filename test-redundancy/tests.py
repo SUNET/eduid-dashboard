@@ -45,7 +45,7 @@ DASHBOARD_SERVER_1 = 'http://192.168.122.1:6545'
 DASHBOARD_SERVER_2 = 'http://192.168.122.1:6546'
 BASE_USERNAME = 'johnsmith'
 BASE_PASSWORD = '1234'
-MONGO_URI = 'mongodb://172.17.0.2:27017/'
+MONGO_URI = 'mongodb://192.168.122.1:27017/'
 MONGO_DB = 'eduid_am'
 
 
@@ -200,22 +200,20 @@ class RedundancyTests(unittest.TestCase):
         givenname_field1.send_keys(u'Pabló')
         self.browser1.find_element_by_css_selector(
                 '#personaldataview-formsave').click()
-        self.browser2.refresh()
+
+        givenname_field2 = self.browser2.find_element_by_css_selector(
+                '#deformField2')
+        self.clear_input(givenname_field2)
+        givenname_field2.send_keys(u'Alba')
+        self.browser2.find_element_by_css_selector(
+                '#personaldataview-formsave').click()
+
+        self.assertIn('The user was out of sync. Please try again',
+                self.browser2.page_source)
+        
         givenname_field2 = self.browser2.find_element_by_css_selector(
                 '#deformField2')
         self.assertEqual(givenname_field2.get_attribute('value'), u'Pabló')
-
-        self.browser1.refresh()
-        givenname_field1 = self.browser1.find_element_by_css_selector(
-                '#deformField2')
-        self.clear_input(givenname_field1)
-        givenname_field1.send_keys(u'Enrique')
-        self.browser1.find_element_by_css_selector(
-                '#personaldataview-formsave').click()
-        self.browser2.refresh()
-        givenname_field2 = self.browser2.find_element_by_css_selector(
-                '#deformField2')
-        self.assertEqual(givenname_field2.get_attribute('value'), u'Enrique')
 
     def test_confirm_email_address(self):
         self.login()
@@ -231,7 +229,7 @@ class RedundancyTests(unittest.TestCase):
                 '#askDialogInput')
         code_input.send_keys(code)
         self.browser1.find_element_by_css_selector(
-                '.fa-spin').click()
+                '.modal-footer > a.ok-button').click()
         self.assertIn('An email address is pending confirmation',
                 self.browser2.page_source)
         self.browser2.find_element_by_css_selector(
