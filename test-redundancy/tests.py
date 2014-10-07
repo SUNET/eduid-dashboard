@@ -197,6 +197,10 @@ class RedundancyTests(unittest.TestCase):
         givenname_field1 = self.browser1.find_element_by_css_selector(
                 '#deformField2')
         self.clear_input(givenname_field1)
+        givenname_field1.send_keys(u'Enrique')
+        self.browser1.find_element_by_css_selector(
+                '#personaldataview-formsave').click()
+        self.clear_input(givenname_field1)
         givenname_field1.send_keys(u'Pabló')
         self.browser1.find_element_by_css_selector(
                 '#personaldataview-formsave').click()
@@ -220,9 +224,10 @@ class RedundancyTests(unittest.TestCase):
 
         self.browser1.find_element_by_css_selector(
                 '.unstyled > li:nth-child(1) > a:nth-child(1)').click()
+
         self.browser1.find_element_by_css_selector(
                 '.resend-code').click()
-        data1 = self.queue.get()
+        data1 = self.queue.get(True, 1)
         pattern = re.compile(r'verificate/mailAliases/([^/]+)/')
         code = pattern.search(data1).group(1)
         code_input = self.browser1.find_element_by_css_selector(

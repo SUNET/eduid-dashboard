@@ -6,6 +6,7 @@
     "use strict";
 
     var sendInfo = function(container, cls, msg) {
+            if (cls === 'out_of_sync') { cls = 'error' }
             var messageHTML = '<div class="alert alert-' + cls +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
@@ -58,6 +59,9 @@
                 },
                 function(data, statusText, xhr) {
                     sendInfo(dialog, data.result, data.message);
+                    if (data.result === 'out_of_sync') {
+                        dialog.find('.cancel-button').click();
+                    }
                 },
                 'json');
             });

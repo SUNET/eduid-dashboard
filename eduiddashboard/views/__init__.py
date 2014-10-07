@@ -105,6 +105,7 @@ class BaseActionsView(object):
         'new_code_sent': _('A new confirmation code has been sent to you'),
         'expired': _('The confirmation code has expired. Please click on '
                      '"Resend confirmation code" to get a new one'),
+        'out_of_sync': _('The user was out of sync. Please try again.'),
     }
 
     def __init__(self, context, request):
@@ -185,7 +186,9 @@ class BaseActionsView(object):
             self.request, self.data_attribute, data_id,
             self.user, hasher=get_short_hash,
         )
-        self.send_verification_code(data_id, code)
+        sent = self.send_verification_code(data_id, code)
+        if sent['result'] != 'ok':
+            return sent
 
         msg = self.verify_messages['new_code_sent']
 
@@ -204,7 +207,7 @@ class BaseActionsView(object):
             self.request.session['user'] = self.user
         message = _('The user was out of sync. Please try again.')
         return {
-            'result': 'error',
+            'result': 'out_of_sync',
             'message': get_localizer(self.request).translate(message),
         }
 

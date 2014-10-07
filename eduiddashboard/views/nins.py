@@ -65,6 +65,11 @@ def send_verification_code(request, user, nin, code=None):
     You need to replace the call to dummy_message with the govt
     message api
     """
+    in_sync = request.db.profiles.find({
+        '_id': user.get_id(),
+        'modified_ts': user.get_modified_ts()})
+    if in_sync.count() == 0:
+        return {'result': 'out_of_sync'}
 
     if code is None:
         code = new_verification_code(request, 'norEduPersonNIN', nin, user,
@@ -73,6 +78,7 @@ def send_verification_code(request, user, nin, code=None):
     language = request.context.get_preferred_language()
 
     request.msgrelay.nin_validator(nin, code, language)
+    return {'result': 'ok'}
 
 
 def get_tab(request):
@@ -177,9 +183,22 @@ class NINsActionsView(BaseActionsView):
         }
 
     def send_verification_code(self, data_id, code):
-        send_verification_code(self.request, self.user, data_id, code)
+        sent = send_verification_code(self.request, self.user, data_id, code)
+        if sent['result'] == 'out_of_sync':
+            return self.sync_user()
+        return sent
 
     def resend_code_action(self, index, post_data):
+        in_sync = self.request.db.profiles.find({
+            '_id': self.user.get_id(),
+            'modified_ts': self.user.get_modified_ts()})
+        if in_sync.count() == 0:
+            message = _('Data out of sync. Please try again')
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
+
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
