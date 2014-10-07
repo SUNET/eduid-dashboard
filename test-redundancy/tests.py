@@ -33,6 +33,9 @@ _author__ = 'eperez'
 import unittest
 import asyncore
 import re
+import datetime
+from copy import deepcopy
+from bson import ObjectId
 from multiprocessing import Process, Queue
 from smtpd import SMTPServer
 from selenium import webdriver
@@ -47,9 +50,11 @@ BASE_USERNAME = 'johnsmith'
 BASE_PASSWORD = '1234'
 MONGO_URI = 'mongodb://192.168.122.1:27017/'
 MONGO_DB = 'eduid_am'
+DASHBOARD_MONGO_DB = 'eduid_dashboard'
 
 
 TEST_USER = {
+    '_id': ObjectId('012345678901234567890123'),
     'givenName': 'John',
     'sn': 'Smith',
     'displayName': 'John Smith',
@@ -139,12 +144,19 @@ class RedundancyTests(unittest.TestCase):
         self.browser2.implicitly_wait(30)
         self.accept_next_alert = True
         self.conn[MONGO_DB].attributes.insert(TEST_USER)
+        profile = deepcopy(TEST_USER)
+        profile['modified_ts'] = datetime.datetime.utcnow()
+        self.conn[DASHBOARD_MONGO_DB].profiles.insert(profile)
 
     def tearDown(self):
         self.browser1.quit()
         self.browser2.quit()
         self.conn[MONGO_DB].attributes.find_and_modify(
-                {'mail': 'johnsmith@example.com'},
+                {'_id': ObjectId('012345678901234567890123')},
+                remove=True
+                )
+        self.conn[DASHBOARD_MONGO_DB].profiles.find_and_modify(
+                {'_id': ObjectId('012345678901234567890123')},
                 remove=True
                 )
     
@@ -196,10 +208,6 @@ class RedundancyTests(unittest.TestCase):
 
         givenname_field1 = self.browser1.find_element_by_css_selector(
                 '#deformField2')
-        self.clear_input(givenname_field1)
-        givenname_field1.send_keys(u'Enrique')
-        self.browser1.find_element_by_css_selector(
-                '#personaldataview-formsave').click()
         self.clear_input(givenname_field1)
         givenname_field1.send_keys(u'Pabló')
         self.browser1.find_element_by_css_selector(
