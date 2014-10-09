@@ -110,11 +110,15 @@ class TestingSMTPServer(SMTPServer):
         self.queue = queue
 
     def process_message(self, peer, mailfrom, rcpttos, data):
-        self.queue.put(data)
+        self.queue.put_nowait(data)
 
 def start_smtp_server(queue):
-    TestingSMTPServer(SMTP_SERVER, None, queue)
-    asyncore.loop()
+    server = TestingSMTPServer(SMTP_SERVER, None, queue)
+    try:
+        asyncore.loop()
+    finally:
+        queue.close()
+        server.close()
 
 
 class RedundancyTests(unittest.TestCase):
@@ -132,9 +136,9 @@ class RedundancyTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls.queue.close()
         cls.smtp_process.terminate()
         cls.smtp_process.join()
-        cls.queue.close()
         cls.conn.close()
 
     def setUp(self):
@@ -247,5 +251,8 @@ class RedundancyTests(unittest.TestCase):
                 self.browser2.page_source)
         self.browser2.find_element_by_css_selector(
                 '.unstyled > li:nth-child(1) > a:nth-child(1)').click()
-        self.assertNotIn('An email address is pending confirmation',
+        self.browser2.find_element_by_css_selector(
+                '.resend-code').click()
+
+        self.assertIn('The user was out of sync. Please try again',
                 self.browser2.page_source)

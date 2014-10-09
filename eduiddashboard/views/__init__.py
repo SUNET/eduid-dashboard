@@ -89,6 +89,8 @@ class BaseFormView(FormView):
         self.user.retrieve_modified_ts(self.request.db.profiles)
         if self.context.workmode == 'personal':
             self.request.session['user'] = self.user
+        else:
+            self.request.session['edit-user'] = self.user
         message = _('The user was out of sync. Please try again.')
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
@@ -205,6 +207,8 @@ class BaseActionsView(object):
         self.user.retrieve_modified_ts(self.request.db.profiles)
         if self.context.workmode == 'personal':
             self.request.session['user'] = self.user
+        else:
+            self.request.session['edit-user'] = self.user
         message = _('The user was out of sync. Please try again.')
         return {
             'result': 'out_of_sync',

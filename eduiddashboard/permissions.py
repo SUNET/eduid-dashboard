@@ -129,17 +129,17 @@ class BaseFactory(object):
             user = self.request.session.get('user', User({}))
             userid = user and user.get_mail() or ''
         else:
-            userid = self.request.matchdict.get('userid', '')
-        cache_user_in_session = asbool(self.request.registry.settings.get(
-            'cache_user_in_session', True))
-        if not cache_user_in_session or self.workmode != 'personal':
-            if EMAIL_RE.match(userid):
-                user = self.request.userdb.get_user(userid)
-            elif OID_RE.match(userid):
-                user = self.request.userdb.get_user_by_oid(userid)
-            if not user:
-                raise HTTPNotFound()
-            user.retrieve_modified_ts(self.request.db.profiles)
+            user = self.request.session.get('edit-user', None)
+            if user is None:
+                userid = self.request.matchdict.get('userid', '')
+                if EMAIL_RE.match(userid):
+                    user = self.request.userdb.get_user(userid)
+                elif OID_RE.match(userid):
+                    user = self.request.userdb.get_user_by_oid(userid)
+                if not user:
+                    raise HTTPNotFound()
+                user.retrieve_modified_ts(self.request.db.profiles)
+                self.request.session['edit-user'] = user
         return user
 
     def route_url(self, route, **kw):
@@ -168,9 +168,11 @@ class BaseFactory(object):
     def update_session_user(self):
         user = self.request.session.get('user', User({}))
         userid = user.get(self.main_attribute, None)
-        self.user = self.request.userdb.get_user(userid)
-        self.user.retrieve_modified_ts(self.request.db.profiles)
-        self.request.session['user'] = self.user
+        user = self.request.userdb.get_user(userid)
+        if self.workmode == 'personal':
+            self.user = user
+            self.user.retrieve_modified_ts(self.request.db.profiles)
+        self.request.session['user'] = user
 
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':

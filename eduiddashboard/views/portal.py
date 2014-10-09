@@ -136,7 +136,6 @@ def session_reload(context, request):
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     userid = request.session.get('user').get(main_attribute)
     user = request.userdb.get_user(userid)
-    user.retrieve_modified_ts(request.db.profiles)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
 
