@@ -11,6 +11,7 @@
   {{ safe_actions_url('emails-actions') }}
 
   {% if mails %}
+  <div class="table-responsive">
   <table class='table table-striped table-thin table-form emails'>
     {% for mail in mails %}
     <tr class='emailrow' data-identifier="{{ loop.index0 }}">
@@ -39,6 +40,7 @@
     </tr>
     {% endfor %}
   </table>
+  </div>
   {% endif %}
 
 {% endblock %}
