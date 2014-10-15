@@ -522,8 +522,8 @@ div.messages-wrapper {
 .tabs-below > .nav-tabs > .active > a:focus {
   border-color: transparent #ddd #ddd #ddd;
 }
-
-@media only screen and (min-width: 992px) {
+    
+@media only screen and (min-width: 768px) {
 
 .tabs-left > .nav-tabs > li,
 .tabs-right > .nav-tabs > li {

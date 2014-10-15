@@ -33,27 +33,58 @@
 {% block contents %}
 
   <div class='profile-combo tabbable well row'>
-    <div class="tabs-left col-md-3 col-sm-12">
+    <div class="tabs-left col-md-3 hidden-xs hidden-sm" id="profile-menu-large">
         <ul class='nav nav-tabs nav-stacked'>
           {% for tab in tabs %}
-            <li>
-                <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
-            </li>
+          <li>
+            <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
+          </li>
           {% endfor %}
             <li>
-        <div class='profile-filled' style='padding-top:80px'>
-          <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
-          <div class="progress progress-striped">
-            <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
-          </div>
-        </div>
+              <div class='profile-filled' style='padding-top:80px'>
+                <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+                <div class="progress progress-striped">
+                  <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+                </div>
+              </div>
             </li>
 
         </ul>
     </div>
 
-    <div class='tab-content info-container col-md-9 col-sm-12'>
+    <nav class="navbar navbar-default hidden-md hidden-lg" role="navigation" id="profile-menu-small">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">{{_("Toggle navigation")}}</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+    
+        <div class="collapse collapsed navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav nav-stacked nav-tabs navbar-nav">
+              {% for tab in tabs %}
+                <li>
+                    <a href='#{{tab.id}}' class="hidden-sm" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' class="hidden-xs">{{_(tab.label)}}</a>
+                </li>
+              {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class='tab-content info-container col-md-9'>
       <div class='tab-pane active'></div>
+    </div>
+
+    <div class="profile-filled hidden-md hidden-lg" style="padding-top:40px">
+      <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+      <div class="progress progress-striped">
+        <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+      </div>
     </div>
   </div>
 
