@@ -522,6 +522,17 @@ div.messages-wrapper {
 .tabs-below > .nav-tabs > .active > a:focus {
   border-color: transparent #ddd #ddd #ddd;
 }
+
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+
+div#profile-menu-small {
+    margin-left: -15px !important;
+    margin-right: -15px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+    
+}
     
 @media only screen and (min-width: 768px) {
 
