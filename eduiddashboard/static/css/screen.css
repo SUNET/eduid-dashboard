@@ -469,12 +469,38 @@ table.passwords {
 
 /* Messages */
 
+@media only screen and (max-width: 768px) {
+
+div.messages-wrapper {
+    display: block;
+    position: relative;
+    left: 5px !important;
+}
+
+}
+@media only screen and (min-width: 768px) {
+
 div.messages-wrapper {
   position:absolute;
   top:70px;
   left:330px;
-  width:600px;
   height:0px;
+}
+
+}
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+
+div.messages-wrapper {
+  width:338px;
+}
+
+}
+@media only screen and (min-width: 992px) {
+
+div.messages-wrapper {
+  width:600px;
+}
+
 }
 
 /* custom inclusion of right, left and below tabs
@@ -521,6 +547,23 @@ div.messages-wrapper {
 .tabs-below > .nav-tabs > .active > a:hover,
 .tabs-below > .nav-tabs > .active > a:focus {
   border-color: transparent #ddd #ddd #ddd;
+}
+
+@media only screen and (max-width: 768px) {
+
+#eduid-header-loa {
+    display: block;
+    position: relative;
+    top: 2px;
+    margin-bottom: 15px;
+}
+
+#eduid-header-pills,
+#eduid-header-logos {
+    display: block;
+    position: relative;
+}
+
 }
 
 @media only screen and (min-width: 768px) and (max-width: 992px) {
