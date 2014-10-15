@@ -12,34 +12,34 @@
 
   {% if mails %}
   <div class="table-responsive">
-  <table class='table table-striped table-thin table-form emails'>
-    {% for mail in mails %}
-    <tr class='emailrow' data-identifier="{{ loop.index0 }}">
-      <td class='identifier'>{{ mail.email }}</td>
-      <td>
-      {% if mail.verified %}
-        {% if mail.email == primary_email %}
-          <span class="nobutton">{{ _('Primary') }}</span>
+    <table class='table table-striped table-thin table-form emails'>
+      {% for mail in mails %}
+      <tr class='emailrow' data-identifier="{{ loop.index0 }}">
+        <td class='identifier'>{{ mail.email }}</td>
+        <td>
+        {% if mail.verified %}
+          {% if mail.email == primary_email %}
+            <span class="nobutton">{{ _('Primary') }}</span>
+          {% else %}
+            <input type='button' class='btn btn-link' value="{{_('Make primary')}}"
+                   data-index='{{ loop.index0 }}' name='setprimary'>
+          {% endif %}
         {% else %}
-          <input type='button' class='btn btn-link' value="{{_('Make primary')}}"
-                 data-index='{{ loop.index0 }}' name='setprimary'>
+            <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
+                   data-index='{{ loop.index0 }}' name='verify'>
         {% endif %}
-      {% else %}
-          <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
-                 data-index='{{ loop.index0 }}' name='verify'>
-      {% endif %}
-      </td>
-      <td>
-        {% if mail.email != primary_email %}
-          <input type='button' class='btn btn-link' value="{{_('Remove')}}"
-                 data-index='{{ loop.index0 }}' name='remove'>
-        {% else %}
-          <span class='text-muted'>{{_('Remove')}}</span>
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
+        </td>
+        <td>
+          {% if mail.email != primary_email %}
+            <input type='button' class='btn btn-link' value="{{_('Remove')}}"
+                   data-index='{{ loop.index0 }}' name='remove'>
+          {% else %}
+            <span class='text-muted'>{{_('Remove')}}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
   </div>
   {% endif %}
 
