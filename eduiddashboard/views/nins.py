@@ -11,6 +11,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
+from eduiddashboard.views import check_user_in_sync
 from eduiddashboard import log
 from eduid_am.user import User
 
@@ -65,12 +66,6 @@ def send_verification_code(request, user, nin, code=None):
     You need to replace the call to dummy_message with the govt
     message api
     """
-    in_sync = request.db.profiles.find({
-        '_id': user.get_id(),
-        'modified_ts': user.get_modified_ts()})
-    if in_sync.count() == 0:
-        return {'result': 'out_of_sync'}
-
     if code is None:
         code = new_verification_code(request, 'norEduPersonNIN', nin, user,
                                      hasher=get_short_hash)
@@ -78,7 +73,6 @@ def send_verification_code(request, user, nin, code=None):
     language = request.context.get_preferred_language()
 
     request.msgrelay.nin_validator(nin, code, language)
-    return {'result': 'ok'}
 
 
 def get_tab(request):
@@ -141,6 +135,9 @@ class NINsActionsView(BaseActionsView):
 
     def verify_action(self, index, post_data):
         """ Only the active (the last one) NIN can be verified """
+        result = self.check_user_in_sync()
+        if result['result'] == 'out_of_sync':
+            return result
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -161,6 +158,9 @@ class NINsActionsView(BaseActionsView):
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
+        result = self.check_user_in_sync()
+        if result['result'] == 'out_of_sync':
+            return result
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -183,21 +183,16 @@ class NINsActionsView(BaseActionsView):
         }
 
     def send_verification_code(self, data_id, code):
-        sent = send_verification_code(self.request, self.user, data_id, code)
-        if sent['result'] == 'out_of_sync':
+        in_sync = self.check_user_in_sync()
+        if in_sync['result'] == 'out_of_sync':
             return self.sync_user()
-        return sent
+
+        send_verification_code(self.request, self.user, data_id, code)
 
     def resend_code_action(self, index, post_data):
-        in_sync = self.request.db.profiles.find({
-            '_id': self.user.get_id(),
-            'modified_ts': self.user.get_modified_ts()})
-        if in_sync.count() == 0:
-            message = _('Data out of sync. Please try again')
-            return {
-                'result': 'out_of_sync',
-                'message': get_localizer(self.request).translate(message),
-            }
+        result = self.check_user_in_sync()
+        if result['result'] == 'out_of_sync':
+            return result
 
         nins = get_not_verified_nins_list(self.request, self.user)
 
@@ -270,9 +265,7 @@ class NinsView(BaseFormView):
         send_verification_code(self.request, self.user, newnin)
 
     def add_success_personal(self, ninform):
-
         self.addition_with_code_validation(ninform)
-
         msg = _('A confirmation code has been sent to your government inbox. '
                 'Please click on "Pending confirmation" link below to enter '
                 'your confirmation code.')
@@ -295,9 +288,7 @@ class NinsView(BaseFormView):
                 'status': 'failure',
                 'data': e.error.asdict()
             }
-
         self.addition_with_code_validation(validated)
-
         return {
             'status': 'ok'
         }
@@ -319,11 +310,7 @@ class NinsView(BaseFormView):
             old_user.set_nins(nins)
             addresses = [a for a in old_user.get_addresses() if not a['verified']]
             old_user.set_addresses(addresses)
-            try:
-                old_user.save(self.request)
-            except UserOutOfSync:
-                self.sync_user()
-                return
+            old_user.save(self.request)
 
         nins = self.user.get_nins()
         nins.append(newnin)
@@ -381,6 +368,12 @@ class NinsWizard(BaseWizard):
             }
 
     def resendcode(self):
+        in_sync = check_user_in_sync(self.request, self.context.user)
+        if in_sync['result'] == 'out_of_sync':
+            return {
+                'status': 'failure',
+                'text': NINsActionsView.verify_messages['out_of_sync'],
+            }
 
         if self.datakey is None:
             message = _("Your national identity number confirmation request "
@@ -390,12 +383,12 @@ class NinsWizard(BaseWizard):
                 'status': 'failure',
                 'text': message
             }
-        send_verification_code(self.request, self.context.user, self.datakey)
-
-        message = NINsActionsView.verify_messages['new_code_sent']
+        send_verification_code(self.request,
+                               self.context.user,
+                               self.datakey)
         return {
             'status': 'ok',
-            'text': message,
+            'text': NINsActionsView.verify_messages['new_code_sent'],
         }
 
 

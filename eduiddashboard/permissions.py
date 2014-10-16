@@ -127,7 +127,6 @@ class BaseFactory(object):
         user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', User({}))
-            userid = user and user.get_mail() or ''
         else:
             user = self.request.session.get('edit-user', None)
             if user is None:
