@@ -186,8 +186,8 @@ class NINsActionsView(BaseActionsView):
         in_sync = self.check_user_in_sync()
         if in_sync['result'] == 'out_of_sync':
             return self.sync_user()
-
         send_verification_code(self.request, self.user, data_id, code)
+        return {'result': 'ok'}
 
     def resend_code_action(self, index, post_data):
         result = self.check_user_in_sync()

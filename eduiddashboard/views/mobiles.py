@@ -63,19 +63,12 @@ def get_tab(request):
 
 
 def send_verification_code(request, user, mobile_number, code=None):
-    in_sync = request.db.profiles.find({
-        '_id': user.get_id(),
-        'modified_ts': user.get_modified_ts()})
-    if in_sync.count() == 0:
-        return {'result': 'out_of_sync'}
     if code is None:
         code = new_verification_code(request, 'mobile', mobile_number, user,
                                      hasher=get_short_hash)
 
     user_language = request.context.get_preferred_language()
     request.msgrelay.mobile_validator(mobile_number, code, user_language)
-
-    return {'result': 'ok'}
 
 
 @view_config(route_name='mobiles-actions', permission='edit')
@@ -149,10 +142,12 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def send_verification_code(self, data_id, code):
-        sent = send_verification_code(self.request, self.user, data_id, code)
-        if sent['result'] == 'out_of_sync':
+        in_sync = self.check_user_in_sync()
+        if in_sync['result'] == 'ok':
+            send_verification_code(self.request, self.user, data_id, code)
+        else:
             return self.sync_user()
-        return sent
+        return in_sync
 
 
 @view_config(route_name='mobiles', permission='edit',

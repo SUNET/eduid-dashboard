@@ -92,7 +92,13 @@ def verificate_code(request, model_name, code):
         msg = "Code {!r} ({!s}) marked as verified"
         log.debug(msg.format(code, str(obj_id)))
 
-        user = request.userdb.get_user_by_oid(unverified['user_oid'])
+        if 'edit-user' in request.session:
+            user = request.session['edit-user']
+        elif 'user' in request.session:
+            user = request.session['user']
+        else:
+            user = request.userdb.get_user_by_oid(unverified['user_oid'])
+        assert user.get_id() == unverified['user_oid']
         user.retrieve_modified_ts(request.db.profiles)
         old_verified = request.db.verifications.find_and_modify(
             {

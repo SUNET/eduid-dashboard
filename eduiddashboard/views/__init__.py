@@ -27,7 +27,7 @@ def check_user_in_sync(request, user):
         '_id': user.get_id(),
         'modified_ts': user.get_modified_ts()})
     if in_sync.count() == 0:
-        message = _('The user was out of sync. Please try again.'),
+        message = BaseActionsView.verify_messages['out_of_sync'],
         return {
             'result': 'out_of_sync',
             'message': get_localizer(request).translate(message),

@@ -123,9 +123,7 @@ class EmailsActionsView(BaseActionsView):
         return data_to_verify['email']
 
     def send_verification_code(self, data_id, code):
-        in_sync = self.request.db.profiles.find({
-            '_id': self.user.get_id(),
-            'modified_ts': self.user.get_modified_ts()})
+        in_sync = self.check_user_in_sync()
         if in_sync.count() == 0:
             return self.sync_user()
         send_verification_mail(self.request, data_id, code)
