@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
+from pyramid.httpexceptions import HTTPFound
 
 from eduid_am.user import User
 from eduid_am.exceptions import UserOutOfSync
@@ -93,20 +94,22 @@ def verificate_code(request, model_name, code):
         log.debug(msg.format(code, str(obj_id)))
 
         if 'edit-user' in request.session:
+            # non personal mode
             user = request.session['edit-user']
         elif 'user' in request.session:
+            # personal mode
             user = request.session['user']
         else:
+            # should not happen
             user = request.userdb.get_user_by_oid(unverified['user_oid'])
+            user.retrieve_modified_ts(request.db.profiles)
         assert user.get_id() == unverified['user_oid']
-        user.retrieve_modified_ts(request.db.profiles)
-        old_verified = request.db.verifications.find_and_modify(
+        old_verified = request.db.verifications.find_one(
             {
                 "model_name": model_name,
                 "obj_id": unverified['obj_id'],
                 "verified": True
-            },
-            remove=True)
+            })
 
         old_user = None
         if old_verified:
@@ -164,23 +167,16 @@ def verificate_code(request, model_name, code):
         msg = get_localizer(request).translate(msg)
         request.session.flash(msg.format(obj=obj_id),
                           queue='forms')
-
+        user.save(request)
         if old_user:
-            try:
-                old_user.save(request)
-            except UserOutOfSync:
-                msg = _('The user was out of sync. Please try again.')
-                msg = get_localizer(request).translate(msg)
-                request.session.flash(msg),
-                raise HTTPFound(request.context.route_url('profile-editor'))
+            old_user.save(request)
+            if old_verified:
+                request.db.verifications.find_and_modify(
+                    {
+                        "_id": old_verified['_id'],
+                    },
+                    remove=True)
 
-        try:
-            user.save(request)
-        except UserOutOfSync:
-            msg = _('The user was out of sync. Please try again.')
-            msg = get_localizer(request).translate(msg)
-            request.session.flash(msg),
-            raise HTTPFound(request.context.route_url('profile-editor'))
         request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
     return obj_id
 

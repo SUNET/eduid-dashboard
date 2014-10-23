@@ -142,12 +142,7 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def send_verification_code(self, data_id, code):
-        in_sync = self.check_user_in_sync()
-        if in_sync['result'] == 'ok':
-            send_verification_code(self.request, self.user, data_id, code)
-        else:
-            return self.sync_user()
-        return in_sync
+        send_verification_code(self.request, self.user, data_id, code)
 
 
 @view_config(route_name='mobiles', permission='edit',

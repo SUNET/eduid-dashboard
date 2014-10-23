@@ -123,11 +123,7 @@ class EmailsActionsView(BaseActionsView):
         return data_to_verify['email']
 
     def send_verification_code(self, data_id, code):
-        in_sync = self.check_user_in_sync()
-        if in_sync.count() == 0:
-            return self.sync_user()
         send_verification_mail(self.request, data_id, code)
-        return {'result': 'ok'}
 
 
 @view_config(route_name='emails', permission='edit',

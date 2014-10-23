@@ -25,7 +25,9 @@
                     $('#askDialog .ok-button.has-spinner').removeClass('loading').removeAttr('disabled');
                     var dialog = $('#askDialog');
                     sendInfo(dialog, data.result, data.message);
-                    if (data.result == 'ok') {
+                    if (data.result === 'out_of_sync') {
+                        dialog.find('.cancel-button').click();
+                    } else if (data.result == 'ok') {
                         dialog.find('.btn').hide();
                         dialog.find('.divDialogElements').hide();
                         dialog.find('.finish-button').show();
@@ -59,9 +61,6 @@
                 },
                 function(data, statusText, xhr) {
                     sendInfo(dialog, data.result, data.message);
-                    if (data.result === 'out_of_sync') {
-                        dialog.find('.cancel-button').click();
-                    }
                 },
                 'json');
             });
