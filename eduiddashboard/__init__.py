@@ -16,6 +16,7 @@ from eduid_am.celery import celery
 from eduid_am.db import MongoDB
 from eduid_am.userdb import UserDB
 from eduid_am.config import read_setting_from_env, read_mapping, read_list
+from eduid_am.config import read_setting_from_env_bool
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -247,6 +248,10 @@ def main(global_config, **settings):
     ``paster serve``.
     """
     settings = dict(settings)
+
+    settings['debug_mode'] = read_setting_from_env_bool(settings,
+                                                        'debug_mode',
+                                                        default=False)
 
     # read pyramid_mailer options
     for key, default in (
