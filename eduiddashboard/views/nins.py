@@ -134,10 +134,9 @@ class NINsActionsView(BaseActionsView):
         return data_to_verify[self.data_attribute]
 
     def verify_action(self, index, post_data):
-        """ Only the active (the last one) NIN can be verified """
-        result = self.check_user_in_sync()
-        if result['result'] == 'out_of_sync':
-            return result
+        """
+        Only the active (the last one) NIN can be verified
+        """
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -153,8 +152,7 @@ class NINsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message),
             }
 
-        return super(NINsActionsView, self)._verify_action(verify_nin,
-                                                           post_data)
+        return self._verify_action(verify_nin, post_data)
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
@@ -186,10 +184,6 @@ class NINsActionsView(BaseActionsView):
         send_verification_code(self.request, self.user, data_id, code)
 
     def resend_code_action(self, index, post_data):
-        result = self.check_user_in_sync()
-        if result['result'] == 'out_of_sync':
-            return result
-
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
