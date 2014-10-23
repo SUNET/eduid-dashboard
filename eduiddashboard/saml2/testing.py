@@ -1,4 +1,5 @@
 import re
+from copy import deepcopy
 from datetime import datetime
 import unittest
 from os import path
@@ -16,7 +17,9 @@ from pyramid import testing
 from eduid_am.userdb import UserDB
 import eduid_am.exceptions
 from eduid_am.user import User
+from eduid_am import testing as am
 from eduiddashboard.saml2 import includeme as saml2_includeme
+from eduiddashboard.testing import get_db
 
 
 class MockedUserDB(UserDB):
@@ -47,6 +50,14 @@ class MockedUserDB(UserDB):
         if userid not in self.test_users:
             raise self.exceptions.UserDoesNotExist
         return User(self.test_users.get(userid))
+    
+    def all_users(self):
+        for user in self.test_users.values():
+            yield User(deepcopy(user))
+
+    def all_userdocs(self):
+        for user in self.test_users.values():
+            yield deepcopy(user)
 
 
 class RootFactory(object):
@@ -80,6 +91,7 @@ def saml2_main(global_config, **settings):
 
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
+    config.set_request_property(lambda x: get_db(settings), 'db', reify=True)
 
     saml2_includeme(config)
 
@@ -107,6 +119,7 @@ class Saml2RequestTests(unittest.TestCase):
             'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'auth_tk_secret': '123456',
+            'mongo_uri': am.MONGO_URI_TEST,
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',
             'jinja2.undefined': 'strict',
@@ -122,6 +135,14 @@ class Saml2RequestTests(unittest.TestCase):
 
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
+        self.userdb = MockedUserDB()
+        self.db = get_db(self.settings)
+        self.db.profiles.drop()
+        userdocs = []
+        for userdoc in self.userdb.all_userdocs():
+            newdoc = deepcopy(userdoc)
+            userdocs.append(newdoc)
+        self.db.profiles.insert(userdocs)
 
         self.config = testing.setUp()
         self.config.registry.settings = self.settings
@@ -130,9 +151,12 @@ class Saml2RequestTests(unittest.TestCase):
     def tearDown(self):
         super(Saml2RequestTests, self).tearDown()
         self.testapp.reset()
+        self.db.profiles.drop()
 
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
+        request.userdb = self.userdb
+        request.db = self.db
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
@@ -142,7 +166,8 @@ class Saml2RequestTests(unittest.TestCase):
     def dummy_request(self):
         request = DummyRequest()
         request.context = DummyResource()
-        request.userdb = MockedUserDB()
+        request.userdb = self.userdb
+        request.db = self.db
         request.registry.settings = self.settings
         return request
 
@@ -151,7 +176,6 @@ class Saml2RequestTests(unittest.TestCase):
         session_factory = queryUtility(ISessionFactory)
 
         request = self.dummy_request()
-        request.userdb = MockedUserDB()
         session = session_factory(request)
         session.persist()
         self.testapp.cookies['beaker.session.id'] = session._sess.id
