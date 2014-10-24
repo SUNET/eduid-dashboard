@@ -153,14 +153,18 @@ class NINsActionsView(BaseActionsView):
 
         return self._verify_action(verify_nin, post_data)
 
-    def remove_action(self, index, post_data):
+    def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """
+        nin, index = data.split()
+        index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             remove_nin = nins[index]
+            if remove_nin != nin:
+                return self.sync_user()
         else:
-            raise HTTPNotFound("The index provides can't be found")
+            raise HTTPNotFound("The index provided can't be found")
 
         verifications = self.request.db.verifications
         verifications.remove({

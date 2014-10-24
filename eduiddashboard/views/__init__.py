@@ -133,7 +133,10 @@ class BaseActionsView(object):
         action = self.request.POST['action']
         action_method = getattr(self, '%s_action' % action)
         post_data = self.request.POST
-        index = int(post_data['identifier'])
+        try:
+            index = int(post_data['identifier'])
+        except ValueError:
+            index = post_data['identifier']
         result = action_method(index, post_data)
         result['action'] = action
         result['identifier'] = index
