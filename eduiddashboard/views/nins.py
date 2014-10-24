@@ -142,6 +142,10 @@ class NINsActionsView(BaseActionsView):
         if len(nins) > index:
             verify_nin = nins[index]
         else:
+            result = self.check_user_in_sync()
+            if result['result'] == 'out_of_sync':
+                return self.sync_user()
+
             raise HTTPNotFound("The index provided can't be found")
 
         if index != len(nins) - 1:
