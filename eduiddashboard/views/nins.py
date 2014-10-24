@@ -132,14 +132,18 @@ class NINsActionsView(BaseActionsView):
     def get_verification_data_id(self, data_to_verify):
         return data_to_verify[self.data_attribute]
 
-    def verify_action(self, index, post_data):
+    def verify_action(self, data, post_data):
         """
         Only the active (the last one) NIN can be verified
         """
+        nin, index = data.split()
+        index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             verify_nin = nins[index]
+            if verify_nin != nin:
+                return self.sync_user()
         else:
             return self.sync_user()
 
@@ -164,7 +168,7 @@ class NINsActionsView(BaseActionsView):
             if remove_nin != nin:
                 return self.sync_user()
         else:
-            raise HTTPNotFound("The index provided can't be found")
+            return self.sync_user()
 
         verifications = self.request.db.verifications
         verifications.remove({
@@ -183,7 +187,9 @@ class NINsActionsView(BaseActionsView):
     def send_verification_code(self, data_id, code):
         send_verification_code(self.request, self.user, data_id, code)
 
-    def resend_code_action(self, index, post_data):
+    def resend_code_action(self, data, post_data):
+        nin, index = data.split()
+        index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:

@@ -27,7 +27,7 @@
           {% if loop.last %}
           <td>
             <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
-                 data-index='{{ loop.index0 }}' name='verify'>
+                 data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
           </td>
           {% else %}
           <td><span class='muted'>{{ _('Pending confirmation')}}</span></td>
