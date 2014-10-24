@@ -11,7 +11,6 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
-from eduiddashboard.views import check_user_in_sync
 from eduiddashboard import log
 from eduid_am.user import User
 
@@ -142,11 +141,7 @@ class NINsActionsView(BaseActionsView):
         if len(nins) > index:
             verify_nin = nins[index]
         else:
-            result = self.check_user_in_sync()
-            if result['result'] == 'out_of_sync':
-                return self.sync_user()
-
-            raise HTTPNotFound("The index provided can't be found")
+            return self.sync_user()
 
         if index != len(nins) - 1:
             message = _("The provided nin can't be verified. You only "
@@ -160,9 +155,6 @@ class NINsActionsView(BaseActionsView):
 
     def remove_action(self, index, post_data):
         """ Only not verified nins can be removed """
-        result = self.check_user_in_sync()
-        if result['result'] == 'out_of_sync':
-            return result
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -362,13 +354,6 @@ class NinsWizard(BaseWizard):
             }
 
     def resendcode(self):
-        in_sync = check_user_in_sync(self.request, self.context.user)
-        if in_sync['result'] == 'out_of_sync':
-            return {
-                'status': 'failure',
-                'text': NINsActionsView.verify_messages['out_of_sync'],
-            }
-
         if self.datakey is None:
             message = _("Your national identity number confirmation request "
                         "can not be found")

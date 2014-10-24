@@ -23,19 +23,6 @@ def get_dummy_status(request, user):
     return None
 
 
-def check_user_in_sync(request, user):
-    in_sync = request.db.profiles.find({
-        '_id': user.get_id(),
-        'modified_ts': user.get_modified_ts()})
-    if in_sync.count() == 0:
-        message = BaseActionsView.default_verify_messages['out_of_sync'],
-        return {
-            'result': 'out_of_sync',
-            'message': get_localizer(request).translate(message),
-        }
-    return {'result': 'ok'}
-
-
 def sync_user(request, context, old_user):
     user = request.userdb.get_user_by_oid(old_user.get_id())
     user.retrieve_modified_ts(request.db.profiles)
@@ -81,27 +68,6 @@ class BaseFormView(FormView):
         bootstrap_form_style = getattr(self, 'bootstrap_form_style', None)
         if bootstrap_form_style is not None:
             self.form_options['bootstrap_form_style'] = bootstrap_form_style
-
-    def __call__(self):
-        if self.request.method == 'POST':
-            result = check_user_in_sync(self.request, self.user)
-            if result['result'] == 'out_of_sync':
-                self.sync_user()
-                result.update(self.get_template_context())
-                use_ajax = getattr(self, 'use_ajax', False)
-                ajax_options = getattr(self, 'ajax_options', '{}')
-                self.schema = self.schema.bind(**self.get_bind_data())
-                form = self.form_class(self.schema, buttons=self.buttons,
-                                       use_ajax=use_ajax, ajax_options=ajax_options,
-                                       **dict(self.form_options))
-                self.before(form)
-                result.update(self.show(form))
-                reqts = form.get_widget_resources()
-                if isinstance(result, dict):
-                    result['js_links'] = reqts['js']
-                    result['css_links'] = reqts['css']
-                return result
-        return super(BaseFormView, self).__call__()
 
     def appstruct(self):
         return self.schema.serialize(self.user)
@@ -244,9 +210,6 @@ class BaseActionsView(object):
 
     def send_verification_code(self, data_id, code):
         raise NotImplementedError()
-
-    def check_user_in_sync(self):
-        return check_user_in_sync(self.request, self.user)
 
     def sync_user(self):
         self.user = sync_user(self.request, self.context, self.user)
