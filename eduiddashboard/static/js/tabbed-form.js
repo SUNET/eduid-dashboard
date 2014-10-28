@@ -59,8 +59,14 @@ var TabbedForm = function (container) {
                     var segments = action_path.split('/');
                     $(document).one('formready', function () {
                         var form_container = $('.' + segments[0] + 'view-form-container');
-                        var link_selector = 'input.btn-link[name="' + segments[1] + '"][data-index="' + segments[2] + '"]';
-                        var verification_link = form_container.find(link_selector);
+                        var link_selector = 'input.btn-link[name="' + segments[1] + '"]';
+                        var verification_links = form_container.find(link_selector);
+                        if (verification_links.length === 1) {
+                            var verification_link = verification_links[0];
+                        } else {
+                            var link_index = + segments[2];
+                            var verification_link = verification_links[link_index];
+                        }
                         verification_link.click();
                     });
                     container.find('.nav-tabs a[href=#' + segments[0] + ']').click();
