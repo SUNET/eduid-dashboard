@@ -217,8 +217,8 @@ def save_as_verificated(request, model_name, user_oid, obj_id):
                 "timestamp": datetime.now(utc),
             }
         },
-        new=True,
-        safe=True
+        upsert=True,
+        new=True
     )
     return result['obj_id']
 
