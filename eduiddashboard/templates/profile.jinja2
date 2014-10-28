@@ -198,13 +198,13 @@ $(document).ready(function () {
       window.setTimeout(clearMessages, 10000);
     });
 
-    $('body').on('action-executed', function() {
-      reloadTab();
-    });
-
     {% if context.workmode == 'personal' %}
       $('body').on('form-submitted action-executed', function() {
         showStatus();
+      });
+
+      $('body').on('action-executed', function() {
+        reloadTab();
       });
     {% else %}
       function statusPolling() {
@@ -212,6 +212,9 @@ $(document).ready(function () {
         window.setTimeout(statusPolling, {{ polling_timeout_for_admin }});
       }
       statusPolling();
+      $('body').on('action-executed', function() {
+        location.reload();
+      });
     {% endif %}
 
     $('body').on('communication-error', function(){
