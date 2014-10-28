@@ -189,15 +189,22 @@ def save_as_verificated(request, model_name, user_oid, obj_id):
             "verified": True,
             "obj_id": obj_id,
         })
-    if old_verified['user_oid'] == user_oid:
+    n = old_verified.count()
+    if n > 1:
+        log.warn('Too many verifications ({}) for NIN {}'.format(n, obj_id))
+
+    already_verified = False
+    for old in old_verified:
+        if old['user_oid'] == user_oid:
+            already_verified = True
+        else:
+            request.db.verifications.find_and_modify(
+                {
+                    '_id': old['_id']
+                },
+                remove=True)
+    if already_verified:
         return
-
-    request.db.verifications.find_and_modify(
-        {
-            '_id': old_verified['_id']
-        },
-        remove=True)
-
 
     result = request.db.verifications.find_and_modify(
         {
