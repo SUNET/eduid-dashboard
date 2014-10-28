@@ -198,13 +198,13 @@ $(document).ready(function () {
       window.setTimeout(clearMessages, 10000);
     });
 
+    $('body').on('action-executed', function() {
+      reloadTab();
+    });
+
     {% if context.workmode == 'personal' %}
       $('body').on('form-submitted action-executed', function() {
         showStatus();
-      });
-
-      $('body').on('action-executed', function() {
-        reloadTab();
       });
     {% else %}
       function statusPolling() {
