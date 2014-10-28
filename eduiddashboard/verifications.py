@@ -164,20 +164,24 @@ def verificate_code(request, model_name, code):
             user.add_verified_email(obj_id)
             msg = _('Email {obj} verified')
 
-        msg = get_localizer(request).translate(msg)
-        request.session.flash(msg.format(obj=obj_id),
-                          queue='forms')
-        user.save(request)
-        if old_user:
-            old_user.save(request)
-            if old_verified:
-                request.db.verifications.find_and_modify(
-                    {
-                        "_id": old_verified['_id'],
-                    },
-                    remove=True)
+        try:
+            user.save(request)
+            if old_user:
+                old_user.save(request)
+                if old_verified:
+                    request.db.verifications.find_and_modify(
+                        {
+                            "_id": old_verified['_id'],
+                        },
+                        remove=True)
 
-        request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+            request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+        except UserOutOfSync:
+            raise
+        else:
+            msg = get_localizer(request).translate(msg)
+            request.session.flash(msg.format(obj=obj_id),
+                              queue='forms')
     return obj_id
 
 
