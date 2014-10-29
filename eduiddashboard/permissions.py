@@ -168,10 +168,12 @@ class BaseFactory(object):
         user = self.request.session.get('user', User({}))
         userid = user.get(self.main_attribute, None)
         user = self.request.userdb.get_user(userid)
+        self.user = user
+        self.user.retrieve_modified_ts(self.request.db.profiles)
         if self.workmode == 'personal':
-            self.user = user
-            self.user.retrieve_modified_ts(self.request.db.profiles)
-        self.request.session['user'] = user
+            self.request.session['user'] = user
+        else:
+            self.request.session['edit-user'] = user
 
     def propagate_user_changes(self, newuser):
         if self.workmode == 'personal':
@@ -184,7 +186,7 @@ class BaseFactory(object):
             user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
                 newuser = User(newuser)
-                self.request.session['user'] = newuser
+                self.request.session['edit-user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
