@@ -23,10 +23,11 @@
   <body>
     <div id='wrap'>
       <div class="container" style="position: relative">
+
         <div class="masthead">
           {% block loasquare %}
           {% with loa=request.context.get_max_loa() %}
-            <div class='loa-big hidden-xs'>
+            <div class="loa-big hidden-xs" id="eduid-header-loa">
               {% if user is defined %}
                 {{ user.get('mail') }}
               {% endif %}
@@ -37,7 +38,7 @@
           <div class="visible-xs-block">
             <h2>{{ _("eduID Dashboard") }}</h2>
           </div>
-          <ul class="nav nav-pills pull-right">
+          <ul class="nav nav-pills pull-right" id="eduid-header-pills">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
             {% if request.is_logged %}
@@ -45,20 +46,20 @@
             {% else %}
             <li><a href="{{ 'saml2-login'|route_url }}">{{ _("Login") }}</a></li>
             {% endif %}
-            <li class='nav-separator hidden-xs'></li>
+            <li class="nav-separator hidden-xs"></li>
           </ul>
-          <div class="hidden-xs">
+          <div id="eduid-header-logos" class="hidden-xs">
             <a href="{{ request.route_path('home') }}">
-                <img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/>
+              <img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/>
             </a>
             <a href="http://www.sunet.se/">
-                <img src="{{'eduiddashboard:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
+              <img src="{{'eduiddashboard:static/img/SUNET_badge.png'|static_url}}" alt="SUNET logotype"/>
             </a>
           </div>
           <div class="clear-right"></div>
         </div>
 
-       <div class="messages-wrapper">
+       <div class="messages-wrapper" id="eduid-header-messages">
          <div class="messages">
          {% for message in request.session.pop_flash() %}
            <div class="alert alert-{{ message|get_flash_message_type }}">
