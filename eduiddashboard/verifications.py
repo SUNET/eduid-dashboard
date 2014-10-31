@@ -199,18 +199,25 @@ def remove_nin_from_others(nin, request):
     :type request: webob.request.BaseRequest
     :return:
     """
-    query = {'norEduPersonNIN': {'$in': [nin]}, }
+    old_profile_query = {'norEduPersonNIN': {'$in': [nin]}, }  # Backwards compatibility
+    profile_query = {'norEduPersonNIN': {'$elemMatch': {'nin': nin}}}
+    attributes_query = {'norEduPersonNIN': {'$in': [nin]}, }
     users = {}
-    for this in request.db.profiles.find(query):
+    for this in request.db.profiles.find(old_profile_query):
         old_user = User(this)
         users[old_user.get_id()] = old_user
-    for this in request.userdb.get_users(query):
+    for this in request.db.profiles.find(profile_query):
+        old_user = User(this)
+        users[old_user.get_id()] = old_user
+    for this in request.userdb.get_users(attributes_query):
         old_user = User(this)
         users[old_user.get_id()] = old_user
 
     for old_user in users.values():
         log.debug("Removing NIN {!r} from old_user {!r}".format(nin, old_user.get_id()))
+        # TODO Set list items that does not match nin to {'nin': nin, 'verfied': True}
         nins = [this for this in old_user.get_nins() if this != nin]
+        # TODO  nins need to be a list of dicts now
         old_user.set_nins(nins)
         # Remove verified postal address too, since that is based on the NIN
         addresses = [a for a in old_user.get_addresses() if not a['verified']]
