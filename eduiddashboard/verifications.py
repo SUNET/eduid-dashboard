@@ -213,11 +213,11 @@ def save_as_verified(request, model_name, user_oid, obj_id):
         if old['user_oid'] == user_oid:
             already_verified = True
         else:
-    request.db.verifications.find_and_modify(
-        {
-                    '_id': old['_id']
-        },
-        remove=True)
+            request.db.verifications.find_and_modify(
+                {
+                            '_id': old['_id']
+                },
+                remove=True)
     if already_verified:
         return
 

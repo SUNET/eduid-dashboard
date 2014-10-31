@@ -26,7 +26,7 @@ def verifications(context, request):
             code, request.session.get('verifications', [])))
         raise HTTPNotFound(_("Can't locate the code in the active session"))
     try:
-    obj_id = verify_code(request, model_name, code)
+        obj_id = verify_code(request, model_name, code)
     except UserOutOfSync:
         if 'edit-user' in request.session:
             user = request.session['edit-user']

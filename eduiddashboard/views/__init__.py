@@ -170,7 +170,7 @@ class BaseActionsView(object):
                         }
                     else:
                         try:
-                        verify_code(self.request, self.data_attribute,
+                            verify_code(self.request, self.data_attribute,
                                         code_sent)
                         except UserOutOfSync:
                             self.sync_user()
@@ -178,10 +178,10 @@ class BaseActionsView(object):
                                 'result': 'out_of_sync',
                                 'message': self.verify_messages['out_of_sync'],
                             }
-                        return {
-                            'result': 'ok',
-                            'message': self.verify_messages['ok'],
-                        }
+                    return {
+                        'result': 'ok',
+                        'message': self.verify_messages['ok'],
+                    }
                 else:
                     log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
             return {
