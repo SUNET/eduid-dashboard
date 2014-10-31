@@ -28,7 +28,7 @@ RFC2822_email = re.compile("(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+
                            ")+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
 
-def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha256):
+def verify_auth_token(shared_key, eppn, token, nonce, timestamp, generator=sha256):
     # check timestamp to make sure it is within 300 seconds from now
     """
     Authenticate user who just signed up, that haven't confirmed their e-mail
@@ -39,14 +39,14 @@ def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha2
     log a new user into the dashboard.
 
     :param shared_key: auth_token string from configuration
-    :param email: the identifier of the user as string
+    :param eppn: the identifier of the user as string
     :param token: authentication token as string
     :param nonce: a public nonce for this authentication request as string
     :param timestamp: unixtime of signup application as hex string
     :param generator: hash function to use (default: SHA-256)
     :return: bool, True on valid authentication
     """
-    logger.debug("Trying to authenticate user {!r} with auth token {!r}".format(email, token))
+    logger.debug("Trying to authenticate user {!r} with auth token {!r}".format(eppn, token))
     # check timestamp to make sure it is within -300..900 seconds from now
     now = int(time.time())
     ts = int(timestamp, 16)
@@ -60,7 +60,7 @@ def verify_auth_token(shared_key, email, token, nonce, timestamp, generator=sha2
         raise HTTPForbidden(_('Login token invalid'))
 
     expected = generator("{0}|{1}|{2}|{3}".format(
-        shared_key, email, nonce, timestamp)).hexdigest()
+        shared_key, eppn, nonce, timestamp)).hexdigest()
     # constant time comparision of the hash, courtesy of
     # http://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-library/
     if len(expected) != len(token):
@@ -169,11 +169,6 @@ def normalize_email(addr):
 
 def validate_email_format(email):
     return RFC2822_email.match(email)
-
-
-def convert_to_e_164(request, mobile):
-    """ convert a mobile to international notation +XX XXXXXXXX """
-    mobile['mobile'] = normalize_to_e_164(request, mobile['mobile'])
 
 
 def normalize_to_e_164(request, mobile):

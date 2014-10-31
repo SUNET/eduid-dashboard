@@ -8,7 +8,7 @@ from eduid_am.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
-from eduiddashboard.utils import convert_to_e_164
+from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
 
 
@@ -121,8 +121,7 @@ class MobilePhoneUniqueValidator(object):
         request = node.bindings.get('request')
         user = request.context.user
         user_mobiles = [m['mobile'] for m in user.get_mobiles()]
-        mobile = {'mobile': value}
-        convert_to_e_164(request, mobile)
+        mobile = {'mobile': normalize_to_e_164(request, value)}
 
         if 'add' in request.POST:
             if mobile['mobile'] in user_mobiles:
@@ -195,7 +194,7 @@ class NINUniqueValidator(object):
         unverified_user_nins = request.db.verifications.find({
             'obj_id': value,
             'model_name': 'norEduPersonNIN',
-            'user_id': user.get_id(),
+            'user_oid': user.get_id(),
             'verified': False
         })
 

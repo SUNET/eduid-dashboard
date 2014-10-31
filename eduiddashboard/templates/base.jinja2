@@ -27,7 +27,7 @@
         <div class="masthead">
           {% block loasquare %}
           {% with loa=request.context.get_max_loa() %}
-            <div class="loa-big" id="eduid-header-loa">
+            <div class="loa-big hidden-xs" id="eduid-header-loa">
               {% if user is defined %}
                 {{ user.get('mail') }}
               {% endif %}
@@ -35,6 +35,9 @@
             </div>
           {% endwith %}
           {% endblock %}
+          <div class="visible-xs-block">
+            <h2>{{ _("eduID Dashboard") }}</h2>
+          </div>
           <ul class="nav nav-pills pull-right" id="eduid-header-pills">
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
@@ -45,7 +48,7 @@
             {% endif %}
             <li class="nav-separator hidden-xs"></li>
           </ul>
-          <div id="eduid-header-logos">
+          <div id="eduid-header-logos" class="hidden-xs">
             <a href="{{ request.route_path('home') }}">
               <img src="{{'eduiddashboard:static/img/logo_eduID_g_color.svg'|static_url}}" alt="Logotype"/>
             </a>
