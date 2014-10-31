@@ -210,6 +210,7 @@ $(document).ready(function () {
     function reloadTab() {
       // reload active tab in order to refresh the HTML
       $('.nav-tabs li.active a').click();
+      showStatus();
     }
 
     $('body').on('form-submitted action-executed', function() {
@@ -247,6 +248,9 @@ $(document).ready(function () {
         window.setTimeout(statusPolling, {{ polling_timeout_for_admin }});
       }
       statusPolling();
+      $('body').on('action-executed', function() {
+        location.reload();
+      });
     {% endif %}
 
     $('body').on('communication-error', function(){

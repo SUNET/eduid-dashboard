@@ -6,6 +6,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
@@ -14,7 +15,7 @@ from eduiddashboard import log
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verified, remove_nin_from_others)
+                                          save_as_verified)
 
 
 def get_status(request, user):
@@ -64,7 +65,6 @@ def send_verification_code(request, user, nin, code=None):
     You need to replace the call to dummy_message with the govt
     message api
     """
-
     if code is None:
         code = new_verification_code(request, 'norEduPersonNIN', nin, user,
                                      hasher=get_short_hash)
@@ -95,18 +95,35 @@ def get_not_verified_nins_list(request, user):
     :return: List of NINs pending confirmation
     :rtype: [string]
     """
-    verified_nins = user.get_nins()
+    active_nins = user.get_nins()
+    nins = []
     verifications = request.db.verifications
-    all_nins = verifications.find({
+    not_verified_nins = verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
+    if active_nins:
+        active_nin = active_nins[-1]
+        nin_found = False
+        for nin in not_verified_nins:
+            if active_nin == nin['obj_id']:
+                nin_found = True
+            elif nin_found and not nin['verified']:
+                nins.append(nin['obj_id'])
+    else:
+        for nin in not_verified_nins:
+            if not nin['verified']:
+                nins.append(nin['obj_id'])
 
-    res = []
-    for nin in all_nins:
-        if not nin['verified'] and not nin['obj_id'] in verified_nins:
-            res.append(nin['obj_id'])
-    return res
+    return nins
+
+
+def get_active_nin(self):
+    active_nins = self.user.get_nins()
+    if active_nins:
+        return active_nins[-1]
+    else:
+        return None
 
 
 @view_config(route_name='nins-actions', permission='edit')
@@ -114,7 +131,7 @@ class NINsActionsView(BaseActionsView):
 
     data_attribute = 'norEduPersonNIN'
     special_verify_messages = {
-        'success': _('National identity number verified'),
+        'ok': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to your "Min myndighetspost" mailbox.'),
         'placeholder': _('National identity number confirmation code'),
@@ -124,26 +141,43 @@ class NINsActionsView(BaseActionsView):
     def get_verification_data_id(self, data_to_verify):
         return data_to_verify[self.data_attribute]
 
-    def verify_action(self, index, post_data):
+    def verify_action(self, data, post_data):
+        """
+        Only the active (the last one) NIN can be verified
+        """
+        nin, index = data.split()
+        index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
 
-        try:
+        if len(nins) > index:
             verify_nin = nins[index]
-        except IndexError:
-            # XXX Could happen with more than one dashboard, should ideally not use index?
-            raise HTTPNotFound("Something went wrong. Please reload the page.")
+            if verify_nin != nin:
+                return self.sync_user()
+        else:
+            return self.sync_user()
 
-        return super(NINsActionsView, self)._verify_action(verify_nin, post_data)
+        if index != len(nins) - 1:
+            message = _("The provided nin can't be verified. You only "
+                        'can verify the last one')
+            return {
+                'result': 'bad',
+                'message': get_localizer(self.request).translate(message),
+            }
 
-    def remove_action(self, index, post_data):
+        return self._verify_action(verify_nin, post_data)
+
+    def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """
+        nin, index = data.split()
+        index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
 
-        try:
+        if len(nins) > index:
             remove_nin = nins[index]
-        except IndexError:
-            # XXX Could happen with more than one dashboard, should ideally not use index?
-            raise HTTPNotFound("Something went wrong. Please reload the page.")
+            if remove_nin != nin:
+                return self.sync_user()
+        else:
+            return self.sync_user()
 
         verifications = self.request.db.verifications
         verifications.remove({
@@ -155,14 +189,16 @@ class NINsActionsView(BaseActionsView):
 
         message = _('National identity number has been removed')
         return {
-            'result': 'success',
+            'result': 'ok',
             'message': get_localizer(self.request).translate(message),
         }
 
     def send_verification_code(self, data_id, code):
         send_verification_code(self.request, self.user, data_id, code)
 
-    def resend_code_action(self, index, post_data):
+    def resend_code_action(self, data, post_data):
+        nin, index = data.split()
+        index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -174,7 +210,7 @@ class NINsActionsView(BaseActionsView):
 
         message = self.verify_messages['new_code_sent']
         return {
-            'result': 'success',
+            'result': 'ok',
             'message': message,
         }
 
@@ -196,18 +232,29 @@ class NinsView(BaseFormView):
 
     bootstrap_form_style = 'form-inline'
 
+    get_active_nin = get_active_nin
+
     def appstruct(self):
         return {}
 
     def get_template_context(self):
+        """
+            Take active NIN (on am profile)
+            Take NINs from verifications, sorted by older and compared with
+            the present active NIN.
+            If they are older, then don't take it.
+            If there are not verified nins newer than the active NIN, then
+            take them as not verified NINs
+        """
         context = super(NinsView, self).get_template_context()
 
         settings = self.request.registry.settings
 
         context.update({
+            'nins': self.user.get_nins(),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
-            'verified_nins': self.user.get_nins(),
+            'active_nin': self.get_active_nin(),
             'nin_service_url': settings.get('nin_service_url'),
             'nin_service_name': settings.get('nin_service_name'),
         })
@@ -223,9 +270,7 @@ class NinsView(BaseFormView):
         send_verification_code(self.request, self.user, newnin)
 
     def add_success_personal(self, ninform):
-
         self.addition_with_code_validation(ninform)
-
         msg = _('A confirmation code has been sent to your government inbox. '
                 'Please click on "Pending confirmation" link below to enter '
                 'your confirmation code.')
@@ -248,11 +293,9 @@ class NinsView(BaseFormView):
                 'status': 'failure',
                 'data': e.error.asdict()
             }
-
         self.addition_with_code_validation(validated)
-
         return {
-            'status': 'success'
+            'status': 'ok'
         }
 
     def add_success_other(self, ninform):
@@ -261,18 +304,32 @@ class NinsView(BaseFormView):
 
         newnin = normalize_nin(newnin)
 
-        remove_nin_from_others(newnin, self.request)
+        old_user = self.request.db.profiles.find_one({
+            'norEduPersonNIN': newnin
+            })
+
+        if old_user:
+            old_user = User(old_user)
+            old_user.retrieve_modified_ts(self.request.db.profiles)
+            nins = [nin for nin in old_user.get_nins() if nin != newnin]
+            old_user.set_nins(nins)
+            addresses = [a for a in old_user.get_addresses() if not a['verified']]
+            old_user.set_addresses(addresses)
+            old_user.save(self.request)
 
         nins = self.user.get_nins()
         nins.append(newnin)
         self.user.set_nins(nins)
 
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            message = _('User data out of sync. Please try again.')
+        else:
+            message = _('Changes saved')
         # Save the state in the verifications collection
         save_as_verified(self.request, 'norEduPersonNIN',
                             self.user.get_id(), newnin)
-
-        self.user.save(self.request)
-        message = _('Changes saved')
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')
@@ -303,9 +360,9 @@ class NinsWizard(BaseWizard):
 
         result = nins_action_view._verify_action(normalize_nin(self.datakey), data)
 
-        if result['result'] == 'success':
+        if result['result'] == 'ok':
             return {
-                'status': 'success',
+                'status': 'ok',
             }
         else:
             return {
@@ -316,7 +373,6 @@ class NinsWizard(BaseWizard):
             }
 
     def resendcode(self):
-
         if self.datakey is None:
             message = _("Your national identity number confirmation request "
                         "can not be found")
@@ -325,12 +381,12 @@ class NinsWizard(BaseWizard):
                 'status': 'failure',
                 'text': message
             }
-        send_verification_code(self.request, self.context.user, self.datakey)
-
-        message = NINsActionsView.verify_messages['new_code_sent']
+        send_verification_code(self.request,
+                               self.context.user,
+                               self.datakey)
         return {
-            'status': 'success',
-            'text': message,
+            'status': 'ok',
+            'text': NINsActionsView.verify_messages['new_code_sent'],
         }
 
 

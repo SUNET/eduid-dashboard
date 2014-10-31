@@ -28,11 +28,11 @@
           <td class='identifier'>{{ nin }}</td>
           <td>
             <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
-                 data-index='{{ loop.index0 }}' name='verify'>
+                 data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
           </td>
           <td>
             <input type='button' class='btn btn-link' value="{{_('Remove')}}"
-                 data-index='{{ loop.index0 }}' name='remove'>
+                 data-index='{{ nin }} {{ loop.index0 }}' name='remove'>
           </td>
       </tr>
       {% endfor %}

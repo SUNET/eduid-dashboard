@@ -1,0 +1,5 @@
+FROM enriquepablo/python2:0.1
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+RUN apt-get update && apt-get install -y rabbitmq-server

@@ -9,6 +9,7 @@ from pyramid.renderers import render_to_response
 
 from pyramid_deform import FormView
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_short_hash
@@ -20,6 +21,16 @@ from eduiddashboard import log
 
 def get_dummy_status(request, user):
     return None
+
+
+def sync_user(request, context, old_user):
+    user = request.userdb.get_user_by_oid(old_user.get_id())
+    user.retrieve_modified_ts(request.db.profiles)
+    if context.workmode == 'personal':
+        request.session['user'] = user
+    else:
+        request.session['edit-user'] = user
+    return user
 
 
 class BaseFormView(FormView):
@@ -84,17 +95,25 @@ class BaseFormView(FormView):
         location = self.request.route_path(self.base_route)
         raise HTTPXRelocate(location)
 
+    def sync_user(self):
+        self.user = sync_user(self.request, self.context, self.user)
+        message = BaseActionsView.default_verify_messages['out_of_sync']
+        self.request.session.flash(
+                get_localizer(self.request).translate(message),
+                queue='forms')
+
 
 class BaseActionsView(object):
     data_attribute = None
     default_verify_messages = {
-        'success': _('The data has been verified'),
+        'ok': _('The data has been verified'),
         'error': _('Confirmation code is invalid'),
         'request': _('Check your email for further instructions'),
         'placeholder': _('Confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to you'),
         'expired': _('The confirmation code has expired. Please click on '
                      '"Resend confirmation code" to get a new one'),
+        'out_of_sync': _('The user was out of sync. Please try again.'),
     }
 
     def __init__(self, context, request):
@@ -114,7 +133,10 @@ class BaseActionsView(object):
         action = self.request.POST['action']
         action_method = getattr(self, '%s_action' % action)
         post_data = self.request.POST
-        index = int(post_data['identifier'])
+        try:
+            index = int(post_data['identifier'])
+        except ValueError:
+            index = post_data['identifier']
         result = action_method(index, post_data)
         result['action'] = action
         result['identifier'] = index
@@ -147,11 +169,18 @@ class BaseActionsView(object):
                             'message': self.verify_messages['expired'],
                         }
                     else:
+                        try:
                         verify_code(self.request, self.data_attribute,
                                         code_sent)
+                        except UserOutOfSync:
+                            self.sync_user()
+                            return {
+                                'result': 'out_of_sync',
+                                'message': self.verify_messages['out_of_sync'],
+                            }
                         return {
-                            'result': 'success',
-                            'message': self.verify_messages['success'],
+                            'result': 'ok',
+                            'message': self.verify_messages['ok'],
                         }
                 else:
                     log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
@@ -176,16 +205,22 @@ class BaseActionsView(object):
             self.user, hasher=get_short_hash,
         )
         self.send_verification_code(data_id, code)
-
         msg = self.verify_messages['new_code_sent']
-
         return {
-            'result': 'success',
+            'result': 'ok',
             'message': msg,
         }
 
     def send_verification_code(self, data_id, code):
         raise NotImplementedError()
+
+    def sync_user(self):
+        self.user = sync_user(self.request, self.context, self.user)
+        message = self.verify_messages['out_of_sync']
+        return {
+            'result': 'out_of_sync',
+            'message': get_localizer(self.request).translate(message),
+        }
 
 
 class HTTPXRelocate(HTTPOk):
@@ -265,7 +300,7 @@ class BaseWizard(object):
             }})
         message = _('The wizard was dismissed')
         return {
-            'status': 'success',
+            'status': 'ok',
             'message': get_localizer(self.request).translate(message),
         }
 
@@ -288,7 +323,7 @@ class BaseWizard(object):
             post_data = self.request.POST
             response = action_method(post_data)
 
-            if response and response['status'] == 'success':
+            if response and response['status'] == 'ok':
                 self.next_step()
 
         elif self.request.POST['action'] == 'dismissed':

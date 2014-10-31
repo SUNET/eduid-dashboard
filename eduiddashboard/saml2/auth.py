@@ -82,11 +82,11 @@ def authenticate(request, session_info):
     :param request: Request object
     :param session_info: Session info received by pysaml2 client
 
-    :returns: User dict
+    :returns: User
 
     :type request: Request()
     :type session_info: dict()
-    :rtype: dict() or None
+    :rtype: User or None
     """
     if session_info is None:
         raise TypeError('Session info is None')
@@ -110,11 +110,14 @@ def authenticate(request, session_info):
 
     log.debug('Looking for user with {!r} == {!r}'.format(user_main_attribute, saml_user))
     try:
-        return request.userdb.get_user(saml_user)
+        user = request.userdb.get_user(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:
         log.error('No user with {!r} = {!r} found'.format(user_main_attribute, saml_user))
     except request.userdb.exceptions.MultipleUsersReturned:
         log.error("There are more than one user with {!r} = {!r}".format(user_main_attribute, saml_user))
+    else:
+        user.retrieve_modified_ts(request.db.profiles)
+        return user
     return None
 
 

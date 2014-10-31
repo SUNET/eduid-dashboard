@@ -1,0 +1,7 @@
+FROM enriquepablo/python2:0.1
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+CMD ["python", "-m", "smtpd", "-n", "-c", "DebuggingServer", "0.0.0.0:2525"]
+
+EXPOSE 2525

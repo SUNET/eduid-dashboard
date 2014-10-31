@@ -5,6 +5,7 @@ import deform
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
@@ -79,7 +80,10 @@ class EmailsActionsView(BaseActionsView):
             }
 
         self.user.set_mail(mail['email'])
-        self.user.save(self.request)
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            return self.sync_user()
 
         message = _('Your primary email address was '
                     'successfully changed')
@@ -104,7 +108,10 @@ class EmailsActionsView(BaseActionsView):
         if not primary_email or primary_email == remove_email:
             self.user.set_mail(emails[0]['email'])
 
-        self.user.save(self.request)
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            return self.sync_user()
 
         message = _('Email address was successfully removed')
         return {
@@ -162,20 +169,24 @@ class EmailsView(BaseFormView):
         emails.append(mailsubdoc)
 
         self.user.set_mail_aliases(emails)
-        self.user.save(self.request)
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            self.sync_user()
 
-        message = _('Changes saved')
-        self.request.session.flash(
-                get_localizer(self.request).translate(message),
-                queue='forms')
+        else:
+            message = _('Changes saved')
+            self.request.session.flash(
+                    get_localizer(self.request).translate(message),
+                    queue='forms')
 
-        send_verification_mail(self.request, newemail['mail'])
+            send_verification_mail(self.request, newemail['mail'])
 
-        second_msg = _('A confirmation email has been sent to your email '
-                'address. Please enter your confirmation code '
-                '<a href="#" class="verifycode" '
-                'data-identifier="${id}">here</a>.',
-                                     mapping={'id': len(emails)})
-        self.request.session.flash(
-                get_localizer(self.request).translate(second_msg),
-                queue='forms')
+            second_msg = _('A confirmation email has been sent to your email '
+                    'address. Please enter your confirmation code '
+                    '<a href="#" class="verifycode" '
+                    'data-identifier="${id}">here</a>.',
+                                         mapping={'id': len(emails)})
+            self.request.session.flash(
+                    get_localizer(self.request).translate(second_msg),
+                    queue='forms')

@@ -1,0 +1,56 @@
+FROM enriquepablo/python2:0.1
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+RUN apt-get update && apt-get install -y \
+  sed \
+  git \
+  xmlsec1 \
+  libxmlsec1 \
+  libxmlsec1-openssl \
+  swig \
+  wget
+
+RUN ln -s /usr/lib/libxmlsec1-openssl.so.1 /usr/lib/libxmlsec1-openssl.so
+
+RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python2
+
+RUN easy_install m2crypto
+
+RUN apt-get install libxml2-dev libxslt-dev \
+  && cd /opt \
+  && git clone git://github.com/SUNET/eduid-am.git \
+  && cd eduid-am \
+  && python2.7 setup.py develop \
+  && cd .. \
+  && git clone git://github.com/SUNET/eduid_msg.git \
+  && cd eduid_msg \
+  && python2.7 setup.py develop \
+  && cd .. \
+  && git clone git://github.com/SUNET/eduid-dashboard.git \
+  && cd eduid-dashboard \
+  && python2.7 setup.py develop
+
+RUN cd /opt/eduid-dashboard \
+  && mkdir certs \
+  && cd certs \
+  && openssl genrsa -out server.key 2048 \
+  &&  openssl req -new -key server.key -out server.csr  -multivalue-rdn -subj /DC=org/DC=OpenSSL/DC=users/UID=123456+CN=JohnDoe \
+  && openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
+
+RUN cd /opt/eduid-dashboard \
+  && cp eduiddashboard/saml2/tests/data/remote_metadata.xml . \
+  && sed -e "s/^\(.*debugtoolbar.*\)$/# \1/" \
+         -e "s/127.0.0.1:5672\/eduid_vhost/rabbitmq:5672\/eduid_vhost/" \
+         -e "s/127.0.0.1:5672\/eduid_msg/rabbitmq:5672\/eduid_msg/" \
+         -e "s/^\(mail.host =\).\+/\1 192.168.122.1/" \
+         -e "s/^\(mail.port =\).\+/\1 2525/" \
+         -e "s/mongodb:\/\/localhost/mongodb:\/\/mongo/" \
+         -e "s/^\(vccs_url =\).\+/\1 http:\/\/eduid_vccs:8550\//" \
+          <config-templates/development.ini >development.ini \
+  && sed "s|^\(BASE_URL =\).\+$|import os\n\1 os.environ\['EDUID_DASHBOARD_BASE_URL'\]|" \
+          <config-templates/saml2_settings.py >saml2_settings.py
+
+WORKDIR /opt/eduid-dashboard
+
+CMD ["pserve", "development.ini", "--reload"]

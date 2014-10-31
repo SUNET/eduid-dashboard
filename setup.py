@@ -21,10 +21,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.2.3'
+version = '0.3.0-dev'
 
 requires = [
-    'eduid_am==0.4.9',
+    'eduid_am==0.5.0-dev',
     'pymongo==2.6.3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',

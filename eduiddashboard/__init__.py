@@ -248,6 +248,10 @@ def main(global_config, **settings):
     """
     settings = dict(settings)
 
+    settings['debug_mode'] = read_setting_from_env_bool(settings,
+                                                        'debug_mode',
+                                                        default=False)
+
     # read pyramid_mailer options
     for key, default in (
         ('host', 'localhost'),

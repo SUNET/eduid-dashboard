@@ -218,6 +218,10 @@ class NINReachableValidator(object):
         value = normalize_nin(copy(value))
         request = node.bindings.get('request')
         settings = request.registry.settings
+
+        if settings.get('debug_mode', False):
+            return
+        
         msg = None
         try:
             reachable = request.msgrelay.nin_reachable(value)

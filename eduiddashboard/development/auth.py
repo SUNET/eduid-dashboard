@@ -34,6 +34,7 @@ def login(request, username):
     Used to set up minimal session parameters for a user.
     """
     user = request.userdb.get_user('%s@example.com' % username)
+    user.retrieve_modified_ts(request.db.profiles)
 
     if username == 'admin':
         al_level = 'http://www.swamid.se/policy/assurance/al3'

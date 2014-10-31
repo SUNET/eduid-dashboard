@@ -1,0 +1,34 @@
+FROM enriquepablo/python2:0.1
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+RUN apt-get update && apt-get install -y \
+  sed \
+  wget \
+  git
+
+RUN wget https://bootstrap.pypa.io/ez_setup.py -O - | python2
+
+RUN cd /opt \
+  && git clone git://github.com/SUNET/eduid-am.git \
+  && cd eduid-am \
+  && python2.7 setup.py develop \
+  && cd .. \
+  && git clone git://github.com/SUNET/eduid-signup.git \
+  && cd eduid-signup \
+  && python2.7 setup.py develop
+
+RUN cd /opt/eduid-signup \
+  && sed -e "s/^\(.*debugtoolbar.*\)$/# \1/" \
+         -e "s/^\(profile_link =\).\+/\1 http:\/\/dashboard\//" \
+         -e "s/^\(reset_password_link =\).\+/\1 http:\/\/eduid_dashboard\/reset_password/" \
+         -e "s/^\(broker_url =\).\+/\1 amqp:\/\/rabbitmq\//" \
+         -e "s/^\(mail.host =\).\+/\1 smtp-debug/" \
+         -e "s/^\(mail.port =\).\+/\1 2525/" \
+         -e "s/mongodb:\/\/localhost/mongodb:\/\/mongo/" \
+         -e "s/^\(vccs_url =\).\+/\1 http:\/\/eduid_vccs:8550\//" \
+          <config-templates/development.ini >development.ini
+
+WORKDIR /opt/eduid-signup
+
+CMD ["pserve", "development.ini", "--reload"]

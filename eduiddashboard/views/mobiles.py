@@ -5,6 +5,7 @@ import deform
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash, normalize_to_e_164
@@ -67,7 +68,6 @@ def send_verification_code(request, user, mobile_number, code=None):
                                      hasher=get_short_hash)
 
     user_language = request.context.get_preferred_language()
-
     request.msgrelay.mobile_validator(mobile_number, code, user_language)
 
 
@@ -92,7 +92,10 @@ class MobilesActionsView(BaseActionsView):
 
         self.user.set_mobiles(mobiles)
 
-        self.user.save(self.request)
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            return self.sync_user()
 
         message = _('Mobile phone number was successfully removed')
         return {
@@ -126,7 +129,11 @@ class MobilesActionsView(BaseActionsView):
         mobiles[index]['primary'] = True
 
         self.user.set_mobiles(mobiles)
-        self.user.save(self.request)
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            return self.sync_user()
+
 
         message = _('Mobile phone number was successfully made primary')
         return {
@@ -173,14 +180,18 @@ class MobilesView(BaseFormView):
                   'primary': False,
                   }
         self.user.add_mobile(mobile)
-        self.user.save(self.request)
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            self.sync_user()
+            
+        else:
+            send_verification_code(self.request, self.user, mobile_number)
 
-        send_verification_code(self.request, self.user, mobile_number)
-
-        self.request.session.flash(_('Changes saved'),
-                                   queue='forms')
-        msg = _('A confirmation code has been sent to your mobile phone. '
-                'Please click on the "Pending confirmation" link below and enter your confirmation code.')
-        msg = get_localizer(self.request).translate(msg)
-        self.request.session.flash(msg,
-                                   queue='forms')
+            self.request.session.flash(_('Changes saved'),
+                                       queue='forms')
+            msg = _('A confirmation code has been sent to your mobile phone. '
+                    'Please click on the "Pending confirmation" link below and enter your confirmation code.')
+            msg = get_localizer(self.request).translate(msg)
+            self.request.session.flash(msg,
+                                       queue='forms')
