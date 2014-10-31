@@ -145,7 +145,7 @@ class NinsFormTests(LoggedInReguestTests):
         }).count()
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'success')
+        self.assertEqual(response_json['result'], 'ok')
         self.assertEqual(nins_before - 1, nins_after)
 
     def test_remove_not_existant_nin(self):
@@ -201,7 +201,7 @@ class NinsFormTests(LoggedInReguestTests):
             )
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'success')
+        self.assertEqual(response_json['result'], 'ok')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = User(old_user)
@@ -313,7 +313,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                 'norEduPersonNIN': '12341234-1234',
                 'code': '1234',
             }, status=200)
-            self.assertEqual(response.json['status'], 'success')
+            self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')
