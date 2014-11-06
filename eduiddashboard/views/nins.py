@@ -311,6 +311,7 @@ class NinsView(BaseFormView):
         nins = self.user.get_nins()
         nins.append(newnin)
         self.user.set_nins(nins)
+        self.user.retrieve_address(self.request, newnin)
 
         try:
             self.user.save(self.request)
