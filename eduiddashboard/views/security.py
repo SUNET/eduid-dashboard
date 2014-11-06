@@ -34,7 +34,8 @@ def change_password(request, user, old_password, new_password):
     vccs_url = request.registry.settings.get('vccs_url')
     added = add_credentials(vccs_url, old_password, new_password, user)
     if added:
-        user.save(request)
+        update_doc = {'$set': {'passwords': user.get_passwords()}}
+        user.save(request, check_sync=False, update_doc=update_doc)
     return added
 
 
