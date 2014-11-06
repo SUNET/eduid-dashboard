@@ -126,7 +126,10 @@ def get_authn_info(request):
     :param request: the request object
     :return: a list of dicts [{'type': string, 'created_ts': timestamp, 'success_ts': timestamp }]
     """
-    user = request.session['user']
+    if 'edit-user' in request.session:
+        user = request.session['edit-user']
+    else:
+        user = request.session['user']
 
     authninfo = []
 
@@ -206,7 +209,10 @@ class PasswordsView(BaseFormView):
 
     def save_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
-        user = self.request.session['user']
+        if 'edit-user' in self.request.session:
+            user = self.request.session['edit-user']
+        else:
+            user = self.request.session['user']
 
         if passwords_data.get('use_custom_password') == 'true':
             # The user has entered his own password and it was verified by

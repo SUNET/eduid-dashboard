@@ -24,7 +24,10 @@ class OldPasswordValidator(object):
         old_password = value
         old_password = old_password.replace(" ", "")
 
-        userid = request.session['user'].get_id()
+        if 'edit-user' in request.session:
+            userid = request.session['edit-user'].get_id()
+        else:
+            userid = request.session['user'].get_id()
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         user = request.userdb.get_user_by_oid(userid)
         # XXX if we saved user['passwords'] to node.bindings.request['user']['passwords'] here,
