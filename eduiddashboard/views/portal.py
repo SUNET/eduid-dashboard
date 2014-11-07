@@ -1,6 +1,8 @@
 import deform
 import re
 
+import vccs_client
+
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.renderers import render_to_response
@@ -16,9 +18,9 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_max_available_loa,
                                   get_available_tabs)
 from eduiddashboard.i18n import TranslationString as _
-
+from eduiddashboard.vccs import get_vccs_client
+from eduiddashboard.saml2.auth import logout
 from eduiddashboard.views.nins import nins_open_wizard
-
 from eduiddashboard.models import UserSearcher
 
 import logging
@@ -206,6 +208,41 @@ def set_language(context, request):
     response.set_cookie(cookie_name, value=lang, **extra_options)
 
     return response
+
+
+@view_config(route_name='terminate-account', request_method='POST',
+             renderer='templates/account-terminated.jinja2',
+             permission='edit')
+def terminate_account(context, request):
+    '''
+    '''
+    settings = request.registry.settings
+
+    # check csrf
+    csrf = request.POST.get('csrf')
+    if csrf != request.session.get_csrf_token():
+        return HTTPBadRequest()
+
+    # revoke all user credentials
+    vccs = get_vccs_client(settings.get('vccs_url'))
+    passwords = context.user.get_passwords()
+    to_revoke = []
+    for passwd_dict in passwords:
+        credential_id = str(passwd_dict['id'])
+        factor = vccs_client.VCCSRevokeFactor(
+            credential_id,
+            'subscriber requested termination',
+            reference='dashboard'
+        )
+        to_revoke.append(factor)
+    userid = str(context.user.get_id())
+    vccs.revoke_credentials(userid, to_revoke)
+    context.user.set_passwords([])
+
+    # logout
+    logout(request)
+    
+    return {}
 
 
 @view_config(route_name='error500test')

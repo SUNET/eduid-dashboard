@@ -1,0 +1,15 @@
+{% extends "templates/base.jinja2" %}
+
+{% block loasquare %}
+{% endblock %}
+
+{% block contents %}
+
+<div class="alert">{{ _("eduID account terminated.") }}</div>
+
+{% trans email=context.user.mail %}
+  <p>The eduID account associated with the email address {{ email }} has been terminated.</p>
+  <p>An email has been sent to said address informing of the termination.</p>
+{% endtrans %}
+
+{% endblock %}

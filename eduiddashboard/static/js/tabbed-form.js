@@ -87,6 +87,12 @@ var TabbedForm = function (container) {
             });
         },
 
+        initialize_account_termination = function () {
+            $('#init-termination-btn').click(function (e) {
+                $('#terminate-account-dialog').modal('show');
+            });
+        },
+
         initialize = function () {
             var opentab = location.toString().split('#')[1];
 
@@ -113,6 +119,8 @@ var TabbedForm = function (container) {
             } else {
                 initialize_verification(opentab);
             }
+
+            initialize_account_termination();
         };
 
     initialize();
