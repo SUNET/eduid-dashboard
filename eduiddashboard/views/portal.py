@@ -22,6 +22,7 @@ from eduiddashboard.vccs import get_vccs_client
 from eduiddashboard.saml2.auth import logout
 from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.models import UserSearcher
+from eduiddashboard.emails import send_termination_mail
 
 import logging
 logger = logging.getLogger(__name__)
@@ -238,6 +239,13 @@ def terminate_account(context, request):
     userid = str(context.user.get_id())
     vccs.revoke_credentials(userid, to_revoke)
     context.user.set_passwords([])
+
+    # flag account as terminated
+    context.user.set_terminated()
+    context.user.save(check_sync=False)
+
+    # email the user
+    send_termination_mail(request, context.user)
 
     # logout
     logout(request)

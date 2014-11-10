@@ -47,3 +47,33 @@ def send_verification_mail(request, email, code=None):
     )
 
     mailer.send(message)
+
+
+def send_termination_mail(request, user):
+    mailer = get_mailer(request)
+    email = user.get_mail()
+    site_name = request.registry.settings.get("site.name", "eduID")
+
+    context = {
+        'email': email,
+        'displayName': user.get_display_name();
+    }
+
+    message = Message(
+        subject=_("{site_name} account termination").format(
+            site_name=site_name),
+        sender=request.registry.settings.get("mail.default_sender"),
+        recipients=[email],
+        body=render(
+            "templates/termination_email.txt.jinja2",
+            context,
+            request,
+        ),
+        html=render(
+            "templates/termination_email.html.jinja2",
+            context,
+            request,
+        ),
+    )
+
+    mailer.send(message)

@@ -172,6 +172,13 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertNotIn('Your password has been successfully updated',
                              response.body)
 
+    def test_terminate_account(self):
+        self.set_logged()
+        response = self.testapp.get('/profile/')
+        form = response.forms['terminate-account-form']
+        form_response = form.submit('submit')
+        self.assertEqual(form_response.status, '200 OK')
+
     def tearDown(self):
         super(PasswordFormTests, self).tearDown()
         self.patcher.stop()
