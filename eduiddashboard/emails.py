@@ -55,8 +55,8 @@ def send_termination_mail(request, user):
     site_name = request.registry.settings.get("site.name", "eduID")
 
     context = {
-        'email': email,
-        'displayName': user.get_display_name();
+        'mail': email,
+        'displayName': user.get_display_name()
     }
 
     message = Message(

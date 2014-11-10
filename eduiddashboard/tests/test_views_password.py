@@ -23,7 +23,7 @@ class FakeVCCSClient(vccs_client.VCCSClient):
 
     def _execute_request_response(self, _service, _values):
         if self.fake_response is not None:
-            return self.fake_response
+            return json.dumps(self.fake_response)
 
         fake_response = {}
         if _service == 'add_creds':
@@ -172,16 +172,27 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertNotIn('Your password has been successfully updated',
                              response.body)
 
+    def tearDown(self):
+        super(PasswordFormTests, self).tearDown()
+        self.patcher.stop()
+
+
+class TerminateAccountTests(LoggedInReguestTests):
+
     def test_terminate_account(self):
         self.set_logged()
         response = self.testapp.get('/profile/')
         form = response.forms['terminate-account-form']
-        form_response = form.submit('submit')
-        self.assertEqual(form_response.status, '200 OK')
-
-    def tearDown(self):
-        super(PasswordFormTests, self).tearDown()
-        self.patcher.stop()
+        with patch('eduiddashboard.views.portal.get_vccs_client'):
+            from eduiddashboard.views.portal import get_vccs_client
+            get_vccs_client.return_value = FakeVCCSClient(fake_response={
+                'revoke_creds_response': {
+                    'version': 1,
+                    'success': True,
+                },
+            })
+            form_response = form.submit('submit')
+            self.assertEqual(form_response.status, '200 OK')
 
 
 TEST_USER = {

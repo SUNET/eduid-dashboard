@@ -242,7 +242,7 @@ def terminate_account(context, request):
 
     # flag account as terminated
     context.user.set_terminated()
-    context.user.save(check_sync=False)
+    context.user.save(request, check_sync=False)
 
     # email the user
     send_termination_mail(request, context.user)
