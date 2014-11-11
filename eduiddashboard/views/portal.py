@@ -2,6 +2,7 @@ import deform
 import re
 
 import vccs_client
+from saml2.client import Saml2Client
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
@@ -20,6 +21,8 @@ from eduiddashboard.utils import (verify_auth_token,
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import get_vccs_client
 from eduiddashboard.saml2.auth import logout
+from eduiddashboard.saml2.cache import IdentityCache, StateCache
+from eduiddashboard.saml2.views import _get_name_id
 from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
@@ -248,8 +251,14 @@ def terminate_account(context, request):
     send_termination_mail(request, context.user)
 
     # logout
+    state = StateCache(request.session)
+    client = Saml2Client(request.saml2_config, state_cache=state,
+                         identity_cache=IdentityCache(request.session))
+    subject_id = _get_name_id(request.session)
+    client.global_logout(subject_id)
+    state.sync()
     logout(request)
-    
+
     return {}
 
 
