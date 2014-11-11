@@ -183,6 +183,8 @@ class TerminateAccountTests(LoggedInReguestTests):
         self.set_logged()
         response = self.testapp.get('/profile/')
         form = response.forms['terminate-account-form']
+        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
+        self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
         with patch('eduiddashboard.views.portal.get_vccs_client'):
             from eduiddashboard.views.portal import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
@@ -193,6 +195,9 @@ class TerminateAccountTests(LoggedInReguestTests):
             })
             form_response = form.submit('submit')
             self.assertEqual(form_response.status, '200 OK')
+            self.assertIn('eduID account terminated', form_response.body)
+        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
+        self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
 
 
 TEST_USER = {
