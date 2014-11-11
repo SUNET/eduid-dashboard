@@ -199,6 +199,45 @@ class TerminateAccountTests(LoggedInReguestTests):
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
         self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
 
+    def test_reset_password_unterminates_account(self):
+        self.set_logged()
+        response = self.testapp.get('/profile/')
+        form = response.forms['terminate-account-form']
+        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
+        self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
+        with patch('eduiddashboard.views.portal.get_vccs_client'):
+            from eduiddashboard.views.portal import get_vccs_client
+            get_vccs_client.return_value = FakeVCCSClient(fake_response={
+                'revoke_creds_response': {
+                    'version': 1,
+                    'success': True,
+                },
+            })
+            form_response = form.submit('submit')
+        self.assertEqual(form_response.status, '200 OK')
+        self.assertIn('eduID account terminated', form_response.body)
+        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
+        self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
+
+        hash_code = '123456'
+        date = datetime.now(pytz.utc)
+        self.db.reset_passwords.insert({
+            'email': 'johnsmith@example.com',
+            'hash_code': hash_code,
+            'mechanism': 'email',
+            'created_at': date
+        }, safe=True)
+        response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
+        self.assertIn('Please choose a new password for your eduID account', response.text)
+        form = response.forms['resetpasswordstep2view-form']
+        with patch('eduiddashboard.vccs.get_vccs_client'):
+            from eduiddashboard.vccs import get_vccs_client
+            get_vccs_client.return_value = FakeVCCSClient()
+            form_resp = form.submit('reset')
+
+        self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
+        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 1)
+
 
 TEST_USER = {
         '_id': ObjectId('012345678901234567890123'),
