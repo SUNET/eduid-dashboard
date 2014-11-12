@@ -4,6 +4,7 @@ from datetime import datetime
 import unittest
 from os import path
 
+import pymongo
 from webtest import TestApp, TestRequest
 
 from pyramid.config import Configurator
@@ -136,7 +137,11 @@ class Saml2RequestTests(unittest.TestCase):
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
         self.userdb = MockedUserDB()
-        self.db = get_db(self.settings)
+        try:
+            self.db = get_db(self.settings)
+        except pymongo.errors.ConnectionFailure:
+            raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
+                self.settings['mongo_uri']))
         self.db.profiles.drop()
         userdocs = []
         for userdoc in self.userdb.all_userdocs():
