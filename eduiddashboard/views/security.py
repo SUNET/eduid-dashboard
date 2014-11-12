@@ -36,7 +36,8 @@ def change_password(request, user, old_password, new_password):
     if added:
         user.set_terminated(terminate=False)
         update_doc = {'$set': {'passwords': user.get_passwords(),
-                               'terminated': False}}
+                               'terminated': False,
+                               'terminated_ts': None}}
         user.save(request, check_sync=False, update_doc=update_doc)
     return added
 

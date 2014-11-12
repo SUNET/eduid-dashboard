@@ -185,8 +185,8 @@ class TerminateAccountTests(LoggedInReguestTests):
         form = response.forms['terminate-account-form']
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
         self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
-        with patch('eduiddashboard.views.portal.get_vccs_client'):
-            from eduiddashboard.views.portal import get_vccs_client
+        with patch('eduiddashboard.vccs.get_vccs_client'):
+            from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
                 'revoke_creds_response': {
                     'version': 1,
@@ -208,8 +208,8 @@ class TerminateAccountTests(LoggedInReguestTests):
         form = response.forms['terminate-account-form']
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
         self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
-        with patch('eduiddashboard.views.portal.get_vccs_client'):
-            from eduiddashboard.views.portal import get_vccs_client
+        with patch('eduiddashboard.vccs.get_vccs_client'):
+            from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
                 'revoke_creds_response': {
                     'version': 1,

@@ -1,8 +1,6 @@
 import deform
 import re
 
-import vccs_client
-
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
 from pyramid.renderers import render_to_response
@@ -18,11 +16,11 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_max_available_loa,
                                   get_available_tabs)
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.vccs import get_vccs_client
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
+from eduiddashboard.vccs import revoke_all_credentials
 
 import logging
 logger = logging.getLogger(__name__)
@@ -232,19 +230,7 @@ def terminate_account(context, request):
         return HTTPBadRequest()
 
     # revoke all user credentials
-    vccs = get_vccs_client(settings.get('vccs_url'))
-    passwords = context.user.get_passwords()
-    to_revoke = []
-    for passwd_dict in passwords:
-        credential_id = str(passwd_dict['id'])
-        factor = vccs_client.VCCSRevokeFactor(
-            credential_id,
-            'subscriber requested termination',
-            reference='dashboard'
-        )
-        to_revoke.append(factor)
-    userid = str(context.user.get_id())
-    vccs.revoke_credentials(userid, to_revoke)
+    revoke_all_credentials(settings.get('vccs_url'), context.user)
     context.user.set_passwords([])
 
     # flag account as terminated
