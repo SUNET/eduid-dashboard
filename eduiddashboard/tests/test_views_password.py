@@ -194,8 +194,11 @@ class TerminateAccountTests(LoggedInReguestTests):
                 },
             })
             form_response = form.submit('submit')
-            self.assertEqual(form_response.status, '200 OK')
-            self.assertIn('eduID account terminated', form_response.body)
+            self.assertEqual(form_response.status, '302 Found')
+            form_response = self.testapp.get(form_response.location)
+            self.assertEqual(form_response.status, '302 Found')
+            form_response = self.testapp.get(form_response.location)
+        self.assertEqual(form_response.status, '200 OK')
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
         self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
 
@@ -214,8 +217,11 @@ class TerminateAccountTests(LoggedInReguestTests):
                 },
             })
             form_response = form.submit('submit')
+            self.assertEqual(form_response.status, '302 Found')
+            form_response = self.testapp.get(form_response.location)
+            self.assertEqual(form_response.status, '302 Found')
+            form_response = self.testapp.get(form_response.location)
         self.assertEqual(form_response.status, '200 OK')
-        self.assertIn('eduID account terminated', form_response.body)
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
         self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
 

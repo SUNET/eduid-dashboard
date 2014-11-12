@@ -169,6 +169,9 @@ def profile_urls(config):
     config.add_route('terminate-account', '/terminate-account/',
                      factory=PersonFactory)
 
+    config.add_route('account-terminated', '/account-terminated/',
+                     factory=RootFactory)
+
     # wizard routes
     config.add_route('wizard-nins', '/nin-wizard/',
                      factory=NinsFactory)

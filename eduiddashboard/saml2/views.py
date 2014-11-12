@@ -269,7 +269,8 @@ def logout_service(request):
     settings = request.registry.settings
 
     logout_redirect_url = settings.get('saml2.logout_redirect_url')
-    next_page = request.GET.get('next_page', logout_redirect_url)
+    next_page = request.session.get('next_page', logout_redirect_url)
+    next_page = request.GET.get('next_page', next_page)
 
     if 'SAMLResponse' in request.GET:  # we started the logout
         log.debug('Receiving a logout response from the IdP')
