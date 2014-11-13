@@ -219,6 +219,7 @@ def set_language(context, request):
              renderer='templates/account-terminated.jinja2',)
 def account_terminated(context, request):
     '''
+    landing page after account termination
     '''
     return {}
 
@@ -227,6 +228,13 @@ def account_terminated(context, request):
              permission='edit')
 def terminate_account(context, request):
     '''
+    Terminate account view.
+    It receives a POST request, checks the csrf token,
+    removes all credentials for the terminated account
+    from the VCCS service,
+    flags the account as terminated,
+    sends an email to the address in the terminated account,
+    and logs out the session.
     '''
     settings = request.registry.settings
 

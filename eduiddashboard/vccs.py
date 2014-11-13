@@ -178,6 +178,9 @@ def revoke_all_credentials(vccs_url, user):
             'subscriber requested termination',
             reference='dashboard'
         )
+        log.debug("Revoked old credential (account termination)"
+                  " {!s} (user {!s})".format(
+                      credential_id, user.get_id()))
         to_revoke.append(factor)
     userid = str(user.get_id())
     vccs.revoke_credentials(userid, to_revoke)
