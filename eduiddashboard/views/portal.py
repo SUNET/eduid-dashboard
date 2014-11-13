@@ -155,8 +155,14 @@ def help(context, request):
 
     locale_name = get_locale_name(request)
     template = 'eduiddashboard:templates/help-%s.jinja2' % locale_name
+    support_email = request.registry.settings.get('mail.support_email',
+                                                  'support@eduid.se')
+    template_context = {
+        'user':context.user.get_doc(),
+        'support_email': support_email
+    }
 
-    return render_to_response(template, {'user':context.user.get_doc()}, request=request)
+    return render_to_response(template, template_context, request=request)
 
 
 @view_config(route_name='token-login', request_method='POST')
