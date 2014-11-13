@@ -10,16 +10,15 @@
 
   {{ safe_actions_url('nins-actions') }}
 
+  <div class="table-responsive">
     <table class='table table-striped table-thin table-form nins'>
-    {% if verified_nins %}
-      {% for nin in verified_nins %}
-        <tr class='ninrow'>
-            <td class='identifier'>{{ nin }}</td>
+    {% if active_nin %}
+        <tr class='ninrow' data-identifier="0">
+            <td class='identifier'>{{ active_nin }}</td>
             <td><span class='nobutton'>{{_("Verified")}}</span></td>
             <td><span class='nobutton'>{{_("Active")}}</span></td>
             <td></td>
         </tr>
-      {% endfor %}
     {% endif %}
     {% if not_verified_nins %}
       {% for nin in not_verified_nins %}
@@ -27,23 +26,25 @@
           <td class='identifier'>{{ nin }}</td>
           <td>
             <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
-                 data-index='{{ loop.index0 }}' name='verify'>
+                 data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
           </td>
           <td>
             <input type='button' class='btn btn-link' value="{{_('Remove')}}"
-                 data-index='{{ loop.index0 }}' name='remove'>
+                 data-index='{{ nin }} {{ loop.index0 }}' name='remove'>
           </td>
       </tr>
       {% endfor %}
     {% endif %}
     </table>
-    {% if verified_nins %}
+  </div>
+
+    {% if active_nin %}
         <p>{% trans %}Your identity is already confirmed. No further action is required here.{% endtrans %}</p>
     {% endif %}
 {% endblock %}
 
 {% block form_generic_form %}
-  {% if not verified_nins or not_verified_nins %}
+  {% if not active_nin %}
     <div class='form-content'>
       {{ form|safe }}
     </div>

@@ -1,0 +1,19 @@
+{% extends "templates/base.jinja2" %}
+
+{% block loasquare %}
+{% endblock %}
+
+{% block title %}
+
+<h2>{{ _("eduID account terminated.") }}</h2>
+
+{% endblock %}
+
+{% block contents %}
+
+{% trans %}
+  <p>Your eduID account has been terminated.</p>
+  <p>An email has been sent to your address informing of the termination.</p>
+{% endtrans %}
+
+{% endblock %}

@@ -2,7 +2,10 @@
 
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.i18n import get_localizer
 
+from eduid_am.exceptions import UserOutOfSync
+from eduiddashboard.views import sync_user
 from eduiddashboard.verifications import verify_code, get_verification_code
 from eduiddashboard.i18n import TranslationString as _
 
@@ -22,8 +25,18 @@ def verifications(context, request):
         log.debug("Code {!r} not found in active sessions verifications: {!r}".format(
             code, request.session.get('verifications', [])))
         raise HTTPNotFound(_("Can't locate the code in the active session"))
-
-    obj_id = verify_code(request, model_name, code)
+    try:
+        obj_id = verify_code(request, model_name, code)
+    except UserOutOfSync:
+        if 'edit-user' in request.session:
+            user = request.session['edit-user']
+        else:
+            user = request.session['user']
+        sync_user(request, context, user)
+        msg = _('The user was out of sync. Please try again.')
+        msg = get_localizer(request).translate(msg)
+        request.session.flash(msg),
+        raise HTTPFound(request.context.route_url('profile-editor'))
 
     if obj_id is not None:
         return HTTPFound(location=request.route_url('home'))

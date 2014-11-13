@@ -4,6 +4,7 @@ from deform import Button
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 
@@ -67,12 +68,15 @@ class PersonalDataView(BaseFormView):
 
         # Insert the new/updated user object
         self.user.get_doc().update(person)
-        self.user.save(self.request)
-
-        message = _('Changes saved')
-        self.request.session.flash(
-                get_localizer(self.request).translate(message),
-                queue='forms')
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            self.sync_user()
+        else:
+            message = _('Changes saved')
+            self.request.session.flash(
+                    get_localizer(self.request).translate(message),
+                    queue='forms')
 
         if new_preferred_language != old_preferred_language:
             self.full_page_reload()

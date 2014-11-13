@@ -194,7 +194,7 @@ class MobilesFormTests(LoggedInReguestTests):
                 )
 
                 response_json = json.loads(response.body)
-                self.assertEqual(response_json['result'], 'success')
+                self.assertEqual(response_json['result'], 'ok')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = User(old_user)

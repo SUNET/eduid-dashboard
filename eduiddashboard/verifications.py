@@ -3,8 +3,10 @@ from datetime import datetime, timedelta
 from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
+from pyramid.httpexceptions import HTTPFound
 
 from eduid_am.user import User
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard import log
@@ -99,19 +101,49 @@ def verify_code(request, model_name, code):
         return
 
     reference = unicode(this_verification['_id'])
-    data = this_verification['obj_id']
+    obj_id = this_verification['obj_id']
 
-    if not data:
-        return
+    if obj_id:
+        msg = "Code {!r} ({!s}) marked as verified"
+        log.debug(msg.format(code, str(obj_id)))
 
-    log.debug("Processing {!r} code {!r} ({!s})".format(model_name, code, str(data)))
+        if 'edit-user' in request.session:
+            # non personal mode
+            user = request.session['edit-user']
+        elif 'user' in request.session:
+            # personal mode
+            user = request.session['user']
+        else:
+            # should not happen
+            user = request.userdb.get_user_by_oid(unverified['user_oid'])
+            user.retrieve_modified_ts(request.db.profiles)
+        assert user.get_id() == unverified['user_oid']
+        old_verified = request.db.verifications.find_one(
+            {
+                "model_name": model_name,
+                "obj_id": unverified['obj_id'],
+                "verified": True
+            })
 
-    user = request.userdb.get_user_by_oid(this_verification['user_oid'])
+        old_user = None
+        if old_verified:
+            old_user = request.userdb.get_user_by_oid(old_verified['user_oid'])
+            old_user.retrieve_modified_ts(request.db.profiles)
 
     if model_name == 'norEduPersonNIN':
-        remove_nin_from_others(data, request)
-        user.add_verified_nin(reference, data)
-        user.retrieve_address(request, data)
+        if not old_user:
+            old_user_doc = request.db.profiles.find_one({
+                'norEduPersonNIN': obj_id
+            })
+            if old_user_doc:
+               old_user = User(old_user_doc)
+        if old_user:
+            nins = [nin for nin in old_user.get_nins() if nin != obj_id]
+            old_user.set_nins(nins)
+            addresses = [a for a in old_user.get_addresses() if not a['verified']]
+            old_user.set_addresses(addresses)
+        user.add_verified_nin(obj_id)
+        user.retrieve_address(request, obj_id)
 
         # Reset session eduPersonIdentityProofing on NIN verification
         request.session['eduPersonIdentityProofing'] = None
@@ -119,25 +151,52 @@ def verify_code(request, model_name, code):
         msg = _('National identity number {obj} verified')
 
     elif model_name == 'mobile':
-        _remove_mobile_from_others(data, request)
-        user.add_verified_mobile(reference, data)
+        if not old_user:
+            old_user_doc = request.db.profiles.find_one({
+                'mobile': {'$elemMatch': {'mobile': obj_id, 'verified': True}}
+            })
+            if old_user_doc:
+               old_user = User(old_user_doc)
+        if old_user:
+            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != obj_id]
+            old_user.set_mobiles(mobiles)
+        user.add_verified_mobile(obj_id)
         msg = _('Mobile {obj} verified')
 
     elif model_name == 'mailAliases':
-        _remove_email_from_others(data, request)
-        user.add_verified_email(reference, data)
+        if not old_user:
+            old_user_doc = request.db.profiles.find_one({
+                'mailAliases': {'email': obj_id, 'verified': True}
+            })
+            if old_user_doc:
+                old_user = User(old_user_doc)
+        if old_user:
+            if old_user.get_mail() == obj_id:
+                old_user.set_mail('')
+            mails = [m for m in old_user.get_mail_aliases() if m['email'] != obj_id]
+            old_user.set_mail_aliases(mails)
+        user.add_verified_email(obj_id)
         msg = _('Email {obj} verified')
 
-    user.save(request)
+        try:
+            user.save(request)
+            if old_user:
+                old_user.save(request)
+                if old_verified:
+                    request.db.verifications.find_and_modify(
+                        {
+                            "_id": old_verified['_id'],
+                        },
+                        remove=True)
 
-    log.debug("Marking {!r} code {!r} ({!s}) as verified".format(model_name, code, str(data)))
-    request.db.verifications.remove({'_id': this_verification['_id']})
-
-    msg = get_localizer(request).translate(msg)
-    request.session.flash(msg.format(obj=data), queue='forms')
-
-    return data
-
+            request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+        except UserOutOfSync:
+            raise
+        else:
+            msg = get_localizer(request).translate(msg)
+            request.session.flash(msg.format(obj=obj_id),
+                              queue='forms')
+    return obj_id
 
 def save_as_verified(request, model_name, user_oid, obj_id):
 
@@ -147,14 +206,22 @@ def save_as_verified(request, model_name, user_oid, obj_id):
             "verified": True,
             "obj_id": obj_id,
         })
-    if old_verified['user_oid'] == user_oid:
-        return
+    n = old_verified.count()
+    if n > 1:
+        log.warn('Too many verifications ({}) for NIN {}'.format(n, obj_id))
 
+    already_verified = False
+    for old in old_verified:
+        if old['user_oid'] == user_oid:
+            already_verified = True
+        else:
     request.db.verifications.find_and_modify(
         {
-            '_id': old_verified['_id']
+                            '_id': old['_id']
         },
         remove=True)
+    if already_verified:
+        return
 
     result = request.db.verifications.find_and_modify(
         {
@@ -167,121 +234,12 @@ def save_as_verified(request, model_name, user_oid, obj_id):
                 "timestamp": datetime.now(utc),
             }
         },
-        new=True,
-        safe=True
+        upsert=True,
+        new=True
     )
-    obj_id = result['obj_id']
-    if obj_id and model_name == 'norEduPersonNIN':
-        user = request.userdb.get_user_by_oid(result['user_oid'])
-        user.retrieve_address(request, obj_id)
-        user.save(request)
-    return obj_id
+    return result['obj_id']
 
 
 def generate_verification_link(request, code, model):
     link = request.context.safe_route_url("verifications", model=model, code=code)
     return link
-
-
-# TODO: Rework but make backwards compatible
-def remove_nin_from_others(nin, request):
-    """
-    When someone successfully validates a NIN, the NIN should be removed from
-    any other user(s).
-
-    NOTE: since this just removes *all* verified addresses from old_user,
-    this will break if there are more methods to validate postal addresses
-    than through the lookup-NIN-in-Navet source.
-
-    :param nin: The NIN
-    :param request: the HTTP request
-    :type nin: string
-    :type request: webob.request.BaseRequest
-    :return:
-    """
-    old_profile_query = {'norEduPersonNIN': {'$in': [nin]}, }  # Backwards compatibility
-    profile_query = {'norEduPersonNIN': {'$elemMatch': {'nin': nin}}}
-    attributes_query = {'norEduPersonNIN': {'$in': [nin]}, }
-    users = {}
-    for this in request.db.profiles.find(old_profile_query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-    for this in request.db.profiles.find(profile_query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-    for this in request.userdb.get_users(attributes_query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-
-    for old_user in users.values():
-        log.debug("Removing NIN {!r} from old_user {!r}".format(nin, old_user.get_id()))
-        # TODO Set list items that does not match nin to {'nin': nin, 'verfied': True}
-        nins = [this for this in old_user.get_nins() if this != nin]
-        # TODO  nins need to be a list of dicts now
-        old_user.set_nins(nins)
-        # Remove verified postal address too, since that is based on the NIN
-        addresses = [a for a in old_user.get_addresses() if not a['verified']]
-        old_user.set_addresses(addresses)
-        old_user.save(request)
-
-
-def _remove_mobile_from_others(number, request):
-    """
-    When someone successfully validates a NIN, the NIN should be removed from
-    any other user(s).
-
-    :param number: The mobile phone number
-    :param request: the HTTP request
-    :type number: string
-    :type request: webob.request.BaseRequest
-    :return:
-    """
-    query = {
-        'mobile': {'$elemMatch': {'mobile': number,
-                                  'verified': True,
-                                  }}
-    }
-    users = {}
-    for this in request.db.profiles.find(query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-    for this in request.userdb.get_users(query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-
-    for old_user in users.values():
-        mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != number]
-        old_user.set_mobiles(mobiles)
-        old_user.save(request)
-
-
-def _remove_email_from_others(email, request):
-    """
-    When someone successfully validates a NIN, the NIN should be removed from
-    any other user(s).
-
-    :param email: The e-mail address
-    :param request: the HTTP request
-    :type email: string
-    :type request: webob.request.BaseRequest
-    :return:
-    """
-    query = {
-        'mailAliases': {'email': email,
-                        'verified': True,
-                        }
-    }
-    users = {}
-    for this in request.db.profiles.find(query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-    for this in request.userdb.get_users(query):
-        old_user = User(this)
-        users[old_user.get_id()] = old_user
-
-    for old_user in users.values():
-        if old_user.get_mail() == email:
-            old_user.set_mail('')
-        mails = [m for m in old_user.get_mail_aliases() if m['email'] != email]
-        old_user.set_mail_aliases(mails)
-        old_user.save(request)

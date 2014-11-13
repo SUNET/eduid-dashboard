@@ -33,31 +33,99 @@
 {% block contents %}
 
   <div class='profile-combo tabbable well row'>
-    <div class="tabs-left col-md-3 col-sm-12">
-      <div>
+    <div class="tabs-left col-md-3 hidden-xs hidden-sm" id="profile-menu-large">
         <ul class='nav nav-tabs nav-stacked'>
           {% for tab in tabs %}
-            <li>
-                <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
-            </li>
+          <li>
+            <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
+          </li>
           {% endfor %}
             <li>
-        <div class='profile-filled' style='padding-top:80px'>
-          <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
-          <div class="progress progress-striped">
-            <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
-          </div>
-        </div>
+              <div class='profile-filled' style='padding-top:80px'>
+                <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+                <div class="progress progress-striped">
+                  <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+                </div>
+              </div>
             </li>
 
         </ul>
-      </div>
     </div>
 
-    <div class='tab-content info-container col-md-9 col-sm-12'>
+    <nav class="navbar navbar-default hidden-md hidden-lg" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#profile-menu-small">
+            <span class="sr-only">{{_("Toggle navigation")}}</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+    
+        <div class="collapse collapsed navbar-collapse" id="profile-menu-small">
+          <ul class="nav nav-stacked nav-tabs navbar-nav">
+              {% for tab in tabs %}
+                <li>
+                    <a href='#{{tab.id}}' class="hidden-sm" data-toggle="collapse" data-target="#profile-menu-small">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' class="hidden-xs">{{_(tab.label)}}</a>
+                </li>
+              {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class='tab-content info-container col-md-9'>
       <div class='tab-pane active'></div>
     </div>
+
+    <div class="profile-filled hidden-md hidden-lg" style="padding-top:40px">
+      <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+      <div class="progress progress-striped">
+        <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+      </div>
+    </div>
   </div>
+
+  {% if context.workmode == 'personal' %}
+
+  <p>
+    <button class="btn btn-xs btn-danger" id="init-termination-btn">{{ _('Terminate eduID account') }}</button>
+  </p>
+
+  <div id="terminate-account-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="terminateAccountDialogPrompt" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 id="terminateAccountDialogPrompt" class="modal-title"></h3>
+    </div>
+    <div class="modal-body">
+      <div class="info-container"></div>
+      <div class="divDialogElements">
+        <p>{{ _('Really terminate eduID account? This action will permanently remove all the data associated with the account from our databases.') }}</p>
+        <p>
+          <form method="POST" action="{{request.route_url("terminate-account")}}" id="terminate-account-form">
+            <button id="terminate-account-button"
+                    class="btn btn-lg btn-danger"
+                    type="submit"
+                    name="submit">
+                  {{ _('Confirm termination of eduID account') }}
+            </button>
+            <input type="hidden" name="csrf" value="{{ request.session.get_csrf_token() }}">
+          </form>
+        </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+    </div>
+    </div>
+    </div>
+  </div>
+
+  {% endif %}
 
   <div id="askDialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="askDialogPrompt" aria-hidden="true">
     <div class="modal-dialog">
@@ -181,6 +249,7 @@ $(document).ready(function () {
     function reloadTab() {
       // reload active tab in order to refresh the HTML
       $('.nav-tabs li.active a').click();
+      showStatus();
     }
 
     $('body').on('form-submitted action-executed', function() {
@@ -218,6 +287,9 @@ $(document).ready(function () {
         window.setTimeout(statusPolling, {{ polling_timeout_for_admin }});
       }
       statusPolling();
+      $('body').on('action-executed', function() {
+        location.reload();
+      });
     {% endif %}
 
     $('body').on('communication-error', function(){

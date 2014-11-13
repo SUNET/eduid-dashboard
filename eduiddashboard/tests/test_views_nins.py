@@ -101,18 +101,19 @@ class NinsFormTests(LoggedInReguestTests):
     def test_verify_not_existant_nin(self):
         self.set_logged(user='johnsmith@example.org')
 
-        self.testapp.post(
+        response = self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 50, 'action': 'verify'},
-            status=404
+            {'identifier': '197801011299 50', 'action': 'verify'}
         )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_verify_existant_nin(self):
         self.set_logged()
 
         response = self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 0, 'action': 'verify'}
+            {'identifier': '123456789050  0', 'action': 'verify'}
         )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'getcode')
@@ -122,7 +123,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 0, 'action': 'remove'},
+            {'identifier': '210987654321 0', 'action': 'remove'},
             status=200)
 
     def test_remove_existant_notverified_nin(self):
@@ -135,7 +136,7 @@ class NinsFormTests(LoggedInReguestTests):
 
         response = self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 0, 'action': 'remove'},
+            {'identifier': '123456789050 0', 'action': 'remove'},
             status=200)
 
         nins_after = self.db.verifications.find({
@@ -144,17 +145,18 @@ class NinsFormTests(LoggedInReguestTests):
         }).count()
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'success')
+        self.assertEqual(response_json['result'], 'ok')
         self.assertEqual(nins_before - 1, nins_after)
 
     def test_remove_not_existant_nin(self):
         self.set_logged(user='johnsmith@example.org')
 
-        self.testapp.post(
+        response = self.testapp.post(
             '/profile/nins-actions/',
-            {'identifier': 24, 'action': 'remove'},
-            status=404
+            {'identifier': '210987654399 24', 'action': 'remove'}
         )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_steal_verified_nin(self):
         self.set_logged(user='johnsmith@example.org')
@@ -195,11 +197,11 @@ class NinsFormTests(LoggedInReguestTests):
 
             response = self.testapp.post(
                 '/profile/nins-actions/',
-                {'identifier': 0, 'action': 'verify', 'code': nin_doc['code']}
+                {'identifier': '197801011234 0', 'action': 'verify', 'code': nin_doc['code']}
             )
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'success')
+        self.assertEqual(response_json['result'], 'ok')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = User(old_user)
@@ -311,7 +313,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                 'norEduPersonNIN': '12341234-1234',
                 'code': '1234',
             }, status=200)
-            self.assertEqual(response.json['status'], 'success')
+            self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')

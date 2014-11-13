@@ -165,3 +165,19 @@ def provision_credentials(vccs_url, new_password, user):
     user.set_passwords(passwords)
 
     return True
+
+
+def revoke_all_credentials(vccs_url, user):
+    vccs = get_vccs_client(vccs_url)
+    passwords = user.get_passwords()
+    to_revoke = []
+    for passwd_dict in passwords:
+        credential_id = str(passwd_dict['id'])
+        factor = vccs_client.VCCSRevokeFactor(
+            credential_id,
+            'subscriber requested termination',
+            reference='dashboard'
+        )
+        to_revoke.append(factor)
+    userid = str(user.get_id())
+    vccs.revoke_credentials(userid, to_revoke)

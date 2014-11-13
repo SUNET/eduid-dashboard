@@ -4,6 +4,7 @@ from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
 from eduid_am.user import User
+from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Permissions
 
@@ -46,9 +47,12 @@ class PermissionsView(BaseFormView):
 
         # Insert the new user object
         self.user.get_doc().update(new_entitletments)
-        self.user.save(self.request)
-
-        message = _('Changes saved.')
-        self.request.session.flash(
-                get_localizer(self.request).translate(message),
-                queue='forms')
+        try:
+            self.user.save(self.request)
+        except UserOutOfSync:
+            self.sync_user()
+        else:
+            message = _('Changes saved.')
+            self.request.session.flash(
+                    get_localizer(self.request).translate(message),
+                    queue='forms')

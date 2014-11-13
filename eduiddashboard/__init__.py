@@ -11,6 +11,8 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
+from pyramid.interfaces import IStaticURLInfo
+from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
 from eduid_am.db import MongoDB
@@ -61,6 +63,15 @@ REQUIRED_PROOFING_LINKS = (
 
 
 log = logging.getLogger('eduiddashboard')
+
+class ConfiguredHostStaticURLInfo(StaticURLInfo):
+
+    def generate(self, path, request, **kw):
+        host = request.registry.settings.get('static_assets_host_override', None)
+        kw.update({'_host': host})
+        return super(ConfiguredHostStaticURLInfo, self).generate(path,
+                                                                 request,
+                                                                 **kw)
 
 
 def groups_callback(userid, request):
@@ -155,6 +166,12 @@ def profile_urls(config):
     config.add_route('userstatus', '/userstatus/',
                      factory=StatusFactory)
 
+    config.add_route('terminate-account', '/terminate-account/',
+                     factory=PersonFactory)
+
+    config.add_route('account-terminated', '/account-terminated/',
+                     factory=RootFactory)
+
     # wizard routes
     config.add_route('wizard-nins', '/nin-wizard/',
                      factory=NinsFactory)
@@ -247,6 +264,10 @@ def main(global_config, **settings):
     ``paster serve``.
     """
     settings = dict(settings)
+
+    settings['debug_mode'] = read_setting_from_env_bool(settings,
+                                                        'debug_mode',
+                                                        default=False)
 
     # read pyramid_mailer options
     for key, default in (
@@ -397,6 +418,9 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
+
+    config.registry.registerUtility(ConfiguredHostStaticURLInfo(),
+                                    IStaticURLInfo)
 
     config.set_request_property(get_locale_name, 'locale', reify=True)
 

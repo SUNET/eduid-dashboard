@@ -1,0 +1,13 @@
+FROM debian:7.5
+
+MAINTAINER Enrique Perez Arnaud <enrique@cazalla.net>
+
+RUN apt-get update && apt-get install -y netcat
+
+RUN echo "HTTP/1.1 200" > response.json \
+  && echo "Content-Type: application/json" >> response.json \
+  && echo "{\"add_creds_response\" : {\"version\" : \"1\", \"success\": \"true\"}}" >> response.json
+
+CMD ["/bin/bash", "-c", "while true ; do nc -l 8550 < response.json ; done"]
+
+EXPOSE 8550
