@@ -51,7 +51,8 @@ def send_verification_mail(request, email, code=None):
 
 def send_termination_mail(request, user):
     mailer = get_mailer(request)
-    email = user.get_mail()
+    email = request.registry.settings.get('mail.support_email',
+                                          'support@eduid.se')
     site_name = request.registry.settings.get("site.name", "eduID")
 
     context = {
