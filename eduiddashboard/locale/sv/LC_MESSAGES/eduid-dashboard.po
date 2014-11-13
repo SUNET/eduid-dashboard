@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-11-12 11:55+0100\n"
+"POT-Creation-Date: 2014-11-13 13:51+0100\n"
 "PO-Revision-Date: 2014-11-03 11:35+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
@@ -27,9 +27,8 @@ msgstr ""
 msgid "{site_name} confirmation email"
 msgstr "{site_name} bekräftelsemail"
 
-#: eduiddashboard/emails.py:63
+#: eduiddashboard/emails.py:64
 #, fuzzy
-#| msgid "{site_name} confirmation email"
 msgid "{site_name} account termination"
 msgstr "{site_name} bekräftelsemail"
 
@@ -481,7 +480,7 @@ msgstr "Dashboard läge %(mode)s"
 msgid "Level %(level)s"
 msgstr "Nivå %(level)s"
 
-#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:94
+#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:92
 msgid "Search"
 msgstr "Sök"
 
@@ -647,12 +646,12 @@ msgstr ""
 "</ul>\n"
 "</p>\n"
 
-#: eduiddashboard/templates/passwords-form-js.jinja2:134
+#: eduiddashboard/templates/passwords-form-js.jinja2:138
 #: eduiddashboard/templates/reset-password-form-js.jinja2:124
 msgid "A stronger password is required."
 msgstr "Lösenordet är inte tillräckligt säkert"
 
-#: eduiddashboard/templates/passwords-form-js.jinja2:150
+#: eduiddashboard/templates/passwords-form-js.jinja2:154
 #: eduiddashboard/templates/reset-password-form-js.jinja2:140
 msgid "Type the same password again"
 msgstr "Skriv samma lösenord igen"
@@ -674,10 +673,38 @@ msgid "Last used"
 msgstr "Användes senast"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
-#: eduiddashboard/templates/passwords-form.jinja2:37
+#: eduiddashboard/templates/passwords-form.jinja2:81
 #: eduiddashboard/views/security.py:164 eduiddashboard/views/security.py:418
 msgid "Change password"
 msgstr "Byt lösenord"
+
+#: eduiddashboard/templates/passwords-form.jinja2:31
+msgid "Account deletion"
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:32
+msgid ""
+"<p>Use the button below to permanently remove your eduID account and any "
+"associated personal information.</p>"
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:36
+msgid "Terminate eduID account"
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:44
+msgid "Terminate account"
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:49
+msgid ""
+"Really terminate eduID account? This action will permanently remove all "
+"the data associated with the account from our databases."
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:56
+msgid "Confirm termination of eduID account"
+msgstr ""
 
 #: eduiddashboard/templates/permissions-form.jinja2:8
 msgid "Available permissions for this user"
@@ -751,39 +778,25 @@ msgstr "Profilstatus"
 msgid "Toggle navigation"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:94
-msgid "Terminate eduID account"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:107
-msgid ""
-"Really terminate eduID account? This action will permanently remove all "
-"the data associated with the account from our databases."
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:114
-msgid "Confirm termination of eduID account"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:141
+#: eduiddashboard/templates/profile.jinja2:102
 msgid "Lost your confirmation code?"
 msgstr "Tappat bort din bekräftelsekod?"
 
-#: eduiddashboard/templates/profile.jinja2:141
+#: eduiddashboard/templates/profile.jinja2:102
 msgid "Resend confirmation code"
 msgstr "Skicka bekräftelsekoden igen"
 
-#: eduiddashboard/templates/profile.jinja2:146
+#: eduiddashboard/templates/profile.jinja2:107
 #: eduiddashboard/templates/wizards/basewizard.jinja2:28
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:34
 msgid "Finish"
 msgstr "Klar"
 
-#: eduiddashboard/templates/profile.jinja2:198
+#: eduiddashboard/templates/profile.jinja2:159
 msgid "Warning!"
 msgstr "Varning!"
 
-#: eduiddashboard/templates/profile.jinja2:198
+#: eduiddashboard/templates/profile.jinja2:159
 msgid ""
 "An error has occurred, please try again or contact support if the problem"
 " persists."
@@ -791,11 +804,11 @@ msgstr ""
 "Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om "
 "problemet kvarstår."
 
-#: eduiddashboard/templates/profile.jinja2:205
+#: eduiddashboard/templates/profile.jinja2:166
 msgid "Error!"
 msgstr "Fel!"
 
-#: eduiddashboard/templates/profile.jinja2:205
+#: eduiddashboard/templates/profile.jinja2:166
 msgid "Permission denied"
 msgstr "Åtkomst nekad"
 
