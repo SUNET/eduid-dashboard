@@ -47,10 +47,9 @@ def send_verification_mail(request, email, reference=None, code=None):
 
     # Development
     if request.registry.settings.get("development", '') == 'true':
-        for mail in mailer.outbox:
-            print mail.body
+        print message.body
     else:
-    mailer.send(message)
+        mailer.send(message)
 
 
 def send_termination_mail(request, user):
@@ -80,4 +79,9 @@ def send_termination_mail(request, user):
         ),
     )
 
-    mailer.send(message)
+    # Development
+    if request.registry.settings.get("development", '') == 'true':
+        for mail in mailer.outbox:
+            print mail.body
+    else:
+        mailer.send(message)
