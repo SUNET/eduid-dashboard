@@ -60,7 +60,7 @@ def get_status(request, user):
     return status
 
 
-def send_nin_verification_code(request, user, nin, reference=None, code=None):
+def send_verification_code(request, user, nin, reference=None, code=None):
     """
     You need to replace the call to dummy_message with the govt
     message api
@@ -113,8 +113,8 @@ def get_not_verified_nins_list(request, user):
         for nin in not_verified_nins:
             if not nin['verified']:
                 nins.append(nin['obj_id'])
-
-    return nins
+    # As we no longer remove verification documents make the list items unique
+    return list(set(nins))
 
 
 def get_active_nin(self):
@@ -193,7 +193,7 @@ class NINsActionsView(BaseActionsView):
         }
 
     def send_verification_code(self, data_id, reference, code):
-        send_nin_verification_code(self.request, self.user, data_id, reference, code)
+        send_verification_code(self.request, self.user, data_id, reference, code)
 
     def resend_code_action(self, data, post_data):
         nin, index = data.split()

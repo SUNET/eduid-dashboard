@@ -159,6 +159,7 @@ class BaseActionsView(object):
             verification_code = get_verification_code(self.request,
                                                       self.data_attribute,
                                                       obj_id=data_id,
+                                                      code=code_sent,
                                                       user=self.user)
             if verification_code:
                 if code_sent == verification_code['code']:

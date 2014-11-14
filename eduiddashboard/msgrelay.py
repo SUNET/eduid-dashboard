@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from eduid_msg.celery import celery, get_message_relay
 import eduid_msg.tasks
-from eduid_msg.tasks import send_message, is_reachable, get_postal_address
+from eduid_msg.tasks import send_message, is_reachable, get_postal_address, set_audit_log_postal_address
 
 import logging
 logger = logging.getLogger(__name__)
@@ -77,6 +77,7 @@ class MsgRelay(object):
         self._send_message = send_message
         self._is_reachable = is_reachable
         self._get_postal_address = get_postal_address
+        self._set_audit_log_postal_address = set_audit_log_postal_address
 
     def get_language(self, lang):
         return LANGUAGE_MAPPING.get(lang, 'en_US')
@@ -102,8 +103,8 @@ class MsgRelay(object):
         })
         lang = self.get_language(language)
 
-        logger.debug('SENT mobile validator message code: {0} phone number: {1}'.format(
-                     code, targetphone))
+        logger.debug('SENT mobile validator message code: {0} phone number: {1} with reference {2}'.format(
+                     code, targetphone, reference))
         self._send_message.delay('sms', reference, content, targetphone,
                                  TEMPLATES_RELATION.get('phone-validator'),
                                  lang)
@@ -205,6 +206,13 @@ class MsgRelay(object):
             return parse_address_dict(result)
         else:
             raise self.TaskFailed('Something goes wrong')
+
+    def postal_address_to_transaction_audit_log(self, reference):
+        """
+            Adds the users postal address to the eduid_msg transaction log when validating a nin.
+        """
+        logger.debug('SENT postal address message for transaction log with reference: {0}'.format(reference))
+        self._set_audit_log_postal_address.delay(reference)
 
 
 def get_msgrelay(request):
