@@ -81,7 +81,6 @@ def send_termination_mail(request, user):
 
     # Development
     if request.registry.settings.get("development", '') == 'true':
-        for mail in mailer.outbox:
-            print mail.body
+        print message.body
     else:
         mailer.send(message)
