@@ -155,8 +155,14 @@ def help(context, request):
 
     locale_name = get_locale_name(request)
     template = 'eduiddashboard:templates/help-%s.jinja2' % locale_name
+    support_email = request.registry.settings.get('mail.support_email',
+                                                  'support@eduid.se')
+    template_context = {
+        'user':context.user.get_doc(),
+        'support_email': support_email
+    }
 
-    return render_to_response(template, {'user':context.user.get_doc()}, request=request)
+    return render_to_response(template, template_context, request=request)
 
 
 @view_config(route_name='token-login', request_method='POST')
@@ -213,6 +219,7 @@ def set_language(context, request):
              renderer='templates/account-terminated.jinja2',)
 def account_terminated(context, request):
     '''
+    landing page after account termination
     '''
     return {}
 
@@ -221,6 +228,13 @@ def account_terminated(context, request):
              permission='edit')
 def terminate_account(context, request):
     '''
+    Terminate account view.
+    It receives a POST request, checks the csrf token,
+    removes all credentials for the terminated account
+    from the VCCS service,
+    flags the account as terminated,
+    sends an email to the address in the terminated account,
+    and logs out the session.
     '''
     settings = request.registry.settings
 

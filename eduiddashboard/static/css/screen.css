@@ -384,6 +384,10 @@ table.passwords {
 .reset-password-form-container .intro {
     padding-bottom: 10px;
 }
+
+div#account-deletion-intro {
+    margin-top: 35px;
+}
 /* End of reset password view styles
 -------------------------------------------------- */
 

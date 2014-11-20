@@ -275,7 +275,8 @@ def main(global_config, **settings):
         ('port', '25'),
         ('username', None),
         ('password', None),
-        ('default_sender', 'no-reply@example.com')
+        ('default_sender', 'no-reply@example.com'),
+        ('support_email', 'support@eduid.se')
     ):
         option = 'mail.' + key
         settings[option] = read_setting_from_env(settings, option, default)

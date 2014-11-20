@@ -71,7 +71,7 @@ class PasswordFormTests(LoggedInReguestTests):
         response = self.testapp.get('/profile/security/')
 
         self.assertEqual(response.status, '200 OK')
-        self.assertIsNotNone(getattr(response, 'form', None))
+        self.assertIn('passwordsview-form', response.forms)
 
     def test_notlogged_get(self):
         response = self.testapp.get('/profile/security/')
@@ -181,7 +181,7 @@ class TerminateAccountTests(LoggedInReguestTests):
 
     def test_terminate_account(self):
         self.set_logged()
-        response = self.testapp.get('/profile/')
+        response = self.testapp.get('/profile/security/')
         form = response.forms['terminate-account-form']
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
         self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
@@ -204,7 +204,7 @@ class TerminateAccountTests(LoggedInReguestTests):
 
     def test_reset_password_unterminates_account(self):
         self.set_logged()
-        response = self.testapp.get('/profile/')
+        response = self.testapp.get('/profile/security/')
         form = response.forms['terminate-account-form']
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
         self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])

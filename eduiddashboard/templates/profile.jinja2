@@ -88,45 +88,6 @@
     </div>
   </div>
 
-  {% if context.workmode == 'personal' %}
-
-  <p>
-    <button class="btn btn-xs btn-danger" id="init-termination-btn">{{ _('Terminate eduID account') }}</button>
-  </p>
-
-  <div id="terminate-account-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="terminateAccountDialogPrompt" aria-hidden="true">
-    <div class="modal-dialog">
-    <div class="modal-content">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="terminateAccountDialogPrompt" class="modal-title"></h3>
-    </div>
-    <div class="modal-body">
-      <div class="info-container"></div>
-      <div class="divDialogElements">
-        <p>{{ _('Really terminate eduID account? This action will permanently remove all the data associated with the account from our databases.') }}</p>
-        <p>
-          <form method="POST" action="{{request.route_url("terminate-account")}}" id="terminate-account-form">
-            <button id="terminate-account-button"
-                    class="btn btn-lg btn-danger"
-                    type="submit"
-                    name="submit">
-                  {{ _('Confirm termination of eduID account') }}
-            </button>
-            <input type="hidden" name="csrf" value="{{ request.session.get_csrf_token() }}">
-          </form>
-        </p>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-    </div>
-    </div>
-    </div>
-  </div>
-
-  {% endif %}
-
   <div id="askDialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="askDialogPrompt" aria-hidden="true">
     <div class="modal-dialog">
     <div class="modal-content">
