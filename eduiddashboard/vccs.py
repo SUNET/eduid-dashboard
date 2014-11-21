@@ -117,7 +117,13 @@ def add_credentials(vccs_url, old_password, new_password, user):
             log.debug("Revoked old credential (password reset) {!s} (user {!s})".format(
                 password['id'], user.get_id()))
         if revoked:
-            vccs.revoke_credentials(str(user.get_id()), revoked)
+            try:
+                vccs.revoke_credentials(str(user.get_id()), revoked)
+            except vccs_client.VCCSClientHTTPError:
+                # Password already revoked
+                # TODO: vccs backend should be changed to return something more informative than
+                # TODO: VCCSClientHTTPError when the credential is already revoked or just return success.
+                pass
         del passwords[:]
 
     passwords.append({
