@@ -47,26 +47,20 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
         "model_name": model_name,
         "obj_id": obj_id,
         "user_oid": user.get_id(),
+        "code": code,
+        "verified": False,
+        "timestamp": datetime.now(utc),
     }
-    request.db.verifications.find_and_modify(
-        obj,
-        {"$set": {
-            "code": code,
-            "verified": False,
-            "timestamp": datetime.now(utc),
-        }},
-        upsert=True,
-        safe=True,
-    )
-
+    doc_id = request.db.verifications.insert(obj)
+    reference = unicode(doc_id)
     session_verifications = request.session.get('verifications', [])
     session_verifications.append(code)
     request.session['verifications'] = session_verifications
 
-    return code
+    return reference, code
 
 
-def get_not_verificated_objects(request, model_name, user):
+def get_not_verified_objects(request, model_name, user):
     return request.db.verifications.find({
         'user_oid': user.get_id(),
         'model_name': model_name,
@@ -88,18 +82,18 @@ def verify_code(request, model_name, code):
 
     :return:
     """
-    unverified = request.db.verifications.find_one(
+    this_verification = request.db.verifications.find_one(
         {
             "model_name": model_name,
             "code": code,
         })
-    
-    if not unverified:
-        msg = "Could not find un-verified code {!r}, model {!r}"
-        log.debug(msg.format(code, model_name))
+
+    if not this_verification:
+        log.debug("Could not find verification record for code {!r}, model {!r}".format(code, model_name))
         return
 
-    obj_id = unverified['obj_id']
+    reference = unicode(this_verification['_id'])
+    obj_id = this_verification['obj_id']
 
     if obj_id:
         msg = "Code {!r} ({!s}) marked as verified"
@@ -113,13 +107,13 @@ def verify_code(request, model_name, code):
             user = request.session['user']
         else:
             # should not happen
-            user = request.userdb.get_user_by_oid(unverified['user_oid'])
+            user = request.userdb.get_user_by_oid(this_verification['user_oid'])
             user.retrieve_modified_ts(request.db.profiles)
-        assert user.get_id() == unverified['user_oid']
+        assert user.get_id() == this_verification['user_oid']
         old_verified = request.db.verifications.find_one(
             {
                 "model_name": model_name,
-                "obj_id": unverified['obj_id'],
+                "obj_id": this_verification['obj_id'],
                 "verified": True
             })
 
@@ -142,6 +136,7 @@ def verify_code(request, model_name, code):
                 old_user.set_addresses(addresses)
             user.add_verified_nin(obj_id)
             user.retrieve_address(request, obj_id)
+            request.msgrelay.postal_address_to_transaction_audit_log(reference)
 
             # Reset session eduPersonIdentityProofing on NIN verification
             request.session['eduPersonIdentityProofing'] = None
@@ -154,7 +149,7 @@ def verify_code(request, model_name, code):
                     'mobile': {'$elemMatch': {'mobile': obj_id, 'verified': True}}
                 })
                 if old_user_doc:
-                    old_user = User(old_user_doc)
+                   old_user = User(old_user_doc)
             if old_user:
                 mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != obj_id]
                 old_user.set_mobiles(mobiles)
@@ -180,21 +175,19 @@ def verify_code(request, model_name, code):
             user.save(request)
             if old_user:
                 old_user.save(request)
-                if old_verified:
-                    request.db.verifications.find_and_modify(
-                        {
-                            "_id": old_verified['_id'],
-                        },
-                        remove=True)
-
-            request.db.verifications.update({'_id': unverified['_id']}, {'verified': True})
+            verified = {
+                'verified': True,
+                'verified_timestamp': datetime.utcnow()
+            }
+            this_verification.update(verified)
+            request.db.verifications.update({'_id': this_verification['_id']}, this_verification)
         except UserOutOfSync:
             raise
         else:
             msg = get_localizer(request).translate(msg)
-            request.session.flash(msg.format(obj=obj_id),
-                              queue='forms')
+            request.session.flash(msg.format(obj=obj_id), queue='forms')
     return obj_id
+
 
 def save_as_verified(request, model_name, user_oid, obj_id):
 
@@ -208,19 +201,10 @@ def save_as_verified(request, model_name, user_oid, obj_id):
     if n > 1:
         log.warn('Too many verifications ({}) for NIN {}'.format(n, obj_id))
 
-    already_verified = False
     for old in old_verified:
         if old['user_oid'] == user_oid:
-            already_verified = True
-        else:
-            request.db.verifications.find_and_modify(
-                {
-                            '_id': old['_id']
-                },
-                remove=True)
-    if already_verified:
-        return
-
+            return obj_id
+    # User was not verified before, create a verification document
     result = request.db.verifications.find_and_modify(
         {
             "model_name": model_name,
@@ -229,7 +213,7 @@ def save_as_verified(request, model_name, user_oid, obj_id):
         }, {
             "$set": {
                 "verified": True,
-                "timestamp": datetime.now(utc),
+                "timestamp": datetime.utcnow(),
             }
         },
         upsert=True,

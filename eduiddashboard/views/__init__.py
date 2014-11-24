@@ -159,6 +159,7 @@ class BaseActionsView(object):
             verification_code = get_verification_code(self.request,
                                                       self.data_attribute,
                                                       obj_id=data_id,
+                                                      code=code_sent,
                                                       user=self.user)
             if verification_code:
                 if code_sent == verification_code['code']:
@@ -181,7 +182,7 @@ class BaseActionsView(object):
                     return {
                         'result': 'ok',
                         'message': self.verify_messages['ok'],
-                    }
+                        }
                 else:
                     log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
             return {
@@ -200,18 +201,18 @@ class BaseActionsView(object):
         data = self.user.get(self.data_attribute, [])
         data_to_resend = data[index]
         data_id = self.get_verification_data_id(data_to_resend)
-        code = new_verification_code(
+        reference, code = new_verification_code(
             self.request, self.data_attribute, data_id,
             self.user, hasher=get_short_hash,
         )
-        self.send_verification_code(data_id, code)
+        self.send_verification_code(data_id, reference, code)
         msg = self.verify_messages['new_code_sent']
         return {
             'result': 'ok',
             'message': msg,
         }
 
-    def send_verification_code(self, data_id, code):
+    def send_verification_code(self, data_id, reference, code):
         raise NotImplementedError()
 
     def sync_user(self):

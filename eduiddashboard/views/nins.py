@@ -1,7 +1,7 @@
 # NINS form
 
 import deform
-
+from datetime import datetime
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.i18n import get_localizer
@@ -60,18 +60,17 @@ def get_status(request, user):
     return status
 
 
-def send_verification_code(request, user, nin, code=None):
+def send_verification_code(request, user, nin, reference=None, code=None):
     """
     You need to replace the call to dummy_message with the govt
     message api
     """
-    if code is None:
-        code = new_verification_code(request, 'norEduPersonNIN', nin, user,
-                                     hasher=get_short_hash)
+    if code is None or reference is None:
+        reference, code = new_verification_code(request, 'norEduPersonNIN', nin, user, hasher=get_short_hash)
 
     language = request.context.get_preferred_language()
 
-    request.msgrelay.nin_validator(nin, code, language)
+    request.msgrelay.nin_validator(reference, nin, code, language)
 
 
 def get_tab(request):
@@ -114,8 +113,8 @@ def get_not_verified_nins_list(request, user):
         for nin in not_verified_nins:
             if not nin['verified']:
                 nins.append(nin['obj_id'])
-
-    return nins
+    # As we no longer remove verification documents make the list items unique
+    return list(set(nins))
 
 
 def get_active_nin(self):
@@ -193,8 +192,8 @@ class NINsActionsView(BaseActionsView):
             'message': get_localizer(self.request).translate(message),
         }
 
-    def send_verification_code(self, data_id, code):
-        send_verification_code(self.request, self.user, data_id, code)
+    def send_verification_code(self, data_id, reference, code):
+        send_verification_code(self.request, self.user, data_id, reference, code)
 
     def resend_code_action(self, data, post_data):
         nin, index = data.split()

@@ -188,25 +188,26 @@ class NinsFormTests(LoggedInReguestTests):
         })
 
         with patch.object(MsgRelay, 'get_postal_address', clear=True):
-
             MsgRelay.get_postal_address.return_value = {
-                    'Address2': u'StreetName 104',
-                    'PostalCode': u'74142',
-                    'City': u'STOCKHOLM',
+                'Address2': u'StreetName 104',
+                'PostalCode': u'74142',
+                'City': u'STOCKHOLM',
                 }
+            with patch.object(MsgRelay, 'postal_address_to_transaction_audit_log'):
+                MsgRelay.postal_address_to_transaction_audit_log.return_value = True
 
-            response = self.testapp.post(
-                '/profile/nins-actions/',
-                {'identifier': '197801011234 0', 'action': 'verify', 'code': nin_doc['code']}
-            )
+                response = self.testapp.post(
+                    '/profile/nins-actions/',
+                    {'identifier': '197801011234 0', 'action': 'verify', 'code': nin_doc['code']}
+                )
 
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+            response_json = json.loads(response.body)
+            self.assertEqual(response_json['result'], 'ok')
 
-        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+            old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
+            old_user = User(old_user)
 
-        self.assertNotIn(nin, old_user.get_nins())
+            self.assertNotIn(nin, old_user.get_nins())
 
 
 class NinWizardTests(LoggedInReguestTests):
@@ -307,13 +308,16 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                 'PostalCode': u'74141',
                 'City': u'STOCKHOLM',
             }
-            response = self.testapp.post('/profile/nin-wizard/', {
-                'action': 'next_step',
-                'step': 1,
-                'norEduPersonNIN': '12341234-1234',
-                'code': '1234',
-            }, status=200)
-            self.assertEqual(response.json['status'], 'ok')
+            with patch.object(MsgRelay, 'postal_address_to_transaction_audit_log'):
+                MsgRelay.postal_address_to_transaction_audit_log.return_value = True
+
+                response = self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'next_step',
+                    'step': 1,
+                    'norEduPersonNIN': '12341234-1234',
+                    'code': '1234',
+                }, status=200)
+                self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')

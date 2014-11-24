@@ -1,6 +1,7 @@
 ## Mobile phones forms
 
 import deform
+from datetime import datetime
 
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
@@ -62,13 +63,12 @@ def get_tab(request):
     }
 
 
-def send_verification_code(request, user, mobile_number, code=None):
-    if code is None:
-        code = new_verification_code(request, 'mobile', mobile_number, user,
-                                     hasher=get_short_hash)
+def send_verification_code(request, user, mobile_number, reference=None, code=None):
+    if code is None or reference is None:
+        reference, code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
 
     user_language = request.context.get_preferred_language()
-    request.msgrelay.mobile_validator(mobile_number, code, user_language)
+    request.msgrelay.mobile_validator(reference, mobile_number, code, user_language)
 
 
 @view_config(route_name='mobiles-actions', permission='edit')
@@ -141,8 +141,8 @@ class MobilesActionsView(BaseActionsView):
             'message': get_localizer(self.request).translate(message),
         }
 
-    def send_verification_code(self, data_id, code):
-        send_verification_code(self.request, self.user, data_id, code)
+    def send_verification_code(self, data_id, reference, code):
+        send_verification_code(self.request, self.user, data_id, reference, code)
 
 
 @view_config(route_name='mobiles', permission='edit',
@@ -178,20 +178,21 @@ class MobilesView(BaseFormView):
         mobile = {'mobile':  mobile_number,
                   'verified': False,
                   'primary': False,
+                  'added_timestamp': datetime.utcnow()
                   }
         self.user.add_mobile(mobile)
         try:
             self.user.save(self.request)
         except UserOutOfSync:
             self.sync_user()
-            
+
         else:
             send_verification_code(self.request, self.user, mobile_number)
 
             self.request.session.flash(_('Changes saved'),
-                                       queue='forms')
+                                   queue='forms')
             msg = _('A confirmation code has been sent to your mobile phone. '
-                    'Please click on the "Pending confirmation" link below and enter your confirmation code.')
+                'Please click on the "Pending confirmation" link below and enter your confirmation code.')
             msg = get_localizer(self.request).translate(msg)
             self.request.session.flash(msg,
-                                       queue='forms')
+                                   queue='forms')

@@ -9,11 +9,10 @@ from eduiddashboard.verifications import (generate_verification_link,
 from eduiddashboard.utils import get_short_hash
 
 
-def send_verification_mail(request, email, code=None):
+def send_verification_mail(request, email, reference=None, code=None):
     mailer = get_mailer(request)
-    if code is None:
-        code = new_verification_code(request, 'mailAliases', email,
-                                     request.context.user,
+    if code is None or reference is None:
+        reference, code = new_verification_code(request, 'mailAliases', email, request.context.user,
                                      hasher=get_short_hash)
 
     verification_link = generate_verification_link(request, code,
@@ -46,7 +45,11 @@ def send_verification_mail(request, email, code=None):
         ),
     )
 
-    mailer.send(message)
+    # Development
+    if request.registry.settings.get("development", '') == 'true':
+        print message.body
+    else:
+        mailer.send(message)
 
 
 def send_termination_mail(request, user):
@@ -77,4 +80,8 @@ def send_termination_mail(request, user):
         ),
     )
 
-    mailer.send(message)
+    # Development
+    if request.registry.settings.get("development", '') == 'true':
+        print message.body
+    else:
+        mailer.send(message)
