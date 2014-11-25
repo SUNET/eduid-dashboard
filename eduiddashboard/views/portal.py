@@ -21,9 +21,9 @@ from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
-from eduiddashboard.saml2.views import (get_authn_request,
-                                        process_saml_response)
+from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
+from eduiddashboard.saml2.acs_actions import register_action, schedule_action
 
 import logging
 logger = logging.getLogger(__name__)
@@ -227,6 +227,32 @@ def account_terminated(context, request):
     return {}
 
 
+def account_termination_action(request, session_info, user):
+    settings = request.registry.settings
+    logged_user = request.session['user']
+
+    if logged_user.get_id() != user.get_id():
+        raise HTTPUnauthorized("Wrong user")
+
+    # revoke all user credentials
+    revoke_all_credentials(settings.get('vccs_url'), user)
+    user.set_passwords([])
+
+    # flag account as terminated
+    user.set_terminated()
+    user.save(request, check_sync=False)
+
+    # email the user
+    send_termination_mail(request, user)
+
+    # logout
+    next_page = request.route_url('account-terminated')
+    request.session['next_page'] = next_page
+    return logout_view(request)
+
+register_action('account-termination-action', account_termination_action)
+
+
 @view_config(route_name='terminate-account', request_method='POST',
              permission='edit')
 def terminate_account(context, request):
@@ -250,31 +276,9 @@ def terminate_account(context, request):
     relay_state = context.route_url('do-terminate-account')
     info = get_authn_request(request, relay_state, selected_idp,
                              force_authn=True)
+    schedule_action(request.session, 'account-termination-action')
+
     return HTTPFound(location=get_location(info))
-
-
-@view_config(route_name='do-terminate-account', request_method='POST',
-             permission='edit')
-def do_terminate_account(context, request):
-    session_info, user = process_saml_response(request)
-    if context.user.get_id() != user.get_id():
-        raise HTTPUnauthorized("Wrong user")
-
-    # revoke all user credentials
-    revoke_all_credentials(settings.get('vccs_url'), context.user)
-    context.user.set_passwords([])
-
-    # flag account as terminated
-    context.user.set_terminated()
-    context.user.save(request, check_sync=False)
-
-    # email the user
-    send_termination_mail(request, context.user)
-
-    # logout
-    next_page = context.route_url('account-terminated')
-    request.session['next_page'] = next_page
-    return logout_view(request)
 
 
 @view_config(route_name='error500test')

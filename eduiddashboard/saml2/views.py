@@ -20,6 +20,9 @@ from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
+from eduiddashboard.saml2.acs_actions import (register_action,
+                                              schedule_action,
+                                              get_action)
 
 from eduiddashboard import log
 
@@ -96,6 +99,19 @@ def forbidden_view(context, request):
         return HTTPXRelocate(loginurl)
 
 
+def login_action(request, session_info, user):
+
+    headers = login(request, session_info, user)
+    _set_name_id(request.session, session_info['name_id'])
+
+    # redirect the user to the view where he came from
+    relay_state = request.POST.get('RelayState', '/')
+    log.debug('Redirecting to the RelayState: ' + relay_state)
+    return HTTPFound(location=relay_state, headers=headers)
+
+register_action('login-action', login_action)
+
+
 @view_config(route_name='saml2-login')
 def login_view(request):
     login_redirect_url = request.registry.settings.get(
@@ -122,6 +138,8 @@ def login_view(request):
 
     result = get_authn_request(request, came_from, selected_idp)
 
+    schedule_action(request.session, 'login-action')
+
     log.debug('Redirecting the user to the IdP')
     if not request.is_xhr:
         return HTTPFound(location=get_location(result))
@@ -133,14 +151,49 @@ def login_view(request):
 
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
-    session_info, user = process_saml_response(request)
-    headers = login(request, session_info, user)
-    _set_name_id(request.session, session_info['name_id'])
+    ''' '''
+    action = get_action(request.session)
 
-    # redirect the user to the view where he came from
-    relay_state = request.POST.get('RelayState', '/')
-    log.debug('Redirecting to the RelayState: ' + relay_state)
-    return HTTPFound(location=relay_state, headers=headers)
+    if 'SAMLResponse' not in request.POST:
+        raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
+    xmlstr = request.POST['SAMLResponse']
+    client = Saml2Client(request.saml2_config,
+                         identity_cache=IdentityCache(request.session))
+
+    oq_cache = OutstandingQueriesCache(request.session)
+    outstanding_queries = oq_cache.outstanding_queries()
+
+    try:
+        # process the authentication response
+        response = client.parse_authn_request_response(xmlstr, BINDING_HTTP_POST,
+                                                       outstanding_queries)
+    except AssertionError:
+        log.error('SAML response is not verified')
+        raise HTTPBadRequest(
+            """SAML response is not verified. May be caused by the response
+            was not issued at a reasonable time or the SAML status is not ok.
+            Check the IDP datetime setup""")
+
+    if response is None:
+        log.error('SAML response is None')
+        raise HTTPBadRequest(
+            "SAML response has errors. Please check the logs")
+
+    session_id = response.session_id()
+    oq_cache.delete(session_id)
+
+    # authenticate the remote user
+    session_info = response.session_info()
+
+    log.debug('Trying to locate the user authenticated by the IdP')
+    log.debug('Session info:\n{!s}\n\n'.format(pprint.pformat(session_info)))
+
+    user = authenticate(request, session_info)
+    if user is None:
+        log.error('Could not find the user identified by the IdP')
+        raise HTTPUnauthorized("Access not authorized")
+
+    return action(request, session_info, user)
 
 
 @view_config(route_name='saml2-echo-attributes')
@@ -290,7 +343,7 @@ def get_authn_request(request, came_from, selected_idp,
                 text=required_loa
             )
         ),
-        "force_authn": force_authn,
+        "force_authn": str(force_authn).lower(),
     }
 
     client = Saml2Client(request.saml2_config)
@@ -307,45 +360,3 @@ def get_authn_request(request, came_from, selected_idp,
     oq_cache = OutstandingQueriesCache(request.session)
     oq_cache.set(session_id, came_from)
     return info
-
-def process_saml_response(request):
-    if 'SAMLResponse' not in request.POST:
-        raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
-    xmlstr = request.POST['SAMLResponse']
-    client = Saml2Client(request.saml2_config,
-                         identity_cache=IdentityCache(request.session))
-
-    oq_cache = OutstandingQueriesCache(request.session)
-    outstanding_queries = oq_cache.outstanding_queries()
-
-    try:
-        # process the authentication response
-        response = client.parse_authn_request_response(xmlstr, BINDING_HTTP_POST,
-                                                       outstanding_queries)
-    except AssertionError:
-        log.error('SAML response is not verified')
-        raise HTTPBadRequest(
-            """SAML response is not verified. May be caused by the response
-            was not issued at a reasonable time or the SAML status is not ok.
-            Check the IDP datetime setup""")
-
-    if response is None:
-        log.error('SAML response is None')
-        raise HTTPBadRequest(
-            "SAML response has errors. Please check the logs")
-
-    session_id = response.session_id()
-    oq_cache.delete(session_id)
-
-    # authenticate the remote user
-    session_info = response.session_info()
-
-    log.debug('Trying to locate the user authenticated by the IdP')
-    log.debug('Session info:\n{!s}\n\n'.format(pprint.pformat(session_info)))
-
-    user = authenticate(request, session_info)
-    if user is None:
-        log.error('Could not find the user identified by the IdP')
-        raise HTTPUnauthorized("Access not authorized")
-
-    return session_info, user
