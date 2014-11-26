@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-11-13 13:51+0100\n"
+"POT-Creation-Date: 2014-11-25 15:32+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: eduiddashboard/emails.py:33
+#: eduiddashboard/emails.py:32
 msgid "{site_name} confirmation email"
 msgstr ""
 
-#: eduiddashboard/emails.py:64
+#: eduiddashboard/emails.py:67
 msgid "{site_name} account termination"
 msgstr ""
 
@@ -271,15 +271,15 @@ msgid ""
 "07</li><li>E-mail address: user@example.edu</li></ul>"
 msgstr ""
 
-#: eduiddashboard/verifications.py:149
+#: eduiddashboard/verifications.py:144
 msgid "National identity number {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:162
+#: eduiddashboard/verifications.py:157
 msgid "Mobile {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:177
+#: eduiddashboard/verifications.py:172
 msgid "Email {obj} verified"
 msgstr ""
 
@@ -371,7 +371,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:4
-#: eduiddashboard/views/emails.py:50
+#: eduiddashboard/views/emails.py:51
 msgid "Email addresses"
 msgstr ""
 
@@ -505,7 +505,7 @@ msgid "Previous"
 msgstr ""
 
 #: eduiddashboard/templates/mobiles-form.jinja2:4
-#: eduiddashboard/views/mobiles.py:57
+#: eduiddashboard/views/mobiles.py:58
 msgid "Mobile phone numbers"
 msgstr ""
 
@@ -1091,60 +1091,60 @@ msgstr ""
 msgid "The user was out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:301
+#: eduiddashboard/views/__init__.py:302
 msgid "The wizard was dismissed"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:336
+#: eduiddashboard/views/__init__.py:337
 msgid "Unexpected error"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:31
+#: eduiddashboard/views/emails.py:32
 msgid "An email address is pending confirmation"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:64
+#: eduiddashboard/views/emails.py:65
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:65 eduiddashboard/views/nins.py:135
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:134
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66
+#: eduiddashboard/views/emails.py:67
 msgid "Check your email inbox for {data} for further instructions"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:67
+#: eduiddashboard/views/emails.py:68
 msgid "Email confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:68
+#: eduiddashboard/views/emails.py:69
 msgid "A new confirmation code has been sent to your email"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:75
+#: eduiddashboard/views/emails.py:76
 msgid "You need to confirm your email address before it can become primary"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:88
+#: eduiddashboard/views/emails.py:89
 msgid "Your primary email address was successfully changed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:96
+#: eduiddashboard/views/emails.py:97
 msgid "Error: You only have one email address and it  can not be removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:116
+#: eduiddashboard/views/emails.py:117
 msgid "Email address was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:141
+#: eduiddashboard/views/emails.py:142
 msgid "Add email address"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:178 eduiddashboard/views/mobiles.py:191
-#: eduiddashboard/views/nins.py:330 eduiddashboard/views/personal.py:76
+#: eduiddashboard/views/emails.py:180 eduiddashboard/views/mobiles.py:192
+#: eduiddashboard/views/nins.py:329 eduiddashboard/views/personal.py:76
 msgid "Changes saved"
 msgstr ""
 
@@ -1155,11 +1155,11 @@ msgid ""
 "identifier=\"${id}\">here</a>."
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:29 eduiddashboard/views/mobiles.py:161
+#: eduiddashboard/views/mobiles.py:30 eduiddashboard/views/mobiles.py:161
 msgid "Add mobile phone number"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:38
+#: eduiddashboard/views/mobiles.py:39
 msgid "A mobile phone number is pending confirmation"
 msgstr ""
 
@@ -1203,13 +1203,13 @@ msgstr ""
 msgid "Mobile phone number was successfully made primary"
 msgstr ""
 
-#: eduiddashboard/views/mobiles.py:193
+#: eduiddashboard/views/mobiles.py:194
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:42 eduiddashboard/views/nins.py:231
+#: eduiddashboard/views/nins.py:42 eduiddashboard/views/nins.py:230
 msgid "Add national identity number"
 msgstr ""
 
@@ -1217,51 +1217,51 @@ msgstr ""
 msgid "Validation required for national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:78
+#: eduiddashboard/views/nins.py:77
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:134
+#: eduiddashboard/views/nins.py:133
 msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:136
+#: eduiddashboard/views/nins.py:135
 msgid "A confirmation code has been sent to your \"Min myndighetspost\" mailbox."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:137
+#: eduiddashboard/views/nins.py:136
 msgid "National identity number confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:138
+#: eduiddashboard/views/nins.py:137
 msgid ""
 "A new confirmation code has been sent to your \"Min myndighetspost\" "
 "mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:160
+#: eduiddashboard/views/nins.py:159
 msgid "The provided nin can't be verified. You only can verify the last one"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:190
+#: eduiddashboard/views/nins.py:189
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:207
+#: eduiddashboard/views/nins.py:206
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:274
+#: eduiddashboard/views/nins.py:273
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:328
+#: eduiddashboard/views/nins.py:327
 msgid "User data out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:378
+#: eduiddashboard/views/nins.py:377
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
