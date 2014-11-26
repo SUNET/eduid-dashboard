@@ -89,7 +89,7 @@ def verify_nin(request, user, new_nin, reference):
     request.msgrelay.postal_address_to_transaction_audit_log(reference)
     # Reset session eduPersonIdentityProofing on NIN verification
     request.session['eduPersonIdentityProofing'] = None
-    return _('National identity number {obj} verified')
+    return user, _('National identity number {obj} verified')
 
 
 def verify_mobile(request, user, new_mobile):
@@ -106,13 +106,13 @@ def verify_mobile(request, user, new_mobile):
             old_user.save(request)
     # Add the verified mobile number to the requesting user
     user.add_verified_mobile(new_mobile)
-    return _('Mobile {obj} verified')
+    return user, _('Mobile {obj} verified')
 
 
 def verify_mail(request, user, new_mail):
     # Start by removing mail address from any other user
     old_user_docs = request.db.profiles.find({
-        'mailAliases': {'email': new_mail, 'verified': True}
+        'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}
     })
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
@@ -125,7 +125,7 @@ def verify_mail(request, user, new_mail):
             old_user.save(request)
     # Add the verified mail address to the requesting user
     user.add_verified_email(new_mail)
-    return _('Email {obj} verified')
+    return user, _('Email {obj} verified')
 
 
 def verify_code(request, model_name, code):
@@ -167,11 +167,11 @@ def verify_code(request, model_name, code):
     assert user.get_id() == this_verification['user_oid'], assert_error_msg
 
     if model_name == 'norEduPersonNIN':
-        msg = verify_nin(request, user, obj_id, reference)
+        user, msg = verify_nin(request, user, obj_id, reference)
     elif model_name == 'mobile':
-        msg = verify_mobile(request, user, obj_id)
+        user, msg = verify_mobile(request, user, obj_id)
     elif model_name == 'mailAliases':
-        msg = verify_mail(request, user, obj_id)
+        user, msg = verify_mail(request, user, obj_id)
     else:
         raise NotImplementedError('Unknown validation model_name')
 
