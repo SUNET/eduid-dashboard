@@ -54,12 +54,11 @@ def send_verification_mail(request, email, reference=None, code=None):
 
 def send_termination_mail(request, user):
     mailer = get_mailer(request)
-    email = request.registry.settings.get('mail.support_email',
-                                          'support@eduid.se')
+    support_email = request.registry.settings.get('mail.support_email', 'support@eduid.se')
     site_name = request.registry.settings.get("site.name", "eduID")
 
     context = {
-        'mail': email,
+        'support_mail': support_email,
         'displayName': user.get_display_name()
     }
 
@@ -67,7 +66,7 @@ def send_termination_mail(request, user):
         subject=_("{site_name} account termination").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
-        recipients=[email],
+        recipients=[user.get_mail()],
         body=render(
             "templates/termination_email.txt.jinja2",
             context,
