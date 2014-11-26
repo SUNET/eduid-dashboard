@@ -20,7 +20,7 @@ from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
-from eduiddashboard.saml2.acs_actions import (register_action,
+from eduiddashboard.saml2.acs_actions import (acs_action,
                                               schedule_action,
                                               get_action)
 
@@ -99,6 +99,7 @@ def forbidden_view(context, request):
         return HTTPXRelocate(loginurl)
 
 
+@acs_action('login-action')
 def login_action(request, session_info, user):
 
     headers = login(request, session_info, user)
@@ -108,8 +109,6 @@ def login_action(request, session_info, user):
     relay_state = request.POST.get('RelayState', '/')
     log.debug('Redirecting to the RelayState: ' + relay_state)
     return HTTPFound(location=relay_state, headers=headers)
-
-register_action('login-action', login_action)
 
 
 @view_config(route_name='saml2-login')

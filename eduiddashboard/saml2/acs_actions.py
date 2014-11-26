@@ -17,19 +17,20 @@ logger = logging.getLogger(__name__)
 _actions = {}
 
 
-def register_action(action_key, action):
+def acs_action(action_key):
     '''
-    Register a new action.
-    This is used at the module level, and executed during initialization,
-    when modules are imported/loaded.
+    Decorator to register a new assertion consumer service action.
 
     :param action_key: the key for the given action
     :type action_key: str
-    :param action: the action to be performed
-    :type action: function
     '''
-    logger.info('Registering acs action ' + action_key)
-    _actions[action_key] = action
+    def outer(func):
+        logger.info('Registering acs action ' + action_key)
+        _actions[action_key] = func
+        def inner(*args, **kwargs):
+            return func(*args, **kwargs)
+        return inner
+    return outer
 
 
 def schedule_action(session, action_key):

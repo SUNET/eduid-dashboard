@@ -23,7 +23,7 @@ from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
-from eduiddashboard.saml2.acs_actions import register_action, schedule_action
+from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 
 import logging
 logger = logging.getLogger(__name__)
@@ -227,6 +227,7 @@ def account_terminated(context, request):
     return {}
 
 
+@acs_action('account-termination-action')
 def account_termination_action(request, session_info, user):
     settings = request.registry.settings
     logged_user = request.session['user']
@@ -249,8 +250,6 @@ def account_termination_action(request, session_info, user):
     next_page = request.POST.get('RelayState', '/')
     request.session['next_page'] = next_page
     return logout_view(request)
-
-register_action('account-termination-action', account_termination_action)
 
 
 @view_config(route_name='terminate-account', request_method='POST',
