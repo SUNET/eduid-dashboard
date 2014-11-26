@@ -68,6 +68,66 @@ def get_not_verified_objects(request, model_name, user):
     })
 
 
+def verify_nin(request, user, new_nin, reference):
+    # Start by removing nin from any other user
+    old_user_docs = request.db.profiles.find({
+        'norEduPersonNIN': new_nin
+    })
+    for old_user_doc in old_user_docs:
+        old_user = User(old_user_doc)
+        if old_user:
+            nins = [nin for nin in old_user.get_nins() if nin != new_nin]
+            old_user.set_nins(nins)
+            addresses = [a for a in old_user.get_addresses() if not a['verified']]
+            old_user.set_addresses(addresses)
+            old_user.retrieve_modified_ts(request.db.profiles)
+            old_user.save(request)
+    # Add the verified nin to the requesting user
+    user.add_verified_nin(new_nin)
+    user.retrieve_address(request, new_nin)
+    # Connect the verification to the transaction audit log
+    request.msgrelay.postal_address_to_transaction_audit_log(reference)
+    # Reset session eduPersonIdentityProofing on NIN verification
+    request.session['eduPersonIdentityProofing'] = None
+    return _('National identity number {obj} verified')
+
+
+def verify_mobile(request, user, new_mobile):
+    # Start by removing mobile number from any other user
+    old_user_docs = request.db.profiles.find({
+        'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}
+    })
+    for old_user_doc in old_user_docs:
+        old_user = User(old_user_doc)
+        if old_user:
+            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != new_mobile]
+            old_user.set_mobiles(mobiles)
+            old_user.retrieve_modified_ts(request.db.profiles)
+            old_user.save(request)
+    # Add the verified mobile number to the requesting user
+    user.add_verified_mobile(new_mobile)
+    return _('Mobile {obj} verified')
+
+
+def verify_mail(request, user, new_mail):
+    # Start by removing mail address from any other user
+    old_user_docs = request.db.profiles.find({
+        'mailAliases': {'email': new_mail, 'verified': True}
+    })
+    for old_user_doc in old_user_docs:
+        old_user = User(old_user_doc)
+        if old_user:
+            if old_user.get_mail() == new_mail:
+                old_user.set_mail('')
+            mails = [m for m in old_user.get_mail_aliases() if m['email'] != new_mail]
+            old_user.set_mail_aliases(mails)
+            old_user.retrieve_modified_ts(request.db.profiles)
+            old_user.save(request)
+    # Add the verified mail address to the requesting user
+    user.add_verified_email(new_mail)
+    return _('Email {obj} verified')
+
+
 def verify_code(request, model_name, code):
     """
     Verify a code and act accordingly to the model_name ('norEduPersonNIN', 'mobile', or 'mailAliases').
@@ -78,9 +138,7 @@ def verify_code(request, model_name, code):
     :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
     :param code: The user supplied code
     :type request: webob.request.BaseRequest
-
-
-    :return:
+    :return: string of verified data
     """
     this_verification = request.db.verifications.find_one(
         {
@@ -95,97 +153,42 @@ def verify_code(request, model_name, code):
     reference = unicode(this_verification['_id'])
     obj_id = this_verification['obj_id']
 
-    if obj_id:
-        msg = "Code {!r} ({!s}) marked as verified"
-        log.debug(msg.format(code, str(obj_id)))
+    if not obj_id:
+        return None
 
-        if 'edit-user' in request.session:
-            # non personal mode
-            user = request.session['edit-user']
-        elif 'user' in request.session:
-            # personal mode
-            user = request.session['user']
-        else:
-            # should not happen
-            user = request.userdb.get_user_by_oid(this_verification['user_oid'])
-            user.retrieve_modified_ts(request.db.profiles)
-        assert user.get_id() == this_verification['user_oid']
-        old_verified = request.db.verifications.find_one(
-            {
-                "model_name": model_name,
-                "obj_id": this_verification['obj_id'],
-                "verified": True
-            })
+    if 'edit-user' in request.session:
+        # non personal mode
+        user = request.session['edit-user']
+    elif 'user' in request.session:
+        # personal mode
+        user = request.session['user']
 
-        old_user = None
-        if old_verified:
-            old_user = request.userdb.get_user_by_oid(old_verified['user_oid'])
-            old_user.retrieve_modified_ts(request.db.profiles)
+    assert_error_msg = 'Requesting users ID does not match verifications user ID'
+    assert user.get_id() == this_verification['user_oid'], assert_error_msg
 
-        if model_name == 'norEduPersonNIN':
-            if not old_user:
-                old_user_doc = request.db.profiles.find_one({
-                    'norEduPersonNIN': obj_id
-                })
-                if old_user_doc:
-                    old_user = User(old_user_doc)
-            if old_user:
-                nins = [nin for nin in old_user.get_nins() if nin != obj_id]
-                old_user.set_nins(nins)
-                addresses = [a for a in old_user.get_addresses() if not a['verified']]
-                old_user.set_addresses(addresses)
-            user.add_verified_nin(obj_id)
-            user.retrieve_address(request, obj_id)
-            request.msgrelay.postal_address_to_transaction_audit_log(reference)
+    if model_name == 'norEduPersonNIN':
+        msg = verify_nin(request, user, obj_id, reference)
+    elif model_name == 'mobile':
+        msg = verify_mobile(request, user, obj_id)
+    elif model_name == 'mailAliases':
+        msg = verify_mail(request, user, obj_id)
+    else:
+        raise NotImplementedError('Unknown validation model_name')
 
-            # Reset session eduPersonIdentityProofing on NIN verification
-            request.session['eduPersonIdentityProofing'] = None
-
-            msg = _('National identity number {obj} verified')
-
-        elif model_name == 'mobile':
-            if not old_user:
-                old_user_doc = request.db.profiles.find_one({
-                    'mobile': {'$elemMatch': {'mobile': obj_id, 'verified': True}}
-                })
-                if old_user_doc:
-                   old_user = User(old_user_doc)
-            if old_user:
-                mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != obj_id]
-                old_user.set_mobiles(mobiles)
-            user.add_verified_mobile(obj_id)
-            msg = _('Mobile {obj} verified')
-
-        elif model_name == 'mailAliases':
-            if not old_user:
-                old_user_doc = request.db.profiles.find_one({
-                    'mailAliases': {'email': obj_id, 'verified': True}
-                })
-                if old_user_doc:
-                    old_user = User(old_user_doc)
-            if old_user:
-                if old_user.get_mail() == obj_id:
-                    old_user.set_mail('')
-                mails = [m for m in old_user.get_mail_aliases() if m['email'] != obj_id]
-                old_user.set_mail_aliases(mails)
-            user.add_verified_email(obj_id)
-            msg = _('Email {obj} verified')
-
-        try:
-            user.save(request)
-            if old_user:
-                old_user.save(request)
-            verified = {
-                'verified': True,
-                'verified_timestamp': datetime.utcnow()
-            }
-            this_verification.update(verified)
-            request.db.verifications.update({'_id': this_verification['_id']}, this_verification)
-        except UserOutOfSync:
-            raise
-        else:
-            msg = get_localizer(request).translate(msg)
-            request.session.flash(msg.format(obj=obj_id), queue='forms')
+    try:
+        user.save(request)
+        verified = {
+            'verified': True,
+            'verified_timestamp': datetime.utcnow()
+        }
+        this_verification.update(verified)
+        request.db.verifications.update({'_id': this_verification['_id']}, this_verification)
+        log.debug("Code {!r} ({!s}) marked as verified".format(code, str(obj_id)))
+    except UserOutOfSync:
+        raise
+    else:
+        msg = get_localizer(request).translate(msg)
+        request.session.flash(msg.format(obj=obj_id), queue='forms')
     return obj_id
 
 
