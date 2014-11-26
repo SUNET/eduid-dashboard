@@ -177,37 +177,25 @@ class PasswordFormTests(LoggedInReguestTests):
         self.patcher.stop()
 
 
+FAKE_SESSION_INFO = {
+    'authn_info': [('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', [])],
+    'ava': {'mail': ['johnsmith@example.com']},
+    'came_from': 'http://profile.eduid.example.com:6544/profile/account-terminated/',
+    'issuer': 'https://idp.example.com/simplesaml/saml2/idp/metadata.php',
+    'not_on_or_after': 1417031214}
+
+
 class TerminateAccountTests(LoggedInReguestTests):
 
-    def test_terminate_account(self):
-        self.set_logged()
-        response = self.testapp.get('/profile/security/')
-        form = response.forms['terminate-account-form']
-        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
-        self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
-        with patch('eduiddashboard.vccs.get_vccs_client'):
-            from eduiddashboard.vccs import get_vccs_client
-            get_vccs_client.return_value = FakeVCCSClient(fake_response={
-                'revoke_creds_response': {
-                    'version': 1,
-                    'success': True,
-                },
-            })
-            form_response = form.submit('submit')
-            self.assertEqual(form_response.status, '302 Found')
-            form_response = self.testapp.get(form_response.location)
-            self.assertEqual(form_response.status, '302 Found')
-            form_response = self.testapp.get(form_response.location)
-        self.assertEqual(form_response.status, '200 OK')
-        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
-        self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
-
     def test_reset_password_unterminates_account(self):
-        self.set_logged()
+        request = self.set_logged()
         response = self.testapp.get('/profile/security/')
         form = response.forms['terminate-account-form']
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
         self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
+        form_response = form.submit('submit')
+        self.assertEqual(form_response.status, '302 Found')
+        self.assertIn('idp.example.com', form_response.location)
         with patch('eduiddashboard.vccs.get_vccs_client'):
             from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
@@ -216,12 +204,17 @@ class TerminateAccountTests(LoggedInReguestTests):
                     'success': True,
                 },
             })
-            form_response = form.submit('submit')
-            self.assertEqual(form_response.status, '302 Found')
-            form_response = self.testapp.get(form_response.location)
-            self.assertEqual(form_response.status, '302 Found')
-            form_response = self.testapp.get(form_response.location)
-        self.assertEqual(form_response.status, '200 OK')
+            with patch('eduiddashboard.views.portal.send_termination_mail'):
+                from eduiddashboard.views.portal import send_termination_mail
+                send_termination_mail.return_value = None
+                with patch('eduiddashboard.views.portal.logout_view'):
+                    from eduiddashboard.views.portal import logout_view
+                    logout_view.return_value = None
+                    request.session['user'] = self.user
+                    request.POST['RelayState'] = '/profile/account-terminated/'
+                    request.context.propagate_user_changes = lambda x: None
+                    from eduiddashboard.views.portal import account_termination_action
+                    account_termination_action(request, FAKE_SESSION_INFO, self.user)
         self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
         self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
 
