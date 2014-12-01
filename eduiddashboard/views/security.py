@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from bson import ObjectId
 import pytz
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
 from pyramid.renderers import render, render_to_response
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
@@ -15,6 +15,7 @@ from pyramid.i18n import get_localizer
 from pyramid_deform import FormView
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
+from pyramid.renderers import render_to_response
 
 from eduid_am.tasks import update_attributes
 
@@ -24,6 +25,11 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
+from eduiddashboard.views.portal import profile_editor
+from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
+from eduiddashboard.saml2.views import get_authn_request
+from eduiddashboard.saml2.utils import get_location
+from eduiddashboard.permissions import SecurityFactory
 from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
     convert_to_localtime, normalize_to_e_164
 from eduiddashboard import log
@@ -150,7 +156,56 @@ def get_authn_info(request):
     return authninfo
 
 
-@view_config(route_name='security', permission='edit')
+@view_config(route_name='start-password-change',
+             request_method='POST',
+             permission='edit')
+def start_password_change(context, request):
+    '''
+    '''
+    settings = request.registry.settings
+
+    # check csrf
+    csrf = request.POST.get('csrf')
+    if csrf != request.session.get_csrf_token():
+        return HTTPBadRequest()
+
+    selected_idp = request.session.get('selected_idp')
+    relay_state = context.route_url('profile-editor')
+    info = get_authn_request(request, relay_state, selected_idp,
+                             force_authn=True)
+    schedule_action(request.session, 'change-password-action')
+
+    return HTTPFound(location=get_location(info))
+
+
+@acs_action('change-password-action')
+def change_password_action(request, session_info, user):
+    settings = request.registry.settings
+    logged_user = request.session['user']
+
+    if logged_user.get_id() != user.get_id():
+        raise HTTPUnauthorized("Wrong user")
+
+    # set timestamp in session
+    request.session['re-authn-ts'] = datetime.utcnow()
+    # send password change form
+    context = SecurityFactory(request)
+    request.context = context
+    return PasswordsView(context, request)()
+
+
+@view_config(route_name='security',
+             permission='edit',
+             renderer='eduiddashboard:templates/passwords-form.jinja2')
+def security_view(context, request):
+    return {
+        'formname': 'security',
+        'authninfo': get_authn_info(request)
+    }
+
+
+@view_config(route_name='password-change',
+             permission='edit')
 class PasswordsView(BaseFormView):
     """
     Change user passwords
@@ -160,7 +215,7 @@ class PasswordsView(BaseFormView):
     """
 
     schema = Passwords()
-    route = 'security'
+    route = 'password-change'
     buttons = (Button(name='save', title=_('Change password')), )
     _password = None
 
@@ -182,13 +237,8 @@ class PasswordsView(BaseFormView):
     def __call__(self):
         if self.request.method == 'POST':
             self.request.POST.add('suggested_password', self.get_suggested_password())
-
         result = super(PasswordsView, self).__call__()
-
-        if self.request.method == 'POST':
-            template = 'eduiddashboard:templates/passwords-form-dialog.jinja2'
-        else:
-            template = 'eduiddashboard:templates/passwords-form.jinja2'
+        template = 'eduiddashboard:templates/passwords-form-dialog.jinja2'
         return render_to_response(template, result, request=self.request)
 
     def get_template_context(self):
@@ -210,6 +260,14 @@ class PasswordsView(BaseFormView):
         return self._password
 
     def save_success(self, passwordform):
+        authn_ts = self.request.session.get('re-authn-ts', None)
+        if authn_ts is None:
+            raise HTTPBadRequest(_('No authentication info'))
+        else:
+            now = datetime.utcnow()
+            delta = now - authn_ts
+            if int(delta.total_seconds()) > 600:
+                raise HTTPBadRequest(_('Stale authentication info'))
         passwords_data = self.schema.serialize(passwordform)
         if 'edit-user' in self.request.session:
             user = self.request.session['edit-user']

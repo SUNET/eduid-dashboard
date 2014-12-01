@@ -168,9 +168,13 @@ def profile_urls(config):
 
     config.add_route('terminate-account', '/terminate-account/',
                      factory=PersonFactory)
-
     config.add_route('account-terminated', '/account-terminated/',
                      factory=RootFactory)
+
+    config.add_route('start-password-change', '/start-password-change/',
+                     factory=SecurityFactory)
+    config.add_route('password-change', '/password-change/',
+                     factory=SecurityFactory)
 
     # wizard routes
     config.add_route('wizard-nins', '/nin-wizard/',
