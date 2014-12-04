@@ -7,9 +7,13 @@ def reauthn_ts_tween_factory(handler, registry):
 
     def clean_reauthn_ts_from_session(request):
         response = handler(request)
-        path = request['PATH_INFO']
+        path = request.get('PATH_INFO', '')
         acs_path = request.route_path('saml2-acs')
-        chp_path = request.route_path('password-change')
+        try:
+            chp_path = request.route_path('password-change')
+        except KeyError:
+            # too early to continue
+            return response
         referer = request.get('HTTP_REFERER', '')
         acs_url = request.route_url('saml2-acs')
         chp_url = request.route_url('password-change')
