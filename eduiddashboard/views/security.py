@@ -188,10 +188,8 @@ def change_password_action(request, session_info, user):
 
     # set timestamp in session
     request.session['re-authn-ts'] = datetime.utcnow()
-    # send password change form
-    context = SecurityFactory(request)
-    request.context = context
-    return PasswordsView(context, request)()
+    # send to password change form
+    return HTTPFound(request.route_url('password-change'))
 
 
 @view_config(route_name='security',
@@ -225,7 +223,7 @@ class PasswordsView(BaseFormView):
         self.ajax_options = json.dumps({
             'replaceTarget': False,
             'url': context.route_url(self.route),
-            'target': "#changePasswordDialog .modal-body",
+            'target': "#changePasswordDialog",
         })
 
     def appstruct(self):
@@ -267,7 +265,9 @@ class PasswordsView(BaseFormView):
             now = datetime.utcnow()
             delta = now - authn_ts
             if int(delta.total_seconds()) > 600:
-                raise HTTPBadRequest(_('Stale authentication info'))
+                msg = _('Stale authentication info. Please try again.')
+                self.request.session.flash('error|' + msg)
+                raise HTTPFound(self.context.route_url('profile-editor'))
         passwords_data = self.schema.serialize(passwordform)
         if 'edit-user' in self.request.session:
             user = self.request.session['edit-user']
@@ -297,11 +297,12 @@ class PasswordsView(BaseFormView):
 
         self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
-            message = _('Your password has been successfully updated')
+            message = 'success|' + _('Your password has been successfully updated')
         else:
-            message = _('An error has occured while updating your password, '
+            message = 'error|' + _('An error has occured while updating your password, '
                         'please try again or contact support if the problem persists.')
-        self.message = get_localizer(self.request).translate(message)
+        self.request.session.flash(message)
+        raise HTTPFound(self.context.route_url('profile-editor'))
 
 
 @view_config(route_name='reset-password', renderer='templates/reset-password.jinja2',
