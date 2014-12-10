@@ -213,8 +213,11 @@ class PasswordsView(BaseFormView):
     """
 
     schema = Passwords()
+    base_route = 'password-change'
     route = 'password-change'
     buttons = (Button(name='save', title=_('Change password')), )
+
+    use_ajax = False
     _password = None
 
     def __init__(self, context, request):

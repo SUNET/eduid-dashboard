@@ -15,6 +15,8 @@ from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials,
                         provision_credentials)
 
+import logging
+log = logging.getLogger(__name__)
 
 class FakeVCCSClient(vccs_client.VCCSClient):
 
@@ -71,7 +73,7 @@ class PasswordFormTests(LoggedInReguestTests):
         response = self.testapp.get('/profile/security/')
 
         self.assertEqual(response.status, '200 OK')
-        self.assertIn('passwordsview-form', response.forms)
+        self.assertIn('start-password-change-form', response.forms)
 
     def test_notlogged_get(self):
         response = self.testapp.get('/profile/security/')
@@ -95,14 +97,23 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_valid_current_password(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/security/')
-
+        response = self.testapp.get('/profile/security/')
+        form = response.forms['start-password-change-form']
+        form_response = form.submit('submit')
+        self.assertEqual(form_response.status, '302 Found')
+        self.assertIn('idp.example.com', form_response.location)
+        response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
+        self.add_to_session({'re-authn-ts': datetime.utcnow(),
+                             'user': self.user})
+        from eduiddashboard.validators import CSRFTokenValidator
+        with patch.object(CSRFTokenValidator, '__call__', clear=True):
 
-        response = form.submit('save')
-
-        self.assertEqual(response.status, '200 OK')
+            CSRFTokenValidator.__call__.return_value = None
+            response = form.submit('save')
+        self.assertEqual(response.status, '302 Found')
+        response = self.testapp.get(response.location)
         self.assertIn('Your password has been successfully updated',
                       response.body)
         self.assertNotIn('Old password do not match', response.body)
@@ -110,35 +121,42 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_not_valid_current_password(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/security/', status=200)
-
+        response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
-
-        with patch('eduiddashboard.vccs', clear=True):
-            vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
-                'auth_response': {
-                    'version': 1,
-                    'authenticated': False,
-                },
-            })
-            response = form.submit('save')
-            self.assertEqual(response.status, '200 OK')
-            self.assertIn('Current password is incorrect', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
+        self.add_to_session({'re-authn-ts': datetime.utcnow(),
+                             'user': self.user})
+        from eduiddashboard.validators import CSRFTokenValidator
+        with patch.object(CSRFTokenValidator, '__call__', clear=True):
+            CSRFTokenValidator.__call__.return_value = None
+            with patch('eduiddashboard.vccs', clear=True):
+                vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
+                    'auth_response': {
+                        'version': 1,
+                        'authenticated': False,
+                    },
+                })
+                response = form.submit('save')
+                self.assertEqual(response.status, '200 OK')
+                self.assertIn('Current password is incorrect', response.body)
+                self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_password_form_entropy(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/security/')
-
+        response = self.testapp.get('/profile/security/')
+        response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
         form['custom_password'].value = '0l8m vta8 j9lr'
         form['repeated_password'].value = form['custom_password'].value
-
-        response = form.submit('save')
-
-        self.assertEqual(response.status, '200 OK')
+        self.add_to_session({'re-authn-ts': datetime.utcnow(),
+                             'user': self.user})
+        from eduiddashboard.validators import CSRFTokenValidator
+        with patch.object(CSRFTokenValidator, '__call__', clear=True):
+            CSRFTokenValidator.__call__.return_value = None
+            response = form.submit('save')
+        self.assertEqual(response.status, '302 Found')
+        response = self.testapp.get(response.location)
         self.assertIn('Your password has been successfully updated',
                       response.body)
         self.assertNotIn('Old password do not match', response.body)
@@ -146,8 +164,8 @@ class PasswordFormTests(LoggedInReguestTests):
 
     def test_password_form_entropy_notvalid(self):
         self.set_logged()
-        response_form = self.testapp.get('/profile/security/')
-
+        response = self.testapp.get('/profile/security/')
+        response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
 
@@ -162,9 +180,13 @@ class PasswordFormTests(LoggedInReguestTests):
             'onetwothreefour',
         ]:
             form['custom_password'].value = password
-            form['repeated_password'].value = password
-
-            response = form.submit('save')
+            form['repeated_password'].value = form['custom_password'].value
+            self.add_to_session({'re-authn-ts': datetime.utcnow(),
+                                 'user': self.user})
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+                CSRFTokenValidator.__call__.return_value = None
+                response = form.submit('save')
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn('The password complexity is too weak.',
