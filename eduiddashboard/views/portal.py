@@ -229,6 +229,14 @@ def account_terminated(context, request):
 
 @acs_action('account-termination-action')
 def account_termination_action(request, session_info, user):
+    '''
+    The account termination action,
+    removes all credentials for the terminated account
+    from the VCCS service,
+    flags the account as terminated,
+    sends an email to the address in the terminated account,
+    and logs out the session.
+    '''
     settings = request.registry.settings
     logged_user = request.session['user']
 
@@ -258,11 +266,8 @@ def terminate_account(context, request):
     '''
     Terminate account view.
     It receives a POST request, checks the csrf token,
-    removes all credentials for the terminated account
-    from the VCCS service,
-    flags the account as terminated,
-    sends an email to the address in the terminated account,
-    and logs out the session.
+    schedules the account termination action,
+    and redirects to the IdP.
     '''
     settings = request.registry.settings
 
@@ -273,8 +278,9 @@ def terminate_account(context, request):
 
     selected_idp = request.session.get('selected_idp')
     relay_state = context.route_url('account-terminated')
+    loa = context.get_loa()
     info = get_authn_request(request, relay_state, selected_idp,
-                             force_authn=True)
+                             required_loa=loa, force_authn=True)
     schedule_action(request.session, 'account-termination-action')
 
     return HTTPFound(location=get_location(info))

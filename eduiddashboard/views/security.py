@@ -171,8 +171,9 @@ def start_password_change(context, request):
 
     selected_idp = request.session.get('selected_idp')
     relay_state = context.route_url('profile-editor')
+    loa = context.get_loa()
     info = get_authn_request(request, relay_state, selected_idp,
-                             force_authn=True)
+                             required_loa=loa, force_authn=True)
     schedule_action(request.session, 'change-password-action')
 
     return HTTPFound(location=get_location(info))
