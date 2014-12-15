@@ -20,6 +20,9 @@ from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
+from eduiddashboard.saml2.acs_actions import (acs_action,
+                                              schedule_action,
+                                              get_action)
 
 from eduiddashboard import log
 
@@ -96,6 +99,18 @@ def forbidden_view(context, request):
         return HTTPXRelocate(loginurl)
 
 
+@acs_action('login-action')
+def login_action(request, session_info, user):
+
+    headers = login(request, session_info, user)
+    _set_name_id(request.session, session_info['name_id'])
+
+    # redirect the user to the view where he came from
+    relay_state = request.POST.get('RelayState', '/')
+    log.debug('Redirecting to the RelayState: ' + relay_state)
+    return HTTPFound(location=relay_state, headers=headers)
+
+
 @view_config(route_name='saml2-login')
 def login_view(request):
     login_redirect_url = request.registry.settings.get(
@@ -107,6 +122,8 @@ def login_view(request):
         return HTTPFound(location=came_from)
 
     selected_idp = request.GET.get('idp', None)
+    if selected_idp is not None:
+        request.session['selected_idp'] = selected_idp
 
     idps = request.saml2_config.getattr('idp')
     if selected_idp is None and len(idps) > 1:
@@ -118,33 +135,9 @@ def login_view(request):
             'login_url': request.route_url('saml2-login'),
         })
 
-    # Request the right AuthnContext for workmode
-    # (AL1 for 'personal', AL2 for 'helpdesk' and AL3 for 'admin' by default)
-    required_loa = request.registry.settings.get('required_loa', {})
-    workmode = request.registry.settings.get('workmode')
-    required_loa = required_loa.get(workmode, '')
-    log.debug('Requesting AuthnContext {!r} for workmode {!r}'.format(required_loa, workmode))
-    kwargs = {
-        "requested_authn_context": RequestedAuthnContext(
-            authn_context_class_ref=AuthnContextClassRef(
-                text=required_loa
-            )
-        )
-    }
+    result = get_authn_request(request, came_from, selected_idp)
 
-    client = Saml2Client(request.saml2_config)
-    try:
-        (session_id, result) = client.prepare_for_authenticate(
-            entityid=selected_idp, relay_state=came_from,
-            binding=BINDING_HTTP_REDIRECT,
-            **kwargs
-        )
-    except TypeError:
-        log.error('Unable to know which IdP to use')
-        raise
-
-    oq_cache = OutstandingQueriesCache(request.session)
-    oq_cache.set(session_id, came_from)
+    schedule_action(request.session, 'login-action')
 
     log.debug('Redirecting the user to the IdP')
     if not request.is_xhr:
@@ -157,8 +150,11 @@ def login_view(request):
 
 @view_config(route_name='saml2-acs', request_method='POST')
 def assertion_consumer_service(request):
+    ''' '''
+    action = get_action(request.session)
+
     if 'SAMLResponse' not in request.POST:
-        return HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
+        raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
                          identity_cache=IdentityCache(request.session))
@@ -172,14 +168,14 @@ def assertion_consumer_service(request):
                                                        outstanding_queries)
     except AssertionError:
         log.error('SAML response is not verified')
-        return HTTPBadRequest(
+        raise HTTPBadRequest(
             """SAML response is not verified. May be caused by the response
             was not issued at a reasonable time or the SAML status is not ok.
             Check the IDP datetime setup""")
 
     if response is None:
         log.error('SAML response is None')
-        return HTTPBadRequest(
+        raise HTTPBadRequest(
             "SAML response has errors. Please check the logs")
 
     session_id = response.session_id()
@@ -194,16 +190,9 @@ def assertion_consumer_service(request):
     user = authenticate(request, session_info)
     if user is None:
         log.error('Could not find the user identified by the IdP')
-        return HTTPUnauthorized("Access not authorized")
+        raise HTTPUnauthorized("Access not authorized")
 
-    headers = login(request, session_info, user)
-
-    _set_name_id(request.session, session_info['name_id'])
-
-    # redirect the user to the view where he came from
-    relay_state = request.POST.get('RelayState', '/')
-    log.debug('Redirecting to the RelayState: ' + relay_state)
-    return HTTPFound(location=relay_state, headers=headers)
+    return action(request, session_info, user)
 
 
 @view_config(route_name='saml2-echo-attributes')
@@ -336,3 +325,37 @@ def wayf_demo(request):
         'came_from': '/',
         'login_url': request.route_url('saml2-login'),
     }
+
+
+def get_authn_request(request, came_from, selected_idp,
+                      required_loa=None, force_authn=False):
+    # Request the right AuthnContext for workmode
+    # (AL1 for 'personal', AL2 for 'helpdesk' and AL3 for 'admin' by default)
+    if required_loa is None:
+        required_loa = request.registry.settings.get('required_loa', {})
+        workmode = request.registry.settings.get('workmode')
+        required_loa = required_loa.get(workmode, '')
+    log.debug('Requesting AuthnContext {!r}'.format(required_loa))
+    kwargs = {
+        "requested_authn_context": RequestedAuthnContext(
+            authn_context_class_ref=AuthnContextClassRef(
+                text=required_loa
+            )
+        ),
+        "force_authn": str(force_authn).lower(),
+    }
+
+    client = Saml2Client(request.saml2_config)
+    try:
+        (session_id, info) = client.prepare_for_authenticate(
+            entityid=selected_idp, relay_state=came_from,
+            binding=BINDING_HTTP_REDIRECT,
+            **kwargs
+        )
+    except TypeError:
+        log.error('Unable to know which IdP to use')
+        raise
+
+    oq_cache = OutstandingQueriesCache(request.session)
+    oq_cache.set(session_id, came_from)
+    return info

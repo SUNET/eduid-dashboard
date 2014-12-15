@@ -168,9 +168,13 @@ def profile_urls(config):
 
     config.add_route('terminate-account', '/terminate-account/',
                      factory=PersonFactory)
-
     config.add_route('account-terminated', '/account-terminated/',
                      factory=RootFactory)
+
+    config.add_route('start-password-change', '/start-password-change/',
+                     factory=SecurityFactory)
+    config.add_route('password-change', '/password-change/',
+                     factory=SecurityFactory)
 
     # wizard routes
     config.add_route('wizard-nins', '/nin-wizard/',
@@ -419,6 +423,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory,
                           locale_negotiator=locale_negotiator)
+
+    config.add_tween('eduiddashboard.middleware.reauthn_ts_tween_factory')
 
     config.registry.registerUtility(ConfiguredHostStaticURLInfo(),
                                     IStaticURLInfo)

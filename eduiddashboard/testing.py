@@ -191,6 +191,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         request = DummyRequest()
         request.context = DummyResource()
         request.userdb = self.userdb
+        request.db = self.db
         request.registry.settings = self.settings
         return request
 

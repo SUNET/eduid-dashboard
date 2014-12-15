@@ -21,6 +21,9 @@ from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
+from eduiddashboard.saml2.views import get_authn_request
+from eduiddashboard.saml2.utils import get_location
+from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 
 import logging
 logger = logging.getLogger(__name__)
@@ -224,17 +227,47 @@ def account_terminated(context, request):
     return {}
 
 
+@acs_action('account-termination-action')
+def account_termination_action(request, session_info, user):
+    '''
+    The account termination action,
+    removes all credentials for the terminated account
+    from the VCCS service,
+    flags the account as terminated,
+    sends an email to the address in the terminated account,
+    and logs out the session.
+    '''
+    settings = request.registry.settings
+    logged_user = request.session['user']
+
+    if logged_user.get_id() != user.get_id():
+        raise HTTPUnauthorized("Wrong user")
+
+    # revoke all user credentials
+    revoke_all_credentials(settings.get('vccs_url'), user)
+    user.set_passwords([])
+
+    # flag account as terminated
+    user.set_terminated()
+    user.save(request, check_sync=False)
+
+    # email the user
+    send_termination_mail(request, user)
+
+    # logout
+    next_page = request.POST.get('RelayState', '/')
+    request.session['next_page'] = next_page
+    return logout_view(request)
+
+
 @view_config(route_name='terminate-account', request_method='POST',
              permission='edit')
 def terminate_account(context, request):
     '''
     Terminate account view.
     It receives a POST request, checks the csrf token,
-    removes all credentials for the terminated account
-    from the VCCS service,
-    flags the account as terminated,
-    sends an email to the address in the terminated account,
-    and logs out the session.
+    schedules the account termination action,
+    and redirects to the IdP.
     '''
     settings = request.registry.settings
 
@@ -243,21 +276,14 @@ def terminate_account(context, request):
     if csrf != request.session.get_csrf_token():
         return HTTPBadRequest()
 
-    # revoke all user credentials
-    revoke_all_credentials(settings.get('vccs_url'), context.user)
-    context.user.set_passwords([])
+    selected_idp = request.session.get('selected_idp')
+    relay_state = context.route_url('account-terminated')
+    loa = context.get_loa()
+    info = get_authn_request(request, relay_state, selected_idp,
+                             required_loa=loa, force_authn=True)
+    schedule_action(request.session, 'account-termination-action')
 
-    # flag account as terminated
-    context.user.set_terminated()
-    context.user.save(request, check_sync=False)
-
-    # email the user
-    send_termination_mail(request, context.user)
-
-    # logout
-    next_page = context.route_url('account-terminated')
-    request.session['next_page'] = next_page
-    return logout_view(request)
+    return HTTPFound(location=get_location(info))
 
 
 @view_config(route_name='error500test')

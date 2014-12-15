@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-11-25 15:32+0100\n"
-"PO-Revision-Date: 2014-11-25 15:04+0000\n"
+"POT-Creation-Date: 2014-12-12 11:20+0100\n"
+"PO-Revision-Date: 2014-11-03 11:35+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
 "dashboard/language/sv/)\n"
@@ -28,11 +28,12 @@ msgid "{site_name} confirmation email"
 msgstr "{site_name} bekräftelsemail"
 
 #: eduiddashboard/emails.py:67
+#, fuzzy
 msgid "{site_name} account termination"
 msgstr "{site_name} kontoborttagning"
 
 #: eduiddashboard/models.py:21 eduiddashboard/models.py:68
-#: eduiddashboard/views/security.py:360
+#: eduiddashboard/views/security.py:422
 msgid "email"
 msgstr "e-post"
 
@@ -185,61 +186,61 @@ msgstr "Ogiltig automatinloggning"
 msgid "Security"
 msgstr "Säkerhet"
 
-#: eduiddashboard/validators.py:40
+#: eduiddashboard/validators.py:41
 msgid "Current password is incorrect"
 msgstr "Nuvarande lösenord är felaktigt"
 
-#: eduiddashboard/validators.py:70
+#: eduiddashboard/validators.py:71
 msgid "The password complexity is too weak."
 msgstr "Lösenordet är för enkelt."
 
-#: eduiddashboard/validators.py:81
+#: eduiddashboard/validators.py:82
 msgid "The permission selected is not available"
 msgstr "Den valda rättigheten är inte tillgänglig"
 
-#: eduiddashboard/validators.py:100
+#: eduiddashboard/validators.py:101
 msgid "You already have this email address"
 msgstr "E-postadressen finns redan i listan"
 
-#: eduiddashboard/validators.py:105
+#: eduiddashboard/validators.py:106
 msgid "This email address is unavailable"
 msgstr "E-postadressen är inte tillgänglig"
 
-#: eduiddashboard/validators.py:116
+#: eduiddashboard/validators.py:117
 msgid "Email address does not exist"
 msgstr "E-postadressen kunde inte hittas"
 
-#: eduiddashboard/validators.py:131
+#: eduiddashboard/validators.py:132
 msgid "This mobile phone was already registered"
 msgstr "Mobiltelefonnumret är redan bekräftat"
 
-#: eduiddashboard/validators.py:145
+#: eduiddashboard/validators.py:146
 msgid "Username does not exist"
 msgstr "Användarnamnet finns inte"
 
-#: eduiddashboard/validators.py:148
+#: eduiddashboard/validators.py:149
 msgid "There is more than one user for that username"
 msgstr "Det finns mer än en användare med det användarnamnet"
 
-#: eduiddashboard/validators.py:157
+#: eduiddashboard/validators.py:158
 msgid "email address ${val} does not exist or is unverified"
 msgstr "mejladressen ${val} finns inte eller är inte verifierad"
 
-#: eduiddashboard/validators.py:162
+#: eduiddashboard/validators.py:163
 msgid "There is more than one user for that email"
 msgstr "Det finns mer än en användare med den e-postadressen"
 
-#: eduiddashboard/validators.py:176
+#: eduiddashboard/validators.py:177
 msgid ""
 "This national identity number does not exist, is not verified or is not "
 "active"
 msgstr "Personnumret kunde inte hittas, är inte bekräftat eller inte aktivt"
 
-#: eduiddashboard/validators.py:206
+#: eduiddashboard/validators.py:207
 msgid "This national identity number is already in use"
 msgstr "Personnumret är redan registrerat"
 
-#: eduiddashboard/validators.py:232
+#: eduiddashboard/validators.py:233
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -247,7 +248,7 @@ msgstr ""
 "Vi har för närvarande tekniska problem med ${service_name}, vänligen "
 "försök igen senare."
 
-#: eduiddashboard/validators.py:238
+#: eduiddashboard/validators.py:239
 msgid ""
 "This national identity number is not registered with \"${service_name}\"."
 " Please register at <a href=\"${service_url}\" "
@@ -256,7 +257,7 @@ msgstr ""
 "Personnumret finns inte registrerat hos ${service_name}. Registrera dig "
 "här <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:243
+#: eduiddashboard/validators.py:244
 msgid ""
 "Your registration process with \"${service_name}\" is not complete. "
 "Please visit <a href=\"${service_url}\" "
@@ -266,7 +267,7 @@ msgstr ""
 "din registrering vänligen besök <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:248
+#: eduiddashboard/validators.py:249
 msgid ""
 "According to \"${service_name}\" you have opted out to receive messages "
 "from SUNET (eduID). In order to receive a confirmation code from us, you "
@@ -278,15 +279,15 @@ msgstr ""
 "blockeringen hos <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:267
+#: eduiddashboard/validators.py:268
 msgid "The entered code does not exist"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/validators.py:282
+#: eduiddashboard/validators.py:283
 msgid "Invalid CSRF token"
 msgstr "Ogiltig CSRF kod"
 
-#: eduiddashboard/validators.py:298
+#: eduiddashboard/validators.py:299
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -483,7 +484,7 @@ msgstr "Dashboard läge %(mode)s"
 msgid "Level %(level)s"
 msgstr "Nivå %(level)s"
 
-#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:92
+#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:95
 msgid "Search"
 msgstr "Sök"
 
@@ -606,15 +607,27 @@ msgstr ""
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
-#: eduiddashboard/templates/passwords-form-dialog.jinja2:8
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:6
+#, fuzzy
+#| msgid "Change password"
+msgid "Change your password"
+msgstr "Byt lösenord"
+
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:15
+#, fuzzy
+#| msgid "" "\n" "  <p>You can change your current password using this form. A
+#| strong " "password\n" "      has been generated for you. You can accept the
+#| generated password " "by clicking\n" "      \"Change password\" or you can
+#| opt to choose your own password " "using the checkbox.</p>\n"
 msgid ""
 "\n"
-"  <p>You can change your current password using this form. A strong "
+"      <p>You can change your current password using this form. A strong "
 "password\n"
-"      has been generated for you. You can accept the generated password "
-"by clicking\n"
-"      \"Change password\" or you can opt to choose your own password "
+"          has been generated for you. You can accept the generated "
+"password by clicking\n"
+"          \"Change password\" or you can opt to choose your own password "
 "using the checkbox.</p>\n"
+"    "
 msgstr ""
 "\n"
 "<p>Du kan använda detta formulär för att ändra ditt lösenord. Ett säkert "
@@ -623,19 +636,27 @@ msgstr ""
 " eller så kan du välja att använda ett eget lösenord med hjälp av "
 "kryssrutan.</p>\n"
 
-#: eduiddashboard/templates/passwords-form-dialog.jinja2:15
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:22
+#, fuzzy
+#| msgid "" "\n" "  </p>\n" "  <p>Choose a strong password. Some tips:</p>\n" "
+#| <ul>\n" "    <li>Use upper- and lowercase characters (preferably not in the
+#| " "beginning or end)</li>\n" "    <li>Add digits somewhere else than at the
+#| end of the password</li>\n" "    <li>Add special characters, such as @ $ / +
+#| _ %</li>\n" "    <li>Spaces are ignored</li>\n" "  </ul>\n" "  </p>\n"
 msgid ""
 "\n"
-"  </p>\n"
-"  <p>Choose a strong password. Some tips:</p>\n"
-"  <ul>\n"
-"    <li>Use upper- and lowercase characters (preferably not in the "
+"      </p>\n"
+"      <p>Choose a strong password. Some tips:</p>\n"
+"      <ul>\n"
+"        <li>Use upper- and lowercase characters (preferably not in the "
 "beginning or end)</li>\n"
-"    <li>Add digits somewhere else than at the end of the password</li>\n"
-"    <li>Add special characters, such as @ $ / + _ %</li>\n"
-"    <li>Spaces are ignored</li>\n"
-"  </ul>\n"
-"  </p>\n"
+"        <li>Add digits somewhere else than at the end of the "
+"password</li>\n"
+"        <li>Add special characters, such as @ $ / + _ %</li>\n"
+"        <li>Spaces are ignored</li>\n"
+"      </ul>\n"
+"      </p>\n"
+"    "
 msgstr ""
 "\n"
 "</p>\n"
@@ -676,8 +697,8 @@ msgid "Last used"
 msgstr "Användes senast"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
-#: eduiddashboard/templates/passwords-form.jinja2:81
-#: eduiddashboard/views/security.py:164 eduiddashboard/views/security.py:418
+#: eduiddashboard/templates/passwords-form.jinja2:84
+#: eduiddashboard/views/security.py:218 eduiddashboard/views/security.py:480
 msgid "Change password"
 msgstr "Byt lösenord"
 
@@ -701,7 +722,7 @@ msgstr "Ta bort eduID-kontot"
 msgid "Terminate account"
 msgstr "Ta bort kontot"
 
-#: eduiddashboard/templates/passwords-form.jinja2:49
+#: eduiddashboard/templates/passwords-form.jinja2:50
 msgid ""
 "Really terminate eduID account? This action will permanently remove all "
 "the data associated with the account from our databases."
@@ -710,9 +731,35 @@ msgstr ""
 "kopplad till det här kontot kommer permanent tas bort från våra "
 "databaser."
 
-#: eduiddashboard/templates/passwords-form.jinja2:56
+#: eduiddashboard/templates/passwords-form.jinja2:52
+msgid ""
+"Note that, for security reasons, if you choose to terminate your account,"
+" you will be asked to identify yourself again."
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:59
 msgid "Confirm termination of eduID account"
 msgstr "Bekräfta borttagandet av eduID-kontot"
+
+#: eduiddashboard/templates/passwords-form.jinja2:67
+#: eduiddashboard/templates/passwords-form.jinja2:104
+#: eduiddashboard/views/security.py:405 eduiddashboard/views/security.py:440
+#: eduiddashboard/views/security.py:481
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: eduiddashboard/templates/passwords-form.jinja2:88
+msgid ""
+"\n"
+"          <p>For security reasons, we will ask you to re-authenticate "
+"yourself\n"
+"            before allowing you to change your password.</p>\n"
+"        "
+msgstr ""
+
+#: eduiddashboard/templates/passwords-form.jinja2:100
+msgid "Accept"
+msgstr ""
 
 #: eduiddashboard/templates/permissions-form.jinja2:8
 msgid "Available permissions for this user"
@@ -1497,19 +1544,27 @@ msgstr "Ändringarna har sparats."
 msgid "Save"
 msgstr "Spara"
 
-#: eduiddashboard/views/security.py:80
+#: eduiddashboard/views/security.py:86
 msgid "Reset your {site_name} password"
 msgstr "Återställning av ditt {site_name} lösenord"
 
-#: eduiddashboard/views/security.py:144
+#: eduiddashboard/views/security.py:150
 msgid "Password"
 msgstr "Lösenord"
 
-#: eduiddashboard/views/security.py:242
+#: eduiddashboard/views/security.py:266
+msgid "No authentication info"
+msgstr ""
+
+#: eduiddashboard/views/security.py:271
+msgid "Stale authentication info. Please try again."
+msgstr ""
+
+#: eduiddashboard/views/security.py:303
 msgid "Your password has been successfully updated"
 msgstr "Ditt lösenord har uppdaterats"
 
-#: eduiddashboard/views/security.py:244
+#: eduiddashboard/views/security.py:305
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
@@ -1517,7 +1572,7 @@ msgstr ""
 "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen "
 "eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/views/security.py:283
+#: eduiddashboard/views/security.py:345
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
@@ -1526,20 +1581,15 @@ msgstr ""
 "Ange e-postadress, personnummer eller mobiltelefonnummer associerat med "
 "ditt eduID konto så skickar vi en länk för att återställa ditt lösenord."
 
-#: eduiddashboard/views/security.py:342 eduiddashboard/views/security.py:377
+#: eduiddashboard/views/security.py:404 eduiddashboard/views/security.py:439
 msgid "Reset password"
 msgstr "Återställ lösenord"
 
-#: eduiddashboard/views/security.py:343 eduiddashboard/views/security.py:378
-#: eduiddashboard/views/security.py:419
-msgid "Cancel"
-msgstr "Avbryt"
-
-#: eduiddashboard/views/security.py:400
+#: eduiddashboard/views/security.py:462
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:421
+#: eduiddashboard/views/security.py:483
 msgid "Please choose a new password for your eduID account."
 msgstr "Välj ett nytt lösenord för ditt eduID konto."
 
