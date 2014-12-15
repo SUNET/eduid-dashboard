@@ -265,18 +265,23 @@ class NinsView(BaseFormView):
     def addition_with_code_validation(self, form):
         newnin = self.schema.serialize(form)
         newnin = newnin['norEduPersonNIN']
-
         newnin = normalize_nin(newnin)
-
+        previous_nins = get_not_verified_nins_list(self.request, self.user)
+        for nin in previous_nins:
+            if newnin != nin:
+                return False
         send_verification_code(self.request, self.user, newnin)
+        return True
 
     def add_success_personal(self, ninform):
-        self.addition_with_code_validation(ninform)
-        msg = _('A confirmation code has been sent to your government inbox. '
-                'Please click on "Pending confirmation" link below to enter '
-                'your confirmation code.')
-
-        msg = get_localizer(self.request).translate(msg)
+        if not self.addition_with_code_validation(ninform):
+            msg = _('You can not add another national identity number. '
+                    'Please contact support if you need to change it. ')
+        else:
+            msg = _('A confirmation code has been sent to your government inbox. '
+                    'Please click on "Pending confirmation" link below to enter '
+                    'your confirmation code.')
+            msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
 
     def add_nin_external(self, data):
