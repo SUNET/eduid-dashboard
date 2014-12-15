@@ -272,6 +272,7 @@ class PasswordsView(BaseFormView):
                 msg = _('Stale authentication info. Please try again.')
                 self.request.session.flash('error|' + msg)
                 raise HTTPFound(self.context.route_url('profile-editor'))
+        del self.request.session['re-authn-ts']
         passwords_data = self.schema.serialize(passwordform)
         if 'edit-user' in self.request.session:
             user = self.request.session['edit-user']
