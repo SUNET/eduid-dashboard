@@ -1,5 +1,6 @@
 import json
 from mock import patch
+import unittest
 from bson import ObjectId
 from datetime import datetime
 
@@ -118,6 +119,7 @@ class NinsFormTests(LoggedInReguestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'getcode')
 
+    @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):
         self.set_logged()
 
@@ -126,6 +128,7 @@ class NinsFormTests(LoggedInReguestTests):
             {'identifier': '210987654321 0', 'action': 'remove'},
             status=200)
 
+    @unittest.skip('Functionality temporary removed')
     def test_remove_existant_notverified_nin(self):
         self.set_logged()
 
@@ -148,6 +151,7 @@ class NinsFormTests(LoggedInReguestTests):
         self.assertEqual(response_json['result'], 'ok')
         self.assertEqual(nins_before - 1, nins_after)
 
+    @unittest.skip('Functionality temporary removed')
     def test_remove_not_existant_nin(self):
         self.set_logged(user='johnsmith@example.org')
 
