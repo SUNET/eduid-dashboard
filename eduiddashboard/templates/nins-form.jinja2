@@ -28,10 +28,12 @@
             <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
           </td>
-          <td>
-            <input type='button' class='btn btn-link' value="{{_('Remove')}}"
-                 data-index='{{ nin }} {{ loop.index0 }}' name='remove'>
-          </td>
+          <!-- Removed functionality temporary
+                      <td>
+                        <input type='button' class='btn btn-link' value="{{_('Remove')}}"
+                             data-index='{{ nin }} {{ loop.index0 }}' name='remove'>
+                      </td>
+                     -->
       </tr>
       {% endfor %}
     {% endif %}

@@ -84,3 +84,43 @@ def send_termination_mail(request, user):
         print message.body
     else:
         mailer.send(message)
+
+
+def send_reset_password_mail(request, user, reset_password_link):
+    """ Send an email with the instructions for resetting password """
+    mailer = get_mailer(request)
+
+    site_name = request.registry.settings.get("site.name", "eduID")
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    email = user.get_mail()
+
+    context = {
+        "email": email,
+        "reset_password_link": reset_password_link,
+        "password_reset_timeout": password_reset_timeout,
+        "site_url": request.route_url("home"),
+        "site_name": site_name,
+    }
+
+    message = Message(
+        subject=_("Reset your {site_name} password").format(
+            site_name=site_name),
+        sender=request.registry.settings.get("mail.default_sender"),
+        recipients=[email],
+        body=render(
+            "templates/reset-password-email.txt.jinja2",
+            context,
+            request,
+        ),
+        html=render(
+            "templates/reset-password-email.html.jinja2",
+            context,
+            request,
+        ),
+    )
+
+    # Development
+    if request.registry.settings.get("development", '') == 'true':
+        print message.body
+    else:
+        mailer.send(message)
