@@ -7,14 +7,11 @@ from datetime import datetime, timedelta
 from bson import ObjectId
 import pytz
 
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest
-from pyramid.renderers import render, render_to_response
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
 from pyramid_deform import FormView
-from pyramid_mailer import get_mailer
-from pyramid_mailer.message import Message
 from pyramid.renderers import render_to_response
 
 from eduid_am.tasks import update_attributes
@@ -25,11 +22,10 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    ResetPasswordStep2)
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.views.portal import profile_editor
+from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
-from eduiddashboard.permissions import SecurityFactory
 from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
     convert_to_localtime, normalize_to_e_164
 from eduiddashboard import log
@@ -508,10 +504,20 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                 if nins:
                     nin = nins[-1]
                     if nin is not None:
-                        self.request.db.profiles.update({"_id": user.get_id()}, {"$set": {"norEduPersonNIN": []}})
-                        self.request.db.verifications.remove({"user_oid": user.get_id(),
-                                                              "model_name": "norEduPersonNIN",
-                                                              "obj_id": nin})
+                        self.request.db.profiles.update({
+                            "_id": user.get_id()
+                        }, {
+                            "$set": {"norEduPersonNIN": []}
+                        })
+                        # Do not remove the verification as we no longer allow users to remove a already verified nin
+                        # even if it gets unverified by a e-mail password reset.
+                        self.request.db.verifications.update({
+                            "user_oid": user.get_id(),
+                            "model_name": "norEduPersonNIN",
+                            "obj_id": nin
+                        }, {
+                            "$set": {"verified": False}
+                        })
                         update_attributes('eduid_dashboard', str(user['_id']))
             url = self.request.route_url('profile-editor')
             reset = True

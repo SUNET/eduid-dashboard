@@ -3,7 +3,7 @@
 import deform
 from datetime import datetime
 from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPNotFound
+from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
 from pyramid.i18n import get_localizer
 
 from eduid_am.exceptions import UserOutOfSync
@@ -167,6 +167,8 @@ class NINsActionsView(BaseActionsView):
 
     def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """
+        raise HTTPNotImplemented  # Temporary remove the functionality
+
         nin, index = data.split()
         index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
