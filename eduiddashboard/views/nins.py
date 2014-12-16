@@ -281,7 +281,7 @@ class NinsView(BaseFormView):
             msg = _('A confirmation code has been sent to your government inbox. '
                     'Please click on "Pending confirmation" link below to enter '
                     'your confirmation code.')
-            msg = get_localizer(self.request).translate(msg)
+        msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
 
     def add_nin_external(self, data):
