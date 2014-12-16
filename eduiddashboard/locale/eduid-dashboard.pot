@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.3.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-15 13:20+0100\n"
+"POT-Creation-Date: 2014-12-16 13:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -572,17 +572,16 @@ msgstr ""
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:22
 msgid ""
 "\n"
-"      </p>\n"
-"      <p>Choose a strong password. Some tips:</p>\n"
-"      <ul>\n"
-"        <li>Use upper- and lowercase characters (preferably not in the "
-"beginning or end)</li>\n"
-"        <li>Add digits somewhere else than at the end of the password</li>\n"
-"        <li>Add special characters, such as @ $ / + _ %</li>\n"
-"        <li>Spaces are ignored</li>\n"
-"      </ul>\n"
-"      </p>\n"
-"    "
+"              <p>Choose a strong password. Some tips:</p>\n"
+"              <ul>\n"
+"                <li>Use upper- and lowercase characters (preferably not in "
+"the beginning or end)</li>\n"
+"                <li>Add digits somewhere else than at the end of the "
+"password</li>\n"
+"                <li>Add special characters, such as @ $ / + _ %</li>\n"
+"                <li>Spaces are ignored</li>\n"
+"              </ul>\n"
+"        "
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form-js.jinja2:138
@@ -1170,7 +1169,7 @@ msgid "Add email address"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:180 eduiddashboard/views/mobiles.py:192
-#: eduiddashboard/views/nins.py:331 eduiddashboard/views/personal.py:76
+#: eduiddashboard/views/nins.py:336 eduiddashboard/views/personal.py:76
 msgid "Changes saved"
 msgstr ""
 
@@ -1271,17 +1270,23 @@ msgstr ""
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:275
+#: eduiddashboard/views/nins.py:278
+msgid ""
+"You can not add another national identity number. Please contact support if "
+"you need to change it. "
+msgstr ""
+
+#: eduiddashboard/views/nins.py:281
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:329
+#: eduiddashboard/views/nins.py:334
 msgid "User data out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:379
+#: eduiddashboard/views/nins.py:384
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-15 13:20+0100\n"
-"PO-Revision-Date: 2014-12-15 13:29+0000\n"
+"POT-Creation-Date: 2014-12-16 13:13+0100\n"
+"PO-Revision-Date: 2014-12-16 12:16+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
 "dashboard/language/sv/)\n"
@@ -634,30 +634,26 @@ msgstr ""
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:22
 msgid ""
 "\n"
-"      </p>\n"
-"      <p>Choose a strong password. Some tips:</p>\n"
-"      <ul>\n"
-"        <li>Use upper- and lowercase characters (preferably not in the "
-"beginning or end)</li>\n"
-"        <li>Add digits somewhere else than at the end of the "
+"              <p>Choose a strong password. Some tips:</p>\n"
+"              <ul>\n"
+"                <li>Use upper- and lowercase characters (preferably not "
+"in the beginning or end)</li>\n"
+"                <li>Add digits somewhere else than at the end of the "
 "password</li>\n"
-"        <li>Add special characters, such as @ $ / + _ %</li>\n"
-"        <li>Spaces are ignored</li>\n"
-"      </ul>\n"
-"      </p>\n"
-"    "
+"                <li>Add special characters, such as @ $ / + _ %</li>\n"
+"                <li>Spaces are ignored</li>\n"
+"              </ul>\n"
+"        "
 msgstr ""
 "\n"
-"</p>\n"
-"<p>Välj ett säkert lösenord. Här är några tips:</p>\n"
+"<p>Välj ett säkert lösenord. Några tips:</p>\n"
 "<ul>\n"
 "<li>Använd stora och små bokstäver (inte bara första bokstaven)</li>\n"
 "<li>Lägg till en eller flera siffror någonstans i mitten av "
-"lösenordet</li>\n"
+"lösenordet</li> \n"
 "<li>Använd specialtecken som @ $ / + _ %</li>\n"
 "<li>Blanksteg (mellanslag) ignoreras</li>\n"
-"</ul>\n"
-"</p>"
+"</ul>"
 
 #: eduiddashboard/templates/passwords-form-js.jinja2:138
 #: eduiddashboard/templates/reset-password-form-js.jinja2:124
@@ -1391,7 +1387,7 @@ msgid "Add email address"
 msgstr "Lägg till e-postadress"
 
 #: eduiddashboard/views/emails.py:180 eduiddashboard/views/mobiles.py:192
-#: eduiddashboard/views/nins.py:331 eduiddashboard/views/personal.py:76
+#: eduiddashboard/views/nins.py:336 eduiddashboard/views/personal.py:76
 msgid "Changes saved"
 msgstr "Ändringarna har sparats"
 
@@ -1507,7 +1503,15 @@ msgstr "Personnumret har tagits bort"
 msgid "No pending national identity numbers found."
 msgstr "Det finns inga personnummer som behöver bekräftas."
 
-#: eduiddashboard/views/nins.py:275
+#: eduiddashboard/views/nins.py:278
+msgid ""
+"You can not add another national identity number. Please contact support "
+"if you need to change it. "
+msgstr ""
+"Du kan inte lägga till ett nytt personnummer. Kontakta supporten om du "
+"behöver ändra ditt personnummer."
+
+#: eduiddashboard/views/nins.py:281
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."
@@ -1516,11 +1520,11 @@ msgstr ""
 "myndighetspost\". Vänligen ange din bekräftelsekod genom att klicka på "
 "\"Bekräfta\" här nedan."
 
-#: eduiddashboard/views/nins.py:329
+#: eduiddashboard/views/nins.py:334
 msgid "User data out of sync. Please try again."
 msgstr "Ditt användardata har ändrats från en annan dashboard. Försök igen."
 
-#: eduiddashboard/views/nins.py:379
+#: eduiddashboard/views/nins.py:384
 msgid "Your national identity number confirmation request can not be found"
 msgstr "Kan ej hitta en bekräftelseförfrågan för ditt personnummer "
 

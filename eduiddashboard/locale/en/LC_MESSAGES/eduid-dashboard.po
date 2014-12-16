@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-15 13:20+0100\n"
+"POT-Creation-Date: 2014-12-16 13:13+0100\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -576,18 +576,16 @@ msgstr ""
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:22
 msgid ""
 "\n"
-"      </p>\n"
-"      <p>Choose a strong password. Some tips:</p>\n"
-"      <ul>\n"
-"        <li>Use upper- and lowercase characters (preferably not in the "
-"beginning or end)</li>\n"
-"        <li>Add digits somewhere else than at the end of the "
+"              <p>Choose a strong password. Some tips:</p>\n"
+"              <ul>\n"
+"                <li>Use upper- and lowercase characters (preferably not "
+"in the beginning or end)</li>\n"
+"                <li>Add digits somewhere else than at the end of the "
 "password</li>\n"
-"        <li>Add special characters, such as @ $ / + _ %</li>\n"
-"        <li>Spaces are ignored</li>\n"
-"      </ul>\n"
-"      </p>\n"
-"    "
+"                <li>Add special characters, such as @ $ / + _ %</li>\n"
+"                <li>Spaces are ignored</li>\n"
+"              </ul>\n"
+"        "
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form-js.jinja2:138
@@ -1181,7 +1179,7 @@ msgid "Add email address"
 msgstr ""
 
 #: eduiddashboard/views/emails.py:180 eduiddashboard/views/mobiles.py:192
-#: eduiddashboard/views/nins.py:331 eduiddashboard/views/personal.py:76
+#: eduiddashboard/views/nins.py:336 eduiddashboard/views/personal.py:76
 msgid "Changes saved"
 msgstr ""
 
@@ -1288,17 +1286,23 @@ msgstr ""
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:275
+#: eduiddashboard/views/nins.py:278
+msgid ""
+"You can not add another national identity number. Please contact support "
+"if you need to change it. "
+msgstr ""
+
+#: eduiddashboard/views/nins.py:281
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:329
+#: eduiddashboard/views/nins.py:334
 msgid "User data out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:379
+#: eduiddashboard/views/nins.py:384
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
@@ -1930,29 +1934,19 @@ msgstr ""
 
 #~ msgid ""
 #~ "\n"
-#~ "<p>Hello %(displayName)s:</p>\n"
-#~ "  \n"
-#~ "<p>Your eduID account has been terminated.</p>\n"
-#~ "\n"
-#~ "<p>If it wasn't you who deleted your account, contact\n"
-#~ "eduID support immediately at\n"
-#~ "\n"
-#~ "  <a href=\"mailto:%(mail)s\">%(mail)s</a>.\n"
-#~ "\n"
-#~ "</p>\n"
-#~ "\n"
-#~ "<p>Thank you for using our services</p>\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "Hello %(displayName)s:\n"
-#~ "  \n"
-#~ "Your eduID account has been terminated.\n"
-#~ "\n"
-#~ "If it wasn't you who deleted your account, contact\n"
-#~ "eduID support immediately at %(mail)s.\n"
-#~ "\n"
-#~ "Thank you for using our services\n"
+#~ "      </p>\n"
+#~ "      <p>Choose a strong password. Some tips:</p>\n"
+#~ "      <ul>\n"
+#~ "        <li>Use upper- and lowercase "
+#~ "characters (preferably not in the "
+#~ "beginning or end)</li>\n"
+#~ "        <li>Add digits somewhere else "
+#~ "than at the end of the "
+#~ "password</li>\n"
+#~ "        <li>Add special characters, such as @ $ / + _ %</li>\n"
+#~ "        <li>Spaces are ignored</li>\n"
+#~ "      </ul>\n"
+#~ "      </p>\n"
+#~ "    "
 #~ msgstr ""
 
