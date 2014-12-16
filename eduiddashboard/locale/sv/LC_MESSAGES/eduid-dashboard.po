@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-16 13:13+0100\n"
-"PO-Revision-Date: 2014-12-16 12:16+0000\n"
+"POT-Creation-Date: 2014-12-16 14:51+0100\n"
+"PO-Revision-Date: 2014-12-16 13:53+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
 "dashboard/language/sv/)\n"
@@ -36,7 +36,7 @@ msgid "Reset your {site_name} password"
 msgstr "Återställning av ditt {site_name} lösenord"
 
 #: eduiddashboard/models.py:21 eduiddashboard/models.py:68
-#: eduiddashboard/views/security.py:385
+#: eduiddashboard/views/security.py:389
 msgid "email"
 msgstr "e-post"
 
@@ -634,15 +634,16 @@ msgstr ""
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:22
 msgid ""
 "\n"
-"              <p>Choose a strong password. Some tips:</p>\n"
-"              <ul>\n"
-"                <li>Use upper- and lowercase characters (preferably not "
-"in the beginning or end)</li>\n"
-"                <li>Add digits somewhere else than at the end of the "
+"            <p>Choose a strong password. Some tips:</p>\n"
+"            <ul>\n"
+"\t            <li>Use upper- and lowercase characters (preferably not in "
+"the beginning or end)</li>\n"
+"\t            <li>Add digits somewhere else than at the end of the "
 "password</li>\n"
-"                <li>Add special characters, such as @ $ / + _ %</li>\n"
-"                <li>Spaces are ignored</li>\n"
-"              </ul>\n"
+"                <li>Add special characters, such as &#64; &#36; &#92; "
+"&#43; &#95; &#37;</li>\n"
+"\t            <li>Spaces are ignored</li>\n"
+"            </ul>\n"
 "        "
 msgstr ""
 "\n"
@@ -651,7 +652,7 @@ msgstr ""
 "<li>Använd stora och små bokstäver (inte bara första bokstaven)</li>\n"
 "<li>Lägg till en eller flera siffror någonstans i mitten av "
 "lösenordet</li> \n"
-"<li>Använd specialtecken som @ $ / + _ %</li>\n"
+"<li>Använd specialtecken som &#64; &#36; &#92; &#43; &#95; &#37;</li>\n"
 "<li>Blanksteg (mellanslag) ignoreras</li>\n"
 "</ul>"
 
@@ -683,7 +684,7 @@ msgstr "Användes senast"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:84
-#: eduiddashboard/views/security.py:180 eduiddashboard/views/security.py:443
+#: eduiddashboard/views/security.py:184 eduiddashboard/views/security.py:447
 msgid "Change password"
 msgstr "Byt lösenord"
 
@@ -730,8 +731,8 @@ msgstr "Bekräfta borttagandet av eduID-kontot"
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:104
-#: eduiddashboard/views/security.py:368 eduiddashboard/views/security.py:403
-#: eduiddashboard/views/security.py:444
+#: eduiddashboard/views/security.py:372 eduiddashboard/views/security.py:407
+#: eduiddashboard/views/security.py:448
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1000,7 +1001,8 @@ msgid ""
 "not in the beginning or end)</li>\n"
 "                    <li>Add digits somewhere else than at the end of the "
 "password</li>\n"
-"                    <li>Add special characters, such as @ $ / + _ %</li>\n"
+"                    <li>Add special characters, such as &#64; &#36; &#92;"
+" &#43; &#95; &#37;</li>\n"
 "                    <li>Spaces are ignored</li>\n"
 "                </ul>\n"
 "            "
@@ -1010,8 +1012,8 @@ msgstr ""
 "<ul>\n"
 "<li>Använd stora och små bokstäver (inte bara första bokstaven)</li>\n"
 "<li>Lägg till en eller flera siffror någonstans i mitten av "
-"lösenordet</li>\n"
-"<li>Använd specialtecken som @ $ / + _ %</li>\n"
+"lösenordet</li> \n"
+"<li>Använd specialtecken som &#64; &#36; &#92; &#43; &#95; &#37;</li>\n"
 "<li>Blanksteg (mellanslag) ignoreras</li>\n"
 "</ul>"
 
@@ -1546,19 +1548,19 @@ msgstr "Spara"
 msgid "Password"
 msgstr "Lösenord"
 
-#: eduiddashboard/views/security.py:228
+#: eduiddashboard/views/security.py:232
 msgid "No authentication info"
 msgstr "Ingen autentiseringsinformation"
 
-#: eduiddashboard/views/security.py:233
+#: eduiddashboard/views/security.py:237
 msgid "Stale authentication info. Please try again."
 msgstr "Autentiseringsinformationen är för gammal. Försök igen."
 
-#: eduiddashboard/views/security.py:266
+#: eduiddashboard/views/security.py:270
 msgid "Your password has been successfully updated"
 msgstr "Ditt lösenord har uppdaterats"
 
-#: eduiddashboard/views/security.py:268
+#: eduiddashboard/views/security.py:272
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
@@ -1566,7 +1568,7 @@ msgstr ""
 "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen "
 "eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/views/security.py:308
+#: eduiddashboard/views/security.py:312
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
@@ -1575,15 +1577,15 @@ msgstr ""
 "Ange e-postadress, personnummer eller mobiltelefonnummer associerat med "
 "ditt eduID konto så skickar vi en länk för att återställa ditt lösenord."
 
-#: eduiddashboard/views/security.py:367 eduiddashboard/views/security.py:402
+#: eduiddashboard/views/security.py:371 eduiddashboard/views/security.py:406
 msgid "Reset password"
 msgstr "Återställ lösenord"
 
-#: eduiddashboard/views/security.py:425
+#: eduiddashboard/views/security.py:429
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:446
+#: eduiddashboard/views/security.py:450
 msgid "Please choose a new password for your eduID account."
 msgstr "Välj ett nytt lösenord för ditt eduID konto."
 
