@@ -10,7 +10,8 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
-
+from eduid_id_proofing.tasks import verify_by_mobile
+import celery.exceptions
 
 class OldPasswordValidator(object):
 
@@ -201,11 +202,13 @@ class NINUniqueValidator(object):
             'verified': False
         })
 
-        if 'add' in request.POST:
-            if unverified_user_nins.count() > 0 or value in user_nins:
-                err = _("This national identity number is already in use")
-                raise colander.Invalid(node,
-                        get_localizer(request).translate(err))
+        # Search the request.POST for any post that starts with "add"
+        for post_value in request.POST:
+            if post_value.startswith('add'):
+                if unverified_user_nins.count() > 0 or value in user_nins:
+                    err = _("This national identity number is already in use")
+                    raise colander.Invalid(node,
+                            get_localizer(request).translate(err))
 
 
 class NINReachableValidator(object):
@@ -252,6 +255,52 @@ class NINReachableValidator(object):
                     '${service_name}</a>.')
 
         if msg:
+            localizer = get_localizer(request)
+            raise colander.Invalid(node, localizer.translate(msg, mapping={
+                'service_name': settings.get('nin_mobile_service_name'),
+                'service_url': settings.get('nin_mobile_service_url'),
+            }))
+
+
+class NINRegisteredMobileValidator(object):
+    """ Validator that checks so the primary mobile number is registered on the given national identity number """
+    def __call__(self, node, value):
+        from eduiddashboard.models import normalize_nin
+
+        value = normalize_nin(copy(value))
+        request = node.bindings.get('request')
+        settings = request.registry.settings
+        user = request.context.user
+
+        #if settings.get('debug_mode', False):
+        #    return
+
+        msg = None
+
+        mobiles = user.get_mobiles()
+        phone = next((mobile for mobile in mobiles if mobile['primary']), None)
+        if phone is None:
+            msg = _('You have no confirmed mobile phone')
+        else:
+            result = verify_by_mobile.delay(phone['mobile'], value)
+            log.debug("Verify nin: {nin} by mobile: {number}, result: {result}".format(nin=value,
+                                                                                       number=phone['mobile'],
+                                                                                       result=result))
+            try:
+                # TODO How long time for timeout?
+                success = result.get(timeout=4)
+            except celery.exceptions.TimeoutError:
+                success = 'timeout'
+                msg = _('Sorry, we are experiencing temporary technical '
+                        'problem with ${service_name}, please try again '
+                        'later.')
+            print success
+
+            if not success:
+                msg = _('The given mobile number was not registered to the given national identity number')
+
+        if msg:
+            # TODO Get different "nin_service_name"
             localizer = get_localizer(request)
             raise colander.Invalid(node, localizer.translate(msg, mapping={
                 'service_name': settings.get('nin_service_name'),
