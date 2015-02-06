@@ -11,6 +11,7 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        PermissionsValidator,
                                        NINReachableValidator,
                                        NINUniqueValidator,
+                                       NINRegisteredMobileValidator,
                                        MobilePhoneUniqueValidator,
                                        CSRFTokenValidator,
                                        ResetPasswordFormValidator)
@@ -59,6 +60,32 @@ class All_StopOnFirst(colander.All):
             except colander.Invalid as e:
                 raise colander.Invalid(node, e.msg)
 
+class All_StopOnFirst_Switch(object):
+    """
+    Handles multiple "All_StopOnFirst" validators.
+    """
+    def __init__(self, All_StopOnFirst_dict):
+        """
+        :param All_StopOnFirst_dict: a dictionary of All_StopOnFirst objects
+
+        For all the keys in "All_StopOnFirst_dict", a search will be made to see
+        if the same value can be found in "request.POST". If the search get a hit, the corresponding validator
+        will be executed.
+        """
+        self.validator_dict = All_StopOnFirst_dict
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+
+        for key in self.validator_dict.keys():
+            if key in request.POST:
+                current_validator = self.validator_dict[key]
+                for validator in current_validator.validators:
+                    try:
+                        validator(node, value)
+                    except colander.Invalid as e:
+                        raise colander.Invalid(node, e.msg)
+
 
 class Email(CSRFTokenSchema):
     mail = colander.SchemaNode(colander.String(),
@@ -99,19 +126,25 @@ class NIN(CSRFTokenSchema):
         19780101 1234
         19780101-1234
     """
-    norEduPersonNIN = colander.SchemaNode(
-        colander.String(),
-        title=_('Swedish national identity number'),
-        validator=All_StopOnFirst(
+    validator_switch = All_StopOnFirst_Switch(
+        {'add': All_StopOnFirst(
             NINFormatValidator,
             NINUniqueValidator(),
             NINReachableValidator()
-        ),
+        ), 'add_by_mobile': All_StopOnFirst(
+            NINFormatValidator,
+            NINUniqueValidator(),
+            NINRegisteredMobileValidator()
+        )})
+
+    norEduPersonNIN = colander.SchemaNode(
+        colander.String(),
+        title=_('Swedish national identity number'),
+        validator=validator_switch,
         widget=deform.widget.TextInputWidget(mask=_('yyyymmddnnnn'),
                                              css_class='form-control',
                                              error_class='text-danger')
     )
-
 
 @colander.deferred
 def preferred_language_widget(node, kw):
