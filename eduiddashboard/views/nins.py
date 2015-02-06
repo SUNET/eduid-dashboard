@@ -60,7 +60,7 @@ def get_status(request, user):
     return status
 
 
-def send_verification_code(request, user, nin, reference=None, code=None):
+def send_verification_code(request, user, nin, reference=None, code=None, recipient=None, message_type='mm'):
     """
     You need to replace the call to dummy_message with the govt
     message api
@@ -70,7 +70,10 @@ def send_verification_code(request, user, nin, reference=None, code=None):
 
     language = request.context.get_preferred_language()
 
-    request.msgrelay.nin_validator(reference, nin, code, language)
+    if message_type == 'mm':
+        recipient = nin
+
+    request.msgrelay.nin_validator(reference, nin, code, language, recipient, message_type=message_type)
 
 
 def get_tab(request):
@@ -224,10 +227,17 @@ class NinsView(BaseFormView):
                     return status and flash message
     """
     schema = NIN()
+
     route = 'nins'
 
+    # All buttons for adding a nin, must have a name that starts with "add". This because the POST message sent
+    # from the button must trigger the "add" validation of a nin.
     buttons = (deform.Button(name='add',
-                             title=_('Add national identity number')), )
+                             title=_('Add national identity number')),
+               deform.Button(name='add_by_mobile',
+                             title=_('Verify by registered phone'),
+                             css_class='btn btn-primary'),
+               )
 
     bootstrap_form_style = 'form-inline'
 
@@ -260,25 +270,27 @@ class NinsView(BaseFormView):
 
         return context
 
-    def addition_with_code_validation(self, form):
+    def addition_with_code_validation(self, form, recipient=None, message_type='mm'):
         newnin = self.schema.serialize(form)
         newnin = newnin['norEduPersonNIN']
 
         newnin = normalize_nin(newnin)
 
-        send_verification_code(self.request, self.user, newnin)
+        if message_type == 'mm':
+            recipient = recipient
 
-    def add_success_personal(self, ninform):
-        self.addition_with_code_validation(ninform)
-        msg = _('A confirmation code has been sent to your government inbox. '
-                'Please click on "Pending confirmation" link below to enter '
-                'your confirmation code.')
+        send_verification_code(self.request, self.user, newnin, recipient=recipient, message_type=message_type)
+
+    def add_success_personal(self, ninform, msg, recipient=None, message_type='mm'):
+        self.addition_with_code_validation(ninform, recipient=recipient, message_type=message_type)
+        #msg = _('A confirmation code has been sent to your government inbox. '
+        #        'Please click on "Pending confirmation" link below to enter '
+        #        'your confirmation code.')
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
 
     def add_nin_external(self, data):
-
         self.schema = self.schema.bind(**self.get_bind_data())
         form = self.form_class(self.schema, buttons=self.buttons,
                                **dict(self.form_options))
@@ -335,11 +347,28 @@ class NinsView(BaseFormView):
                 queue='forms')
 
     def add_success(self, ninform):
+        """ This method is bounded to the "add"-button by it's name """
         if self.context.workmode == 'personal':
-            self.add_success_personal(ninform)
+            msg = _('A confirmation code has been sent to your government inbox. '
+                    'Please click on "Pending confirmation" link below to enter '
+                    'your confirmation code.')
+            self.add_success_personal(ninform, msg)
         else:
             self.add_success_other(ninform)
 
+    def add_by_mobile_success(self, ninform):
+        """ This method is bounded to the "add_by_mobile"-button by it's name """
+        if self.context.workmode == 'personal':
+            msg = _('A confirmation code has been sent to your registered mobile phone. '
+                    'Please click on "Pending confirmation" link below to enter '
+                    'your confirmation code.')
+
+            mobiles = self.user.get_mobiles()
+            phone = next((mobile for mobile in mobiles if mobile['primary']), None)
+
+            self.add_success_personal(ninform, msg, recipient=phone['mobile'], message_type='sms')
+        else:
+            self.add_success_other(ninform)
 
 @view_config(route_name='wizard-nins', permission='edit', renderer='json')
 class NinsWizard(BaseWizard):
