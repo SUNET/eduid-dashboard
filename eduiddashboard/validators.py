@@ -10,7 +10,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
-from eduid_id_proofing.tasks import verify_by_mobile
+from eduid_idproofing_mobile.tasks import verify_by_mobile
 import celery.exceptions
 
 class OldPasswordValidator(object):
