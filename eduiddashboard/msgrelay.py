@@ -145,7 +145,7 @@ class MsgRelay(object):
         self._send_message.delay('mm', reference, content, nin,
                                  TEMPLATES_RELATION.get('nin-validator'), lang)
 
-    def nin_reset_password(self, nin, email, link, password_reset_timeout, language):
+    def nin_reset_password(self, reference, nin, email, link, password_reset_timeout, language):
         """
             The template keywords are:
                 * sitename: eduID by default
@@ -163,9 +163,7 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin reset link message: {0} NIN: {1}'.format(
                      link, nin))
-        self._send_message.delay('mm', content, nin,
-                                 TEMPLATES_RELATION.get('nin-reset-password'),
-                                 lang)
+        self._send_message.delay('mm', reference, content, nin, TEMPLATES_RELATION.get('nin-reset-password'), lang)
 
     def get_postal_address(self, nin):
         """

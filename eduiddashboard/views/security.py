@@ -49,25 +49,27 @@ def new_reset_password_code(request, user, mechanism='email'):
     request.db.reset_passwords.remove({
         'email': user.get_mail()
     })
-    request.db.reset_passwords.insert({
+    reference = request.db.reset_passwords.insert({
         'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
         'created_at': date,
-    }, safe=True)
+    }, safe=True, manipulate=True)
+    log.debug("New reset password code: {!s} via {!s} for user: {!r}.".format(hash_code, mechanism, user))
     reset_password_link = request.route_url(
         "reset-password-step2",
         code=hash_code,
     )
-    return reset_password_link
+    return reference, reset_password_link
 
 
-def send_reset_password_gov_message(request, nin, user, reset_password_link):
+def send_reset_password_gov_message(request, reference, nin, user, reset_password_link):
     """ Send an message to the gov mailbox with the instructions for resetting password """
     user_language = user.get_preferred_language()
     email = user.get_mail()
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
-    request.msgrelay.nin_reset_password(nin, email, reset_password_link, password_reset_timeout, user_language)
+    request.msgrelay.nin_reset_password(reference, nin, email, reset_password_link, password_reset_timeout,
+                                        user_language)
 
 
 def generate_suggested_password(request):
@@ -352,6 +354,7 @@ class BaseResetPasswordView(FormView):
             user = self.request.userdb.get_user_by_nin(text)
 
         user.retrieve_modified_ts(self.request.db.profiles)
+        log.debug("Found user {!r} using input {!s}.".format(user, text))
         return user
 
 
@@ -374,12 +377,13 @@ class ResetPasswordEmailView(BaseResetPasswordView):
 
         try:
             user = self._search_user(email_or_username)
+            log.debug("Reset password via email initiated for user {!r}".format(user))
         except self.request.userdb.exceptions.UserDoesNotExist:
             log.debug("User {!r} does not exist".format(email_or_username))
             user = None
 
         if user is not None:
-            reset_password_link = new_reset_password_code(self.request, user)
+            reference, reset_password_link = new_reset_password_code(self.request, user)
             send_reset_password_mail(self.request, user, reset_password_link)
 
         self.request.session['_reset_type'] = _('email')
@@ -409,6 +413,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
 
         try:
             user = self._search_user(email_or_username)
+            log.debug("Reset password via mm initiated for user {!r}.".format(user))
         except self.request.userdb.exceptions.UserDoesNotExist:
             log.debug("User {!r} does not exist".format(email_or_username))
             user = None
@@ -419,8 +424,8 @@ class ResetPasswordNINView(BaseResetPasswordView):
             if nins:
                 nin = nins[-1]
             if nin is not None:
-                reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
-                send_reset_password_gov_message(self.request, nin, user, reset_password_link)
+                reference, reset_password_link = new_reset_password_code(self.request, user, mechanism='govmailbox')
+                send_reset_password_gov_message(self.request, reference, nin, user, reset_password_link)
 
         self.request.session['_reset_type'] = _('Myndighetspost')
         return HTTPFound(location=self.request.route_url('reset-password-sent'))
