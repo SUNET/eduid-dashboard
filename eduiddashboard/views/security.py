@@ -379,7 +379,8 @@ class ResetPasswordEmailView(BaseResetPasswordView):
             user = self._search_user(email_or_username)
             log.debug("Reset password via email initiated for user {!r}".format(user))
         except self.request.userdb.exceptions.UserDoesNotExist:
-            log.debug("User {!r} does not exist".format(email_or_username))
+            log.debug("Tried to initiate reset password via email but user {!r} does not exist".format(
+                email_or_username))
             user = None
 
         if user is not None:
@@ -415,7 +416,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
             user = self._search_user(email_or_username)
             log.debug("Reset password via mm initiated for user {!r}.".format(user))
         except self.request.userdb.exceptions.UserDoesNotExist:
-            log.debug("User {!r} does not exist".format(email_or_username))
+            log.debug("Tried to initiate reset password via mm but user {!r} does not exist".format(email_or_username))
             user = None
 
         if user is not None:
