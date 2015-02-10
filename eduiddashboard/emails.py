@@ -7,6 +7,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.verifications import (generate_verification_link,
                                           new_verification_code)
 from eduiddashboard.utils import get_short_hash
+from eduiddashboard import log
 
 
 def send_verification_mail(request, email, reference=None, code=None):
@@ -50,6 +51,7 @@ def send_verification_mail(request, email, reference=None, code=None):
         print message.body
     else:
         mailer.send(message)
+    log.debug("Sent verification mail to user {!r} with address {!s}.".format(request.context.user, email))
 
 
 def send_termination_mail(request, user):
@@ -84,6 +86,7 @@ def send_termination_mail(request, user):
         print message.body
     else:
         mailer.send(message)
+    log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))
 
 
 def send_reset_password_mail(request, user, reset_password_link):
@@ -124,3 +127,4 @@ def send_reset_password_mail(request, user, reset_password_link):
         print message.body
     else:
         mailer.send(message)
+    log.debug("Sent reset password mail to user {!r} with address {!s}.".format(user, email))
