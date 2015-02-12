@@ -26,6 +26,7 @@ version = '0.3.3'
 requires = [
     'eduid_am>=0.5.1',
     'eduid_msg>=0.8.3',
+    'eduid_idproofing_mobile>=0.0.1',
     'pymongo==2.6.3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
