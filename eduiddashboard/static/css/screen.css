@@ -513,6 +513,7 @@ div.wizard div.wizard-card-container {
 
 div.position-relative {
     position: relative;
+    clear: both;
 }
 
 div.profile-filled-large {
