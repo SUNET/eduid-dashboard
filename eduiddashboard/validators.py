@@ -261,24 +261,36 @@ class NINReachableValidator(object):
                 'service_url': settings.get('nin_mobile_service_url'),
             }))
 
-
 class NINRegisteredMobileValidator(object):
     """ Validator that checks so the primary mobile number is registered on the given national identity number """
     def __call__(self, node, value):
+        request = node.bindings.get('request')
+        settings = request.registry.settings
+        msg = self._validate(request, value)
+
+        if msg:
+            # TODO Get different "nin_service_name"
+            localizer = get_localizer(request)
+            raise colander.Invalid(node, localizer.translate(msg, mapping={
+                'service_name': settings.get('nin_service_name'),
+                'service_url': settings.get('nin_service_url'),
+            }))
+
+    def _validate(self, request, value):
         from eduiddashboard.models import normalize_nin
 
         value = normalize_nin(copy(value))
-        request = node.bindings.get('request')
-        settings = request.registry.settings
+        #settings = request.registry.settings
         user = request.context.user
 
         #if settings.get('debug_mode', False):
         #    return
 
         msg = None
-
         mobiles = user.get_mobiles()
+        # TODO Check against all verified mobiles and not only primary?
         phone = next((mobile for mobile in mobiles if mobile['primary']), None)
+
         if phone is None:
             msg = _('You have no confirmed mobile phone')
         else:
@@ -294,19 +306,10 @@ class NINRegisteredMobileValidator(object):
                 msg = _('Sorry, we are experiencing temporary technical '
                         'problem with ${service_name}, please try again '
                         'later.')
-            print success
 
             if not success:
                 msg = _('The given mobile number was not registered to the given national identity number')
-
-        if msg:
-            # TODO Get different "nin_service_name"
-            localizer = get_localizer(request)
-            raise colander.Invalid(node, localizer.translate(msg, mapping={
-                'service_name': settings.get('nin_service_name'),
-                'service_url': settings.get('nin_service_url'),
-            }))
-
+        return msg
 
 class ResetPasswordCodeExistsValidator(object):
 

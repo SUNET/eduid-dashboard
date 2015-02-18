@@ -11,6 +11,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
+from eduiddashboard.validators import NINRegisteredMobileValidator
 from eduiddashboard import log
 from eduid_am.user import User
 
@@ -216,6 +217,39 @@ class NINsActionsView(BaseActionsView):
             'message': message,
         }
 
+    def resend_code_mobile_action(self, data, post_data):
+        """ Resend nin verification code by mobile """
+        nin, index = data.split()
+        index = int(index)
+        nins = get_not_verified_nins_list(self.request, self.user)
+
+        if len(nins) > index:
+            nin = nins[index]
+        else:
+            raise HTTPNotFound(_("No pending national identity numbers found."))
+
+        # Validate that the primary mobile is registered to the given nin
+        validator = NINRegisteredMobileValidator()
+        msg = validator._validate(self.request, nin)
+
+        # If anny message from the validation, then it failed
+        if msg:
+            return {
+                'result': 'fail',
+                'message': msg,
+            }
+
+        mobiles = self.user.get_mobiles()
+        phone = next((mobile for mobile in mobiles if mobile['primary']), None)
+
+        send_verification_code(self.request, self.context.user, nin, recipient=phone['mobile'], message_type='sms')
+
+        message = self.verify_messages['new_code_sent']
+        return {
+            'result': 'ok',
+            'message': message,
+        }
+
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')
@@ -230,8 +264,8 @@ class NinsView(BaseFormView):
 
     route = 'nins'
 
-    # All buttons for adding a nin, must have a name that starts with "add". This because the POST message sent
-    # from the button must trigger the "add" validation of a nin.
+    # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
+    # from the button, must trigger the "add" validation part of a nin.
     buttons = (deform.Button(name='add',
                              title=_('Add national identity number')),
                deform.Button(name='add_by_mobile',
@@ -283,9 +317,6 @@ class NinsView(BaseFormView):
 
     def add_success_personal(self, ninform, msg, recipient=None, message_type='mm'):
         self.addition_with_code_validation(ninform, recipient=recipient, message_type=message_type)
-        #msg = _('A confirmation code has been sent to your government inbox. '
-        #        'Please click on "Pending confirmation" link below to enter '
-        #        'your confirmation code.')
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
