@@ -21,7 +21,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.3.6'
+version = '0.3.7-dev'
 
 requires = [
     'eduid_am>=0.5.1',
@@ -41,7 +41,7 @@ requires = [
     'pycountry==1.2',
     'eventlet==0.14.0',
     'gunicorn==18.0',
-    'vccs_client==0.4.1',
+    'vccs_client>=0.4.1',
     'pwgen==0.4',
     'zxcvbn==1.0',
     'pytz'
