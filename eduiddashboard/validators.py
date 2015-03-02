@@ -10,7 +10,8 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
-from eduid_idproofing_mobile.tasks import verify_by_mobile
+from eduid_lookup_mobile.tasks import verify_identity
+
 import celery.exceptions
 
 class OldPasswordValidator(object):
@@ -261,55 +262,48 @@ class NINReachableValidator(object):
                 'service_url': settings.get('nin_mobile_service_url'),
             }))
 
+
 class NINRegisteredMobileValidator(object):
     """ Validator that checks so the primary mobile number is registered on the given national identity number """
+
     def __call__(self, node, value):
         request = node.bindings.get('request')
         settings = request.registry.settings
-        msg = self._validate(request, value)
+        result = self._validate(request.context.user, value)
 
-        if msg:
+        if not result['success']:
             # TODO Get different "nin_service_name"
             localizer = get_localizer(request)
-            raise colander.Invalid(node, localizer.translate(msg, mapping={
+            raise colander.Invalid(node, localizer.translate(result['message'], mapping={
                 'service_name': settings.get('nin_service_name'),
                 'service_url': settings.get('nin_service_url'),
             }))
 
-    def _validate(self, request, value):
-        from eduiddashboard.models import normalize_nin
+    def _validate(self, user, nin):
+        # Get list of verified mobile numbers
+        verified_mobiles = []
+        for one_mobile in user.get_mobiles():
+            if one_mobile['verified']:
+                verified_mobiles.append(one_mobile['mobile'])
 
-        value = normalize_nin(copy(value))
-        #settings = request.registry.settings
-        user = request.context.user
+        result = {'success': False, 'status': '', 'mobile': None}
+        try:
+            result = verify_identity.delay(nin, verified_mobiles)
+            result = result.get(timeout=10)
+            status = result['status']
+        except celery.exceptions.TimeoutError:
+            status = 'timeout'
 
-        #if settings.get('debug_mode', False):
-        #    return
-
-        msg = None
-        mobiles = user.get_mobiles()
-        # TODO Check against all verified mobiles and not only primary?
-        phone = next((mobile for mobile in mobiles if mobile['primary']), None)
-
-        if phone is None:
+        if status == 'no_phone':
             msg = _('You have no confirmed mobile phone')
-        else:
-            result = verify_by_mobile.delay(phone['mobile'], value)
-            log.debug("Verify nin: {nin} by mobile: {number}, result: {result}".format(nin=value,
-                                                                                       number=phone['mobile'],
-                                                                                       result=result))
-            try:
-                # TODO How long time for timeout?
-                success = result.get(timeout=4)
-            except celery.exceptions.TimeoutError:
-                success = 'timeout'
-                msg = _('Sorry, we are experiencing temporary technical '
-                        'problem with ${service_name}, please try again '
-                        'later.')
+        elif status == 'no_match':
+            msg = _('The given mobile number was not registered to the given national identity number')
+        elif status == 'timeout':
+            msg = _('Sorry, we are experiencing temporary technical '
+                    'problem with ${service_name}, please try again '
+                    'later.')
 
-            if not success:
-                msg = _('The given mobile number was not registered to the given national identity number')
-        return msg
+        return {'success': result['success'], 'message': msg, 'mobile': result['mobile']}
 
 class ResetPasswordCodeExistsValidator(object):
 
