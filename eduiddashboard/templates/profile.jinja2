@@ -37,7 +37,7 @@
         <ul class='nav nav-tabs nav-stacked'>
           {% for tab in tabs %}
           <li>
-            <a href='#{{tab.id}}'>{{_(tab.label)}}</a>
+            <a class="main-nav-tabs" href='#{{tab.id}}'>{{_(tab.label)}}</a>
           </li>
           {% endfor %}
             <li>
@@ -115,7 +115,7 @@
   </div>
 
   {% if open_wizard %}
-  <div class="openwizard hide"></div>
+  <div class="openwizard"></div>
   {% endif  %}
 
   {% if context.workmode != "personal" %}
@@ -148,7 +148,6 @@
 <script src="{{'eduiddashboard:static/js/libs/bootstrap-wizard.js'|static_url}}"></script>
 
 
-<script src="{{'eduiddashboard:static/js/eduid-wizards.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/tablelist-form.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/libs/zxcvbn-async.js'|static_url}}"></script>
@@ -209,7 +208,7 @@ $(document).ready(function () {
 
     function reloadTab() {
       // reload active tab in order to refresh the HTML
-      $('.nav-tabs li.active a').click();
+      $('.nav-tabs li.active a.main-nav-tabs').click();
       showStatus();
     }
 
@@ -317,6 +316,9 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");
 };
+</script>
+<script src="{{'eduiddashboard:static/js/eduid-wizards.js'|static_url}}"></script>
+<script>
 </script>
 
 {% endblock %}

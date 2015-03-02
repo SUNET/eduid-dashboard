@@ -646,3 +646,25 @@ div#profile-menu-small {
 }
 
 }
+
+/* wizard */
+
+button.wizard-next {
+    margin-left: 0 !important;
+}
+
+div.btn-group-single {
+    margin-left: 26%;
+}
+
+div.wizard-steps {
+    height: 295px !important;
+    width: 36%;
+}
+
+a#go-to-mobiles-tab {
+    cursor: pointer;
+}
+
+/* end wizard */
+

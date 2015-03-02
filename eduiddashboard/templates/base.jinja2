@@ -103,6 +103,8 @@
         </div>
     </div>
 
+    <div id="nins-wizard-chooser-holder"></div>
+
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
@@ -146,6 +148,46 @@
         $($('.alert')[index]).animate({opacity: 0.25}, 150).delay(150).animate({opacity: 1}, 150);
 
       };
+
+      {% if nins_wizard_chooser_url is defined %}
+
+      window.is_nins_wizard_chooser_open = false;
+            window.loadNinsWizardChooser = function (open) {
+                if ( ! window.is_nins_wizard_chooser_open) {
+                    $.get('{{ nins_wizard_chooser_url }}', {}, function (data, status_text, xhr) {
+                        $('div#nins-wizard-chooser').remove();
+                        $('div#nins-wizard-chooser-holder').empty();
+                        $('div#nins-wizard-chooser-holder').html(data);
+                        if (open) {
+                            $('div#nins-wizard-chooser-holder > div#nins-wizard-chooser').modal({}).on('hide.bs.modal', function (e) {
+            window.is_nins_wizard_chooser_open = false;
+                            });
+                            window.is_nins_wizard_chooser_open = true;
+                        }
+      
+
+        {% if open_wizard is defined and open_wizard %}
+            {% if not has_mobile %}
+            $('a#go-to-mobiles-tab').click(function (e) {
+                $('div#nins-wizard-chooser').modal('hide');
+                $('a.main-nav-tabs[href="#mobiles"]').click();
+            });
+            {% endif %}
+
+            $('button#dismiss-wizard').click(function (e) {
+                $('div#nins-wizard-chooser').modal('hide');
+                currentwizard.cancelButton.click();
+            });
+    
+            $('button#nins-wizard-choose-mm').click(function (e) {
+                $('div#nins-wizard-chooser').modal('hide');
+                currentwizard.show();
+            });
+                    }, 'html');
+                }
+        {% endif %}
+            };
+      {% endif %}
 
       $(document).ready(function () {
         $(document).ready(function () {$('div#content-block').show()});

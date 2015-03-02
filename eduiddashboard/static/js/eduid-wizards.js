@@ -46,7 +46,6 @@ var EduidWizard = function (container_path, active_card, options) {
 
     currentwizard = wizard;
 
-
     Wizard.prototype._onNextClick = function () {
         var jsondata,
             currentCard = this.getActiveCard(),
@@ -81,7 +80,7 @@ var EduidWizard = function (container_path, active_card, options) {
                 type: 'POST',
                 success: function (data, textStatus, jqXHR) {
                     var el, input;
-                    if (data.status === 'success') {
+                    if (data.status === 'ok') {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
@@ -162,7 +161,6 @@ var EduidWizard = function (container_path, active_card, options) {
         e.preventDefault();
     });
 
-    wizard.show();
     if (active_card > 1) {
         presentcard = wizard._cards[0];
         presentcard.deselect();

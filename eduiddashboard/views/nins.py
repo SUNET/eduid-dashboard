@@ -17,6 +17,9 @@ from eduid_am.user import User
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def get_status(request, user):
     """
@@ -258,6 +261,7 @@ class NinsView(BaseFormView):
             'active_nin': self.get_active_nin(),
             'nin_service_url': settings.get('nin_service_url'),
             'nin_service_name': settings.get('nin_service_name'),
+            'open_wizard': nins_open_wizard(self.context, self.request),
         })
 
         return context
@@ -379,6 +383,11 @@ class NinsWizard(BaseWizard):
                 }
             }
 
+    def get_template_context(self):
+        context = super(NinsWizard,self).get_template_context()
+        context['title'] = _('Add NIN with MM confirmation')
+        return context
+
     def resendcode(self):
         if self.datakey is None:
             message = _("Your national identity number confirmation request "
@@ -391,9 +400,11 @@ class NinsWizard(BaseWizard):
         send_verification_code(self.request,
                                self.context.user,
                                self.datakey)
+        text = NINsActionsView.special_verify_messages.get('new_code_sent',
+            NINsActionsView.default_verify_messages.get('new_code_sent', ''))
         return {
             'status': 'ok',
-            'text': NINsActionsView.verify_messages['new_code_sent'],
+            'text': text,
         }
 
 
@@ -404,5 +415,9 @@ def nins_open_wizard(context, request):
 
     datakey = ninswizard.obj.get('datakey', None)
     open_wizard = ninswizard.is_open_wizard()
+
+    logger.debug('Wizard params: open: {}, datakey: {}'.format(
+                   str(open_wizard),
+                   datakey))
 
     return (open_wizard, datakey)
