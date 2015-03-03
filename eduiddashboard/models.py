@@ -126,6 +126,7 @@ class NIN(CSRFTokenSchema):
         19780101 1234
         19780101-1234
     """
+
     validator_switch = All_StopOnFirst_Switch(
         {'add': All_StopOnFirst(
             NINFormatValidator,
@@ -137,6 +138,17 @@ class NIN(CSRFTokenSchema):
             NINRegisteredMobileValidator()
         )})
 
+    """
+    validator_switch = All_StopOnFirst_Switch(
+        {'add': All_StopOnFirst(
+            NINFormatValidator,
+            NINUniqueValidator(),
+            NINReachableValidator()
+        ), 'add_by_mobile': All_StopOnFirst(
+            NINFormatValidator,
+            NINUniqueValidator()
+        )})
+    """
     norEduPersonNIN = colander.SchemaNode(
         colander.String(),
         title=_('Swedish national identity number'),

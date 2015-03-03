@@ -230,19 +230,16 @@ class NINsActionsView(BaseActionsView):
 
         # Validate that the primary mobile is registered to the given nin
         validator = NINRegisteredMobileValidator()
-        msg = validator._validate(self.request, nin)
+        result = validator._validate(self.request.context.user, nin)
 
-        # If anny message from the validation, then it failed
-        if msg:
+        # Check the result of the validation
+        if not result['success']:
             return {
                 'result': 'fail',
-                'message': msg,
+                'message': result['message'],
             }
 
-        mobiles = self.user.get_mobiles()
-        phone = next((mobile for mobile in mobiles if mobile['primary']), None)
-
-        send_verification_code(self.request, self.context.user, nin, recipient=phone['mobile'], message_type='sms')
+        send_verification_code(self.request, self.context.user, nin, recipient=result['mobile'], message_type='sms')
 
         message = self.verify_messages['new_code_sent']
         return {
@@ -390,14 +387,15 @@ class NinsView(BaseFormView):
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
         if self.context.workmode == 'personal':
-            msg = _('A confirmation code has been sent to your registered mobile phone. '
-                    'Please click on "Pending confirmation" link below to enter '
-                    'your confirmation code.')
-
             mobiles = self.user.get_mobiles()
             phone = next((mobile for mobile in mobiles if mobile['primary']), None)
 
-            self.add_success_personal(ninform, msg, recipient=phone['mobile'], message_type='sms')
+            msg = _('A confirmation code has been sent to your mobile phone: {phone_number}. '
+                    'Please click on "Pending confirmation" link below to enter '
+                    'your confirmation code.')
+            msg = msg.format(phone_number=phone)
+
+            self.add_success_personal(ninform, msg, recipient=phone, message_type='sms')
         else:
             self.add_success_other(ninform)
 

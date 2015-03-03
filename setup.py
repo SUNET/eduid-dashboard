@@ -26,7 +26,7 @@ version = '0.3.3'
 requires = [
     'eduid_am>=0.5.1',
     'eduid_msg>=0.8.3',
-    'eduid_idproofing_mobile>=0.0.1',
+    'eduid_lookup_mobile>=0.0.1',
     'pymongo==2.6.3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
@@ -42,7 +42,7 @@ requires = [
     'pycountry==1.2',
     'eventlet==0.14.0',
     'gunicorn==18.0',
-    'vccs_client==0.4.1',
+    'vccs_client>=0.4.1',
     'pwgen==0.4',
     'zxcvbn==1.0',
     'pytz'
