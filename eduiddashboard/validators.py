@@ -11,6 +11,7 @@ from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
 from eduid_lookup_mobile.tasks import verify_identity
+from eduid_lookup_mobile.celery import app
 
 import celery.exceptions
 
@@ -288,6 +289,14 @@ class NINRegisteredMobileValidator(object):
 
         result = {'success': False, 'status': '', 'mobile': None}
         try:
+
+            con = {
+                'BROKER_URL': 'amqp://eduid:eduid_pw@rabbitmq.docker:5672/lookup_mobile',
+                'CELERY_RESULT_BACKEND': 'amqp',
+            }
+
+            app.conf.update(con)
+
             result = verify_identity.delay(nin, verified_mobiles)
             result = result.get(timeout=10)
             status = result['status']
