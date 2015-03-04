@@ -64,7 +64,7 @@ def get_status(request, user):
     return status
 
 
-def send_verification_code(request, user, nin, reference=None, code=None, recipient=None, message_type='mm'):
+def send_verification_code(request, user, nin, reference=None, code=None):
     """
     You need to replace the call to dummy_message with the govt
     message api
@@ -74,10 +74,7 @@ def send_verification_code(request, user, nin, reference=None, code=None, recipi
 
     language = request.context.get_preferred_language()
 
-    if message_type == 'mm':
-        recipient = nin
-
-    request.msgrelay.nin_validator(reference, nin, code, language, recipient, message_type=message_type)
+    request.msgrelay.nin_validator(reference, nin, code, language, nin, message_type='mm')
 
 
 def get_tab(request):
@@ -222,36 +219,6 @@ class NINsActionsView(BaseActionsView):
             'message': message,
         }
 
-    def resend_code_mobile_action(self, data, post_data):
-        """ Resend nin verification code by mobile """
-        nin, index = data.split()
-        index = int(index)
-        nins = get_not_verified_nins_list(self.request, self.user)
-
-        if len(nins) > index:
-            nin = nins[index]
-        else:
-            raise HTTPNotFound(_("No pending national identity numbers found."))
-
-        # Validate that the primary mobile is registered to the given nin
-        validator = NINRegisteredMobileValidator()
-        result = validator._validate(self.request.context.user, nin)
-
-        # Check the result of the validation
-        if not result['success']:
-            return {
-                'result': 'fail',
-                'message': result['message'],
-            }
-
-        send_verification_code(self.request, self.context.user, nin, recipient=result['mobile'], message_type='sms')
-
-        message = self.verify_messages['new_code_sent']
-        return {
-            'result': 'ok',
-            'message': message,
-        }
-
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')
@@ -307,15 +274,15 @@ class NinsView(BaseFormView):
 
         return context
 
-    def addition_with_code_validation(self, form, recipient=None, message_type='mm'):
+    def addition_with_code_validation(self, form):
         newnin = self.schema.serialize(form)
         newnin = newnin['norEduPersonNIN']
         newnin = normalize_nin(newnin)
 
-        send_verification_code(self.request, self.user, newnin, recipient=recipient, message_type=message_type)
+        send_verification_code(self.request, self.user, newnin)
 
-    def add_success_personal(self, ninform, msg, recipient=None, message_type='mm'):
-        self.addition_with_code_validation(ninform, recipient=recipient, message_type=message_type)
+    def add_success_personal(self, ninform, msg):
+        self.addition_with_code_validation(ninform)
 
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
@@ -368,7 +335,7 @@ class NinsView(BaseFormView):
         except UserOutOfSync:
             message = _('User data out of sync. Please try again.')
         else:
-            message = _('Changes saved')
+            message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
         save_as_verified(self.request, 'norEduPersonNIN',
                             self.user.get_id(), newnin)
@@ -388,18 +355,7 @@ class NinsView(BaseFormView):
 
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
-        if self.context.workmode == 'personal':
-            mobiles = self.user.get_mobiles()
-            phone = next((mobile for mobile in mobiles if mobile['primary']), None)
-
-            msg = _('A confirmation code has been sent to your mobile phone: {phone_number}. '
-                    'Please click on "Pending confirmation" link below to enter '
-                    'your confirmation code.')
-            msg = msg.format(phone_number=phone)
-
-            self.add_success_personal(ninform, msg, recipient=phone, message_type='sms')
-        else:
-            self.add_success_other(ninform)
+        self.add_success_other(ninform)
 
 @view_config(route_name='wizard-nins', permission='edit', renderer='json')
 class NinsWizard(BaseWizard):

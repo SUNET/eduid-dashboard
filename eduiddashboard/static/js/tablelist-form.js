@@ -65,25 +65,6 @@
                 'json');
             });
 
-            $('.resend-code-mobile').unbind('click');
-
-            $('.resend-code-mobile').click(function(e) {
-                var actions_url = $(this).attr('href'),
-                    value = $(this).attr('data-identifier'),
-                    dialog = $(this).parents('#askDialog');
-
-                e.preventDefault();
-
-                $.post(actions_url, {
-                    action: 'resend_code_mobile',
-                    identifier: value
-                },
-                function(data, statusText, xhr) {
-                    sendInfo(dialog, data.result, data.message);
-                },
-                'json');
-            });
-
             container.find('a.verifycode').click(function (e) {
                 var identifier = $(e.target).attr('data-identifier');
                 e.preventDefault();
