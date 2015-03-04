@@ -270,7 +270,7 @@ class NINRegisteredMobileValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         settings = request.registry.settings
-        result = self._validate(request.context.user, value)
+        result = self._validate(request, request.context.user, value)
 
         if not result['success']:
             # TODO Get different "nin_service_name"
@@ -280,7 +280,7 @@ class NINRegisteredMobileValidator(object):
                 'service_url': settings.get('nin_service_url'),
             }))
 
-    def _validate(self, user, nin):
+    def _validate(self, request, user, nin):
         # Get list of verified mobile numbers
         verified_mobiles = []
         for one_mobile in user.get_mobiles():
@@ -288,26 +288,18 @@ class NINRegisteredMobileValidator(object):
                 verified_mobiles.append(one_mobile['mobile'])
 
         result = {'success': False, 'status': '', 'mobile': None}
+
         try:
-
-            con = {
-                'BROKER_URL': 'amqp://eduid:eduid_pw@rabbitmq.docker:5672/lookup_mobile',
-                'CELERY_RESULT_BACKEND': 'amqp',
-            }
-
-            app.conf.update(con)
-
-            result = verify_identity.delay(nin, verified_mobiles)
-            result = result.get(timeout=10)
+            result = request.lookuprelay.verify_identity(nin, verified_mobiles)
             status = result['status']
-        except celery.exceptions.TimeoutError:
-            status = 'timeout'
+        except request.lookuprelay.TaskFailed:
+            status = 'error'
 
         if status == 'no_phone':
             msg = _('You have no confirmed mobile phone')
         elif status == 'no_match':
-            msg = _('The given mobile number was not registered to the given national identity number')
-        elif status == 'timeout':
+            msg = _('The given mobile number was not associated to the given national identity number')
+        elif status == 'error':
             msg = _('Sorry, we are experiencing temporary technical '
                     'problem with ${service_name}, please try again '
                     'later.')
