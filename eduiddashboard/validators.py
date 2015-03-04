@@ -10,7 +10,10 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
+from eduid_lookup_mobile.tasks import verify_identity
+from eduid_lookup_mobile.celery import app
 
+import celery.exceptions
 
 class OldPasswordValidator(object):
 
@@ -201,11 +204,13 @@ class NINUniqueValidator(object):
             'verified': False
         })
 
-        if 'add' in request.POST:
-            if unverified_user_nins.count() > 0 or value in user_nins:
-                err = _("This national identity number is already in use")
-                raise colander.Invalid(node,
-                        get_localizer(request).translate(err))
+        # Search the request.POST for any post that starts with "add"
+        for post_value in request.POST:
+            if post_value.startswith('add'):
+                if unverified_user_nins.count() > 0 or value in user_nins:
+                    err = _("This national identity number is already in use")
+                    raise colander.Invalid(node,
+                            get_localizer(request).translate(err))
 
 
 class NINReachableValidator(object):
@@ -254,10 +259,52 @@ class NINReachableValidator(object):
         if msg:
             localizer = get_localizer(request)
             raise colander.Invalid(node, localizer.translate(msg, mapping={
+                'service_name': settings.get('nin_mobile_service_name'),
+                'service_url': settings.get('nin_mobile_service_url'),
+            }))
+
+
+class NINRegisteredMobileValidator(object):
+    """ Validator that checks so the primary mobile number is registered on the given national identity number """
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        settings = request.registry.settings
+        result = self._validate(request, request.context.user, value)
+
+        if not result['success']:
+            # TODO Get different "nin_service_name"
+            localizer = get_localizer(request)
+            raise colander.Invalid(node, localizer.translate(result['message'], mapping={
                 'service_name': settings.get('nin_service_name'),
                 'service_url': settings.get('nin_service_url'),
             }))
 
+    def _validate(self, request, user, nin):
+        # Get list of verified mobile numbers
+        verified_mobiles = []
+        for one_mobile in user.get_mobiles():
+            if one_mobile['verified']:
+                verified_mobiles.append(one_mobile['mobile'])
+
+        result = {'success': False, 'status': '', 'mobile': None}
+
+        try:
+            result = request.lookuprelay.verify_identity(nin, verified_mobiles)
+            status = result['status']
+        except request.lookuprelay.TaskFailed:
+            status = 'error'
+
+        if status == 'no_phone':
+            msg = _('You have no confirmed mobile phone')
+        elif status == 'no_match':
+            msg = _('The given mobile number was not associated to the given national identity number')
+        elif status == 'error':
+            msg = _('Sorry, we are experiencing temporary technical '
+                    'problem with ${service_name}, please try again '
+                    'later.')
+
+        return {'success': result['success'], 'message': msg, 'mobile': result['mobile']}
 
 class ResetPasswordCodeExistsValidator(object):
 

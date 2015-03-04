@@ -11,6 +11,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
+from eduiddashboard.validators import NINRegisteredMobileValidator
 from eduiddashboard import log
 from eduid_am.user import User
 
@@ -63,7 +64,7 @@ def get_status(request, user):
     return status
 
 
-def send_verification_code(request, user, nin, reference=None, code=None):
+def send_verification_code(request, user, nin, reference=None, code=None, recipient=None, message_type='mm'):
     """
     You need to replace the call to dummy_message with the govt
     message api
@@ -73,7 +74,10 @@ def send_verification_code(request, user, nin, reference=None, code=None):
 
     language = request.context.get_preferred_language()
 
-    request.msgrelay.nin_validator(reference, nin, code, language)
+    if message_type == 'mm':
+        recipient = nin
+
+    request.msgrelay.nin_validator(reference, nin, code, language, recipient, message_type=message_type)
 
 
 def get_tab(request):
@@ -218,6 +222,36 @@ class NINsActionsView(BaseActionsView):
             'message': message,
         }
 
+    def resend_code_mobile_action(self, data, post_data):
+        """ Resend nin verification code by mobile """
+        nin, index = data.split()
+        index = int(index)
+        nins = get_not_verified_nins_list(self.request, self.user)
+
+        if len(nins) > index:
+            nin = nins[index]
+        else:
+            raise HTTPNotFound(_("No pending national identity numbers found."))
+
+        # Validate that the primary mobile is registered to the given nin
+        validator = NINRegisteredMobileValidator()
+        result = validator._validate(self.request.context.user, nin)
+
+        # Check the result of the validation
+        if not result['success']:
+            return {
+                'result': 'fail',
+                'message': result['message'],
+            }
+
+        send_verification_code(self.request, self.context.user, nin, recipient=result['mobile'], message_type='sms')
+
+        message = self.verify_messages['new_code_sent']
+        return {
+            'result': 'ok',
+            'message': message,
+        }
+
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')
@@ -229,10 +263,17 @@ class NinsView(BaseFormView):
                     return status and flash message
     """
     schema = NIN()
+
     route = 'nins'
 
+    # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
+    # from the button, must trigger the "add" validation part of a nin.
     buttons = (deform.Button(name='add',
-                             title=_('Add national identity number')), )
+                             title=_('Add national identity number')),
+               deform.Button(name='add_by_mobile',
+                             title=_('Verify by registered phone'),
+                             css_class='btn btn-primary'),
+               )
 
     bootstrap_form_style = 'form-inline'
 
@@ -266,30 +307,20 @@ class NinsView(BaseFormView):
 
         return context
 
-    def addition_with_code_validation(self, form):
+    def addition_with_code_validation(self, form, recipient=None, message_type='mm'):
         newnin = self.schema.serialize(form)
         newnin = newnin['norEduPersonNIN']
         newnin = normalize_nin(newnin)
-        previous_nins = get_not_verified_nins_list(self.request, self.user)
-        for nin in previous_nins:
-            if newnin != nin:
-                return False
-        send_verification_code(self.request, self.user, newnin)
-        return True
 
-    def add_success_personal(self, ninform):
-        if not self.addition_with_code_validation(ninform):
-            msg = _('You can not add another national identity number. '
-                    'Please contact support if you need to change it. ')
-        else:
-            msg = _('A confirmation code has been sent to your government inbox. '
-                    'Please click on "Pending confirmation" link below to enter '
-                    'your confirmation code.')
+        send_verification_code(self.request, self.user, newnin, recipient=recipient, message_type=message_type)
+
+    def add_success_personal(self, ninform, msg, recipient=None, message_type='mm'):
+        self.addition_with_code_validation(ninform, recipient=recipient, message_type=message_type)
+
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
 
     def add_nin_external(self, data):
-
         self.schema = self.schema.bind(**self.get_bind_data())
         form = self.form_class(self.schema, buttons=self.buttons,
                                **dict(self.form_options))
@@ -346,11 +377,29 @@ class NinsView(BaseFormView):
                 queue='forms')
 
     def add_success(self, ninform):
+        """ This method is bounded to the "add"-button by it's name """
         if self.context.workmode == 'personal':
-            self.add_success_personal(ninform)
+            msg = _('A confirmation code has been sent to your government inbox. '
+                    'Please click on "Pending confirmation" link below to enter '
+                    'your confirmation code.')
+            self.add_success_personal(ninform, msg)
         else:
             self.add_success_other(ninform)
 
+    def add_by_mobile_success(self, ninform):
+        """ This method is bounded to the "add_by_mobile"-button by it's name """
+        if self.context.workmode == 'personal':
+            mobiles = self.user.get_mobiles()
+            phone = next((mobile for mobile in mobiles if mobile['primary']), None)
+
+            msg = _('A confirmation code has been sent to your mobile phone: {phone_number}. '
+                    'Please click on "Pending confirmation" link below to enter '
+                    'your confirmation code.')
+            msg = msg.format(phone_number=phone)
+
+            self.add_success_personal(ninform, msg, recipient=phone, message_type='sms')
+        else:
+            self.add_success_other(ninform)
 
 @view_config(route_name='wizard-nins', permission='edit', renderer='json')
 class NinsWizard(BaseWizard):

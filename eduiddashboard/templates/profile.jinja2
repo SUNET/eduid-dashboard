@@ -100,6 +100,7 @@
       <div class="divDialogElements">
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
         <p>{{ _('Lost your confirmation code?')}} <a href="#" class="resend-code">{{ _('Resend confirmation code') }}</a></p>
+          <p>{{ _('Lost your confirmation code?')}} <a href="#" class="resend-code-mobile">{{ _('Resend confirmation code by mobile') }}</a></p>
         <p class="extra-info"></p>
       </div>
     </div>
@@ -313,6 +314,8 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
   $("#askDialog .resend-code").attr('href', actionsURL);
+  $("#askDialog .resend-code-mobile").attr('data-identifier', identifier);
+  $("#askDialog .resend-code-mobile").attr('href', actionsURL);
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");
 };

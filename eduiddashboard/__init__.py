@@ -28,6 +28,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         HelpFactory, AdminFactory, is_logged)
 
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
+from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -222,6 +223,10 @@ def includeme(config):
     config.registry.settings['msgrelay'] = msgrelay
     config.add_request_method(get_msgrelay, 'msgrelay', reify=True)
 
+    lookuprelay = LookupMobileRelay(config.registry.settings)
+    config.registry.settings['lookuprelay'] = lookuprelay
+    config.add_request_method(get_lookuprelay, 'lookuprelay', reify=True)
+
     config.set_request_property(is_logged, 'is_logged', reify=True)
 
     config.add_route('home', '/', factory=HomeFactory)
@@ -331,6 +336,10 @@ def main(global_config, **settings):
     settings['msg_broker_url'] = read_setting_from_env(settings,
                                                        'msg_broker_url',
                                                        'amqp://eduid_msg')
+
+    settings['lookup_mobile_broker_url'] = read_setting_from_env(settings,
+                                                                 'lookup_mobile_broker_url',
+                                                                 'amqp://lookup_mobile')
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')
