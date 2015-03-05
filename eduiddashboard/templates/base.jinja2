@@ -164,7 +164,6 @@
                             });
                             window.is_nins_wizard_chooser_open = true;
                         }
-      
 
         {% if open_wizard is defined and open_wizard %}
             {% if not has_mobile %}
@@ -182,6 +181,11 @@
             $('button#nins-wizard-choose-mm').click(function (e) {
                 $('div#nins-wizard-chooser').modal('hide');
                 currentwizard.show();
+            });
+
+            $('button#nins-wizard-choose-mb').click(function (e) {
+                $('div#nins-wizard-chooser').modal('hide');
+                $('button#ninsview-formadd').hide();
             });
                     }, 'html');
                 }

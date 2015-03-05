@@ -276,8 +276,8 @@ class NINRegisteredMobileValidator(object):
             # TODO Get different "nin_service_name"
             localizer = get_localizer(request)
             raise colander.Invalid(node, localizer.translate(result['message'], mapping={
-                'service_name': settings.get('nin_service_name'),
-                'service_url': settings.get('nin_service_url'),
+                'service_name': settings.get('mobile_service_name', 'Navet'),
+                #'service_url': settings.get('nin_service_url'),
             }))
 
     def _validate(self, request, user, nin):

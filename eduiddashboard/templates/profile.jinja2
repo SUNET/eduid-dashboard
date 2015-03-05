@@ -200,6 +200,7 @@ $(document).ready(function () {
     $.get( '{{ "wizard-nins" | route_url }}', params, function (data, textStatus, jqXHR) {
         $('div.openwizard').html(data);
     });
+
   {% endif %}
 
     function showStatus() {

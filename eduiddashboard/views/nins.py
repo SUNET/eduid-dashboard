@@ -11,7 +11,6 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
-from eduiddashboard.validators import NINRegisteredMobileValidator
 from eduiddashboard import log
 from eduid_am.user import User
 
@@ -356,6 +355,7 @@ class NinsView(BaseFormView):
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
         self.add_success_other(ninform)
+
 
 @view_config(route_name='wizard-nins', permission='edit', renderer='json')
 class NinsWizard(BaseWizard):
