@@ -668,3 +668,6 @@ a#go-to-mobiles-tab {
 
 /* end wizard */
 
+p.eduid-strong {
+    font-weight: 600;
+}

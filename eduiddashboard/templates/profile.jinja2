@@ -98,6 +98,7 @@
     <div class="modal-body">
       <div class="info-container"></div>
       <div class="divDialogElements">
+        <p class="eduid-strong">{{ _('For') }} <span id="eduid-object-to-confirm"></span></p>
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
         <p>{{ _('Lost your confirmation code?')}} <a href="#" class="resend-code">{{ _('Resend confirmation code') }}</a></p>
         <p class="extra-info"></p>
@@ -315,6 +316,7 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   $("#askDialog").find('.finish-button').hide();
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
+  $("#askDialog span#eduid-object-to-confirm").html(identifier.split(' ')[0]);
   $("#askDialog .resend-code").attr('href', actionsURL);
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");
