@@ -10,10 +10,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
 from eduiddashboard import log
-from eduid_lookup_mobile.tasks import verify_identity
-from eduid_lookup_mobile.celery import app
 
-import celery.exceptions
 
 class OldPasswordValidator(object):
 
@@ -280,31 +277,88 @@ class NINRegisteredMobileValidator(object):
                 'service_url': settings.get('nin_service_url'),
             }))
 
+    def _get_age(self, nin):
+        import time
+
+        current_year = int(time.strftime("%Y"))
+        current_month = int(time.strftime("%m"))
+        current_day = int(time.strftime("%d"))
+
+        birth_year = int(nin[:4])
+        birth_month = int(nin[4:6])
+        birth_day = int(nin[6:8])
+
+        age = current_year - birth_year
+
+        if current_month < birth_month or (current_month == birth_month and current_day < birth_day):
+            age -= 1
+
+        return age
+
     def _validate(self, request, user, nin):
+        from eduid_lookup_mobile.utilities import format_NIN
         # Get list of verified mobile numbers
         verified_mobiles = []
         for one_mobile in user.get_mobiles():
             if one_mobile['verified']:
                 verified_mobiles.append(one_mobile['mobile'])
 
-        result = {'success': False, 'status': '', 'mobile': None}
+        national_identity_number = format_NIN(nin)
+        status = 'no_phone'
+        valid_mobile = None
+        registered_to_nin = None
+
+        age = self._get_age(national_identity_number)
 
         try:
-            result = request.lookuprelay.verify_identity(nin, verified_mobiles)
-            status = result['status']
-        except request.lookuprelay.TaskFailed:
-            status = 'error'
+            for mobile_number in verified_mobiles:
+                status = 'no_match'
+                # Get the registered owner of the mobile number
+                registered_to_nin = request.lookuprelay.find_NIN_by_mobile(mobile_number)
+                registered_to_nin = format_NIN(registered_to_nin)
 
+                if registered_to_nin == national_identity_number:
+                    # Check if registered nin was the given nin
+                    valid_mobile = mobile_number
+                    status = 'match'
+                    break
+                elif registered_to_nin is not None and age < 18:
+                    # Check if registered nin is related to given nin
+                    relation = request.msgrelay.get_relations_to(national_identity_number, registered_to_nin)
+                    # TODO All relations?
+                    #valid_relations = ['M', 'B', 'FA', 'MO', 'VF']
+                    valid_relations = ['FA', 'MO']
+                    if any(r in relation for r in valid_relations):
+                        valid_mobile = mobile_number
+                        status = 'match_by_navet'
+                        break
+        except request.lookuprelay.TaskFailed:
+            status = 'error_lookup'
+        except request.msgrelay.TaskFailed:
+            status = 'error_navet'
+
+        msg = None
         if status == 'no_phone':
             msg = _('You have no confirmed mobile phone')
         elif status == 'no_match':
             msg = _('The given mobile number was not associated to the given national identity number')
-        elif status == 'error':
+        elif status == 'error_lookup' or status == 'error_navet':
             msg = _('Sorry, we are experiencing temporary technical '
                     'problem with ${service_name}, please try again '
                     'later.')
 
-        return {'success': result['success'], 'message': msg, 'mobile': result['mobile']}
+        validation_result = {'success': valid_mobile is not None, 'message': msg, 'mobile': valid_mobile}
+
+        # TODO What to log ?
+        log.debug("ID-PROOFING:: nin: {nin}, by number: {mobile}, registered to: {reg_nin}, "
+                 "status: {stat}, success: {success}"
+                 .format(nin=national_identity_number,
+                         mobile=valid_mobile,
+                         reg_nin=registered_to_nin,
+                         stat=status,
+                         success=validation_result['success']))
+
+        return validation_result
 
 class ResetPasswordCodeExistsValidator(object):
 
