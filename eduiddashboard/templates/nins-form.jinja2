@@ -25,8 +25,14 @@
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
           <td>
-            <input type='button' class='btn btn-link' value="{{_('Pending confirmation')}}"
+            <input type='button' class='btn btn-link' value="{{_('Verify through Mina Meddelanden')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
+          </td>
+          <td>
+            {% if has_mobile %}
+            <input type='button' class='btn btn-link verify_mb' value="{{_('Verify by registered phone')}}"
+                 data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
+            {% endif %}
           </td>
           <!-- Removed functionality temporary
                       <td>

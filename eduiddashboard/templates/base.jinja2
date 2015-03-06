@@ -104,6 +104,7 @@
     </div>
 
     <div id="nins-wizard-chooser-holder"></div>
+    <div id="nins-verification-chooser-holder"></div>
 
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
@@ -190,6 +191,43 @@
                     }, 'html');
                 }
         {% endif %}
+            };
+      {% endif %}
+
+      {% if nins_verification_chooser_url is defined %}
+
+            window.loadNinsVerificationChooser = function (index) {
+                    $.get('{{ nins_verification_chooser_url }}', {}, function (data, status_text, xhr) {
+                        $('div#nins-verification-chooser').remove();
+                        $('div#nins-verification-chooser-holder').empty();
+                        $('div#nins-verification-chooser-holder').html(data);
+                        $('div#nins-verification-chooser-holder > div#nins-verification-chooser').modal({});
+
+            {% if not has_mobile %}
+            $('a#go-to-mobiles-tab').click(function (e) {
+                $('div#nins-verification-chooser').modal('hide');
+                $('a.main-nav-tabs[href="#mobiles"]').click();
+            });
+            {% endif %}
+
+            $('button#dismiss-verify-nin').click(function (e) {
+                $('div#nins-verification-chooser').modal('hide');
+            });
+
+            var form_container = $('.ninsview-form-container');
+    
+            $('button#nins-verification-choose-mm').click(function (e) {
+                $('div#nins-verification-chooser').modal('hide');
+                var verification_links = form_container.find('input.btn-link[name="verify"]');
+                verification_links[index].click();
+            });
+
+            $('button#nins-verification-choose-mb').click(function (e) {
+                $('div#nins-verification-chooser').modal('hide');
+                var verification_links = form_container.find('input.btn-link[name="verify_mb"]');
+                verification_links[index].click();
+            });
+                    }, 'html');
             };
       {% endif %}
 

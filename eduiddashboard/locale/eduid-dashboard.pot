@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.3.7.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-05 13:11+0100\n"
+"POT-Creation-Date: 2015-03-06 09:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,7 +229,7 @@ msgstr ""
 msgid "This national identity number is already in use"
 msgstr ""
 
-#: eduiddashboard/validators.py:237 eduiddashboard/validators.py:303
+#: eduiddashboard/validators.py:237 eduiddashboard/validators.py:287
 msgid ""
 "Sorry, we are experiencing temporary technical problem with ${service_name}, "
 "please try again later."
@@ -257,25 +257,25 @@ msgid ""
 "target=\"_blank\">${service_name}</a>."
 msgstr ""
 
-#: eduiddashboard/validators.py:299
+#: eduiddashboard/validators.py:283
 msgid "You have no confirmed mobile phone"
 msgstr ""
 
-#: eduiddashboard/validators.py:301
+#: eduiddashboard/validators.py:285
 msgid ""
 "The given mobile number was not associated to the given national identity "
 "number"
 msgstr ""
 
-#: eduiddashboard/validators.py:314
+#: eduiddashboard/validators.py:316
 msgid "The entered code does not exist"
 msgstr ""
 
-#: eduiddashboard/validators.py:329
+#: eduiddashboard/validators.py:331
 msgid "Invalid CSRF token"
 msgstr ""
 
-#: eduiddashboard/validators.py:345
+#: eduiddashboard/validators.py:347
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -404,14 +404,13 @@ msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:28
 #: eduiddashboard/templates/mobiles-form.jinja2:28
-#: eduiddashboard/templates/nins-form.jinja2:28
 msgid "Pending confirmation"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:34
 #: eduiddashboard/templates/emails-form.jinja2:37
 #: eduiddashboard/templates/mobiles-form.jinja2:33
-#: eduiddashboard/templates/nins-form.jinja2:33
+#: eduiddashboard/templates/nins-form.jinja2:39
 msgid "Remove"
 msgstr ""
 
@@ -449,7 +448,7 @@ msgstr ""
 msgid "Level %(level)s"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:98
+#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:99
 msgid "Search"
 msgstr ""
 
@@ -470,6 +469,7 @@ msgid "NIN"
 msgstr ""
 
 #: eduiddashboard/templates/home.jinja2:32
+#: eduiddashboard/templates/nins-verification-chooser.jinja2:27
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:27
 msgid "Mobile"
 msgstr ""
@@ -547,11 +547,19 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:44
+#: eduiddashboard/templates/nins-form.jinja2:28 eduiddashboard/views/nins.py:274
+msgid "Verify through Mina Meddelanden"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:33 eduiddashboard/views/nins.py:276
+msgid "Verify by registered phone"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:50
 msgid "Your identity is already confirmed. No further action is required here."
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:57
+#: eduiddashboard/templates/nins-form.jinja2:63
 #, python-format
 msgid ""
 "\n"
@@ -560,8 +568,42 @@ msgid ""
 "  "
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:67
+#: eduiddashboard/templates/nins-form.jinja2:73
 msgid "We are verifying that the provided identity number is valid, please wait."
+msgstr ""
+
+#: eduiddashboard/templates/nins-verification-chooser.jinja2:7
+msgid "Choose NIN verification method"
+msgstr ""
+
+#: eduiddashboard/templates/nins-verification-chooser.jinja2:12
+msgid ""
+"\n"
+"                            You can confirm your NIN either via Mina "
+"meddelanden or via a registered mobile number.\n"
+"                            "
+msgstr ""
+
+#: eduiddashboard/templates/nins-verification-chooser.jinja2:18
+#: eduiddashboard/templates/nins-wizard-chooser.jinja2:18
+msgid ""
+"\n"
+"                            To confirm via mobile, you need to have at least "
+"one confirmed mobile phone number.\n"
+"                            Please add and verify a mobile phone in the <a id"
+"=\"go-to-mobiles-tab\">mobiles tab</a>.\n"
+"                            "
+msgstr ""
+
+#: eduiddashboard/templates/nins-verification-chooser.jinja2:25
+#: eduiddashboard/templates/nins-wizard-chooser.jinja2:25
+msgid "Min myndighetspost"
+msgstr ""
+
+#: eduiddashboard/templates/nins-verification-chooser.jinja2:32
+#: eduiddashboard/templates/nins-wizard-chooser.jinja2:32
+#: eduiddashboard/templates/wizards/basewizard.jinja2:89
+msgid "Dismiss"
 msgstr ""
 
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:7
@@ -574,25 +616,6 @@ msgid ""
 "                            To add your NIN, you can confirm it either via "
 "Mina meddelanden or via your mobile.\n"
 "                            "
-msgstr ""
-
-#: eduiddashboard/templates/nins-wizard-chooser.jinja2:18
-msgid ""
-"\n"
-"                            To confirm via mobile, you need to have at least "
-"one confirmed mobile phone number.\n"
-"                            Please add and verify a mobile phone in the <a id"
-"=\"go-to-mobiles-tab\">mobiles tab</a>.\n"
-"                            "
-msgstr ""
-
-#: eduiddashboard/templates/nins-wizard-chooser.jinja2:25
-msgid "Min myndighetspost"
-msgstr ""
-
-#: eduiddashboard/templates/nins-wizard-chooser.jinja2:32
-#: eduiddashboard/templates/wizards/basewizard.jinja2:89
-msgid "Dismiss"
 msgstr ""
 
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:6
@@ -1172,7 +1195,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:137
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:138
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -1270,69 +1293,65 @@ msgid ""
 "\"Pending confirmation\" link below and enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:45 eduiddashboard/views/nins.py:238
+#: eduiddashboard/views/nins.py:46
 msgid "Add national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:47
+#: eduiddashboard/views/nins.py:48
 msgid "Validation required for national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:80
+#: eduiddashboard/views/nins.py:81
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:136
+#: eduiddashboard/views/nins.py:137
 msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:138
+#: eduiddashboard/views/nins.py:139
 msgid "A confirmation code has been sent to your \"Min myndighetspost\" mailbox."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:139
+#: eduiddashboard/views/nins.py:140
 msgid "National identity number confirmation code"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:140
+#: eduiddashboard/views/nins.py:141
 msgid "A new confirmation code has been sent to your \"Min myndighetspost\" mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:162
+#: eduiddashboard/views/nins.py:163 eduiddashboard/views/nins.py:188
 msgid "The provided nin can't be verified. You only can verify the last one"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:194
+#: eduiddashboard/views/nins.py:230
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:211
+#: eduiddashboard/views/nins.py:247
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:240
-msgid "Verify by registered phone"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:335
+#: eduiddashboard/views/nins.py:372
 msgid "User data out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:337
+#: eduiddashboard/views/nins.py:374
 msgid "Your national identity number has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:348
+#: eduiddashboard/views/nins.py:385
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:393
+#: eduiddashboard/views/nins.py:430
 msgid "Add NIN with MM confirmation"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:398
+#: eduiddashboard/views/nins.py:435
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 

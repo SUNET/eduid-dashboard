@@ -212,6 +212,8 @@ $(document).ready(function () {
       $('.nav-tabs li.active a.main-nav-tabs').click();
       showStatus();
     }
+    
+    window.eduidReloadTab = reloadTab;
 
     $('body').on('form-submitted action-executed', function() {
       // move the form messages to the messages main area

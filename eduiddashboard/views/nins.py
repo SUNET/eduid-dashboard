@@ -9,9 +9,10 @@ from pyramid.i18n import get_localizer
 from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
+from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
-from eduiddashboard import log
+from eduiddashboard.validators import validate_nin_by_mobile
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
@@ -168,6 +169,41 @@ class NINsActionsView(BaseActionsView):
 
         return self._verify_action(verify_nin, post_data)
 
+    def verify_mb_action(self, data, post_data):
+        """
+        Only the active (the last one) NIN can be verified
+        """
+        nin, index = data.split()
+        index = int(index)
+        nins = get_not_verified_nins_list(self.request, self.user)
+
+        if len(nins) > index:
+            verify_nin = nins[index]
+            if verify_nin != nin:
+                return self.sync_user()
+        else:
+            return self.sync_user()
+
+        if index != len(nins) - 1:
+            message = _("The provided nin can't be verified. You only "
+                        'can verify the last one')
+            return {
+                'result': 'bad',
+                'message': get_localizer(self.request).translate(message),
+            }
+
+        validation = validate_nin_by_mobile(self.request, self.user, nin)
+        result = validation['success'] and 'ok' or 'error'
+        settings = self.request.registry.settings
+        msg = get_localizer(self.request).translate(validation['message'],
+                mapping={
+                'service_name': settings.get('mobile_service_name', 'Navet'),
+                })
+        return {
+            'result': result,
+            'message': msg,
+            }
+
     def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """
         raise HTTPNotImplemented  # Temporary remove the functionality
@@ -235,7 +271,7 @@ class NinsView(BaseFormView):
     # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
     # from the button, must trigger the "add" validation part of a nin.
     buttons = (deform.Button(name='add',
-                             title=_('Add national identity number')),
+                             title=_('Verify through Mina Meddelanden')),
                deform.Button(name='add_by_mobile',
                              title=_('Verify by registered phone'),
                              css_class='btn btn-primary'),
@@ -269,6 +305,7 @@ class NinsView(BaseFormView):
             'nin_service_url': settings.get('nin_service_url'),
             'nin_service_name': settings.get('nin_service_name'),
             'open_wizard': nins_open_wizard(self.context, self.request),
+            'has_mobile': has_confirmed_mobile(self.user),
         })
 
         return context

@@ -49,8 +49,19 @@ var TabbedForm = function (container) {
 
         initialize_pending_actions = function () {
             $('ul.pending-actions a').click(function (e) {
-                var action_path = e.target.href.split('#')[1];
-                initialize_verification(action_path);
+                var action_path = e.target.href.split('#')[1],
+                    segments = action_path.split('/'),
+                    is_nin = segments[0] === 'nins',
+                    index = segments[2];
+                if (is_nin) {
+                    if (action_path.indexOf('/') === -1) {
+                        container.find('.nav-tabs a.main-nav-tabs[href=#' + action_path + ']').click();
+                    } else {
+                        window.loadNinsVerificationChooser(index);
+                    }
+                } else {
+                    initialize_verification(action_path);
+                }
             });
         },
 
