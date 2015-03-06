@@ -125,119 +125,119 @@
     </script>
     <![endif]-->
     <script>
-      if (window.messagesTimer === undefined) {
-          window.messagesTimer = null;
-      }
-
-      var clearMessages = function() {
-        if (window.messagesTimer) {
-          window.clearTimeout(window.messagesTimer);
+        if (window.messagesTimer === undefined) {
+            window.messagesTimer = null;
         }
-        $('.alert').not('.fixed').fadeOut(400, function (){
-          $(this).remove();
-        });
-      };
+  
+        var clearMessages = function() {
+          if (window.messagesTimer) {
+            window.clearTimeout(window.messagesTimer);
+          }
+          $('.alert').not('.fixed').fadeOut(400, function (){
+            $(this).remove();
+          });
+        };
+  
+        var setMessagesTimer = function () {
+          window.messagesTimer = window.setTimeout(clearMessages, 10000);
+        };
+  
+        window.messagesResetTimer = function (index) {
+          window.clearTimeout(window.messagesTimer);
+          // do a fancy effect
+          window.setMessagesTimer();
+          $($('.alert')[index]).animate({opacity: 0.25}, 150).delay(150).animate({opacity: 1}, 150);
+  
+        };
+  
+        {% if nins_wizard_chooser_url is defined %}
+  
+        window.is_nins_wizard_chooser_open = false;
+        window.loadNinsWizardChooser = function (open) {
+            if ( ! window.is_nins_wizard_chooser_open) {
+                $.get('{{ nins_wizard_chooser_url }}', {}, function (data, status_text, xhr) {
+                    $('div#nins-wizard-chooser').remove();
+                    $('div#nins-wizard-chooser-holder').empty();
+                    $('div#nins-wizard-chooser-holder').html(data);
+                    if (open) {
+                        $('div#nins-wizard-chooser-holder > div#nins-wizard-chooser').modal({}).on('hide.bs.modal', function (e) {
+                            window.is_nins_wizard_chooser_open = false;
+                        });
+                        window.is_nins_wizard_chooser_open = true;
+                    }
 
-      var setMessagesTimer = function () {
-        window.messagesTimer = window.setTimeout(clearMessages, 10000);
-      };
+                    {% if open_wizard is defined and open_wizard %}
+                        {% if not has_mobile %}
+                        $('a#go-to-mobiles-tab').click(function (e) {
+                            $('div#nins-wizard-chooser').modal('hide');
+                            $('a.main-nav-tabs[href="#mobiles"]').click();
+                        });
+                        {% endif %}
 
-      window.messagesResetTimer = function (index) {
-        window.clearTimeout(window.messagesTimer);
-        // do a fancy effect
-        window.setMessagesTimer();
-        $($('.alert')[index]).animate({opacity: 0.25}, 150).delay(150).animate({opacity: 1}, 150);
+                        $('button#dismiss-wizard').click(function (e) {
+                            $('div#nins-wizard-chooser').modal('hide');
+                            currentwizard.cancelButton.click();
+                        });
 
-      };
+                        $('button#nins-wizard-choose-mm').click(function (e) {
+                            $('div#nins-wizard-chooser').modal('hide');
+                            currentwizard.show();
+                        });
 
-      {% if nins_wizard_chooser_url is defined %}
-
-      window.is_nins_wizard_chooser_open = false;
-            window.loadNinsWizardChooser = function (open) {
-                if ( ! window.is_nins_wizard_chooser_open) {
-                    $.get('{{ nins_wizard_chooser_url }}', {}, function (data, status_text, xhr) {
-                        $('div#nins-wizard-chooser').remove();
-                        $('div#nins-wizard-chooser-holder').empty();
-                        $('div#nins-wizard-chooser-holder').html(data);
-                        if (open) {
-                            $('div#nins-wizard-chooser-holder > div#nins-wizard-chooser').modal({}).on('hide.bs.modal', function (e) {
-            window.is_nins_wizard_chooser_open = false;
-                            });
-                            window.is_nins_wizard_chooser_open = true;
-                        }
-
-        {% if open_wizard is defined and open_wizard %}
-            {% if not has_mobile %}
-            $('a#go-to-mobiles-tab').click(function (e) {
-                $('div#nins-wizard-chooser').modal('hide');
-                $('a.main-nav-tabs[href="#mobiles"]').click();
-            });
-            {% endif %}
-
-            $('button#dismiss-wizard').click(function (e) {
-                $('div#nins-wizard-chooser').modal('hide');
-                currentwizard.cancelButton.click();
-            });
-    
-            $('button#nins-wizard-choose-mm').click(function (e) {
-                $('div#nins-wizard-chooser').modal('hide');
-                currentwizard.show();
-            });
-
-            $('button#nins-wizard-choose-mb').click(function (e) {
-                $('div#nins-wizard-chooser').modal('hide');
-                $('button#ninsview-formadd').hide();
-            });
-                    }, 'html');
-                }
+                        $('button#nins-wizard-choose-mb').click(function (e) {
+                            $('div#nins-wizard-chooser').modal('hide');
+                            $('button#ninsview-formadd').hide();
+                        });
+                    {% endif %}
+                }, 'html');
+            }
+        };
         {% endif %}
-            };
-      {% endif %}
 
-      {% if nins_verification_chooser_url is defined %}
+        {% if nins_verification_chooser_url is defined %}
 
-            window.loadNinsVerificationChooser = function (index) {
-                    $.get('{{ nins_verification_chooser_url }}', {}, function (data, status_text, xhr) {
-                        $('div#nins-verification-chooser').remove();
-                        $('div#nins-verification-chooser-holder').empty();
-                        $('div#nins-verification-chooser-holder').html(data);
-                        $('div#nins-verification-chooser-holder > div#nins-verification-chooser').modal({});
+        window.loadNinsVerificationChooser = function (index) {
+            $.get('{{ nins_verification_chooser_url }}', {}, function (data, status_text, xhr) {
+                $('div#nins-verification-chooser').remove();
+                $('div#nins-verification-chooser-holder').empty();
+                $('div#nins-verification-chooser-holder').html(data);
+                $('div#nins-verification-chooser-holder > div#nins-verification-chooser').modal({});
 
-            {% if not has_mobile %}
-            $('a#go-to-mobiles-tab').click(function (e) {
-                $('div#nins-verification-chooser').modal('hide');
-                $('a.main-nav-tabs[href="#mobiles"]').click();
-            });
-            {% endif %}
+                {% if not has_mobile %}
+                $('a#go-to-mobiles-tab').click(function (e) {
+                    $('div#nins-verification-chooser').modal('hide');
+                    $('a.main-nav-tabs[href="#mobiles"]').click();
+                });
+                {% endif %}
 
-            $('button#dismiss-verify-nin').click(function (e) {
-                $('div#nins-verification-chooser').modal('hide');
-            });
+                $('button#dismiss-verify-nin').click(function (e) {
+                    $('div#nins-verification-chooser').modal('hide');
+                });
 
-            var form_container = $('.ninsview-form-container');
+                var form_container = $('.ninsview-form-container');
     
-            $('button#nins-verification-choose-mm').click(function (e) {
-                $('div#nins-verification-chooser').modal('hide');
-                var verification_links = form_container.find('input.btn-link[name="verify"]');
-                verification_links[index].click();
-            });
+                $('button#nins-verification-choose-mm').click(function (e) {
+                    $('div#nins-verification-chooser').modal('hide');
+                    var verification_links = form_container.find('input.btn-link[name="verify"]');
+                    verification_links[index].click();
+                });
 
-            $('button#nins-verification-choose-mb').click(function (e) {
-                $('div#nins-verification-chooser').modal('hide');
-                var verification_links = form_container.find('input.btn-link[name="verify_mb"]');
-                verification_links[index].click();
-            });
-                    }, 'html');
-            };
-      {% endif %}
+                $('button#nins-verification-choose-mb').click(function (e) {
+                    $('div#nins-verification-chooser').modal('hide');
+                    var verification_links = form_container.find('input.btn-link[name="verify_mb"]');
+                    verification_links[index].click();
+                });
+            }, 'html');
+        };
+        {% endif %}
 
-      $(document).ready(function () {
-        $(document).ready(function () {$('div#content-block').show()});
-        $('a.null-link').click(function (e) {
-            e.preventDefault();
-        });
+        $(document).ready(function () {
+            $(document).ready(function () {$('div#content-block').show()});
+            $('a.null-link').click(function (e) {
+                e.preventDefault();
+            });
         setMessagesTimer();
-      });
+        });
     </script>
     {% block extrajs %}
     {% endblock %}
