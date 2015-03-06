@@ -167,7 +167,8 @@
                     $('div#nins-wizard-chooser').remove();
                     $('div#nins-wizard-chooser-holder').empty();
                     $('div#nins-wizard-chooser-holder').html(data);
-                    if (open) {
+                    var is_pending_action = (window.location.href.split('#')[1].indexOf('/') !== -1)
+                    if (open && !is_pending_action) {
                         $('div#nins-wizard-chooser-holder > div#nins-wizard-chooser').modal({}).on('hide.bs.modal', function (e) {
                             window.is_nins_wizard_chooser_open = false;
                         });
