@@ -57,6 +57,7 @@ var TabbedForm = function (container) {
                     if (action_path.indexOf('/') === -1) {
                         container.find('.nav-tabs a.main-nav-tabs[href=#' + action_path + ']').click();
                     } else {
+                        container.find('.nav-tabs a.main-nav-tabs[href=#nins]').click();
                         window.loadNinsVerificationChooser(index);
                     }
                 } else {
