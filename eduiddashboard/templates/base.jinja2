@@ -103,7 +103,9 @@
         </div>
     </div>
 
+    {% if open_wizard %}
     <div id="nins-wizard-chooser-holder"></div>
+    {% endif %}
     <div id="nins-verification-chooser-holder"></div>
 
     <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
@@ -151,10 +153,16 @@
         };
   
         {% if nins_wizard_chooser_url is defined %}
+
+        window.is_nin_wizard_chooser_dismissed = false;
+        window.dismissNinsWizardChooser = function () {
+            $('div#nins-wizard-chooser').modal('hide');
+            window.is_nin_wizard_chooser_dismissed = true;
+        };
   
         window.is_nins_wizard_chooser_open = false;
         window.loadNinsWizardChooser = function (open) {
-            if ( ! window.is_nins_wizard_chooser_open) {
+            if ( ! window.is_nins_wizard_chooser_open && ! window.is_nin_wizard_chooser_dismissed ) {
                 $.get('{{ nins_wizard_chooser_url }}', {}, function (data, status_text, xhr) {
                     $('div#nins-wizard-chooser').remove();
                     $('div#nins-wizard-chooser-holder').empty();

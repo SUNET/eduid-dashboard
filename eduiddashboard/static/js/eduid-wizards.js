@@ -117,6 +117,9 @@ var EduidWizard = function (container_path, active_card, options) {
             type: 'POST',
             success: function (data, textStatus, jqXHR){
                 wizard.reset().close();
+                if (window.dismissNinsWizardChooser){
+                    window.dismissNinsWizardChooser();
+                }
             },
             error: function (event, jqXHR, ajaxSettings, thrownError) {
                 console.debug('Hey!, there are some errors here ' +
