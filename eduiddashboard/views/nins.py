@@ -159,13 +159,13 @@ class NINsActionsView(BaseActionsView):
         else:
             return self.sync_user()
 
-        if index != len(nins) - 1:
-            message = _("The provided nin can't be verified. You only "
-                        'can verify the last one')
-            return {
-                'result': 'bad',
-                'message': get_localizer(self.request).translate(message),
-            }
+#        if index != len(nins) - 1:
+#            message = _("The provided nin can't be verified. You only "
+#                        'can verify the last one')
+#            return {
+#                'result': 'bad',
+#                'message': get_localizer(self.request).translate(message),
+#            }
 
         return self._verify_action(verify_nin, post_data)
 
@@ -184,13 +184,13 @@ class NINsActionsView(BaseActionsView):
         else:
             return self.sync_user()
 
-        if index != len(nins) - 1:
-            message = _("The provided nin can't be verified. You only "
-                        'can verify the last one')
-            return {
-                'result': 'bad',
-                'message': get_localizer(self.request).translate(message),
-            }
+#        if index != len(nins) - 1:
+#            message = _("The provided nin can't be verified. You only "
+#                        'can verify the last one')
+#            return {
+#                'result': 'bad',
+#                'message': get_localizer(self.request).translate(message),
+#            }
 
         validation = validate_nin_by_mobile(self.request, self.user, nin)
         result = validation['success'] and 'ok' or 'error'
