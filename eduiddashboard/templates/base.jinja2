@@ -175,27 +175,25 @@
                     }
 
                     {% if open_wizard is defined and open_wizard %}
-                        {% if not has_mobile %}
-                        $('a#go-to-mobiles-tab').click(function (e) {
-                            $('div#nins-wizard-chooser').modal('hide');
-                            $('a.main-nav-tabs[href="#mobiles"]').click();
-                        });
-                        {% endif %}
+                    $('a#go-to-mobiles-tab').click(function (e) {
+                        $('div#nins-wizard-chooser').modal('hide');
+                        $('a.main-nav-tabs[href="#mobiles"]').click();
+                    });
 
-                        $('button#dismiss-wizard').click(function (e) {
-                            $('div#nins-wizard-chooser').modal('hide');
-                            currentwizard.cancelButton.click();
-                        });
+                    $('button#dismiss-wizard').click(function (e) {
+                        $('div#nins-wizard-chooser').modal('hide');
+                        currentwizard.cancelButton.click();
+                    });
 
-                        $('button#nins-wizard-choose-mm').click(function (e) {
-                            $('div#nins-wizard-chooser').modal('hide');
-                            currentwizard.show();
-                        });
+                    $('button#nins-wizard-choose-mm').click(function (e) {
+                        $('div#nins-wizard-chooser').modal('hide');
+                        currentwizard.show();
+                    });
 
-                        $('button#nins-wizard-choose-mb').click(function (e) {
-                            $('div#nins-wizard-chooser').modal('hide');
-                            $('button#ninsview-formadd').hide();
-                        });
+                    $('button#nins-wizard-choose-mb').click(function (e) {
+                        $('div#nins-wizard-chooser').modal('hide');
+                        $('button#ninsview-formadd').hide();
+                    });
                     {% endif %}
                 }, 'html');
             }
