@@ -316,7 +316,12 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   $("#askDialog").find('.finish-button').hide();
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
-  $("#askDialog span#eduid-object-to-confirm").html(identifier.split(' ')[0]);
+  var identifiers = identifier.split(' ');
+  if (identifiers.length > 1) {
+    $("#askDialog span#eduid-object-to-confirm").html(identifiers[0]);
+  } else {
+      $("#askDialog span#eduid-object-to-confirm").parent().empty();
+  }
   $("#askDialog .resend-code").attr('href', actionsURL);
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");
