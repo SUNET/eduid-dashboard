@@ -318,9 +318,9 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   $("#askDialog .resend-code").attr('data-identifier', identifier);
   var identifiers = identifier.split(' ');
   if (identifiers.length > 1) {
-    $("#askDialog span#eduid-object-to-confirm").html(identifiers[0]);
+    $("#askDialog span#eduid-object-to-confirm").html(identifiers[0]).parent().show();
   } else {
-      $("#askDialog span#eduid-object-to-confirm").parent().empty();
+      $("#askDialog span#eduid-object-to-confirm").parent().hide();
   }
   $("#askDialog .resend-code").attr('href', actionsURL);
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
