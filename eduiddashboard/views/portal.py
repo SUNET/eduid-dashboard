@@ -66,6 +66,7 @@ def profile_editor(context, request):
         'datakey': datakey,
         'has_mobile': has_confirmed_mobile(context.user),
         'nins_wizard_chooser_url': request.route_url('nins-wizard-chooser'),
+        'nins_verification_chooser_url': request.route_url('nins-verification-chooser'),
     }
 
     return view_context
@@ -293,6 +294,15 @@ def terminate_account(context, request):
              renderer='templates/nins-wizard-chooser.jinja2',
              request_method='GET', permission='edit')
 def nins_wizard_chooser(context, request):
+    return {
+            'has_mobile': has_confirmed_mobile(context.user),
+            }
+
+
+@view_config(route_name='nins-verification-chooser',
+             renderer='templates/nins-verification-chooser.jinja2',
+             request_method='GET', permission='edit')
+def nins_verification_chooser(context, request):
     return {
             'has_mobile': has_confirmed_mobile(context.user),
             }

@@ -98,6 +98,7 @@
     <div class="modal-body">
       <div class="info-container"></div>
       <div class="divDialogElements">
+        <p class="eduid-strong">{{ _('For') }} <span id="eduid-object-to-confirm"></span></p>
         <input class="xlarge" id="askDialogInput" name="xlInput" type="text" />
         <p>{{ _('Lost your confirmation code?')}} <a href="#" class="resend-code">{{ _('Resend confirmation code') }}</a></p>
         <p class="extra-info"></p>
@@ -200,6 +201,7 @@ $(document).ready(function () {
     $.get( '{{ "wizard-nins" | route_url }}', params, function (data, textStatus, jqXHR) {
         $('div.openwizard').html(data);
     });
+
   {% endif %}
 
     function showStatus() {
@@ -211,6 +213,8 @@ $(document).ready(function () {
       $('.nav-tabs li.active a.main-nav-tabs').click();
       showStatus();
     }
+    
+    window.eduidReloadTab = reloadTab;
 
     $('body').on('form-submitted action-executed', function() {
       // move the form messages to the messages main area
@@ -312,6 +316,12 @@ function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, as
   $("#askDialog").find('.finish-button').hide();
   document.getElementById("askDialogPrompt").innerHTML = prompt;
   $("#askDialog .resend-code").attr('data-identifier', identifier);
+  var identifiers = identifier.split(' ');
+  if (identifiers.length > 1) {
+    $("#askDialog span#eduid-object-to-confirm").html(identifiers[0]).parent().show();
+  } else {
+      $("#askDialog span#eduid-object-to-confirm").parent().hide();
+  }
   $("#askDialog .resend-code").attr('href', actionsURL);
   $("#askDialog .extra-info").html($(".askdialog-extra-info").html());
   $("#askDialog").modal("show");

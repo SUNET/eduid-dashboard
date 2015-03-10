@@ -183,6 +183,9 @@ def profile_urls(config):
 
     config.add_route('nins-wizard-chooser', '/nins-wizard-chooser/',
                      factory=NinsFactory)
+    config.add_route('nins-verification-chooser',
+                     '/nins-verification-chooser/',
+                     factory=NinsFactory)
 
 
 def admin_urls(config):

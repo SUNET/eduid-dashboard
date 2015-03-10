@@ -74,21 +74,32 @@
             container.find('table.table-form input[type=button]').click(function (e) {
                 var action = $(e.target).attr('name'),
                     value = $(e.target).attr('data-index'),
-                    actions_url = $('.actions-url').attr('data-url');
+                    actions_url = $('.actions-url').attr('data-url'),
+                    post_func = function (data, statusText, xhr) {
+                        if (data.result == 'getcode') {
+                            askCode(actions_url, action, container, value, data.message, data.placeholder);
+                        } else {
+                            sendInfo(container, data.result, data.message);
+                            $('body').trigger('action-executed');
+                        }
+                    };
+
+                if ($(e.target).attr('name') === 'verify_mb') {
+                    post_func = function (data, statusText, xhr) {
+                        if (data.result == 'error') {
+                            sendInfo(container, 'danger', data.message);
+                        } else {
+                            sendInfo(container, 'success', data.message);
+                            eduidReloadTab();
+                        }
+                    };
+                }
 
                 $.post(actions_url, {
                     action: action,
                     identifier: value
-                },
-                function(data, statusText, xhr) {
-                    if (data.result == 'getcode') {
-                        askCode(actions_url, action, container, value, data.message, data.placeholder);
-                    } else {
-                        sendInfo(container, data.result, data.message);
-                        $('body').trigger('action-executed');
-                    }
-                },
-                'json');
+                    },
+                    post_func, 'json');
             });
     };
     tabbedform.changetabs_calls.push(initialize);
