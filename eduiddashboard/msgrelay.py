@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from eduid_msg.celery import celery, get_message_relay
 import eduid_msg.tasks
-from eduid_msg.tasks import send_message, is_reachable, get_postal_address, set_audit_log_postal_address
+from eduid_msg.tasks import send_message, is_reachable, get_postal_address, set_audit_log_postal_address, get_relations_to
 
 import logging
 logger = logging.getLogger(__name__)
@@ -78,6 +78,7 @@ class MsgRelay(object):
         self._send_message = send_message
         self._is_reachable = is_reachable
         self._get_postal_address = get_postal_address
+        self._get_relations_to = get_relations_to
         self._set_audit_log_postal_address = set_audit_log_postal_address
 
     def get_language(self, lang):
@@ -204,6 +205,36 @@ class MsgRelay(object):
         if rtask.successful():
             result = rtask.get()
             return parse_address_dict(result)
+        else:
+            raise self.TaskFailed('Something goes wrong')
+
+    def get_relations_to(self, nin, relative_nin):
+        """
+        Get a list of the NAVET 'Relations' type codes between a NIN and a relatives NIN.
+
+        Known codes:
+            M = spouse (make/maka)
+            B = child (barn)
+            FA = father
+            MO = mother
+            VF = some kind of legal guardian status. Childs typically have ['B', 'VF'] it seems.
+
+        :param nin: Swedish National Identity Number
+        :param relative_nin: Another Swedish National Identity Number
+        :type nin: str | unicode
+        :type relative_nin: str | unicode
+        :return: List of codes. Empty list if the NINs are not related.
+        :rtype: [str | unicode]
+        """
+        rtask = self._get_relations_to.apply_async(args=[nin, relative_nin])
+        try:
+            rtask.wait()
+        except:
+            raise self.TaskFailed('Something goes wrong')
+
+        if rtask.successful():
+            result = rtask.get()
+            return result
         else:
             raise self.TaskFailed('Something goes wrong')
 
