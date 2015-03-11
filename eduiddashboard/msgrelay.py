@@ -69,6 +69,7 @@ class MsgRelay(object):
                                        'amqp://eduid:eduid@127.0.0.1:5672/eduid_msg'),
             'TEMPLATES_DIR': 'templates/',
             'CELERY_RESULT_BACKEND': 'amqp',
+            'CELERY_TASK_SERIALIZER': 'json',
         }
         celery.conf.update(config)
 
