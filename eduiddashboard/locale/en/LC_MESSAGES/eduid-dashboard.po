@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-12-16 14:51+0100\n"
+"POT-Creation-Date: 2015-04-01 13:05+0200\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -18,20 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: eduiddashboard/emails.py:32
+#: eduiddashboard/emails.py:33
 msgid "{site_name} confirmation email"
 msgstr ""
 
-#: eduiddashboard/emails.py:66
+#: eduiddashboard/emails.py:68
 msgid "{site_name} account termination"
 msgstr ""
 
-#: eduiddashboard/emails.py:106
+#: eduiddashboard/emails.py:109
 msgid "Reset your {site_name} password"
 msgstr ""
 
 #: eduiddashboard/models.py:21 eduiddashboard/models.py:68
-#: eduiddashboard/views/security.py:389
+#: eduiddashboard/views/security.py:390
 msgid "email"
 msgstr ""
 
@@ -158,11 +158,11 @@ msgstr ""
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-#: eduiddashboard/permissions.py:267
+#: eduiddashboard/permissions.py:262
 msgid "Not logged in"
 msgstr ""
 
-#: eduiddashboard/permissions.py:276
+#: eduiddashboard/permissions.py:271
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 
@@ -275,15 +275,15 @@ msgid ""
 "07</li><li>E-mail address: user@example.edu</li></ul>"
 msgstr ""
 
-#: eduiddashboard/verifications.py:92
+#: eduiddashboard/verifications.py:102
 msgid "National identity number {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:109
+#: eduiddashboard/verifications.py:126
 msgid "Mobile {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:128
+#: eduiddashboard/verifications.py:153
 msgid "Email {obj} verified"
 msgstr ""
 
@@ -617,7 +617,7 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:84
-#: eduiddashboard/views/security.py:184 eduiddashboard/views/security.py:447
+#: eduiddashboard/views/security.py:182 eduiddashboard/views/security.py:449
 msgid "Change password"
 msgstr ""
 
@@ -657,8 +657,8 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:104
-#: eduiddashboard/views/security.py:372 eduiddashboard/views/security.py:407
-#: eduiddashboard/views/security.py:448
+#: eduiddashboard/views/security.py:371 eduiddashboard/views/security.py:408
+#: eduiddashboard/views/security.py:450
 msgid "Cancel"
 msgstr ""
 
@@ -1308,6 +1308,10 @@ msgstr ""
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
+#: eduiddashboard/views/nins.py:402
+msgid "Add your national identity number"
+msgstr ""
+
 #: eduiddashboard/views/permissions.py:15
 msgid "Permissions"
 msgstr ""
@@ -1322,44 +1326,44 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: eduiddashboard/views/security.py:111
+#: eduiddashboard/views/security.py:113
 msgid "Password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:232
+#: eduiddashboard/views/security.py:230
 msgid "No authentication info"
 msgstr ""
 
-#: eduiddashboard/views/security.py:237
+#: eduiddashboard/views/security.py:235
 msgid "Stale authentication info. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/security.py:270
+#: eduiddashboard/views/security.py:268
 msgid "Your password has been successfully updated"
 msgstr ""
 
-#: eduiddashboard/views/security.py:272
+#: eduiddashboard/views/security.py:270
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 msgstr ""
 
-#: eduiddashboard/views/security.py:312
+#: eduiddashboard/views/security.py:310
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
 "your password."
 msgstr ""
 
-#: eduiddashboard/views/security.py:371 eduiddashboard/views/security.py:406
+#: eduiddashboard/views/security.py:370 eduiddashboard/views/security.py:407
 msgid "Reset password"
 msgstr ""
 
-#: eduiddashboard/views/security.py:429
+#: eduiddashboard/views/security.py:431
 msgid "Myndighetspost"
 msgstr ""
 
-#: eduiddashboard/views/security.py:450
+#: eduiddashboard/views/security.py:452
 msgid "Please choose a new password for your eduID account."
 msgstr ""
 
@@ -1932,35 +1936,5 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Update password"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "            <p>Choose a strong password:</p>\n"
-#~ "            <ul>\n"
-#~ "\t            <li>Use upper- and lowercase "
-#~ "characters (preferably not in the "
-#~ "beginning or end)</li>\n"
-#~ "\t            <li>Add digits somewhere else"
-#~ " than at the end of the "
-#~ "password</li>\n"
-#~ "\t            <li>Spaces are ignored</li>\n"
-#~ "            </ul>\n"
-#~ "        "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "                <p>Choose a strong password:</p>\n"
-#~ "                <ul>\n"
-#~ "    \t            <li>Use upper- and lowercase"
-#~ " characters (preferably not in the "
-#~ "beginning or end)</li>\n"
-#~ "\t                <li>Add digits somewhere "
-#~ "else than at the end of the "
-#~ "password</li>\n"
-#~ "   \t                <li>Spaces are ignored</li>\n"
-#~ "                </ul>\n"
-#~ "            "
 #~ msgstr ""
 
