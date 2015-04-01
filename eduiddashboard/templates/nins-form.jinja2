@@ -57,14 +57,11 @@
   {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
         You can access your governmental inbox using <a href="{{nin_service_url}}" target="_blank">{{nin_service_name}}</a>
   {% endtrans %}
+
+  <span class="dataholder" id="ninsform-data" data-msg_verifying="{{ _("We are verifying that the provided identity number is valid, please wait.") }}">
+
 {% endblock %}
 
    {% block extrajs %}
-   <script>
-       window.beforeSubmit = function () {
-           $('#ninsview-formadd').
-              prop('disabled', true).
-              after('<p class="nin-wait">{{_("We are verifying that the provided identity number is valid, please wait.")}}');
-       };
-   </script>
+    <script type="text/javascript" src="{{'eduiddashboard:static/js/nins-form.js'|static_url}}"></script>
    {% endblock %}

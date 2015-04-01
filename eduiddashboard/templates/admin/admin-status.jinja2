@@ -39,13 +39,5 @@
 {% endblock %}
 
 {% block extrajs %}
-<script>
-    $('#dbtabs a').click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-    })
-    $(function () {
-        $('#dbtabs a:first').tab('show');
-    })
-</script>
+    <script src="{{'eduiddashboard:static/js/admin-status.js'|static_url}}"></script>
 {% endblock %}
