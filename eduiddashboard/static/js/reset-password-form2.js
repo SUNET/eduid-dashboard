@@ -1,8 +1,8 @@
-<script src="{{'eduiddashboard:static/js/libs/zxcvbn-async.js'|static_url}}"></script>
-
-<script>
 (function () {
-    var password_min_entropy = {{request.registry.settings.get('password_entropy', 60)}},
+    var dataholder = $('span.dataholder#reset-password2-data'),
+        password_min_entropy = parseInt(dataholder.data('min_entropy')),
+        msg_stronger = dataholder.data('msg_stronger'),
+        msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,
         pwequality_errors = undefined,
         pwdialog = $("#resetPassword"),
@@ -121,7 +121,7 @@
 
             if (custom_password !== suggested_password &&
                   (verdict.entropy < password_min_entropy)) {
-                messages.push('{{ _("A stronger password is required.") }}');
+                messages.push(msg_stronger);
             }
             pwquality_errors = messages.length;
             error_messages(password_field.parent(), messages);
@@ -137,7 +137,7 @@
             repeated_password_field.val(repeated_password);  // properly remove spaces for pwcheck
 
             if (repeated_password != password) {
-                messages.push('{{_("Type the same password again")}}');
+                messages.push(msg_again);
             }
             pwequality_errors = messages.length;
             error_messages(repeated_password_field, messages);
@@ -152,7 +152,7 @@
     });
 
     /* Password meter */
-    var required_entropy = {{ request.registry.settings.get('password_entropy', 60) }};
+    var required_entropy = password_min_entropy;
     var pwbar_options = {};
     pwbar_options.ui = {
         //verdicts: ["Too weak", "Halfway", "Almost", "Strong"],
@@ -177,4 +177,3 @@
     $(document).ready(init_password_dialog);
 }());
 
-</script>
