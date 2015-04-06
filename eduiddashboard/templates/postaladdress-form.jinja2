@@ -64,17 +64,5 @@
 
 
 {% block extrajs %}
-<script>
- window.deform && deform.addCallback(
-    'postaladdressview-form',
-    function() {
-       $('button.alternative-postal-address-button').click(function (){
-           $(this).toggleClass('hide');
-           $('.alternative-postal-address-form').toggleClass('hide');
-       });
-
-       $("#postaladderessview-form div.controls input").first().focus();
-    }
-);
-</script>
+    <script type="text/javascript" src="{{'eduiddashboard:static/js/postaladdress-form.js'|static_url}}"></script>
 {% endblock %}
