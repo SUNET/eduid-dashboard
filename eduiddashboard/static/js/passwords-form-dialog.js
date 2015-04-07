@@ -1,7 +1,8 @@
 (function () {
-    var password_min_entropy = $('span.dataholder#password-form-dialog-data').data('entropy'),
-        msg_stronger = $('span.dataholder#password-form-dialog-data').data('msg_stronger'),
-        msg_again = $('span.dataholder#password-form-dialog-data').data('msg_again'),
+    var dataholder = $('span.dataholder#password-form-dialog-data'),
+        password_min_entropy = dataholder.data('entropy'),
+        msg_stronger = dataholder.data('msg_stronger'),
+        msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,
         pwequality_errors = undefined,
         pwdialog = $("#changePasswordDialog"),

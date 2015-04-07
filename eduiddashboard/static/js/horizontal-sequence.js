@@ -1,9 +1,10 @@
-function ($) {
-    var field_oid = $('span.dataholder#field-oid').data('fieldoid'),
-        min_len = $('span.dataholder#field-oid').data('min_len'),
-        max_len = $('span.dataholder#field-oid').data('max_len'),
-        now_len = $('span.dataholder#field-oid').data('now_len'),
-        orderable = $('span.dataholder#field-oid').data('orderable');
+(function ($) {
+    var dataholder = $('span.dataholder#field-oid'),
+        field_oid = dataholder.data('fieldoid'),
+        min_len = dataholder.data('min_len'),
+        max_len = dataholder.data('max_len'),
+        now_len = dataholder.data('now_len'),
+        orderable = dataholder.data('orderable');
      deform.addCallback(
        field_oid,
        function(oid) {
@@ -16,5 +17,4 @@ function ($) {
     if (orderable) {
         $( "#${oid}-orderable" ).sortable({handle: "span.deformOrderbutton"});
     }
-}(jQuery);
-
+}(jQuery));

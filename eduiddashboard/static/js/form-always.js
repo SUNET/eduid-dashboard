@@ -1,5 +1,4 @@
-
-function ($) {
+(function ($) {
     var field_formid = $('span.dataholder#field-formid').data('fieldformid');
     // Highlight all tabs with errors, move to the first one with the error
     window.deform && deform.addCallback(
@@ -31,4 +30,4 @@ function ($) {
             $('body').trigger('formready');
         }
     );
-}(jQuery);
+}(jQuery));

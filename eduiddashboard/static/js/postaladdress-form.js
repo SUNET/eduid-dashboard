@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
  window.deform && deform.addCallback(
     'postaladdressview-form',
     function() {
@@ -10,4 +10,4 @@ function ($) {
        $("#postaladderessview-form div.controls input").first().focus();
     }
 );
-}(jQuery);
+}(jQuery));

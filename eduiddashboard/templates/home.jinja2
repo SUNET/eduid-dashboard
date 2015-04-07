@@ -65,14 +65,16 @@
       </table>
       <hr>
     {% endif %}
+{% endblock %}
 
+{% block extra_jsdata %}
     <span class="dataholder" id="home-data" data-sLengthMenu="{{ _("Display _MENU_ records") }}"
                                             data-sInfo="{{ _("Showing _START_ to _END_ of _TOTAL_ entries") }}"
                                             data-sInfoFiltered="{{ _("filtered from _MAX_ records") }}"
                                             data-sSearch="{{ _("Filter") }}"
                                             data-sZeroRecords="{{ _("No users matching that search query was found") }}"
                                             data-sNext="{{ _("Next") }}"
-                                            data-sPrevious="{{ _("Previous") }}">
+                                            data-sPrevious="{{ _("Previous") }}"></span>
 {% endblock %}
 
 {% block extracss %}

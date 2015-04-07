@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
     var msg_invalidnin = $('span.dataholder#ninwizard-data').data('msg_invalidnin');
 
     window.validateNIN = function (el) {
@@ -15,5 +15,4 @@ function ($) {
            // if format is valid, then try to send to server
            return ret;
         };
-}(jQuery);
-
+}(jQuery));

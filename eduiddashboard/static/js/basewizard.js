@@ -1,14 +1,15 @@
-function ($) {
-    var step = $('span.dataholder#basewizard-data').data('step'),
-        datakey = $('span.dataholder#basewizard-data').data('datakey'),
-        model = $('span.dataholder#basewizard-data').data('model'),
-        path = $('span.dataholder#basewizard-data').data('path'),
-        msg_done = $('span.dataholder#basewizard-data').data('msg_done'),
-        msg_sending = $('span.dataholder#basewizard-data').data('msg_sending'),
-        msg_next = $('span.dataholder#basewizard-data').data('msg_next'),
-        msg_back = $('span.dataholder#basewizard-data').data('msg_back'),
-        msg_dismiss = $('span.dataholder#basewizard-data').data('msg_dismiss'),
-        msg_invalidnin = $('span.dataholder#basewizard-data').data('msg_invalidnin');
+(function ($) {
+    var dataholder = $('span.dataholder#basewizard-data'),
+        step = dataholder.data('step'),
+        datakey = dataholder.data('datakey'),
+        model = dataholder.data('model'),
+        path = dataholder.data('path'),
+        msg_done = dataholder.data('msg_done'),
+        msg_sending = dataholder.data('msg_sending'),
+        msg_next = dataholder.data('msg_next'),
+        msg_back = dataholder.data('msg_back'),
+        msg_dismiss = dataholder.data('msg_dismiss'),
+        msg_invalidnin = dataholder.data('msg_invalidnin');
 
     $.fn.wizard.logging = true;
     var active_card = step,
@@ -39,4 +40,4 @@ function ($) {
       }
       return ret;
     }
-}(jQuery);
+}(jQuery));

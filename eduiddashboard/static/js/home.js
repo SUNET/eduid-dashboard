@@ -1,11 +1,12 @@
-function ($) {
-    var sLengthMenu = $('span.dataholder#home-data').data('sLengthMenu'),
-        sInfo = $('span.dataholder#home-data').data('sInfo'),
-        sInfoFiltered = $('span.dataholder#home-data').data('sInfoFiltered'),
-        sSearch = $('span.dataholder#home-data').data('sSearch'),
-        sZeroRecords = $('span.dataholder#home-data').data('sZeroRecords'),
-        sNext = $('span.dataholder#home-data').data('sNext'),
-        sPrevious = $('span.dataholder#home-data').data('sPrevious');
+(function ($) {
+    var dataholder = $('span.dataholder#home-data'),
+        sLengthMenu = dataholder.data('sLengthMenu'),
+        sInfo = dataholder.data('sInfo'),
+        sInfoFiltered = dataholder.data('sInfoFiltered'),
+        sSearch = dataholder.data('sSearch'),
+        sZeroRecords = dataholder.data('sZeroRecords'),
+        sNext = dataholder.data('sNext'),
+        sPrevious = dataholder.data('sPrevious');
 
         $(document).ready( function () {
             $('#user-table').dataTable({
@@ -27,5 +28,4 @@ function ($) {
                 ]
             });
         } );
-}(jQuery);
-
+}(jQuery));

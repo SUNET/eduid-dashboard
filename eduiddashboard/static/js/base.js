@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
       if (window.messagesTimer === undefined) {
           window.messagesTimer = null;
       }
@@ -31,5 +31,5 @@ function ($) {
         });
         setMessagesTimer();
       });
-}(jQuery);
+}(jQuery));
 

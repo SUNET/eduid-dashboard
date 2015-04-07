@@ -1,5 +1,3 @@
-
-
 $(document).ready(
     (function () {
         var givenName = $('input[name="givenName"]'),

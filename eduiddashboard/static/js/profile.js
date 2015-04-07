@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
   var dataholder = $('span.dataholder#profile-data'),
       workmode = dataholder.data('workmode'),
       open_wizard = dataholder.data('openwizard'),
@@ -27,8 +27,8 @@ function ($) {
       $("button[data-toggle=tooltip]").tooltip();
       loa_popovers();
   
-      if (workmode === 'personal' and open_wizard) {
-        if (datakey !== '') {
+      if ((workmode === 'personal') && open_wizard) {
+        if (datakey === '') {
           var params = {};
         } else {
           var params = {
@@ -156,5 +156,5 @@ function ($) {
     $("#askDialog").modal("show");
   };
 
-}(jQuery);
+}(jQuery));
 

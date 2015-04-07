@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
     var msg_verifying = $('span.dataholder#ninsform-data').data('msg_verifying');
 
        window.beforeSubmit = function () {
@@ -6,5 +6,4 @@ function ($) {
               prop('disabled', true).
               after('<p class="nin-wait">' + msg_verifying + '</p>');
        };
-}(jQuery);
-
+}(jQuery));

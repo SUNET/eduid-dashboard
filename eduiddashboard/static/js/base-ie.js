@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
         if (!(window.console && console.log)) {
             (function() {
                 var noop = function() {};
@@ -9,5 +9,4 @@ function ($) {
                 }
             }());
         }
-}(jQuery);
-
+}(jQuery));

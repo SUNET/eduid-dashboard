@@ -1,4 +1,4 @@
-function ($) {
+(function ($) {
     var field_formid = $('span.dataholder#field-formid').data('fieldformid');
     window.deform && deform.addCallback(
        field_formid,
@@ -29,4 +29,4 @@ function ($) {
          $('#' + oid).ajaxForm($.extend(options, extra_options));
        }
     );
-}(jQuery);
+}(jQuery));

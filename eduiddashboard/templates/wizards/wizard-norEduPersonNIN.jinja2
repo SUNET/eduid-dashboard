@@ -39,10 +39,9 @@
     </div>
   </div>
 
-<span class="dataholder" id="ninwizard-data" data-msg_invalidnin="{{ _("Invalid identity number") }}" >
+  <span class="dataholder" id="ninwizard-data" data-msg_invalidnin="{{ _("Invalid identity number") }}" ></span>
 {% endblock %}
 
 {% block wizard_extrajs %}
-    {% super %}
     <script type="text/javascript" src="{{'eduiddashboard:static/js/wizard-norEduPersonNIN.js'|static_url}}"></script>
 {% endblock %}
