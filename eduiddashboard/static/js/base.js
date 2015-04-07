@@ -3,7 +3,7 @@
           window.messagesTimer = null;
       }
 
-      var clearMessages = function() {
+      window.clearMessages = function() {
         if (window.messagesTimer) {
           window.clearTimeout(window.messagesTimer);
         }
@@ -13,13 +13,13 @@
       };
 
       var setMessagesTimer = function () {
-        window.messagesTimer = window.setTimeout(clearMessages, 10000);
+        window.messagesTimer = window.setTimeout(window.clearMessages, 10000);
       };
 
       window.messagesResetTimer = function (index) {
         window.clearTimeout(window.messagesTimer);
         // do a fancy effect
-        window.setMessagesTimer();
+        setMessagesTimer();
         $($('.alert')[index]).animate({opacity: 0.25}, 150).delay(150).animate({opacity: 1}, 150);
 
       };

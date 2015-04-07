@@ -1,6 +1,6 @@
 (function () {
     var dataholder = $('span.dataholder#password-form-dialog-data'),
-        password_min_entropy = dataholder.data('entropy'),
+        password_min_entropy = parseInt(dataholder.data('entropy')),
         msg_stronger = dataholder.data('msg_stronger'),
         msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,

@@ -133,11 +133,7 @@
 
 {% block extra_jsdata %}
 <span class="dataholder" id="profile-data" data-workmode="{{ workmode }}"
-                                           {% if open_wizard is defined and open_wizard == 'True' %}
-                                             data-openwizard="true"
-                                           {% else %}
-                                             data-openwizard=""
-                                           {% endif %}
+                                           data-openwizard="{{ open_wizard }}"
                                            {% if datakey is defined and datakey %}
                                              data-datakey="{{ datakey }}"
                                            {% else %}

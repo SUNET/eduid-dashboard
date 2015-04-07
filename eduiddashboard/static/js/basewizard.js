@@ -1,6 +1,6 @@
 (function ($) {
     var dataholder = $('span.dataholder#basewizard-data'),
-        step = dataholder.data('step'),
+        step = parseInt(dataholder.data('step')),
         datakey = dataholder.data('datakey'),
         model = dataholder.data('model'),
         path = dataholder.data('path'),

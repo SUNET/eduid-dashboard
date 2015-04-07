@@ -5,7 +5,13 @@
       datakey = dataholder.data('datakey'),
       wizard_nins_url = dataholder.data('wizard_nins_url'),
       userstatus_url = dataholder.data('userstatus-url'),
-      polling_timeout = dataholder.data('polling_timeout');
+      polling_timeout = parseInt(dataholder.data('polling_timeout'));
+
+  if (open_wizard === 'True') {
+    open_wizard = true;
+  } else {
+    open_wizard = false;
+  }
 
   var loa_popovers = function () {
     $('.circles-widget-labels a').popover({
@@ -140,7 +146,7 @@
     input.askcallback(input.value);
   };
   
-  function askDialog(identifier, actionsURL, prompt, defaultvalue, placeholder, askcallback) {
+  window.askDialog = function (identifier, actionsURL, prompt, defaultvalue, placeholder, askcallback) {
     var input = document.getElementById("askDialogInput");
     input.value = defaultvalue;
     input.placeholder = placeholder;

@@ -78,7 +78,8 @@ class BaseFormView(FormView):
         }
 
     def failure(self, e):
-        rendered = e.render(request=self.request)
+        rendered = e.field.widget.serialize(e.field, e.cstruct,
+                                            request=self.request)
         context = {
             'form': rendered,
             }
