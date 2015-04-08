@@ -25,7 +25,12 @@ var TabbedForm = function (container) {
                         deform.callbacks.length === 0) {
                     target.find('span.scriptholder').each(function (i, e) {
                         var script_url = $(e).data('script');
-                        $.getScript(script_url);
+                        $.ajax({
+                          url: script_url,
+                          dataType: 'script',
+                          cache: true,
+                          async: false
+                        });
                     });
                 }
                 deform.processCallbacks();
