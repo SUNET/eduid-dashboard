@@ -1,6 +1,7 @@
 (function ($) {
-  alert('hihi');
-    var field_formid = $('span.dataholder#field-formid').data('fieldformid');
+    var dataholder = $('span.dataholder#field-formid'),
+        field_formid = dataholder.data('fieldformid'),
+        ajax_options = dataholder.data('ajax_options');
     window.deform && deform.addCallback(
        field_formid,
        function(oid) {
@@ -26,7 +27,7 @@
                 beforeSubmit: window.beforeSubmit
 
              },
-             extra_options = ${field.ajax_options} || {};
+             extra_options = ajax_options && $.parseJSON(ajax_options) || {};
          $('#' + oid).ajaxForm($.extend(options, extra_options));
        }
     );

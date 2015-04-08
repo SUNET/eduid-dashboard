@@ -1,6 +1,5 @@
 (function ($) {
     var msg_verifying = $('span.dataholder#ninsform-data').data('msg_verifying');
-
        window.beforeSubmit = function () {
            $('#ninsview-formadd').
               prop('disabled', true).

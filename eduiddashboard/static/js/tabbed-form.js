@@ -25,11 +25,15 @@ var TabbedForm = function (container) {
                         deform.callbacks.length === 0) {
                     target.find('span.scriptholder').each(function (i, e) {
                         var script_url = $(e).data('script');
+                        console.log('Fetching form script: ' + script_url);
                         $.ajax({
                           url: script_url,
                           dataType: 'script',
                           cache: true,
                           async: false
+                        })
+                        .complete(function (xhr, code) {
+                          console.log('Script ' + script_url + ' completed, status code: ' + code)
                         });
                     });
                 }

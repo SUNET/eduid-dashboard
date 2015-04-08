@@ -97,8 +97,9 @@
     </tal:block>
   </div>
 
-  <span class="dataholder" id="field-formid" data-fieldformid="${field.formid}"></span>
-  <span class="scriptholder" tal:condition="field.use_ajax" data-script="${request.static_url('eduiddashboard:static/js/form-use-ajax.js')}"></span> 
+  <span class="dataholder" id="field-formid" data-fieldformid="${field.formid}"
+                                             data-ajax_options='${field.ajax_options}'></span>
   <span class="scriptholder" data-script="${request.static_url('eduiddashboard:static/js/form-always.js')}"></span>
+  <span class="scriptholder" tal:condition="field.use_ajax" data-script="${request.static_url('eduiddashboard:static/js/form-use-ajax.js')}"></span> 
 
 </form>
