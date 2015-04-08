@@ -15,12 +15,11 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_am.userdb import UserDB
+from eduid_userdb.userdb import UserDB
 import eduid_am.exceptions
-from eduid_am.user import User
-from eduid_am import testing as am
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.saml2 import includeme as saml2_includeme
-from eduiddashboard.testing import get_db
+from eduid_userdb.testing import MongoTemporaryInstance
 
 
 class MockedUserDB(UserDB):
@@ -50,11 +49,11 @@ class MockedUserDB(UserDB):
     def get_user(self, userid):
         if userid not in self.test_users:
             raise self.exceptions.UserDoesNotExist
-        return User(self.test_users.get(userid))
+        return OldUser(self.test_users.get(userid))
     
     def all_users(self):
         for user in self.test_users.values():
-            yield User(deepcopy(user))
+            yield OldUser(deepcopy(user))
 
     def all_userdocs(self):
         for user in self.test_users.values():
@@ -113,6 +112,8 @@ class Saml2RequestTests(unittest.TestCase):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
 
+        self.tmp_db = MongoTemporaryInstance.get_instance()
+
         self.settings = {
             'saml2.settings_module': path.join(path.dirname(__file__),
                                                'tests/data/saml2_settings.py'),
@@ -120,7 +121,7 @@ class Saml2RequestTests(unittest.TestCase):
             'saml2.logout_redirect_url': '/',
             'saml2.user_main_attribute': 'mail',
             'auth_tk_secret': '123456',
-            'mongo_uri': am.MONGO_URI_TEST,
+            'mongo_uri': self.tmp_db.get_uri('eduid_dashboard_test'),
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',
             'jinja2.undefined': 'strict',
@@ -138,7 +139,7 @@ class Saml2RequestTests(unittest.TestCase):
         self.testapp = TestApp(app)
         self.userdb = MockedUserDB()
         try:
-            self.db = get_db(self.settings)
+            self.db = self.tmp_db.conn['eduid_dashboard_test']
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
                 self.settings['mongo_uri']))

@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
-from pyramid.httpexceptions import HTTPFound
 
-from eduid_am.user import User
+from eduid_userdb.user import User
 from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash

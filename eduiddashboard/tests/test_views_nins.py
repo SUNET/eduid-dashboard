@@ -4,21 +4,21 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb.userdb import UserDB
+from eduiddashboard.user import User
+from eduiddashboard.testing import LoggedInRequestTests
 
 
 def return_true(*args, **kwargs):
     return True
 
 
-class NinsFormTests(LoggedInReguestTests):
+class NinsFormTests(LoggedInRequestTests):
 
     formname = 'ninsview-form'
 
     def test_logged_get(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response = self.testapp.get('/profile/nins/')
 
         self.assertEqual(response.status, '200 OK')
@@ -29,7 +29,7 @@ class NinsFormTests(LoggedInReguestTests):
         self.assertEqual(response.status, '302 Found')
 
     def test_add_valid_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/nins/')
 
@@ -54,7 +54,7 @@ class NinsFormTests(LoggedInReguestTests):
                 self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_not_valid_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         nin = '200010100001-'
         response_form = self.testapp.get('/profile/nins/')
@@ -75,7 +75,7 @@ class NinsFormTests(LoggedInReguestTests):
 
     def test_add_existant_nin(self):
         from eduiddashboard.msgrelay import MsgRelay
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response_form = self.testapp.get('/profile/nins/')
         form = response_form.forms[self.formname]
         nin = '200010100001'
@@ -100,7 +100,7 @@ class NinsFormTests(LoggedInReguestTests):
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response = self.testapp.post(
             '/profile/nins-actions/',
@@ -153,7 +153,7 @@ class NinsFormTests(LoggedInReguestTests):
 
     @unittest.skip('Functionality temporary removed')
     def test_remove_not_existant_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response = self.testapp.post(
             '/profile/nins-actions/',
@@ -163,7 +163,7 @@ class NinsFormTests(LoggedInReguestTests):
         self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_steal_verified_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/nins/')
 
@@ -214,7 +214,7 @@ class NinsFormTests(LoggedInReguestTests):
             self.assertNotIn(nin, old_user.get_nins())
 
 
-class NinWizardTests(LoggedInReguestTests):
+class NinWizardTests(LoggedInRequestTests):
 
     users = [{
         'mail': 'johnsmith@example.com',
@@ -227,7 +227,7 @@ class NinWizardTests(LoggedInReguestTests):
     }]
 
     def test_no_display_wizard(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/profile/', status=200)
         self.assertNotIn('openwizard', response.body)
 
@@ -236,17 +236,17 @@ class NinWizardTests(LoggedInReguestTests):
         self.testapp.get('/profile/nin-wizard/', status=302)
 
     def test_display_wizard(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response = self.testapp.get('/profile/', status=200)
         self.assertIn('openwizard', response.body)
 
     def test_get_wizard_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response = self.testapp.get('/profile/nin-wizard/', status=200)
         self.assertIn('norEduPersonNIN', response.body)
 
     def test_step0_notvalid_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 0,
@@ -255,7 +255,7 @@ class NinWizardTests(LoggedInReguestTests):
         self.assertEqual(response.json['status'], 'failure')
 
     def test_step0_valid_nin(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 0,
@@ -264,7 +264,7 @@ class NinWizardTests(LoggedInReguestTests):
         self.assertEqual(response.json['status'], 'failure')
 
     def test_step_storage(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         from eduiddashboard.msgrelay import MsgRelay
 
@@ -279,7 +279,7 @@ class NinWizardTests(LoggedInReguestTests):
             self.assertIn('initial_card = 1', response.body)
 
 
-class NinWizardStep1Tests(LoggedInReguestTests):
+class NinWizardStep1Tests(LoggedInRequestTests):
 
     users = [{
         'mail': 'johnsmith@example.com',
@@ -302,7 +302,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
     }]
 
     def test_step1_valid_code(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         from eduiddashboard.msgrelay import MsgRelay
 
@@ -324,7 +324,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                 self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 1,

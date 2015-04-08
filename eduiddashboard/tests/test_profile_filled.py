@@ -4,12 +4,12 @@ import re
 
 from mock import patch
 
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb.userdb import UserDB
+from eduiddashboard.user import User
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class ProfileFilledTests(LoggedInReguestTests):
+class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_100(self):
         self.set_logged()

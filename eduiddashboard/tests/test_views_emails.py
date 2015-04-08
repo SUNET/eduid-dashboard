@@ -4,12 +4,12 @@ import re
 
 from mock import patch
 
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb.userdb import UserDB
+from eduiddashboard.user import User
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class MailsFormTests(LoggedInReguestTests):
+class MailsFormTests(LoggedInRequestTests):
 
     formname = 'emailsview-form'
 
@@ -182,7 +182,7 @@ class MailsFormTests(LoggedInReguestTests):
         self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
 
     def test_steal_verified_mail(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/emails/')
 

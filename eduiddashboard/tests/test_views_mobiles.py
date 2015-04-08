@@ -3,13 +3,13 @@ from bson import ObjectId
 
 from mock import patch
 
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb import UserDB
+from eduiddashboard.user import User
+from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard.msgrelay import MsgRelay
 
 
-class MobilesFormTests(LoggedInReguestTests):
+class MobilesFormTests(LoggedInRequestTests):
 
     formname = 'mobilesview-form'
 
@@ -156,7 +156,7 @@ class MobilesFormTests(LoggedInReguestTests):
         self.assertEqual(verified_mobile['verified'], True)
 
     def test_steal_verified_mobile(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/mobiles/')
 

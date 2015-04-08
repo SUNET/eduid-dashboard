@@ -12,7 +12,7 @@ from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
-from eduid_am.user import User
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
@@ -315,7 +315,7 @@ class NinsView(BaseFormView):
             })
 
         if old_user:
-            old_user = User(old_user)
+            old_user = OldUser(old_user)
             old_user.retrieve_modified_ts(self.request.db.profiles)
             nins = [nin for nin in old_user.get_nins() if nin != newnin]
             old_user.set_nins(nins)

@@ -3,7 +3,7 @@
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
-from eduid_am.user import User
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Permissions
@@ -37,7 +37,7 @@ class PermissionsView(BaseFormView):
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
         ma = self.context.main_attribute
-        if self.context.user.get(ma) == self.request.session.get('user', User({})).get(ma):
+        if self.context.user.get(ma) == self.request.session.get('user', OldUser({})).get(ma):
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False

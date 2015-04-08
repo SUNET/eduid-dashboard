@@ -1,7 +1,7 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class PermissionsFormTestsAdminMode(LoggedInReguestTests):
+class PermissionsFormTestsAdminMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
@@ -32,7 +32,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
                          status=302)
 
     def test_logged_withoutpermissions_get(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
@@ -52,7 +52,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
                                 ['urn:mace:eduid.se:role:admin'])
 
     def test_logged_remove_admin_permissions(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email ='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.org/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
@@ -65,7 +65,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
         self.values_are_checked(res.form.fields.get('checkbox'),
                                 ['urn:mace:eduid.se:role:ra'])
 
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
@@ -85,7 +85,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
                                 ['urn:mace:eduid.se:role:admin'])
 
 
-class PermissionsFormTestsPersonalMode(LoggedInReguestTests):
+class PermissionsFormTestsPersonalMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 

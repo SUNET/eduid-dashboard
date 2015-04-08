@@ -7,16 +7,14 @@ import simplejson as json
 import vccs_client
 import pytz
 
-from eduid_am.exceptions import UserDoesNotExist
-from eduid_am.user import User
-
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.user import User
+from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import vccs
-from eduiddashboard.vccs import (check_password, add_credentials,
-                        provision_credentials)
+from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
 
 import logging
 log = logging.getLogger(__name__)
+
 
 class FakeVCCSClient(vccs_client.VCCSClient):
 
@@ -52,7 +50,7 @@ class FakeVCCSClient(vccs_client.VCCSClient):
         return json.dumps(fake_response)
 
 
-class PasswordFormTests(LoggedInReguestTests):
+class PasswordFormTests(LoggedInRequestTests):
 
     formname = 'passwordsview-form'
     initial_password = 'old-password'
@@ -207,7 +205,7 @@ FAKE_SESSION_INFO = {
     'not_on_or_after': 1417031214}
 
 
-class TerminateAccountTests(LoggedInReguestTests):
+class TerminateAccountTests(LoggedInRequestTests):
 
     def test_reset_password_unterminates_account(self):
         request = self.set_logged()
@@ -312,7 +310,7 @@ class MockedUserDB(MUDB):
     }
 
 
-class ResetPasswordFormTests(LoggedInReguestTests):
+class ResetPasswordFormTests(LoggedInRequestTests):
 
     formname = 'passwordsview-form'
     initial_password = 'old-password'
