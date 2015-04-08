@@ -98,7 +98,7 @@
   </div>
 
   <span class="dataholder" id="field-formid" data-fieldformid="${field.formid}"></span>
-  <script type="text/javascript" tal:condition="field.use_ajax" src="${request.static_url('eduiddashboard:static/js/form-use-ajax.js')}"></script> 
-  <script type="text/javascript" src="${request.static_url('eduiddashboard:static/js/form-always.js')}"></script>
+  <span class="scriptholder" data-script="${request.static_url('eduiddashboard:static/js/form-use-ajax.js')}"></span> 
+  <span class="scriptholder" data-script="${request.static_url('eduiddashboard:static/js/form-always.js')}"></span>
 
 </form>

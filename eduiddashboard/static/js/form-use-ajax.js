@@ -1,4 +1,5 @@
 (function ($) {
+  alert('hihi');
     var field_formid = $('span.dataholder#field-formid').data('fieldformid');
     window.deform && deform.addCallback(
        field_formid,

@@ -60,9 +60,7 @@
   <h5>{% trans %}Alternative postal address{% endtrans %}</h5>
  {{ form|safe }}
 </div>
-{% endblock %}
 
+<span class="scriptholder" data-script="{{'eduiddashboard:static/js/postaladdress-form.js'|static_url}}"></span>
 
-{% block extrajs %}
-    <script type="text/javascript" src="{{'eduiddashboard:static/js/postaladdress-form.js'|static_url}}"></script>
 {% endblock %}

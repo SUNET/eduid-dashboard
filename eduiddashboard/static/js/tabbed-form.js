@@ -23,9 +23,9 @@ var TabbedForm = function (container) {
                 $('div.tab-pane.active button.btn-primary').enable(false);
                 if (deform.callbacks !== undefined &&
                         deform.callbacks.length === 0) {
-                    $('form script').each(function (i, e) {
-                        var f = new Function(e.innerHTML);
-                        f();
+                    target.find('span.scriptholder').each(function (i, e) {
+                        var script_url = $(e).data('script');
+                        $.getScript(script_url);
                     });
                 }
                 deform.processCallbacks();

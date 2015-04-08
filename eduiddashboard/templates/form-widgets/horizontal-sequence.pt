@@ -41,7 +41,7 @@
                                           data-max_len="${max_len}"
                                           data-now_len="${now_len}"
                                           data-orderable="${orderable}" ></span>
-  <script type="text/javascript" src="${request.static_url('eduiddashboard:static/js/horizontal-sequence.js')}"></script> 
+  <span class="scriptholder" data-script="${request.static_url('eduiddashboard:static/js/horizontal-sequence.js')}"></span> 
   <input type="hidden" name="__end__" value="${field.name}:sequence"/>
   <!-- /sequence -->
 </div>
