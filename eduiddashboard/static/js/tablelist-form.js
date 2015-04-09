@@ -6,7 +6,7 @@
     "use strict";
 
     var sendInfo = function(container, cls, msg) {
-            if (cls === 'out_of_sync') { cls = 'error' }
+            if (cls === 'out_of_sync' || cls === 'error') { cls = 'danger' }
             if (cls === 'ok') {cls = 'success'}
             var messageHTML = '<div class="alert alert-' + cls +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
