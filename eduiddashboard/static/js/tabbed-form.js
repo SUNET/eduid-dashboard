@@ -9,6 +9,24 @@ if (window.tabbedform.changetabs_calls === undefined) {
     window.tabbedform.changetabs_calls = [];
 }
 
+jQuery.fn.initDeformCallbacks = function () {
+    if (deform.callbacks !== undefined &&
+            deform.callbacks.length === 0) {
+        this.find('span.scriptholder').each(function (i, e) {
+            var script_url = $(e).data('script');
+            console.log('Fetching form script: ' + script_url);
+            $.ajax({
+              url: script_url,
+              dataType: 'script',
+              cache: true,
+              async: false
+            })
+            .complete(function (xhr, code) {
+              console.log('Script ' + script_url + ' completed, status code: ' + code)
+            });
+        });
+    }
+};
 
 var TabbedForm = function (container) {
     "use strict";
@@ -21,22 +39,7 @@ var TabbedForm = function (container) {
                 };
                 target.html(data);
                 $('div.tab-pane.active button.btn-primary').enable(false);
-                if (deform.callbacks !== undefined &&
-                        deform.callbacks.length === 0) {
-                    target.find('span.scriptholder').each(function (i, e) {
-                        var script_url = $(e).data('script');
-                        console.log('Fetching form script: ' + script_url);
-                        $.ajax({
-                          url: script_url,
-                          dataType: 'script',
-                          cache: true,
-                          async: false
-                        })
-                        .complete(function (xhr, code) {
-                          console.log('Script ' + script_url + ' completed, status code: ' + code)
-                        });
-                    });
-                }
+                target.initDeformCallbacks();
                 deform.processCallbacks();
                 $('div.tab-pane.active button.btn-primary').enable(true);
 
@@ -112,7 +115,7 @@ var TabbedForm = function (container) {
                 });
             });
 
-            $('body').bind('reloadtabs', function () {
+            $('body').one('reloadtabs', function () {
                 initialize_nav_tabs();
                 initialize_pending_actions();
             });

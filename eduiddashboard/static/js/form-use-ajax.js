@@ -8,7 +8,7 @@
          if (window.beforeSubmit === undefined) {
             window.beforeSubmit = function () {};
          }
-
+         var targetElem = $('#' + oid);
          var options = {
                 target: '#' + oid,
                 replaceTarget: true,
@@ -17,6 +17,7 @@
                   if (loc) {
                       document.location = loc;
                   };
+                  targetElem.initDeformCallbacks();
                   deform.processCallbacks();
                   deform.focusFirstInput();
                   $('body').trigger('form-submitted');
@@ -28,7 +29,8 @@
 
              },
              extra_options = ajax_options && $.parseJSON(ajax_options) || {};
-         $('#' + oid).ajaxForm($.extend(options, extra_options));
+         console.log('Set AJAX form at ' + oid);
+         targetElem.ajaxForm($.extend(options, extra_options));
        }
     );
 }(jQuery));
