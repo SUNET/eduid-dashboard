@@ -120,15 +120,24 @@ class BaseFactory(object):
         return True
 
     def get_user(self):
+        """
+        Get the current user.
 
+        In 'personal' mode, this is the logged in user. In 'admin' mode, it is the
+        'edit-user' user from the session, or the user indicated by the matchdict
+        'userid'. Matchdict is a part of the URL extracted by Pyramid with routes like
+        '/users/{userid}/'.
+
+        :return: User object
+        :rtype: OldUser()
+        """
         # Cache user until the request is completed
         if self.user is not None:
             return self.user
 
-        user = None
         if self.workmode == 'personal':
             user = self.request.session.get('user', OldUser({}))
-        else:
+        elif self.workmode == 'admin' or self.workmode == 'helpdesk':
             user = self.request.session.get('edit-user', None)
             if user is None:
                 userid = self.request.matchdict.get('userid', '')
@@ -138,8 +147,15 @@ class BaseFactory(object):
                     user = self.request.userdb.get_user_by_oid(userid)
                 if not user:
                     raise HTTPNotFound()
-                user.retrieve_modified_ts(self.request.db.profiles)
                 self.request.session['edit-user'] = user
+        else:
+            raise NotImplementedError("Unknown workmode: {!s}".format(self.workmode))
+
+        # Get the modified_ts from the user document in the dashboards private user
+        # database, since that is where we will be writing any updates
+        user.retrieve_modified_ts(self.request.db.profiles)
+        assert user.get_modified_ts() is not None
+
         return user
 
     def route_url(self, route, **kw):
