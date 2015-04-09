@@ -14,8 +14,9 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_userdb.db import MongoDB
+from eduid_userdb import MongoDB, UserDB
 from eduiddashboard.user import DashboardLegacyUser as OldUser
+from eduiddashboard.userdb import DashboardUserDB
 from eduid_userdb.testing import MongoTestCase, MOCKED_USER_STANDARD
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
@@ -177,6 +178,8 @@ class LoggedInRequestTests(MongoTestCase):
 
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database()
+        self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
+        self.userdb_new = UserDB(self.mongodb_uri('eduid_userdb'))
         # Clean up the dashboards private database collections
         logger.debug("Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         self.db.profiles.drop()
@@ -219,6 +222,11 @@ class LoggedInRequestTests(MongoTestCase):
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(email)
         user_obj = self.userdb.get_user_by_mail(email)
+        if not user_obj:
+            logging.error("User {!s} not found in database {!r}. Users:".format(email, self.userdb))
+            for this in self.userdb._get_all_userdocs():
+                this_user = OldUser(this)
+                logging.debug("  User: {!s}".format(this_user))
         # user only exists in eduid-userdb, so need to clear modified-ts to be able
         # to save it to eduid-dashboard.profiles
         user_obj.set_modified_ts(None)

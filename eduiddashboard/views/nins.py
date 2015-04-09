@@ -94,27 +94,35 @@ def get_not_verified_nins_list(request, user):
     :return: List of NINs pending confirmation
     :rtype: [string]
     """
-    active_nins = user.get_nins()
-    nins = []
-    verifications = request.db.verifications
-    not_verified_nins = verifications.find({
+    users_nins = user.get_nins()
+    res = []
+    user_already_verified = []
+    user_not_verified = []
+    verifications = request.db.verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
-    if active_nins:
-        active_nin = active_nins[-1]
-        nin_found = False
-        for nin in not_verified_nins:
-            if active_nin == nin['obj_id']:
-                nin_found = True
-            elif nin_found and not nin['verified']:
-                nins.append(nin['obj_id'])
-    else:
-        for nin in not_verified_nins:
-            if not nin['verified']:
-                nins.append(nin['obj_id'])
+    if users_nins:
+        if isinstance(users_nins[0], dict):
+            for this in users_nins:
+                if this['verified']:
+                    user_already_verified.append(this['number'])
+                else:
+                    user_not_verified.append(this['number'])
+        else:
+            # old style, list of strings (understood to be verified)
+            user_already_verified = users_nins
+    for this in verifications:
+        if this['verified']:
+            if this['obj_id'] in user_not_verified:
+                # Found to be verified after all, filter out from user_not_verified
+                user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
+        else:
+            if this['obj_id'] not in user_already_verified:
+                res.append(this['obj_id'])
+    res += user_not_verified
     # As we no longer remove verification documents make the list items unique
-    return list(set(nins))
+    return list(set(res))
 
 
 def get_active_nin(self):

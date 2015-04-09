@@ -4,7 +4,7 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 
-from eduid_userdb.userdb import UserDB
+from eduiddashboard.userdb import UserDBWrapper
 from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
@@ -17,8 +17,24 @@ class NinsFormTests(LoggedInRequestTests):
 
     formname = 'ninsview-form'
 
+    #no_nin_user_email = 'johnsmith@example.org'
+    #users = [{
+    #    'mail': no_nin_user_email,
+    #    #'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
+    #    'norEduPersonNIN': []
+    #}]
+
+
+    def setUp(self):
+        super(NinsFormTests, self).setUp()
+        # these tests want the self.user user to not have a NIN
+        self.no_nin_user_email = 'johnsmith@example.org'
+        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
+        user.set_nins([])
+        self.userdb.save(user)
+
     def test_logged_get(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.get('/profile/nins/')
 
         self.assertEqual(response.status, '200 OK')
@@ -29,9 +45,10 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response.status, '302 Found')
 
     def test_add_valid_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         response_form = self.testapp.get('/profile/nins/')
+        response_form.mustcontain(self.formname)
 
         self.assertNotIn('johnsmith@example.info', response_form.body)
 
@@ -40,12 +57,12 @@ class NinsFormTests(LoggedInRequestTests):
         form['norEduPersonNIN'].value = nin
 
         from eduiddashboard.msgrelay import MsgRelay
-        with patch.object(UserDB, 'exists_by_filter', clear=True):
+        with patch.object(UserDBWrapper, 'exists_by_filter', clear=True):
 
             with patch.multiple(MsgRelay, nin_validator=return_true,
                                 nin_reachable=return_true):
 
-                UserDB.exists_by_filter.return_value = False
+                UserDBWrapper.exists_by_filter.return_value = False
 
                 response = form.submit('add')
 
@@ -54,7 +71,7 @@ class NinsFormTests(LoggedInRequestTests):
                 self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_not_valid_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         nin = '200010100001-'
         response_form = self.testapp.get('/profile/nins/')
@@ -65,9 +82,9 @@ class NinsFormTests(LoggedInRequestTests):
         form = response_form.forms[self.formname]
 
         form['norEduPersonNIN'].value = nin
-        with patch.object(UserDB, 'exists_by_filter', clear=True):
+        with patch.object(UserDBWrapper, 'exists_by_filter', clear=True):
 
-            UserDB.exists_by_filter.return_value = False
+            UserDBWrapper.exists_by_filter.return_value = False
             response = form.submit('add')
 
             self.assertEqual(response.status, '200 OK')
@@ -78,22 +95,22 @@ class NinsFormTests(LoggedInRequestTests):
 
     def test_add_existant_nin(self):
         from eduiddashboard.msgrelay import MsgRelay
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response_form = self.testapp.get('/profile/nins/')
         form = response_form.forms[self.formname]
         nin = '200010100001'
         # First we add a nin...
-        with patch.object(UserDB, 'exists_by_filter', clear=True):
+        with patch.object(UserDBWrapper, 'exists_by_filter', clear=True):
             with patch.multiple(MsgRelay, nin_validator=return_true,
                                 nin_reachable=return_true):
-                UserDB.exists_by_filter.return_value = True
+                UserDBWrapper.exists_by_filter.return_value = True
                 form['norEduPersonNIN'].value = nin
                 form.submit('add')
         # ...and then we try to add it again.
-        with patch.object(UserDB, 'exists_by_filter', clear=True):
+        with patch.object(UserDBWrapper, 'exists_by_filter', clear=True):
             with patch.multiple(MsgRelay, nin_validator=return_true,
                                 nin_reachable=return_true):
-                UserDB.exists_by_filter.return_value = True
+                UserDBWrapper.exists_by_filter.return_value = True
                 form['norEduPersonNIN'].value = nin
                 response = form.submit('add')
 
@@ -103,7 +120,7 @@ class NinsFormTests(LoggedInRequestTests):
             self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         response = self.testapp.post(
             '/profile/nins-actions/',
@@ -113,7 +130,27 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_verify_existant_nin(self):
-        self.set_logged()
+        # Add a non-verified NIN to the user with no NINs
+        email = self.no_nin_user_email
+        user = self.userdb.get_user_by_mail(email)
+        user.set_nins([{'number': '123456789050',
+                        'verified': False,
+                        'primary': True,
+                       }])
+        self.userdb.save(user)
+        # Set up a pending verfication
+        verification_data = {
+            '_id': ObjectId(),
+            'code': '123124',
+            'model_name': 'norEduPersonNIN',
+            'obj_id': '123456789050',
+            'user_oid': user.get_id(),
+            'timestamp': datetime.utcnow(),
+            'verified': False,
+        }
+        self.db.verifications.insert(verification_data)
+
+        self.set_logged(email)
 
         response = self.testapp.post(
             '/profile/nins-actions/',
@@ -156,7 +193,7 @@ class NinsFormTests(LoggedInRequestTests):
 
     @unittest.skip('Functionality temporary removed')
     def test_remove_not_existant_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         response = self.testapp.post(
             '/profile/nins-actions/',
@@ -166,7 +203,7 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_steal_verified_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         response_form = self.testapp.get('/profile/nins/')
 
@@ -186,7 +223,8 @@ class NinsFormTests(LoggedInRequestTests):
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)
 
-        self.assertIn(nin, old_user.get_nins())
+        nins_list = [x['number'] for x in old_user.get_nins()]
+        self.assertIn(nin, nins_list)
 
         nin_doc = self.db.verifications.find_one({
             'model_name': 'norEduPersonNIN',
@@ -229,6 +267,7 @@ class NinWizardTests(LoggedInRequestTests):
         'norEduPersonNIN': []
     }]
 
+    no_nin_user_email = 'johnsmith@example.org'
     def test_no_display_wizard(self):
         self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/profile/', status=200)
@@ -239,17 +278,17 @@ class NinWizardTests(LoggedInRequestTests):
         self.testapp.get('/profile/nin-wizard/', status=302)
 
     def test_display_wizard(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.get('/profile/', status=200)
         self.assertIn('openwizard', response.body)
 
     def test_get_wizard_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.get('/profile/nin-wizard/', status=200)
         self.assertIn('norEduPersonNIN', response.body)
 
     def test_step0_notvalid_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 0,
@@ -258,7 +297,7 @@ class NinWizardTests(LoggedInRequestTests):
         self.assertEqual(response.json['status'], 'failure')
 
     def test_step0_valid_nin(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 0,
@@ -267,7 +306,7 @@ class NinWizardTests(LoggedInRequestTests):
         self.assertEqual(response.json['status'], 'failure')
 
     def test_step_storage(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         from eduiddashboard.msgrelay import MsgRelay
 
@@ -279,17 +318,19 @@ class NinWizardTests(LoggedInRequestTests):
                 'norEduPersonNIN': '12341234-1234',
             }, status=200)
             response = self.testapp.get('/profile/', status=200)
-            self.assertIn('initial_card = 1', response.body)
+            response.mustcontain('initial_card = 1')
 
 
 class NinWizardStep1Tests(LoggedInRequestTests):
+
+    no_nin_user_email = 'johnsmith@example.org'
 
     users = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
         'norEduPersonNIN': ['197801011234']
     }, {
-        'mail': 'johnsmith@example.org',
+        'mail': no_nin_user_email,
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
         'norEduPersonNIN': []
     }]
@@ -305,7 +346,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
     }]
 
     def test_step1_valid_code(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
 
         from eduiddashboard.msgrelay import MsgRelay
 
@@ -327,7 +368,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                 self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 1,

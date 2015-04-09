@@ -33,13 +33,69 @@
 #           Fredrik Thulin <fredrik@thulin.net>
 #
 
+import copy
 from datetime import datetime
 
 from eduid_am.tasks import update_attributes
-from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync, UserDBValueError
 
+from eduid_userdb import User
+
+import bson
 import logging
 log = logging.getLogger('eduiddashboard')
+
+
+class DashboardUser(User):
+    """
+    Subclass of eduid_userdb.User with eduid Dashboard application specific data.
+    """
+
+    def __init__(self, userid = None, eppn = None, subject = 'physical person', data = None):
+        data_in = data
+        data = copy.copy(data_in)  # to not modify callers data
+
+        if data is None:
+            if userid is None:
+                userid = bson.ObjectId()
+            data = dict(_id = userid,
+                        eduPersonPrincipalName = eppn,
+                        subject = subject,
+                        )
+        _terminated = data.pop('terminated', None)
+
+        User.__init__(self, data = data)
+
+        # now self._data exists so we can call our setters
+        self.terminated = _terminated
+
+    def to_dict(self, old_userdb_format=False):
+        res = User.to_dict(self, old_userdb_format=old_userdb_format)
+        res['terminated'] = self.terminated
+        return res
+
+    # -----------------------------------------------------------------
+    @property
+    def terminated(self):
+        """
+        Get the user's terminated status (False or the timestamp when the user was terminated).
+
+        :rtype: False | datetime
+        """
+        return self._data.get('terminated', False)
+
+    @terminated.setter
+    def terminated(self, value):
+        """
+        :param value: Set the user's terminated status.
+        :type value: bool
+        """
+        if value is not None:
+            if not isinstance(value, bool) and not isinstance(value, datetime):
+                raise UserDBValueError('Non-bool/datetime terminated value')
+            if value is True:
+                value = datetime.utcnow()
+            self._data['terminated'] = value
 
 
 class DashboardLegacyUser(object):
@@ -484,7 +540,9 @@ class DashboardLegacyUser(object):
 
         :return: list
         '''
-        return self._mongo_doc.get('passwords', [])
+        # Make a copy since caller might manipulate this dict (like adding user_id_hint,
+        # breaking other test cases later on)
+        return copy.deepcopy(self._mongo_doc.get('passwords', []))
 
     def set_passwords(self, passwords):
         '''

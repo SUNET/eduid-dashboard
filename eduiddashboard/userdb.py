@@ -32,14 +32,27 @@
 
 __author__ = 'ft'
 
-from eduid_userdb.userdb import UserDB
+from eduid_userdb import UserDB, User
+from eduiddashboard.user import DashboardUser
 from eduiddashboard.user import DashboardLegacyUser as OldUser
-from eduid_userdb.exceptions import MultipleUsersReturned
 
 import logging
 logger = logging.getLogger('eduiddashboard')
 
+
 class DashboardUserDB(UserDB):
+
+    UserClass = DashboardUser
+
+    def __init__(self, db_uri, collection='profiles'):
+        super(DashboardUserDB, self).__init__(db_uri, collection=collection)
+
+    def save(self, user, check_sync=True, old_format=True):
+        # XXX old_format default is set to True here
+        super(DashboardUserDB, self).save(user, check_sync=check_sync, old_format=old_format)
+
+
+class DashboardOldUserDB(UserDB):
 
     UserClass = OldUser
 
@@ -55,6 +68,10 @@ class UserDBWrapper(UserDB):
         # XXX remove logging
         logger.debug("GET USER {!r}".format(email))
         return self.get_user_by_mail(email)
+
+    def get_user_by_oid(self, oid):
+        # renamed method in UserDB
+        return self.get_user_by_id(oid)
 
     def get_user_by_filter(self, filter, fields=None):
         """
@@ -112,4 +129,29 @@ class UserDBWrapper(UserDB):
         """
 
         return self.exists_by_filter({field: value})
+
+    def save(self, user, check_sync=True, old_format=True):
+        if isinstance(user, OldUser):
+            user = User(data = user._mongo_doc)
+        UserDB.save(self, user, check_sync, old_format)
+
+    def get_identity_proofing(self, user):
+        """
+        Return the proofing urn value
+
+        :param user: The user object
+        :type user: OldUser
+        """
+        obj_id = user['_id']
+        # TODO
+        # This method need to be implemented
+        al1_urn = 'http://www.swamid.se/policy/assurance/al1'
+        al2_urn = 'http://www.swamid.se/policy/assurance/al2'
+        user = self._coll.find_one({'_id': obj_id})
+        if user is not None:
+            nins = user.get('norEduPersonNIN')
+            if nins is not None and len(nins) > 0:
+                return al2_urn
+
+        return al1_urn
 

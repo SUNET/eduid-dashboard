@@ -12,6 +12,8 @@ from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
 
+from eduid_userdb import Password
+
 from eduid_userdb.testing import MockedUserDB as MUDB
 
 import logging
@@ -210,11 +212,26 @@ FAKE_SESSION_INFO = {
 class TerminateAccountTests(LoggedInRequestTests):
 
     def test_reset_password_unterminates_account(self):
-        request = self.set_logged()
+        email = 'johnsmith@example.com'
+        # Set up a bunch of faked passwords to make sure they are all revoked
+        user = self.dashboard_db.get_user_by_mail(email)
+        for i in range(7):
+            pw = Password(credential_id=ObjectId(),
+                          salt=str(i) * 64,
+                          application='dashboard_unittest',
+                          )
+            user.passwords.add(pw)
+        self.dashboard_db.save(user)
+
+        request = self.set_logged(email=email)
         response = self.testapp.get('/profile/security/')
         form = response.forms['terminate-account-form']
-        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
-        self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
+
+        # Verify the user has eight passwords and is NOT terminated at this point
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(len(user.passwords.to_list_of_dicts()), 8)
+        self.assertFalse(user.terminated)
+
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
         self.assertIn('idp.example.com', form_response.location)
@@ -236,14 +253,19 @@ class TerminateAccountTests(LoggedInRequestTests):
                     request.POST['RelayState'] = '/profile/account-terminated/'
                     request.context.propagate_user_changes = lambda x: None
                     from eduiddashboard.views.portal import account_termination_action
-                    account_termination_action(request, FAKE_SESSION_INFO, self.user)
-        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
-        self.assertTrue(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
+                    user = self.userdb.get_user_by_mail(email)
+                    account_termination_action(request, FAKE_SESSION_INFO, user)
 
+        # Verify the user doesn't have ANY passwords and IS terminated at this point
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(len(user.passwords.to_list_of_dicts()), 0)
+        self.assertTrue(user.terminated)
+
+        # Do a password reset, which should resurrect the terminated user
         hash_code = '123456'
         date = datetime.now(pytz.utc)
         self.db.reset_passwords.insert({
-            'email': 'johnsmith@example.com',
+            'email': email,
             'hash_code': hash_code,
             'mechanism': 'email',
             'created_at': date
@@ -256,8 +278,10 @@ class TerminateAccountTests(LoggedInRequestTests):
             get_vccs_client.return_value = FakeVCCSClient()
             form_resp = form.submit('reset')
 
-        self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
-        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 1)
+        # Verify the user has a password and is NOT terminated again
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(len(user.passwords.to_list_of_dicts()), 1)
+        self.assertFalse(user.terminated)
 
 
 TEST_USER = {
