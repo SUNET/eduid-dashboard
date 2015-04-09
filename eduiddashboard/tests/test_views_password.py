@@ -7,10 +7,12 @@ import simplejson as json
 import vccs_client
 import pytz
 
-from eduiddashboard.user import User
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
+
+from eduid_userdb.testing import MockedUserDB as MUDB
 
 import logging
 log = logging.getLogger(__name__)
@@ -260,15 +262,16 @@ class TerminateAccountTests(LoggedInRequestTests):
 
 TEST_USER = {
         '_id': ObjectId('012345678901234567890123'),
+        'eduPersonPrincipalName': 'heffe-leffe',
         'givenName': 'John',
         'sn': 'Smith',
         'displayName': 'John Smith',
         'norEduPersonNIN': ['197801011234'],
-        'photo': 'https://pointing.to/your/photo',
+        #'photo': 'https://pointing.to/your/photo',
         'preferredLanguage': 'en',
         'mail': 'johnnysmith1@example.org',
         'eduPersonEntitlement': [],
-        'modified_ts': datetime.utcnow(),
+        #'modified_ts': datetime.utcnow(),
         'mobile': [{
             'mobile': '+46701234567',
             'verified': True,
@@ -296,8 +299,6 @@ TEST_VERIFICATIONS = [{
     'verified': False,
 }]
 
-from eduid_am.testing import MockedUserDB as MUDB
-
 
 def return_true(*args, **kwargs):
     return True
@@ -316,7 +317,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
     initial_password = 'old-password'
     MockedUserDB = MockedUserDB
     initial_verifications = TEST_VERIFICATIONS
-    user = User(TEST_USER)
+    user = OldUser(TEST_USER)
     users = []
 
     def setUp(self, settings={}):

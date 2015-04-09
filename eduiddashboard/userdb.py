@@ -37,7 +37,7 @@ from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduid_userdb.exceptions import MultipleUsersReturned
 
 import logging
-logging.getLogger('eduiddashboard')
+logger = logging.getLogger('eduiddashboard')
 
 class DashboardUserDB(UserDB):
 
@@ -52,5 +52,64 @@ class UserDBWrapper(UserDB):
     UserClass = OldUser
 
     def get_user(self, email):
-        log.debug("Get user {!r}".format(email))
+        # XXX remove logging
+        logger.debug("GET USER {!r}".format(email))
         return self.get_user_by_mail(email)
+
+    def get_user_by_filter(self, filter, fields=None):
+        """
+        Locate a user in the userdb using a custom search filter.
+
+        :param filter: the search filter
+        :type filter: dict
+        :param fields: the fields to return in the search result
+        :type fields: dict
+        :return: eduid_am.user.User
+        :raise self.UserDoesNotExist: No user matching the search criteria
+        :raise self.MultipleUsersReturned: More than one user matched the search criteria
+        """
+        logger.debug("Looking in {!r} using filter {!r}, returning fields {!r}".format(
+            self._coll, filter, fields))
+        users = self._get_users(filter, fields)
+
+        if users.count() == 0:
+            raise self.exceptions.UserDoesNotExist("No user found using filter")
+        elif users.count() > 1:
+            raise self.exceptions.MultipleUsersReturned("More than one user returned from filter query")
+
+        logger.debug("Found user {!r}".format(users[0]))
+        return self.UserClass(users[0])
+
+    def _get_users(self, spec, fields=None):
+        """
+        Return a list with users object in the attribute manager MongoDB matching the filter
+
+        :param spec: a standard mongodb read operation filter
+        :param fields: If not None, pass as proyection to mongo searcher
+        :return a list with users
+        """
+        if fields is None:
+            return self._coll.find(spec)
+        else:
+            return self._coll.find(spec, fields)
+
+    def exists_by_filter(self, spec):
+        """
+        Return true if at least one doc matchs with the value
+
+        :param spec: The filter used in the query
+        """
+
+        docs = self._coll.find(spec)
+        return docs.count() >= 1
+
+    def exists_by_field(self, field, value):
+        """
+        Return true if at least one doc matchs with the value
+
+        :param field: The name of a field
+        :param value: The field value
+        """
+
+        return self.exists_by_filter({field: value})
+

@@ -4,7 +4,7 @@ from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
 
-from eduid_userdb.user import User
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduid_am.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
@@ -13,7 +13,7 @@ from eduiddashboard import log
 
 def dummy_message(request, message):
     """
-    This function is only for debugging propposing
+    This function is only for debugging purposes
     """
     log.debug('[DUMMY_MESSAGE]: {!s}'.format(message))
 
@@ -76,7 +76,7 @@ def verify_nin(request, user, new_nin, reference):
         'norEduPersonNIN': new_nin
     })
     for old_user_doc in old_user_docs:
-        old_user = User(old_user_doc)
+        old_user = OldUser(old_user_doc)
         if old_user:
             log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
             log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.get_nins()))
@@ -109,7 +109,7 @@ def verify_mobile(request, user, new_mobile):
         'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}
     })
     for old_user_doc in old_user_docs:
-        old_user = User(old_user_doc)
+        old_user = OldUser(old_user_doc)
         if old_user:
             log.debug('Found old user {!r} with mobile number ({!s}) already verified.'.format(old_user, new_mobile))
             log.debug('Old user mobile numbers BEFORE: {!r}.'.format(old_user.get_mobiles()))
@@ -133,7 +133,7 @@ def verify_mail(request, user, new_mail):
         'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}
     })
     for old_user_doc in old_user_docs:
-        old_user = User(old_user_doc)
+        old_user = OldUser(old_user_doc)
         if old_user:
             log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
             log.debug('Old user mail BEFORE: {!s}.'.format(old_user.get_mail()))

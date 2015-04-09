@@ -344,7 +344,7 @@ class BaseResetPasswordView(FormView):
         @return: user object
         """
         if validate_email_format(text):
-            user = self.request.userdb.get_user_by_email(normalize_email(text))
+            user = self.request.userdb.get_user_by_mail(normalize_email(text), raise_on_missing=True)
         elif text.startswith(u'0') or text.startswith(u'+'):
             text = normalize_to_e_164(self.request, text)
             user = self.request.userdb.get_user_by_filter(
@@ -353,8 +353,8 @@ class BaseResetPasswordView(FormView):
         else:
             user = self.request.userdb.get_user_by_nin(text)
 
-        user.retrieve_modified_ts(self.request.db.profiles)
         log.debug("Found user {!r} using input {!s}.".format(user, text))
+        user.retrieve_modified_ts(self.request.db.profiles)
         return user
 
 

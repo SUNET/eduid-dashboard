@@ -5,7 +5,7 @@ from bson import ObjectId
 from datetime import datetime
 
 from eduid_userdb.userdb import UserDB
-from eduiddashboard.user import User
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
 
@@ -59,6 +59,9 @@ class NinsFormTests(LoggedInRequestTests):
         nin = '200010100001-'
         response_form = self.testapp.get('/profile/nins/')
 
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.debug("FREDRIK: BODY:\n{!s}".format(response_form.body))
         form = response_form.forms[self.formname]
 
         form['norEduPersonNIN'].value = nin
@@ -181,7 +184,7 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertIn(nin, old_user.get_nins())
 
@@ -209,7 +212,7 @@ class NinsFormTests(LoggedInRequestTests):
             self.assertEqual(response_json['result'], 'ok')
 
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-            old_user = User(old_user)
+            old_user = OldUser(old_user)
 
             self.assertNotIn(nin, old_user.get_nins())
 

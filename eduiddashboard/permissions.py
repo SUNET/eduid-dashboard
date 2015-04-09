@@ -85,7 +85,7 @@ class BaseFactory(object):
             raise HTTPForbidden(_('You do not have sufficient permissions to access this user'))
 
         self.__acl__ = self.acls[self.workmode]
-        logger.debug("Using ACL {!r} for work-mode {!r}".format(self.acls[self.workmode], self.workmode))
+        #logger.debug("Using ACL {!r} for work-mode {!r}".format(self.acls[self.workmode], self.workmode))
         return None
 
     def authorize(self):
@@ -208,7 +208,10 @@ class BaseFactory(object):
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
     def get_groups(self, userid=None, request=None):
-        user = self.request.session.get('user', OldUser({}))
+        user = self.request.session.get('user', None)
+        if not user:
+            logger.debug("No user found in request.session (userid {!r})".format(userid))
+            user = OldUser({})
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')

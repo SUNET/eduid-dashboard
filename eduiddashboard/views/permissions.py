@@ -43,10 +43,10 @@ class PermissionsView(BaseFormView):
             tempcontext['confirmation_required'] = False
         return tempcontext
 
-    def save_success(self, new_entitletments):
+    def save_success(self, new_entitlements):
 
         # Insert the new user object
-        self.user.get_doc().update(new_entitletments)
+        self.user.get_doc().update(new_entitlements)
         try:
             self.user.save(self.request)
         except UserOutOfSync:

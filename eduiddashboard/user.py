@@ -29,13 +29,17 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Author : Fredrik Thulin <fredrik@thulin.net>
+# Authors : Enrique Perez Arnaud <enrique@cazalla.net>
+#           Fredrik Thulin <fredrik@thulin.net>
 #
 
 from datetime import datetime
 
 from eduid_am.tasks import update_attributes
 from eduid_userdb.exceptions import UserOutOfSync
+
+import logging
+log = logging.getLogger('eduiddashboard')
 
 
 class DashboardLegacyUser(object):
@@ -52,9 +56,12 @@ class DashboardLegacyUser(object):
             self._mongo_doc = data._mongo_doc
         else:
             self._mongo_doc = data
+        # XXX logging
+        import pprint
+        log.debug("CREATED USER {!s}:\n{!s}".format(self, pprint.pformat(data)))
 
     def __repr__(self):
-        return '<DashboardLegacyUser: {0}>'.format(self.get_eppn())
+        return '<DashboardLegacyUser: {0}/{1}>'.format(self.get_eppn(), self.get('_id'))
 
     def __getitem__(self, key):
         return self._mongo_doc[key]
@@ -149,16 +156,21 @@ class DashboardLegacyUser(object):
         try:
             userid = self.get_id()
         except KeyError:
+            log.debug("User {!s} has no id, setting modified_ts to None".format(self))
             self._mongo_doc['modified_ts'] = None
         else:
             profiles_user = profiles.find_one({'_id': userid})
             if profiles_user is None:
+                log.debug("User {!s} not found in profiles ({!s}), setting modified_ts to None".format(self, profiles))
                 self._mongo_doc['modified_ts'] = None
             else:
                 try:
                     self._mongo_doc['modified_ts'] = profiles_user['modified_ts']
+                    log.debug("Using modified_ts from profiles user {!s}: {!s}".format(self, self.get_modified_ts()))
                 except KeyError:
                     self._mongo_doc['modified_ts'] = datetime.utcnow()
+                    log.debug("Updating user {!s} in profiles {!s} with new modified_ts: {!s}".format(
+                        self, profiles, self.get_modified_ts()))
                     profiles.update(
                         {
                             '_id': userid,

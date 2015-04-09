@@ -3,8 +3,8 @@ from bson import ObjectId
 
 from mock import patch
 
-from eduid_userdb import UserDB
-from eduiddashboard.user import User
+from eduiddashboard.userdb import UserDBWrapper
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard.msgrelay import MsgRelay
 
@@ -50,8 +50,8 @@ class MobilesFormTests(LoggedInRequestTests):
             form['mobile'].value = good_value
 
             with patch.object(MsgRelay, 'mobile_validator', clear=True):
-                with patch.object(UserDB, 'exists_by_field', clear=True):
-                    UserDB.exists_by_field.return_value = False
+                with patch.object(UserDBWrapper, 'exists_by_field', clear=True):
+                    UserDBWrapper.exists_by_field.return_value = False
                     MsgRelay.mobile_validator.return_value = True
 
                     response = form.submit('add')
@@ -79,8 +79,8 @@ class MobilesFormTests(LoggedInRequestTests):
 
         for bad_value in ('not_a_number', '545455', '+555555', '0770123456'):
             form['mobile'].value = bad_value
-            with patch.object(UserDB, 'exists_by_field', clear=True):
-                UserDB.exists_by_field.return_value = False
+            with patch.object(UserDBWrapper, 'exists_by_field', clear=True):
+                UserDBWrapper.exists_by_field.return_value = False
                 response = form.submit('add')
 
                 self.assertEqual(response.status, '200 OK')
@@ -173,7 +173,7 @@ class MobilesFormTests(LoggedInRequestTests):
             self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])
 
@@ -184,8 +184,8 @@ class MobilesFormTests(LoggedInRequestTests):
         })
 
         with patch.object(MsgRelay, 'mobile_validator', clear=True):
-            with patch.object(UserDB, 'exists_by_field', clear=True):
-                UserDB.exists_by_field.return_value = False
+            with patch.object(UserDBWrapper, 'exists_by_field', clear=True):
+                UserDBWrapper.exists_by_field.return_value = False
                 MsgRelay.mobile_validator.return_value = True
 
                 response = self.testapp.post(
@@ -197,6 +197,6 @@ class MobilesFormTests(LoggedInRequestTests):
                 self.assertEqual(response_json['result'], 'ok')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertNotIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])

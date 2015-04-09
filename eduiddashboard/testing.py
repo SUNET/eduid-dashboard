@@ -16,12 +16,15 @@ from pyramid import testing
 
 from eduid_userdb.db import MongoDB
 from eduiddashboard.user import DashboardLegacyUser as OldUser
-from eduid_userdb.testing import MongoTestCase
+from eduid_userdb.testing import MongoTestCase, MOCKED_USER_STANDARD
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
 
 from eduid_am.celery import celery, get_attribute_manager
+
+import logging
+logger = logging.getLogger(__name__)
 
 MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
 MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
@@ -137,12 +140,12 @@ class LoggedInRequestTests(MongoTestCase):
 
     #MockedUserDB = am.MockedUserDB
 
-    #user = User(data=am.MOCKED_USER_STANDARD)
+    user = OldUser(MOCKED_USER_STANDARD)
     #user.modified_ts = True
     #users = []
 
-    def setUp(self, settings={}):
-        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager)
+    def setUp(self, settings={}, skip_on_fail=False):
+        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
         #if getattr(self, 'settings', None) is None:
         self.settings = SETTINGS
@@ -159,8 +162,10 @@ class LoggedInRequestTests(MongoTestCase):
         try:
             app = eduiddashboard_main({}, **self.settings)
         except pymongo.errors.ConnectionFailure:
-            raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
-                self.settings['mongo_uri']))
+            if skip_on_fail:
+                raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
+                    self.settings['mongo_uri']))
+            raise
 
         self.testapp = TestApp(app)
 
@@ -172,22 +177,24 @@ class LoggedInRequestTests(MongoTestCase):
 
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database()
+        # Clean up the dashboards private database collections
+        logger.debug("Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         self.db.profiles.drop()
         self.db.verifications.drop()
+        self.db.reset_passwords.drop()
+
+        # Copy all the users from the eduid userdb into the dashboard applications userdb
+        # since otherwise the out-of-sync check will trigger on every save to the dashboard
+        # applications database because there is no document there with the right modified_ts
+        for userdoc in self.userdb._get_all_userdocs():
+            self.db.profiles.insert(userdoc)
+
         for verification_data in self.initial_verifications:
             self.db.verifications.insert(verification_data)
 
-        #userdocs = []
-        ##ts = datetime.datetime.utcnow()
-        #for userdoc in self.userdb.all_userdocs():
-        #    newdoc = deepcopy(userdoc)
-        ##    newdoc['modified_ts'] = ts
-        #    userdocs.append(newdoc)
-        #self.db.profiles.insert(userdocs)
-
-
     def tearDown(self):
         super(LoggedInRequestTests, self).tearDown()
+        logger.debug("tearDown: Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         self.db.profiles.drop()
         self.db.verifications.drop()
         self.db.reset_passwords.drop()
@@ -197,7 +204,7 @@ class LoggedInRequestTests(MongoTestCase):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduid_am.userdb.UserDB.get_user',
+        patcher = patch('eduiddashboard.userdb.UserDBWrapper.get_user',
                         self.dummy_get_user)
         patcher.start()
 
@@ -212,6 +219,9 @@ class LoggedInRequestTests(MongoTestCase):
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(email)
         user_obj = self.userdb.get_user_by_mail(email)
+        # user only exists in eduid-userdb, so need to clear modified-ts to be able
+        # to save it to eduid-dashboard.profiles
+        user_obj.set_modified_ts(None)
         session_data = {
             'user': user_obj,
             'eduPersonAssurance': loa(3),

@@ -1,11 +1,4 @@
 import json
-from bson import ObjectId
-import re
-
-from mock import patch
-
-from eduid_userdb.userdb import UserDB
-from eduiddashboard.user import User
 from eduiddashboard.testing import LoggedInRequestTests
 
 

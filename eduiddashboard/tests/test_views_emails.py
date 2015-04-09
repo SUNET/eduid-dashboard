@@ -4,8 +4,8 @@ import re
 
 from mock import patch
 
-from eduid_userdb.userdb import UserDB
-from eduiddashboard.user import User
+from eduiddashboard.userdb import UserDBWrapper as UserDB
+from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
 
@@ -199,7 +199,7 @@ class MailsFormTests(LoggedInRequestTests):
             self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
 
@@ -218,6 +218,6 @@ class MailsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'ok')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertNotIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
