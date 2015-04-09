@@ -28,7 +28,7 @@
                 beforeSubmit: window.beforeSubmit
 
              },
-             extra_options = ajax_options && $.parseJSON(ajax_options) || {};
+             extra_options = ajax_options || {};
          console.log('Set AJAX form at ' + oid);
          targetElem.ajaxForm($.extend(options, extra_options));
        }
