@@ -76,9 +76,6 @@ class NinsFormTests(LoggedInRequestTests):
         nin = '200010100001-'
         response_form = self.testapp.get('/profile/nins/')
 
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.debug("FREDRIK: BODY:\n{!s}".format(response_form.body))
         form = response_form.forms[self.formname]
 
         form['norEduPersonNIN'].value = nin
@@ -257,7 +254,7 @@ class NinsFormTests(LoggedInRequestTests):
 
 class NinWizardTests(LoggedInRequestTests):
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
         'norEduPersonNIN': ['197801011234']
@@ -325,7 +322,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
 
     no_nin_user_email = 'johnsmith@example.org'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
         'norEduPersonNIN': ['197801011234']

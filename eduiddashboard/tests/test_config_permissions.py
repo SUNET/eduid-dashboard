@@ -5,7 +5,7 @@ class PermissionsAlternativePemissionsInAdminMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -57,7 +57,7 @@ class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -109,7 +109,7 @@ class PermissionsAlternativePemissionsInPersonalMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',

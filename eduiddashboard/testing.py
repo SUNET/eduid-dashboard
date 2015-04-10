@@ -17,7 +17,7 @@ from pyramid import testing
 from eduid_userdb import MongoDB, UserDB
 from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.userdb import DashboardUserDB
-from eduid_userdb.testing import MongoTestCase, MOCKED_USER_STANDARD
+from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
@@ -139,13 +139,7 @@ def get_db(settings):
 class LoggedInRequestTests(MongoTestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
-    #MockedUserDB = am.MockedUserDB
-
-    user = OldUser(MOCKED_USER_STANDARD)
-    #user.modified_ts = True
-    #users = []
-
-    def setUp(self, settings={}, skip_on_fail=False):
+    def setUp(self, settings={}, skip_on_fail=False, std_user='johnsmith@example.com'):
         super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
         #if getattr(self, 'settings', None) is None:
@@ -175,11 +169,14 @@ class LoggedInRequestTests(MongoTestCase):
         self.config.registry.registerUtility(self, IDebugLogger)
 
         self.userdb = app.registry.settings['userdb']
+        _userdoc = self.userdb.get_user_by_mail(std_user)
+        self.assertIsNotNone(_userdoc, "Could not load the standard test user {!r} from the database".format(std_user))
+        self.user = OldUser(data=_userdoc)
 
         #self.db = get_db(self.settings)
-        self.db = app.registry.settings['mongodb'].get_database()
+        self.db = app.registry.settings['mongodb'].get_database()    # central userdb in old format (OldUser)
+        self.userdb_new = UserDB(self.mongodb_uri('eduid_userdb'))   # central userdb in new format (User)
         self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
-        self.userdb_new = UserDB(self.mongodb_uri('eduid_userdb'))
         # Clean up the dashboards private database collections
         logger.debug("Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         self.db.profiles.drop()
@@ -198,6 +195,8 @@ class LoggedInRequestTests(MongoTestCase):
     def tearDown(self):
         super(LoggedInRequestTests, self).tearDown()
         logger.debug("tearDown: Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
+        for userdoc in self.db.profiles.find({}):
+            assert OldUser(userdoc)
         self.db.profiles.drop()
         self.db.verifications.drop()
         self.db.reset_passwords.drop()
@@ -221,7 +220,7 @@ class LoggedInRequestTests(MongoTestCase):
 
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(email)
-        user_obj = self.userdb.get_user_by_mail(email)
+        user_obj = self.userdb.get_user_by_mail(email, raise_on_missing=True)
         if not user_obj:
             logging.error("User {!s} not found in database {!r}. Users:".format(email, self.userdb))
             for this in self.userdb._get_all_userdocs():
@@ -258,13 +257,21 @@ class LoggedInRequestTests(MongoTestCase):
         self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
         return request
 
-    def check_values(self, fields, values):
+    def check_values(self, fields, values, ignore_not_found=[]):
         for field in fields:
             if field.attrs['type'] == 'checkbox':
+                # A webtest.app.Checkbox only has a value if it is checked (!)
                 old_status = field.checked
                 field.checked = True
-                if field.value not in values:
+                if field.value in values:
+                    logger.debug("Checked checkbox {!r} (value {!r})".format(field.id, field.value))
+                    values.remove(field.value)
+                else:
+                    # restore the checkbox whose value was not found in values
                     field.checked = old_status
+        values = [x for x in values if x not in ignore_not_found]
+        self.assertEqual(values, [], "Failed checking one or more checkboxes: {!r}".format(values))
+
 
     def values_are_checked(self, fields, values):
         checked = [f.value for f in fields if f.value is not None]

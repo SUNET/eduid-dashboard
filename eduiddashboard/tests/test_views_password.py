@@ -341,11 +341,9 @@ class ResetPasswordFormTests(LoggedInRequestTests):
     initial_password = 'old-password'
     MockedUserDB = MockedUserDB
     initial_verifications = TEST_VERIFICATIONS
-    user = OldUser(TEST_USER)
-    users = []
 
     def setUp(self, settings={}):
-        super(ResetPasswordFormTests, self).setUp(settings=settings)
+        super(ResetPasswordFormTests, self).setUp(settings=settings, std_user='johnnysmith1@example.org')
         vccs_url = self.settings['vccs_url']
         fake_vccs_client = FakeVCCSClient()
         mock_config = {

@@ -5,7 +5,8 @@ class PermissionsFormTestsAdminMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    # Patch some parts of the mock users in eduid_userdb.testing.MongoTestCase
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -16,8 +17,24 @@ class PermissionsFormTestsAdminMode(LoggedInRequestTests):
     }]
 
     def setUp(self, settings={}):
+        # Make sure the default permission mappings are set here - the mappings
+        # are changed in test_config_permissions.py and that affects this test too :( :(
         settings.update({
-            'workmode': 'admin'
+            'workmode': 'admin',
+            'available_permissions': """
+urn:mace:eduid.se:role:ra
+urn:mace:eduid.se:role:admin
+urn:mace:eduid.se:role:manager
+urn:mace:eduid.se:role:consultant
+urn:mace:eduid.se:role:student
+urn:mace:eduid.se:role:teacher
+urn:mace:eduid.se:role:helpdesk
+            """,
+            'permissions_mapping': """
+personal =
+helpdesk = urn:mace:eduid.se:role:ra
+admin = urn:mace:eduid.se:role:admin
+            """
         })
         super(PermissionsFormTestsAdminMode, self).setUp(settings=settings)
 
@@ -77,7 +94,9 @@ class PermissionsFormTestsAdminMode(LoggedInRequestTests):
         self.assertIsNotNone(getattr(res, 'form', None))
 
         self.check_values(res.form.fields.get('checkbox'),
-                          ['urn:mace:eduid.se:role:admin', 'dirty-permissions'])
+                          ['urn:mace:eduid.se:role:admin', 'dirty-permissions'],
+                          ignore_not_found = ['dirty-permissions']
+                          )
 
         res = res.form.submit('save')
 
@@ -89,7 +108,7 @@ class PermissionsFormTestsPersonalMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:ra',
