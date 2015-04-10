@@ -218,7 +218,6 @@ class BaseFactory(object):
         if required_urn is '':
             return ['']
         if required_urn in user.get_entitlements():
-        elif required_urn in user.get_entitlements():
             return [self.workmode]
         logger.debug("Required URN {!r} not found in user {!r} entitlements: {!r}".format(
             required_urn, user, user.get_entitlements()))
