@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-04-01 13:05+0200\n"
+"POT-Creation-Date: 2015-04-10 13:54+0200\n"
 "PO-Revision-Date: 2013-11-22 09:46+0100\n"
 "Last-Translator: Fredrik Thulin <fredrik@thulin.net>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -479,32 +479,32 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:81
+#: eduiddashboard/templates/home.jinja2:71
 msgid "Display _MENU_ records"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:82
+#: eduiddashboard/templates/home.jinja2:72
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:83
+#: eduiddashboard/templates/home.jinja2:73
 msgid "filtered from _MAX_ records"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:84
+#: eduiddashboard/templates/home.jinja2:74
 msgid "Filter"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:85
+#: eduiddashboard/templates/home.jinja2:75
 msgid "No users matching that search query was found"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:87
-#: eduiddashboard/templates/wizards/basewizard.jinja2:87
+#: eduiddashboard/templates/home.jinja2:76
+#: eduiddashboard/templates/wizards/basewizard.jinja2:81
 msgid "Next"
 msgstr ""
 
-#: eduiddashboard/templates/home.jinja2:88
+#: eduiddashboard/templates/home.jinja2:77
 msgid "Previous"
 msgstr ""
 
@@ -553,7 +553,7 @@ msgid ""
 "  "
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:67
+#: eduiddashboard/templates/nins-form.jinja2:63
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr ""
 
@@ -589,13 +589,13 @@ msgid ""
 "        "
 msgstr ""
 
-#: eduiddashboard/templates/passwords-form-js.jinja2:138
-#: eduiddashboard/templates/reset-password-form-js.jinja2:124
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:40
+#: eduiddashboard/templates/reset-password-form2.jinja2:55
 msgid "A stronger password is required."
 msgstr ""
 
-#: eduiddashboard/templates/passwords-form-js.jinja2:154
-#: eduiddashboard/templates/reset-password-form-js.jinja2:140
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:41
+#: eduiddashboard/templates/reset-password-form2.jinja2:56
 msgid "Type the same password again"
 msgstr ""
 
@@ -679,7 +679,7 @@ msgstr ""
 msgid "Available permissions for this user"
 msgstr ""
 
-#: eduiddashboard/templates/permissions-form.jinja2:16
+#: eduiddashboard/templates/permissions-form.jinja2:14
 msgid "Are you sure you want to save your permission changes?"
 msgstr ""
 
@@ -757,21 +757,21 @@ msgstr ""
 msgid "Finish"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:159
+#: eduiddashboard/templates/profile.jinja2:172
 msgid "Warning!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:159
+#: eduiddashboard/templates/profile.jinja2:172
 msgid ""
 "An error has occurred, please try again or contact support if the problem"
 " persists."
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:166
+#: eduiddashboard/templates/profile.jinja2:179
 msgid "Error!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:166
+#: eduiddashboard/templates/profile.jinja2:179
 msgid "Permission denied"
 msgstr ""
 
@@ -1059,25 +1059,20 @@ msgstr ""
 msgid "The wizard is completed"
 msgstr ""
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:85
+#: eduiddashboard/templates/wizards/basewizard.jinja2:79
 msgid "Done"
 msgstr ""
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:86
+#: eduiddashboard/templates/wizards/basewizard.jinja2:80
 msgid "Sending"
 msgstr ""
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:88
+#: eduiddashboard/templates/wizards/basewizard.jinja2:82
 msgid "Back"
 msgstr ""
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:89
+#: eduiddashboard/templates/wizards/basewizard.jinja2:83
 msgid "Dismiss"
-msgstr ""
-
-#: eduiddashboard/templates/wizards/basewizard.jinja2:105
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:53
-msgid "Invalid identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:7
@@ -1089,7 +1084,7 @@ msgid "Confirm identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:112
+#: eduiddashboard/views/__init__.py:119
 msgid "Confirmation code"
 msgstr ""
 
@@ -1101,38 +1096,42 @@ msgstr ""
 msgid "Congratulations, your national number was verified."
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:109
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:42
+msgid "Invalid identity number"
+msgstr ""
+
+#: eduiddashboard/views/__init__.py:116
 msgid "The data has been verified"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:110
+#: eduiddashboard/views/__init__.py:117
 msgid "Confirmation code is invalid"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:111
+#: eduiddashboard/views/__init__.py:118
 msgid "Check your email for further instructions"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:113
+#: eduiddashboard/views/__init__.py:120
 msgid "A new confirmation code has been sent to you"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:114
+#: eduiddashboard/views/__init__.py:121
 msgid ""
 "The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:116
+#: eduiddashboard/views/__init__.py:123
 #: eduiddashboard/views/verifications.py:36
 msgid "The user was out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:302
+#: eduiddashboard/views/__init__.py:309
 msgid "The wizard was dismissed"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:337
+#: eduiddashboard/views/__init__.py:344
 msgid "Unexpected error"
 msgstr ""
 
