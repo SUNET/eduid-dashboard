@@ -10,7 +10,6 @@
            if (!re.test(val)) {
              ret.status = false;
              ret.msg = msg_invalidnin;
-             return ret;
            }
            // if format is valid, then try to send to server
            return ret;

@@ -46,7 +46,6 @@ var EduidWizard = function (container_path, active_card, options) {
 
     currentwizard = wizard;
 
-
     Wizard.prototype._onNextClick = function () {
         var jsondata,
             currentCard = this.getActiveCard(),
