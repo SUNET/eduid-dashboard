@@ -12,7 +12,7 @@ if (window.tabbedform.changetabs_calls === undefined) {
 jQuery.fn.initDeformCallbacks = function () {
     if (deform.callbacks !== undefined &&
             deform.callbacks.length === 0) {
-        this.find('span.scriptholder').each(function (i, e) {
+        $(this).find('span.scriptholder').each(function (i, e) {
             var script_url = $(e).data('script');
             console.log('Fetching form script: ' + script_url);
             $.ajax({
