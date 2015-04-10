@@ -277,12 +277,12 @@ class NinWizardTests(LoggedInRequestTests):
     def test_display_wizard(self):
         self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.get('/profile/', status=200)
-        self.assertIn('openwizard', response.body)
+        response.mustcontain('openwizard')
 
     def test_get_wizard_nin(self):
         self.set_logged(email=self.no_nin_user_email)
         response = self.testapp.get('/profile/nin-wizard/', status=200)
-        self.assertIn('norEduPersonNIN', response.body)
+        response.mustcontain('norEduPersonNIN')
 
     def test_step0_notvalid_nin(self):
         self.set_logged(email=self.no_nin_user_email)
