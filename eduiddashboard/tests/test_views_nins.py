@@ -8,6 +8,9 @@ from eduiddashboard.userdb import UserDBWrapper
 from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def return_true(*args, **kwargs):
     return True
@@ -254,17 +257,18 @@ class NinsFormTests(LoggedInRequestTests):
 
 class NinWizardTests(LoggedInRequestTests):
 
+    no_nin_user_email = 'johnsmith@example.org'
+
     mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
         'norEduPersonNIN': ['197801011234']
     }, {
-        'mail': 'johnsmith@example.org',
+        'mail': no_nin_user_email,
         'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
         'norEduPersonNIN': []
     }]
 
-    no_nin_user_email = 'johnsmith@example.org'
     def test_no_display_wizard(self):
         self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/profile/', status=200)
@@ -304,6 +308,10 @@ class NinWizardTests(LoggedInRequestTests):
 
     def test_step_storage(self):
         self.set_logged(email=self.no_nin_user_email)
+
+        # Make sure the user doesn't already have a nin
+        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
+        self.assertEqual(user.nins.to_list(), [])
 
         from eduiddashboard.msgrelay import MsgRelay
 
