@@ -25,7 +25,7 @@ version = '0.3.7'
 
 requires = [
     'eduid_am==0.5.2',
-    'eduid_msg>=0.8.7',
+    'eduid_msg==0.8.7',
     'pymongo>=2.8,<3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
