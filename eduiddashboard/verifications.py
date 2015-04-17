@@ -4,8 +4,8 @@ from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
 
-from eduiddashboard.user import DashboardLegacyUser as OldUser
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard import log

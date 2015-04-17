@@ -3,7 +3,7 @@ from copy import copy
 import zxcvbn
 
 from pyramid.i18n import get_localizer
-from eduid_am.exceptions import UserDoesNotExist, MultipleUsersReturned
+from eduid_userdb.exceptions import UserDoesNotExist, MultipleUsersReturned
 from eduid_userdb.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _

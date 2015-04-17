@@ -6,9 +6,8 @@ from deform import widget, Button
 import pycountry
 
 from pyramid.i18n import get_localizer
-from pyramid.view import view_config
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import PostalAddress
 from eduiddashboard.views import BaseFormView

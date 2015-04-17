@@ -3,8 +3,8 @@
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
-from eduiddashboard.user import DashboardLegacyUser as OldUser
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Permissions
 

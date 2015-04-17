@@ -16,8 +16,8 @@ from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
 from eduid_userdb.userdb import UserDB
-import eduid_am.exceptions
-from eduiddashboard.user import DashboardLegacyUser as OldUser
+import eduid_userdb.exceptions
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.saml2 import includeme as saml2_includeme
 from eduid_userdb.testing import MongoTemporaryInstance
 
@@ -44,7 +44,7 @@ class MockedUserDB(UserDB):
     }
 
     def __init__(self):
-        self.exceptions = eduid_am.exceptions
+        self.exceptions = eduid_userdb.exceptions
 
     def get_user(self, userid):
         if userid not in self.test_users:

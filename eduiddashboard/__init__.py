@@ -16,7 +16,7 @@ from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
 from eduid_userdb.db import MongoDB
-from eduiddashboard.userdb import UserDBWrapper
+from eduid_userdb.dashboard import UserDBWrapper
 from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,

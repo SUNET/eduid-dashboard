@@ -4,8 +4,8 @@ import re
 
 from mock import patch
 
-from eduiddashboard.userdb import UserDBWrapper as UserDB
-from eduiddashboard.user import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import UserDBWrapper as UserDB
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
 

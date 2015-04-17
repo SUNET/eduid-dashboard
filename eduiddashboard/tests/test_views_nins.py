@@ -4,8 +4,8 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 
-from eduiddashboard.userdb import UserDBWrapper
-from eduiddashboard.user import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import UserDBWrapper
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
 import logging

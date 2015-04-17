@@ -1,18 +1,17 @@
 # NINS form
 
 import deform
-from datetime import datetime
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
-from eduiddashboard.user import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)

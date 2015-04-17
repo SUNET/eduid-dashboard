@@ -3,8 +3,8 @@ from bson import ObjectId
 
 from mock import patch
 
-from eduiddashboard.userdb import UserDBWrapper
-from eduiddashboard.user import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import UserDBWrapper
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard.msgrelay import MsgRelay
 

@@ -7,7 +7,7 @@ from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
-from eduiddashboard.user import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 
 import logging
 logger = logging.getLogger(__name__)

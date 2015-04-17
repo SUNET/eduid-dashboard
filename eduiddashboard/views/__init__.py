@@ -9,7 +9,7 @@ from pyramid.renderers import render_to_response
 
 from pyramid_deform import FormView
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_short_hash

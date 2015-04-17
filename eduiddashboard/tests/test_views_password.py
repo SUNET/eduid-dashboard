@@ -1,13 +1,11 @@
 from datetime import datetime
 from mock import patch
-from copy import deepcopy
 
 from bson import ObjectId
 import simplejson as json
 import vccs_client
 import pytz
 
-from eduiddashboard.user import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)

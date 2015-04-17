@@ -15,8 +15,8 @@ from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
 from eduid_userdb import MongoDB, UserDB
-from eduiddashboard.user import DashboardLegacyUser as OldUser
-from eduiddashboard.userdb import DashboardUserDB
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardUserDB
 from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
@@ -187,6 +187,7 @@ class LoggedInRequestTests(MongoTestCase):
         # since otherwise the out-of-sync check will trigger on every save to the dashboard
         # applications database because there is no document there with the right modified_ts
         for userdoc in self.userdb._get_all_userdocs():
+            logger.debug("COPYING USER INTO PROFILES:\n{!s}".format(userdoc))
             self.db.profiles.insert(userdoc)
 
         for verification_data in self.initial_verifications:
@@ -206,7 +207,7 @@ class LoggedInRequestTests(MongoTestCase):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduiddashboard.userdb.UserDBWrapper.get_user',
+        patcher = patch('eduid_userdb.dashboard.UserDBWrapper.get_user',
                         self.dummy_get_user)
         patcher.start()
 
