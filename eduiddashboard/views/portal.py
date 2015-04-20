@@ -3,7 +3,6 @@ import re
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
-from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
@@ -30,13 +29,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@view_config(route_name='profile-editor',
+@view_config(route_name='profile-editor', renderer='templates/profile.jinja2',
              request_method='GET', permission='edit')
 def profile_editor(context, request):
     """
         Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
-    template = 'templates/profile.jinja2'
+
     context.user.retrieve_modified_ts(request.db.profiles)
 
     view_context = {}
@@ -66,11 +65,7 @@ def profile_editor(context, request):
         'datakey': datakey,
     }
 
-    response = render_to_response(template, view_context, request=request)
-
-    response.headers['Content-Security-Policy'] = "default-src 'self';"
-
-    return response
+    return view_context
 
 
 SEARCHER_FIELDS = [
