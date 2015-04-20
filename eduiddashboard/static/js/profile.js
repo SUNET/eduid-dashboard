@@ -52,6 +52,10 @@
             });
         });
       }
+      // show progress
+      var profile_filled = $('span.dataholder#profile-data').data('profile_filled'),
+          pb = $('div.profile-filled-progress-bar');
+      pb.css('width', profile_filled + '%');
   
       function showStatus() {
         userstatus.renderStatus(userstatus_url);

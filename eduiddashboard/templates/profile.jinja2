@@ -41,10 +41,10 @@
           </li>
           {% endfor %}
             <li>
-              <div class='profile-filled'>
+              <div class='profile-filled profile-filled-large'>
                 <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
                 <div class="progress progress-striped">
-                  <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+                  <div class="progress-bar profile-filled-progress-bar"></div>
                 </div>
               </div>
             </li>
@@ -80,10 +80,10 @@
       <div class='tab-pane active'></div>
     </div>
 
-    <div class="profile-filled hidden-md hidden-lg" style="padding-top:40px">
+    <div class="profile-filled profile-filled-small hidden-md hidden-lg">
       <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
       <div class="progress progress-striped">
-        <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
+        <div class="progress-bar profile-filled-progress-bar"></div>
       </div>
     </div>
   </div>
@@ -142,6 +142,7 @@
                                            data-wizard_nins_url="{{ "wizard-nins" | route_url }}"
                                            data-userstatus_url="{{ context.safe_route_url('userstatus') }}"
                                            data-polling_timeout="{{ polling_timeout_for_admin }}"
+                                           data-profile_filled="{{ profile_filled }}"
                                            ></span>
 {% endblock %}
 
