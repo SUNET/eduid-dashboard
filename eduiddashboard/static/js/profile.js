@@ -43,7 +43,13 @@
             initial_card = 1;
         }
         $.get( wizard_nins_url, params, function (data, textStatus, jqXHR) {
-            $('div.openwizard').html(data);
+            var wizardholder = $('div.openwizard');
+            wizardholder.html(data);
+            wizardholder.find('span.scriptholder').each(function (i, e) {
+                var script = $(e).data('script');
+                console.log('Executing wizard form script: ' + script);
+                window.forms_helper_functions[script]();
+            });
         });
       }
   

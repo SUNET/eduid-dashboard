@@ -41,7 +41,7 @@
           </li>
           {% endfor %}
             <li>
-              <div class='profile-filled' style='padding-top:80px'>
+              <div class='profile-filled'>
                 <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
                 <div class="progress progress-striped">
                   <div class="progress-bar" style="width: {{ profile_filled }}%;"></div>
@@ -181,5 +181,6 @@
 </script>
 
 <script type="text/javascript" src="{{'eduiddashboard:static/js/profile.js'|static_url}}"></script>
+<script type="text/javascript" src="{{'eduiddashboard:static/js/forms-helper-functions.js'|static_url}}"></script>
 
 {% endblock %}

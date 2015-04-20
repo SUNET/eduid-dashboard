@@ -10,20 +10,13 @@ if (window.tabbedform.changetabs_calls === undefined) {
 }
 
 jQuery.fn.initDeformCallbacks = function () {
+    "use strict";
     if (deform.callbacks !== undefined &&
             deform.callbacks.length === 0) {
         $(this).find('span.scriptholder').each(function (i, e) {
-            var script_url = $(e).data('script');
-            console.log('Fetching form script: ' + script_url);
-            $.ajax({
-              url: script_url,
-              dataType: 'script',
-              cache: true,
-              async: false
-            })
-            .complete(function (xhr, code) {
-              console.log('Script ' + script_url + ' completed, status code: ' + code)
-            });
+            var script = $(e).data('script');
+            console.log('Executing form script: ' + script);
+            window.forms_helper_functions[script]();
         });
     }
 };
