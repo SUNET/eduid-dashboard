@@ -35,7 +35,7 @@ requires = [
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
     'colander==1.0b1',
-    'deform==0.9.8',
+    'deform>=0.9.8',
     'deform_bootstrap==0.2.9',
     'pysaml2==1.2.0beta2',
     'pycountry==1.2',
