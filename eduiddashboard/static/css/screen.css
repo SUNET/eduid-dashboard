@@ -430,10 +430,37 @@ div#account-deletion-intro {
   color: #b94a48;
 }
 
+@media only screen and (min-width: 598px) {
+
 .wizard-body .wizard-steps {
     height:298px !important;
 }
 
+}
+
+@media only screen and (max-width: 598px) {
+
+div.wizard div.wizard-steps {
+  display: none;
+}
+
+div.wizard div.wizard-dialog {
+  width: 94% !important;
+  margin-top: 15px !important;
+}
+
+div.wizard div.wizard-card-container {
+  margin-left: 0px;
+}
+
+div.wizard div.wizard-content,
+div.wizard div.wizard-body,
+div.wizard div.wizard-cards,
+div.wizard div.wizard-card-container {
+  height: auto !important;
+}
+
+}
 
 /* End of wizard
 -------------------------------------------------- */
