@@ -359,7 +359,10 @@ class NinsWizard(BaseWizard):
 
         nins_view = NinsView(self.context, self.request)
 
-        return nins_view.add_nin_external(data)
+        result = nins_view.add_nin_external(data)
+        if result['status'] == 'ok':
+            result['status'] = 'success'
+        return result
 
     def step_1(self, data):
         """ The verification code form """
