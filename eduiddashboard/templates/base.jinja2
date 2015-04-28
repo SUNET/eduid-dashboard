@@ -42,9 +42,9 @@
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
             {% if request.is_logged %}
-            <li><a href="{{ 'saml2-logout'|route_url }}">{{ _("Logout") }}</a></li>
+            <li><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></li>
             {% else %}
-            <li><a href="{{ 'saml2-login'|route_url }}">{{ _("Login") }}</a></li>
+            <li><a href="{{ request.route_path('saml2-login') }}">{{ _("Login") }}</a></li>
             {% endif %}
             <li class="nav-separator hidden-xs"></li>
           </ul>
