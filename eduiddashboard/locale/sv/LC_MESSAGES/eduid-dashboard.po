@@ -1,19 +1,19 @@
 # Swedish translations for eduid-dashboard.
-# Copyright (C) 2014 ORGANIZATION
+# Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the eduid-dashboard
 # project.
 #
 # Translators:
 # Fredrik Thulin, 2013-2014
-# lundberg.johan <lundberg.johan@gmail.com>, 2014
+# lundberg.johan <lundberg.johan@gmail.com>, 2014-2015
 # Stefan Liström <steli@sunet.se>, 2013-2014
 # Stefan Wold <swold@sunet.se>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-03-06 09:21+0100\n"
-"PO-Revision-Date: 2014-12-16 13:53+0000\n"
+"POT-Creation-Date: 2015-04-30 14:28+0200\n"
+"PO-Revision-Date: 2015-04-30 12:43+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
 "dashboard/language/sv/)\n"
@@ -189,61 +189,61 @@ msgstr "Ogiltig automatinloggning"
 msgid "Security"
 msgstr "Säkerhet"
 
-#: eduiddashboard/validators.py:43
+#: eduiddashboard/validators.py:40
 msgid "Current password is incorrect"
 msgstr "Nuvarande lösenord är felaktigt"
 
-#: eduiddashboard/validators.py:73
+#: eduiddashboard/validators.py:70
 msgid "The password complexity is too weak."
 msgstr "Lösenordet är för enkelt."
 
-#: eduiddashboard/validators.py:84
+#: eduiddashboard/validators.py:81
 msgid "The permission selected is not available"
 msgstr "Den valda rättigheten är inte tillgänglig"
 
-#: eduiddashboard/validators.py:103
+#: eduiddashboard/validators.py:100
 msgid "You already have this email address"
 msgstr "E-postadressen finns redan i listan"
 
-#: eduiddashboard/validators.py:108
+#: eduiddashboard/validators.py:105
 msgid "This email address is unavailable"
 msgstr "E-postadressen är inte tillgänglig"
 
-#: eduiddashboard/validators.py:119
+#: eduiddashboard/validators.py:116
 msgid "Email address does not exist"
 msgstr "E-postadressen kunde inte hittas"
 
-#: eduiddashboard/validators.py:134
+#: eduiddashboard/validators.py:131
 msgid "This mobile phone was already registered"
 msgstr "Mobiltelefonnumret är redan bekräftat"
 
-#: eduiddashboard/validators.py:148
+#: eduiddashboard/validators.py:145
 msgid "Username does not exist"
 msgstr "Användarnamnet finns inte"
 
-#: eduiddashboard/validators.py:151
+#: eduiddashboard/validators.py:148
 msgid "There is more than one user for that username"
 msgstr "Det finns mer än en användare med det användarnamnet"
 
-#: eduiddashboard/validators.py:160
+#: eduiddashboard/validators.py:157
 msgid "email address ${val} does not exist or is unverified"
 msgstr "mejladressen ${val} finns inte eller är inte verifierad"
 
-#: eduiddashboard/validators.py:165
+#: eduiddashboard/validators.py:162
 msgid "There is more than one user for that email"
 msgstr "Det finns mer än en användare med den e-postadressen"
 
-#: eduiddashboard/validators.py:179
+#: eduiddashboard/validators.py:176
 msgid ""
 "This national identity number does not exist, is not verified or is not "
 "active"
 msgstr "Personnumret kunde inte hittas, är inte bekräftat eller inte aktivt"
 
-#: eduiddashboard/validators.py:211
+#: eduiddashboard/validators.py:208
 msgid "This national identity number is already in use"
 msgstr "Personnumret är redan registrerat"
 
-#: eduiddashboard/validators.py:237 eduiddashboard/validators.py:287
+#: eduiddashboard/validators.py:234 eduiddashboard/validators.py:331
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -251,7 +251,7 @@ msgstr ""
 "Vi har för närvarande tekniska problem med ${service_name}, vänligen "
 "försök igen senare."
 
-#: eduiddashboard/validators.py:243
+#: eduiddashboard/validators.py:240
 msgid ""
 "This national identity number is not registered with \"${service_name}\"."
 " Please register at <a href=\"${service_url}\" "
@@ -260,7 +260,7 @@ msgstr ""
 "Personnumret finns inte registrerat hos ${service_name}. Registrera dig "
 "här <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:248
+#: eduiddashboard/validators.py:245
 msgid ""
 "Your registration process with \"${service_name}\" is not complete. "
 "Please visit <a href=\"${service_url}\" "
@@ -270,7 +270,7 @@ msgstr ""
 "din registrering vänligen besök <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:253
+#: eduiddashboard/validators.py:250
 msgid ""
 "According to \"${service_name}\" you have opted out to receive messages "
 "from SUNET (eduID). In order to receive a confirmation code from us, you "
@@ -282,25 +282,27 @@ msgstr ""
 "blockeringen hos <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:283
+#: eduiddashboard/validators.py:327
 msgid "You have no confirmed mobile phone"
-msgstr ""
+msgstr "Du har inget bekräftat mobiltelefonnummer"
 
-#: eduiddashboard/validators.py:285
+#: eduiddashboard/validators.py:329
 msgid ""
 "The given mobile number was not associated to the given national identity"
 " number"
 msgstr ""
+"Ditt bekräftade mobiltelefonnummer är inte kopplat till det personnummer "
+"du angav"
 
-#: eduiddashboard/validators.py:316
+#: eduiddashboard/validators.py:369
 msgid "The entered code does not exist"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/validators.py:331
+#: eduiddashboard/validators.py:384
 msgid "Invalid CSRF token"
 msgstr "Ogiltig CSRF kod"
 
-#: eduiddashboard/validators.py:347
+#: eduiddashboard/validators.py:400
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -496,7 +498,7 @@ msgstr "Dashboard läge %(mode)s"
 msgid "Level %(level)s"
 msgstr "Nivå %(level)s"
 
-#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:99
+#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:100
 msgid "Search"
 msgstr "Sök"
 
@@ -604,12 +606,12 @@ msgstr "Aktiv"
 #: eduiddashboard/templates/nins-form.jinja2:28
 #: eduiddashboard/views/nins.py:274
 msgid "Verify through Mina Meddelanden"
-msgstr ""
+msgstr "Bekräfta din identitet via Mina Meddelanden"
 
 #: eduiddashboard/templates/nins-form.jinja2:33
 #: eduiddashboard/views/nins.py:276
 msgid "Verify by registered phone"
-msgstr ""
+msgstr "Bekräfta din identitet via ditt mobiltelefonnummer"
 
 #: eduiddashboard/templates/nins-form.jinja2:50
 msgid "Your identity is already confirmed. No further action is required here."
@@ -632,10 +634,8 @@ msgid "We are verifying that the provided identity number is valid, please wait.
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:7
-#, fuzzy
-#| msgid "Choose NIN confirmation method"
 msgid "Choose NIN verification method"
-msgstr "Skicka bekräftelsekoden igen"
+msgstr "Välj metod att bekräfta din identitet med"
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:12
 msgid ""
@@ -644,6 +644,9 @@ msgid ""
 "meddelanden or via a registered mobile number.\n"
 "                            "
 msgstr ""
+"\n"
+"Du kan bekräfta din identitet via Mina Meddelanden eller med ett "
+"bekräftat mobiltelefonnummer"
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:18
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:18
@@ -655,12 +658,16 @@ msgid ""
 "<a id=\"go-to-mobiles-tab\">mobiles tab</a>.\n"
 "                            "
 msgstr ""
+"\n"
+"För att bekräfta din identitet med mobiltelefonnummer måste du ha minst "
+"ett bekräftat mobiltelefonnummer.\n"
+"Börja med att lägga till och bekräfta ett mobiltelefonnummer på <a id"
+"=\"go-to-mobiles-tab\">Mobiltelefonnummer-tabben</a>."
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:25
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:25
-#, fuzzy
 msgid "Min myndighetspost"
-msgstr "Myndighetspost"
+msgstr ""
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:32
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:32
@@ -669,9 +676,8 @@ msgid "Dismiss"
 msgstr "Avbryt"
 
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:7
-#, fuzzy
 msgid "Choose NIN confirmation method"
-msgstr "Skicka bekräftelsekoden igen"
+msgstr "Välj metod att bekräfta din identitet med"
 
 #: eduiddashboard/templates/nins-wizard-chooser.jinja2:12
 msgid ""
@@ -680,6 +686,10 @@ msgid ""
 "via Mina meddelanden or via your mobile.\n"
 "                            "
 msgstr ""
+"\n"
+"För att lägga till ett bekräftat personnumer kan du antingen använda Mina"
+" Meddelanden eller ditt mobiltelefonnummer.\n"
+" "
 
 #: eduiddashboard/templates/passwords-form-dialog.jinja2:6
 msgid "Change your password"
@@ -728,12 +738,12 @@ msgstr ""
 "</ul>"
 
 #: eduiddashboard/templates/passwords-form-js.jinja2:138
-#: eduiddashboard/templates/reset-password-form-js.jinja2:124
+#: eduiddashboard/templates/reset-password-form-js.jinja2:123
 msgid "A stronger password is required."
 msgstr "Lösenordet är inte tillräckligt säkert"
 
 #: eduiddashboard/templates/passwords-form-js.jinja2:154
-#: eduiddashboard/templates/reset-password-form-js.jinja2:140
+#: eduiddashboard/templates/reset-password-form-js.jinja2:139
 msgid "Type the same password again"
 msgstr "Skriv samma lösenord igen"
 
@@ -895,25 +905,29 @@ msgstr "Profilstatus"
 msgid "Toggle navigation"
 msgstr "Ändra gränssnitt"
 
-#: eduiddashboard/templates/profile.jinja2:102
+#: eduiddashboard/templates/profile.jinja2:101
+msgid "For"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:103
 msgid "Lost your confirmation code?"
 msgstr "Tappat bort din bekräftelsekod?"
 
-#: eduiddashboard/templates/profile.jinja2:102
+#: eduiddashboard/templates/profile.jinja2:103
 msgid "Resend confirmation code"
 msgstr "Skicka bekräftelsekoden igen"
 
-#: eduiddashboard/templates/profile.jinja2:107
+#: eduiddashboard/templates/profile.jinja2:108
 #: eduiddashboard/templates/wizards/basewizard.jinja2:28
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:34
 msgid "Finish"
 msgstr "Klar"
 
-#: eduiddashboard/templates/profile.jinja2:158
+#: eduiddashboard/templates/profile.jinja2:159
 msgid "Warning!"
 msgstr "Varning!"
 
-#: eduiddashboard/templates/profile.jinja2:158
+#: eduiddashboard/templates/profile.jinja2:159
 msgid ""
 "An error has occurred, please try again or contact support if the problem"
 " persists."
@@ -921,11 +935,11 @@ msgstr ""
 "Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om "
 "problemet kvarstår."
 
-#: eduiddashboard/templates/profile.jinja2:165
+#: eduiddashboard/templates/profile.jinja2:166
 msgid "Error!"
 msgstr "Fel!"
 
-#: eduiddashboard/templates/profile.jinja2:165
+#: eduiddashboard/templates/profile.jinja2:166
 msgid "Permission denied"
 msgstr "Åtkomst nekad"
 
@@ -1558,12 +1572,6 @@ msgid ""
 "mailbox"
 msgstr "En ny bekräftelsekod har skickats till inlåda hos \"Min myndighetspost\""
 
-#: eduiddashboard/views/nins.py:163 eduiddashboard/views/nins.py:188
-msgid "The provided nin can't be verified. You only can verify the last one"
-msgstr ""
-"Personnumret kan inte verifieras. Endast det första personnumret kan "
-"verifiers."
-
 #: eduiddashboard/views/nins.py:230
 msgid "National identity number has been removed"
 msgstr "Personnumret har tagits bort"
@@ -1577,9 +1585,8 @@ msgid "User data out of sync. Please try again."
 msgstr "Ditt användardata har ändrats från en annan dashboard. Försök igen."
 
 #: eduiddashboard/views/nins.py:374
-#, fuzzy
 msgid "Your national identity number has been confirmed"
-msgstr "Personnumret har tagits bort"
+msgstr "Ditt personnummer är bekräftat"
 
 #: eduiddashboard/views/nins.py:385
 msgid ""
@@ -1591,19 +1598,16 @@ msgstr ""
 "\"Bekräfta\" här nedan."
 
 #: eduiddashboard/views/nins.py:430
-#, fuzzy
 msgid "Add NIN with MM confirmation"
-msgstr "Bekräfta"
+msgstr "Lägg till personnummer med MM bekräftelse"
 
 #: eduiddashboard/views/nins.py:435
 msgid "Your national identity number confirmation request can not be found"
 msgstr "Kan ej hitta en bekräftelseförfrågan för ditt personnummer "
 
-#: eduiddashboard/views/nins.py:402
-#, fuzzy
-#| msgid "Add national identity number"
+#: eduiddashboard/views/nins.py:455
 msgid "Add your national identity number"
-msgstr "Lägg till personnummer"
+msgstr "Lägg till ditt personnummer"
 
 #: eduiddashboard/views/permissions.py:15
 msgid "Permissions"
@@ -1667,7 +1671,4 @@ msgstr "Välj ett nytt lösenord för ditt eduID konto."
 #: eduiddashboard/views/verifications.py:27
 msgid "Can't locate the code in the active session"
 msgstr "Kan inte hitta koden i den aktiva sessionen"
-
-#~ msgid ""
-#~ msgstr ""
 
