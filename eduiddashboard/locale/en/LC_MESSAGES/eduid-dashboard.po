@@ -158,11 +158,11 @@ msgstr ""
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr ""
 
-#: eduiddashboard/permissions.py:267
+#: eduiddashboard/permissions.py:262
 msgid "Not logged in"
 msgstr ""
 
-#: eduiddashboard/permissions.py:276
+#: eduiddashboard/permissions.py:271
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 
@@ -285,15 +285,15 @@ msgid ""
 "07</li><li>E-mail address: user@example.edu</li></ul>"
 msgstr ""
 
-#: eduiddashboard/verifications.py:92
+#: eduiddashboard/verifications.py:102
 msgid "National identity number {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:109
+#: eduiddashboard/verifications.py:126
 msgid "Mobile {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:128
+#: eduiddashboard/verifications.py:153
 msgid "Email {obj} verified"
 msgstr ""
 
@@ -1371,6 +1371,10 @@ msgstr ""
 
 #: eduiddashboard/views/nins.py:435
 msgid "Your national identity number confirmation request can not be found"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:402
+msgid "Add your national identity number"
 msgstr ""
 
 #: eduiddashboard/views/permissions.py:15

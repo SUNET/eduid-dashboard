@@ -3,6 +3,7 @@ import re
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
+from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config

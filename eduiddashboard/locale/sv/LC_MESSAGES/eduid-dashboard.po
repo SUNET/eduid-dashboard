@@ -165,11 +165,11 @@ msgstr "Du har inte tillräckliga rättigheter för att komma åt denna använda
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr "Du har inte tillräckligt hög AL-nivå för att komma åt detta arbetsläge"
 
-#: eduiddashboard/permissions.py:267
+#: eduiddashboard/permissions.py:262
 msgid "Not logged in"
 msgstr "EJ inloggad"
 
-#: eduiddashboard/permissions.py:276
+#: eduiddashboard/permissions.py:271
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 "Du måste vara inloggad med behörighet {user_AL} för att kunna ändra dina "
@@ -310,15 +310,15 @@ msgstr ""
 "ååååmmddnnnn</li><li>Mobilnummer som börjar med + eller "
 "07</li><li>E-postadress: namn@example.edu</li></ul>"
 
-#: eduiddashboard/verifications.py:92
+#: eduiddashboard/verifications.py:102
 msgid "National identity number {obj} verified"
 msgstr "Personnummer {obj} bekräftat"
 
-#: eduiddashboard/verifications.py:109
+#: eduiddashboard/verifications.py:126
 msgid "Mobile {obj} verified"
 msgstr "Telefonnummer {obj} bekräftad"
 
-#: eduiddashboard/verifications.py:128
+#: eduiddashboard/verifications.py:153
 msgid "Email {obj} verified"
 msgstr "E-postadressen {obj} bekräftad"
 
@@ -1598,6 +1598,12 @@ msgstr "Bekräfta"
 #: eduiddashboard/views/nins.py:435
 msgid "Your national identity number confirmation request can not be found"
 msgstr "Kan ej hitta en bekräftelseförfrågan för ditt personnummer "
+
+#: eduiddashboard/views/nins.py:402
+#, fuzzy
+#| msgid "Add national identity number"
+msgid "Add your national identity number"
+msgstr "Lägg till personnummer"
 
 #: eduiddashboard/views/permissions.py:15
 msgid "Permissions"

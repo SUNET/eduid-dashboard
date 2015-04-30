@@ -449,6 +449,12 @@ class NinsWizard(BaseWizard):
             'text': text,
         }
 
+    def get_template_context(self):
+        context = super(NinsWizard, self).get_template_context()
+        context.update({
+            'wizard_title': _('Add your national identity number'),
+        })
+        return context
 
 def nins_open_wizard(context, request):
     if context.workmode != 'personal':

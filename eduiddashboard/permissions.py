@@ -195,8 +195,6 @@ class BaseFactory(object):
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
-        logger.debug('Required URN for workmode {!r} is {!r}, user entitlements are {!r}'.format(
-            self.workmode, required_urn, user.get_entitlements()))
         if required_urn is '':
             return ['']
         elif required_urn in user.get_entitlements():
@@ -205,10 +203,7 @@ class BaseFactory(object):
 
     def get_loa(self):
         available_loa = self.request.registry.settings.get('available_loa')
-        logger.debug('AL-level is {!r} (default: {!r})'.format(self.request.session.get('eduPersonAssurance'),
-                                                               available_loa[0]))
-        return self.request.session.get('eduPersonAssurance',
-                                        available_loa[0])
+        return self.request.session.get('eduPersonAssurance', available_loa[0])
 
     def get_max_loa(self):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)

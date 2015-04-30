@@ -277,6 +277,10 @@ form.form-horizontal .btn-primary {
   margin-left: 26%;
 }
 
+form.form-horizontal .btn-primary.wizard-next {
+  margin-left: 0;
+}
+
 .table-thin {
   width: 50%;
 }
@@ -419,11 +423,15 @@ div#account-deletion-intro {
     margin-bottom:40px;
 }
 .wizard-progress-container > .progress {
-    width:180px;
+    width:135px;
 }
 
 .wizard-modal .help-inline .error {
   color: #b94a48;
+}
+
+.wizard-body .wizard-steps {
+    height:298px !important;
 }
 
 
