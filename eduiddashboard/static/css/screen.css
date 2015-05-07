@@ -392,6 +392,12 @@ table.passwords {
 div#account-deletion-intro {
     margin-top: 35px;
 }
+
+form#start-password-change-form {
+    float: left;
+    margin-right: 50px;
+}
+
 /* End of reset password view styles
 -------------------------------------------------- */
 

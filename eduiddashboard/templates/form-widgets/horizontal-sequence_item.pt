@@ -15,23 +15,8 @@
        id="${field.oid}-close"
        tal:condition="not field.widget.hidden"
        title="Remove"
-       style="padding-right:0.4em"
        i18n:attributes="title"
        onclick="javascript:deform.removeSequenceItem(this);">&times;</a>
-
-<style>
-    .deformOrderbutton {
-        float:right;
-    }
-    .deformOrderbuttonActive:before {
-        content:"\2195";
-        margin-right: 5px;
-    }
-    .deformSeqItem.form-inline div {
-        display: inline-block;
-        margin-right: 1em;
-    }
-</style>
 
   <span tal:replace="structure field.serialize(cstruct)"/>
   <tal:errors
