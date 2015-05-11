@@ -21,12 +21,15 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.3.7-dev'
+version = '0.3.8'
 
 requires = [
-    'eduid_am>=0.5.1',
-    'eduid_msg>=0.8.6',
-    'pymongo==2.6.3',
+    'eduid_am>=0.5.3,<0.6.0-dev',
+    'eduid_msg>=0.8.7,<0.9.0-dev',
+    'vccs_client>=0.4.1',
+    'pysaml2==1.2.0beta2',
+
+    'pymongo>=2.8,<3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
     'pyramid_debugtoolbar==1.0.4',
@@ -37,11 +40,9 @@ requires = [
     'colander==1.0b1',
     'deform==0.9.8',
     'deform_bootstrap==0.2.9',
-    'pysaml2==1.2.0beta2',
     'pycountry==1.2',
     'eventlet==0.14.0',
     'gunicorn==18.0',
-    'vccs_client>=0.4.1',
     'pwgen==0.4',
     'zxcvbn==1.0',
     'pytz'
