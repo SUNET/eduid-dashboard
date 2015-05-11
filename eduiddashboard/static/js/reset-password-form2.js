@@ -37,7 +37,6 @@
                 // Show the suggested password
                 pwdialog.find("span.suggested-password").parents(".form-group").fadeIn();
             }
-            console.debug("FIRE!!!!")
             update_save_button();
         },
 
