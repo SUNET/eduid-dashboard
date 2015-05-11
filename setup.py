@@ -38,7 +38,7 @@ requires = [
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
     'colander==1.0b1',
-    'deform==0.9.8',
+    'deform==2.0a2',
     'deform_bootstrap==0.2.9',
     'pycountry==1.2',
     'eventlet==0.14.0',

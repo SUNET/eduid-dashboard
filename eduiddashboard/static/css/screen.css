@@ -392,6 +392,12 @@ table.passwords {
 div#account-deletion-intro {
     margin-top: 35px;
 }
+
+form#start-password-change-form {
+    float: left;
+    margin-right: 50px;
+}
+
 /* End of reset password view styles
 -------------------------------------------------- */
 
@@ -489,6 +495,26 @@ div.profile-filled-large {
 div.profile-filled-small {
     padding-top: 40px;
 }
+
+span.deformOrderbutton {
+    padding-right: 0.4em;
+    float:right;
+}
+
+span.deformClosebutton {
+    padding-right: 0.4em;
+}
+
+span.deformSeqItem.form-inline div {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+span.deformOrderbuttonActive:before {
+    content:"\2195";
+    margin-right: 5px;
+}
+
 
 /* end of removing inlines
 ---------------------------  */
