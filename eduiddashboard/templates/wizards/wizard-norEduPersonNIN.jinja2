@@ -38,23 +38,7 @@
       </p>
     </div>
   </div>
-{% endblock %}
 
-{% block wizard_extrajs %}
-<script type="text/javascript">
-    var validateNIN = function (el) {
-           var val = el.val(),
-               re = /^(18|19|20)\d{2}(0[1-9]|1[0-2])\d{2}[-\s]?\d{4}$/,
-               ret = {
-                 status: true
-               };
-           if (!re.test(val)) {
-             ret.status = false;
-             ret.msg = "{{ _("Invalid identity number") }}";
-             return ret;
-           }
-           // if format is valid, then try to send to server
-           return ret;
-        };
-</script>
+  <span class="dataholder" id="ninwizard-data" data-msg_invalidnin="{{ _("Invalid identity number") }}" ></span>
+  <span class="scriptholder" data-script="wizard_norEduPersonNIN"></span>
 {% endblock %}

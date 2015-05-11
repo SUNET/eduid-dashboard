@@ -74,21 +74,28 @@ class BaseFormView(FormView):
 
     def get_template_context(self):
         return {
-            'formname': self.classname
+            'formname': self.classname,
         }
 
     def failure(self, e):
-        context = super(BaseFormView, self).failure(e)
-
+        rendered = e.field.widget.serialize(e.field, e.cstruct,
+                                            request=self.request)
+        context = {
+            'form': rendered,
+            }
         context.update(self.get_template_context())
-
         return context
 
     def show(self, form):
-        context = super(BaseFormView, self).show(form)
-
+        appstruct = self.appstruct()
+        if appstruct is None:
+            rendered = form.render(request=self.request)
+        else:
+            rendered = form.render(appstruct, request=self.request)
+        context = {
+            'form': rendered,
+            }
         context.update(self.get_template_context())
-
         return context
 
     def full_page_reload(self):

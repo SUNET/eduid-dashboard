@@ -68,43 +68,19 @@
 
 <!-- End of modal wizard -->
 
-<script type="text/javascript">
-
-$(function() {
-    $.fn.wizard.logging = true;
-    var active_card = {{ step + 1 }},
-        {% if datakey is defined and datakey %}
-        datakey = "{{ datakey }}",
-        {% endif %}
-        eduidwizard;
-    eduidwizard = EduidWizard("#{{ model }}-wizard", active_card, {
-            showCancel: true,
-            isModal: true,
-            submitUrl: "{{ path }}",
-            buttons: {
-              submitText: "{{ _("Done") }}",
-              submittingText: "{{ _("Sending") }}",
-              nextText: "{{ _("Next") }}",
-              backText: "{{ _("Back") }}",
-              cancelText: "{{ _("Dismiss") }}",
-            },
-        });
-});
-</script>
-
+<span class="dataholder" id="basewizard-data" data-step="{{ step + 1 }}"
+                                              {% if datakey is defined and datakey %}
+                                                data-datakey="{{ datakey }}"
+                                              {% else %}
+                                                data-datakey=""
+                                              {% endif %}
+                                              data-model="{{ model }}"
+                                              data-path="{{ path }}"
+                                              data-msg_done="{{ _('Done') }}"
+                                              data-msg_sending="{{ _('Sending') }}"
+                                              data-msg_next="{{ _('Next') }}"
+                                              data-msg_back="{{ _('Back') }}"
+                                              data-msg_dismiss="{{ _('Dismiss') }}"></span>
+<span class="scriptholder" data-script="basewizard"></span>
 {% block wizard_extrajs %}
-<script type="text/javascript">
-    function exampleValidator(el) {
-      var val = el.val(),
-          re = /^[0-9]{8}-?[0-9]{4}$/,
-          ret = {
-            status: true
-          };
-      if (!re.test(val)) {
-        ret.status = false;
-        ret.msg = "{{ _("Invalid identity number") }}";
-      }
-      return ret;
-    }
-</script>
 {% endblock %}

@@ -359,7 +359,10 @@ class NinsWizard(BaseWizard):
 
         nins_view = NinsView(self.context, self.request)
 
-        return nins_view.add_nin_external(data)
+        result = nins_view.add_nin_external(data)
+        if result['status'] == 'ok':
+            result['status'] = 'success'
+        return result
 
     def step_1(self, data):
         """ The verification code form """
@@ -369,7 +372,7 @@ class NinsWizard(BaseWizard):
 
         if result['result'] == 'ok':
             return {
-                'status': 'ok',
+                'status': 'success',
             }
         else:
             return {
@@ -392,8 +395,8 @@ class NinsWizard(BaseWizard):
                                self.context.user,
                                self.datakey)
         return {
-            'status': 'ok',
-            'text': NINsActionsView.verify_messages['new_code_sent'],
+            'status': 'success',
+            'text': NINsActionsView.special_verify_messages['new_code_sent'],
         }
 
     def get_template_context(self):

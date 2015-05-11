@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-04-01 13:05+0200\n"
+"POT-Creation-Date: 2015-04-10 13:54+0200\n"
 "PO-Revision-Date: 2014-12-16 13:53+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
@@ -523,32 +523,32 @@ msgstr "Ändra"
 msgid "Status"
 msgstr "Status"
 
-#: eduiddashboard/templates/home.jinja2:81
+#: eduiddashboard/templates/home.jinja2:71
 msgid "Display _MENU_ records"
 msgstr "Visa _MENU_ rader"
 
-#: eduiddashboard/templates/home.jinja2:82
+#: eduiddashboard/templates/home.jinja2:72
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "Visar _START_ till _END_ av _TOTAL_ rader"
 
-#: eduiddashboard/templates/home.jinja2:83
+#: eduiddashboard/templates/home.jinja2:73
 msgid "filtered from _MAX_ records"
 msgstr "filtrerat från _MAX_ rader"
 
-#: eduiddashboard/templates/home.jinja2:84
+#: eduiddashboard/templates/home.jinja2:74
 msgid "Filter"
 msgstr "Filter"
 
-#: eduiddashboard/templates/home.jinja2:85
+#: eduiddashboard/templates/home.jinja2:75
 msgid "No users matching that search query was found"
 msgstr "Ingen användare som matchar din sökning hittades"
 
-#: eduiddashboard/templates/home.jinja2:87
-#: eduiddashboard/templates/wizards/basewizard.jinja2:87
+#: eduiddashboard/templates/home.jinja2:76
+#: eduiddashboard/templates/wizards/basewizard.jinja2:81
 msgid "Next"
 msgstr "Nästa"
 
-#: eduiddashboard/templates/home.jinja2:88
+#: eduiddashboard/templates/home.jinja2:77
 msgid "Previous"
 msgstr "Föregående"
 
@@ -606,7 +606,7 @@ msgstr ""
 "Du når din myndighetspost genom <a "
 "href=\"%(nin_service_url)s\">%(nin_service_name)s</a>"
 
-#: eduiddashboard/templates/nins-form.jinja2:67
+#: eduiddashboard/templates/nins-form.jinja2:63
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
@@ -656,13 +656,13 @@ msgstr ""
 "<li>Blanksteg (mellanslag) ignoreras</li>\n"
 "</ul>"
 
-#: eduiddashboard/templates/passwords-form-js.jinja2:138
-#: eduiddashboard/templates/reset-password-form-js.jinja2:124
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:40
+#: eduiddashboard/templates/reset-password-form2.jinja2:55
 msgid "A stronger password is required."
 msgstr "Lösenordet är inte tillräckligt säkert"
 
-#: eduiddashboard/templates/passwords-form-js.jinja2:154
-#: eduiddashboard/templates/reset-password-form-js.jinja2:140
+#: eduiddashboard/templates/passwords-form-dialog.jinja2:41
+#: eduiddashboard/templates/reset-password-form2.jinja2:56
 msgid "Type the same password again"
 msgstr "Skriv samma lösenord igen"
 
@@ -756,7 +756,7 @@ msgstr "Godkänn"
 msgid "Available permissions for this user"
 msgstr "Tillgängliga rättighetsnivåer för denna användare"
 
-#: eduiddashboard/templates/permissions-form.jinja2:16
+#: eduiddashboard/templates/permissions-form.jinja2:14
 msgid "Are you sure you want to save your permission changes?"
 msgstr "Spara dina ändrade rättigheter?"
 
@@ -838,11 +838,11 @@ msgstr "Skicka bekräftelsekoden igen"
 msgid "Finish"
 msgstr "Klar"
 
-#: eduiddashboard/templates/profile.jinja2:159
+#: eduiddashboard/templates/profile.jinja2:172
 msgid "Warning!"
 msgstr "Varning!"
 
-#: eduiddashboard/templates/profile.jinja2:159
+#: eduiddashboard/templates/profile.jinja2:172
 msgid ""
 "An error has occurred, please try again or contact support if the problem"
 " persists."
@@ -850,11 +850,11 @@ msgstr ""
 "Ett fel har uppståt. Vänligen försök igen eller kontakta supporten om "
 "problemet kvarstår."
 
-#: eduiddashboard/templates/profile.jinja2:166
+#: eduiddashboard/templates/profile.jinja2:179
 msgid "Error!"
 msgstr "Fel!"
 
-#: eduiddashboard/templates/profile.jinja2:166
+#: eduiddashboard/templates/profile.jinja2:179
 msgid "Permission denied"
 msgstr "Åtkomst nekad"
 
@@ -1261,26 +1261,21 @@ msgstr ""
 msgid "The wizard is completed"
 msgstr "Guiden är nu genomförd"
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:85
+#: eduiddashboard/templates/wizards/basewizard.jinja2:79
 msgid "Done"
 msgstr "Klar"
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:86
+#: eduiddashboard/templates/wizards/basewizard.jinja2:80
 msgid "Sending"
 msgstr "Skickar"
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:88
+#: eduiddashboard/templates/wizards/basewizard.jinja2:82
 msgid "Back"
 msgstr "Tillbaka"
 
-#: eduiddashboard/templates/wizards/basewizard.jinja2:89
+#: eduiddashboard/templates/wizards/basewizard.jinja2:83
 msgid "Dismiss"
 msgstr "Avbryt"
-
-#: eduiddashboard/templates/wizards/basewizard.jinja2:105
-#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:53
-msgid "Invalid identity number"
-msgstr "Ogiltigt personnummer"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:7
 msgid "Identity number"
@@ -1291,7 +1286,7 @@ msgid "Confirm identity number"
 msgstr "Bekräfta identitet"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:112
+#: eduiddashboard/views/__init__.py:119
 msgid "Confirmation code"
 msgstr "Bekräftelsekod"
 
@@ -1303,23 +1298,27 @@ msgstr "Skicka bekräftelsekoden igen"
 msgid "Congratulations, your national number was verified."
 msgstr "Ditt personnummer är nu bekräftat."
 
-#: eduiddashboard/views/__init__.py:109
+#: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:42
+msgid "Invalid identity number"
+msgstr "Ogiltigt personnummer"
+
+#: eduiddashboard/views/__init__.py:116
 msgid "The data has been verified"
 msgstr "Information har bekräftats"
 
-#: eduiddashboard/views/__init__.py:110
+#: eduiddashboard/views/__init__.py:117
 msgid "Confirmation code is invalid"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/views/__init__.py:111
+#: eduiddashboard/views/__init__.py:118
 msgid "Check your email for further instructions"
 msgstr "Se e-post för vidare instruktioner"
 
-#: eduiddashboard/views/__init__.py:113
+#: eduiddashboard/views/__init__.py:120
 msgid "A new confirmation code has been sent to you"
 msgstr "En ny bekräftelsekod har skickats till dig"
 
-#: eduiddashboard/views/__init__.py:114
+#: eduiddashboard/views/__init__.py:121
 msgid ""
 "The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
@@ -1327,16 +1326,16 @@ msgstr ""
 "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en"
 " ny."
 
-#: eduiddashboard/views/__init__.py:116
+#: eduiddashboard/views/__init__.py:123
 #: eduiddashboard/views/verifications.py:36
 msgid "The user was out of sync. Please try again."
 msgstr "Ditt användardata har ändrats från en annan dashboard. Försök igen."
 
-#: eduiddashboard/views/__init__.py:302
+#: eduiddashboard/views/__init__.py:309
 msgid "The wizard was dismissed"
 msgstr "Guiden har avbrutits"
 
-#: eduiddashboard/views/__init__.py:337
+#: eduiddashboard/views/__init__.py:344
 msgid "Unexpected error"
 msgstr "Ett oväntat fel inträffade"
 
@@ -1532,7 +1531,6 @@ msgstr "Kan ej hitta en bekräftelseförfrågan för ditt personnummer "
 
 #: eduiddashboard/views/nins.py:402
 #, fuzzy
-#| msgid "Add national identity number"
 msgid "Add your national identity number"
 msgstr "Lägg till personnummer"
 

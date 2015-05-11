@@ -476,6 +476,23 @@ div#account-deletion-intro {
     width: 19px;
 }
 
+/* removing inlines */
+
+div.position-relative {
+    position: relative;
+}
+
+div.profile-filled-large {
+    padding-top: 80px;
+}
+
+div.profile-filled-small {
+    padding-top: 40px;
+}
+
+/* end of removing inlines
+---------------------------  */
+
 /* End of Spinner on buttons
 -------------------------------------------------- */
 

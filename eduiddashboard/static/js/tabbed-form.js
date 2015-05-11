@@ -9,6 +9,17 @@ if (window.tabbedform.changetabs_calls === undefined) {
     window.tabbedform.changetabs_calls = [];
 }
 
+jQuery.fn.initDeformCallbacks = function () {
+    "use strict";
+    if (deform.callbacks !== undefined &&
+            deform.callbacks.length === 0) {
+        $(this).find('span.scriptholder').each(function (i, e) {
+            var script = $(e).data('script');
+            console.log('Executing form script: ' + script);
+            window.forms_helper_functions[script]();
+        });
+    }
+};
 
 var TabbedForm = function (container) {
     "use strict";
@@ -21,13 +32,7 @@ var TabbedForm = function (container) {
                 };
                 target.html(data);
                 $('div.tab-pane.active button.btn-primary').enable(false);
-                if (deform.callbacks !== undefined &&
-                        deform.callbacks.length === 0) {
-                    $('form script').each(function (i, e) {
-                        var f = new Function(e.innerHTML);
-                        f();
-                    });
-                }
+                target.initDeformCallbacks();
                 deform.processCallbacks();
                 $('div.tab-pane.active button.btn-primary').enable(true);
 
@@ -103,7 +108,7 @@ var TabbedForm = function (container) {
                 });
             });
 
-            $('body').bind('reloadtabs', function () {
+            $('body').one('reloadtabs', function () {
                 initialize_nav_tabs();
                 initialize_pending_actions();
             });

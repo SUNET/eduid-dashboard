@@ -4,9 +4,7 @@
     <h4>{% trans %}Personal information{% endtrans %}</h4>
     {% trans %}<p>The personal information stored in eduID is sent to service providers you log in to using eduID in
     order to personalize those services for you. For more information see the help section.</p>{% endtrans %}
-{% endblock %}
 
-{% block extrajs %}
-    {{ super() }}
-    <script src="{{'eduiddashboard:static/js/auto-displayname.js'|static_url}}"></script>
+    <span class="scriptholder" data-script="auto_displayname"></span>
+
 {% endblock %}
