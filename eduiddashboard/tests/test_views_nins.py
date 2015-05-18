@@ -229,7 +229,7 @@ class NinWizardTests(LoggedInReguestTests):
     def test_no_display_wizard(self):
         self.set_logged(user='johnsmith@example.com')
         response = self.testapp.get('/profile/', status=200)
-        self.assertNotIn('openwizard', response.body)
+        response.mustcontain('data-openwizard="False"')
 
     def test_not_logged_not_display_wizard(self):
         """ Redirect to saml views if no logged session """
@@ -276,7 +276,7 @@ class NinWizardTests(LoggedInReguestTests):
                 'norEduPersonNIN': '12341234-1234',
             }, status=200)
             response = self.testapp.get('/profile/', status=200)
-            self.assertIn('initial_card = 1', response.body)
+            response.mustcontain('data-datakey="12341234-1234"')
 
 
 class NinWizardStep1Tests(LoggedInReguestTests):
@@ -321,7 +321,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                     'norEduPersonNIN': '12341234-1234',
                     'code': '1234',
                 }, status=200)
-                self.assertEqual(response.json['status'], 'ok')
+                self.assertEqual(response.json['status'], 'success')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')
