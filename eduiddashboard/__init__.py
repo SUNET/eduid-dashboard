@@ -29,6 +29,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
 
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
+from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -229,6 +230,10 @@ def includeme(config):
     lookuprelay = LookupMobileRelay(config.registry.settings)
     config.registry.settings['lookuprelay'] = lookuprelay
     config.add_request_method(get_lookuprelay, 'lookuprelay', reify=True)
+
+    idproofinglog = IDProofingLog(config.registry.settings)
+    config.registry.settings['idproofinglog'] = idproofinglog
+    config.add_request_method(get_idproofinglog, 'idproofinglog', reify=True)
 
     config.set_request_property(is_logged, 'is_logged', reify=True)
 
