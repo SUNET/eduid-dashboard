@@ -80,9 +80,8 @@ class IDProofingLog(object):
         default_mongodb_port = 27017
         default_mongodb_name = 'eduid_dashboard'
         default_mongodb_uri = 'mongodb://%s:%d/%s' % (default_mongodb_host, default_mongodb_port, default_mongodb_name)
-        self.mongodb_uri = conf['MONGO_URI'] if 'MONGO_URI' in conf else default_mongodb_uri
-        self.collection = MongoDB(self.mongodb_uri).get_collection['id_proofing_log']
-        self.msgrelay = MsgRelay(conf)
+        self.mongodb_uri = conf['mongo_uri'] if 'mongo_uri' in conf else default_mongodb_uri
+        self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log')
 
     def insert(self, doc):
         self.collection.insert(doc, w=2)  # Make sure we write to two replicas before returning
