@@ -30,6 +30,7 @@ requires = [
     'eduid_lookup_mobile',
     'eduid_userdb>=0.0.2',
     'pysaml2==1.2.0beta2',
+
     'pymongo>=2.8,<3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
@@ -39,7 +40,7 @@ requires = [
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
     'colander==1.0b1',
-    'deform==0.9.8',
+    'deform==2.0a2',
     'deform_bootstrap==0.2.9',
     'pycountry==1.2',
     'eventlet==0.14.0',
