@@ -9,6 +9,7 @@ from eduid_am.userdb import UserDB
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
+from eduiddashboard.idproofinglog import TeleAdressProofing, TeleAdressProofingRelation
 from eduiddashboard import log
 
 
@@ -334,14 +335,26 @@ def validate_nin_by_mobile(request, user, nin):
 
     validation_result = {'success': valid_mobile is not None, 'message': msg, 'mobile': valid_mobile}
 
+    if status == 'match' or status == 'matched_by_navet':
+        user_postal_address = request.msgrelay.get_postal_address(national_identity_number)
+        if status == 'match':
+            proofing_data = TeleAdressProofing(user, status, national_identity_number, valid_mobile,
+                                               user_postal_address)
+        else:
+            registered_postal_address = request.msgrelay.get_postal_address(registered_to_nin)
+            proofing_data = TeleAdressProofingRelation(user, status, national_identity_number, valid_mobile,
+                                                       user_postal_address, registered_to_nin, relation,
+                                                       registered_postal_address)
+        request.idproofinglog.insert(proofing_data)
+
     # TODO What to log ?
     log.debug("ID-PROOFING:: nin: {nin}, by number: {mobile}, registered to: {reg_nin}, "
-             "status: {stat}, success: {success}"
-             .format(nin=national_identity_number,
-                     mobile=valid_mobile,
-                     reg_nin=registered_to_nin,
-                     stat=status,
-                     success=validation_result['success']))
+              "status: {stat}, success: {success}"
+              .format(nin=national_identity_number,
+                      mobile=valid_mobile,
+                      reg_nin=registered_to_nin,
+                      stat=status,
+                      success=validation_result['success']))
 
     return validation_result
 
