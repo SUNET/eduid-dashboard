@@ -331,7 +331,7 @@ class BaseWizard(object):
             post_data = self.request.POST
             response = action_method(post_data)
 
-            if response and response['status'] == 'ok':
+            if response and response['status'] in ('success', 'ok'):
                 self.next_step()
 
         elif self.request.POST['action'] == 'dismissed':

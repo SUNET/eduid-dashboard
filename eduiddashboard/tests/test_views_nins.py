@@ -270,13 +270,18 @@ class NinWizardTests(LoggedInReguestTests):
 
         with patch.multiple(MsgRelay, nin_validator=return_true,
                             nin_reachable=return_true):
-            self.testapp.post('/profile/nin-wizard/', {
-                'action': 'next_step',
-                'step': 0,
-                'norEduPersonNIN': '12341234-1234',
-            }, status=200)
-            response = self.testapp.get('/profile/', status=200)
-            response.mustcontain('data-datakey="12341234-1234"')
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
+                CSRFTokenValidator.__call__.return_value = None
+                self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'next_step',
+                    'step': 0,
+                    'norEduPersonNIN': '197412041234',
+                    'csrf': '12345',
+                }, status=200)
+                response = self.testapp.get('/profile/', status=200)
+                response.mustcontain('data-datakey="197412041234"')
 
 
 class NinWizardStep1Tests(LoggedInReguestTests):
