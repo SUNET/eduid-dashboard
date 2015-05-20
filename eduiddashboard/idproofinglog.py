@@ -75,12 +75,11 @@ class TeleAdressProofingRelation(TeleAdressProofing):
 
 class IDProofingLog(object):
     def __init__(self, config):
-        conf = config.read_configuration()
         default_mongodb_host = 'localhost'
         default_mongodb_port = 27017
         default_mongodb_name = 'eduid_dashboard'
         default_mongodb_uri = 'mongodb://%s:%d/%s' % (default_mongodb_host, default_mongodb_port, default_mongodb_name)
-        self.mongodb_uri = conf['mongo_uri'] if 'mongo_uri' in conf else default_mongodb_uri
+        self.mongodb_uri = config['mongo_uri'] if 'mongo_uri' in config else default_mongodb_uri
         self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log')
 
     def insert(self, doc):
