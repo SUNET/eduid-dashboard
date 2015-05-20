@@ -138,7 +138,7 @@
                                            {% else %}
                                              data-datakey=""
                                            {% endif %}
-                                           data-wizard_nins_url="{{ "wizard-nins" | route_url }}"
+                                           data-wizard_nins_url="{{ context.safe_route_url('wizard-nins') }}"
                                            data-userstatus_url="{{ context.safe_route_url('userstatus') }}"
                                            data-polling_timeout="{{ polling_timeout_for_admin }}"
                                            data-profile_filled="{{ profile_filled }}"
