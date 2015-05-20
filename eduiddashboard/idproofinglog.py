@@ -36,7 +36,7 @@ class IDProofingData(object):
 class TeleAdressProofing(IDProofingData):
     """
     data = {
-            'reason': 'matched|match_by_navet',
+            'reason': 'matched',
             'nin': national_identity_number,
             'mobile_number': mobile_number,
             'teleadress_response': {teleadress_response},
@@ -44,33 +44,36 @@ class TeleAdressProofing(IDProofingData):
         }
     """
 
-    def __init__(self, user, data):
+    def __init__(self, user, reason, nin, mobile_number, user_postal_address):
         super(TeleAdressProofing, self).__init__(user)
-        self._required_keys.extend(['proofing_method', 'reason', 'nin', 'mobile_number', 'teleadress_response',
-                                    'user_postal_address'])
+        self._required_keys.extend(['proofing_method', 'reason', 'nin', 'mobile_number', 'user_postal_address'])
         self.data['proofing_method'] = 'TeleAdress'
-        self.data.update(data)
+        self.data['reason'] = reason
+        self.data['nin'] = nin
+        self.data['mobile_number'] = mobile_number
+        self.data['user_postal_address'] = user_postal_address
 
 
 class TeleAdressProofingRelation(TeleAdressProofing):
     """
     data = {
-            'reason': 'matched|match_by_navet',
+            'reason': 'match_by_navet',
             'nin': national_identity_number,
             'mobile_number': mobile_number,
             'teleadress_response': {teleadress_response},
             'user_postal_address': {postal_address_from_navet}
-            'registered_to': 'registered_national_identity_number',
-            'relation': 'registered_relation_to_user'
+            'mobile_number_registered_to': 'registered_national_identity_number',
+            'registered_relation': 'registered_relation_to_user'
             'registered_postal_address': {postal_address_from_navet}
         }
     """
-    def __init__(self, user, data):
-        super(TeleAdressProofingRelation, self).__init__(user, data)
-        self._required_keys.extend(['proofing_method', 'reason', 'nin', 'mobile_number', 'teleadress_response',
-                                    'user_postal_address', 'mobile_number_registered_to', 'registered_relation',
-                                    'registered_postal_address'])
-        self.data.update(data)
+    def __init__(self, user, reason, nin, mobile_number, user_postal_address, mobile_number_registered_to,
+                 registered_relation, registered_postal_address):
+        super(TeleAdressProofingRelation, self).__init__(user, reason, nin, mobile_number, user_postal_address)
+        self._required_keys.extend(['mobile_number_registered_to', 'registered_relation', 'registered_postal_address'])
+        self.data['mobile_number_registered_to'] = mobile_number_registered_to
+        self.data['registered_relation'] = registered_relation
+        self.data['registered_postal_address'] = registered_postal_address
 
 
 class IDProofingLog(object):
@@ -83,7 +86,7 @@ class IDProofingLog(object):
         self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log')
 
     def insert(self, doc):
-        self.collection.insert(doc, w=2)  # Make sure we write to two replicas before returning
+        self.collection.insert(doc, safe=True)  # Make sure the write succeeded
 
     def log_verified_by_mobile(self, id_proofing_data):
         """
