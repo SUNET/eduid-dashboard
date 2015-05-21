@@ -282,6 +282,8 @@ def _get_age(nin):
 
 
 def validate_nin_by_mobile(request, user, nin):
+    log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
+    log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN
     # Get list of verified mobile numbers
     verified_mobiles = []
@@ -307,6 +309,8 @@ def validate_nin_by_mobile(request, user, nin):
                 # Check if registered nin was the given nin
                 valid_mobile = mobile_number
                 status = 'match'
+                log.info('Mobile number matched for user {!r}.'.format(user))
+                log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
                 break
             elif registered_to_nin is not None and age < 18:
                 # Check if registered nin is related to given nin
@@ -317,6 +321,10 @@ def validate_nin_by_mobile(request, user, nin):
                 if any(r in relation for r in valid_relations):
                     valid_mobile = mobile_number
                     status = 'match_by_navet'
+                    log.info('Mobile number matched for user {!r} via navet.'.format(user))
+                    log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
+                    log.debug('Person with NIN {!s} have relation {!s} to user: {!r}.'.format(registered_to_nin,
+                                                                                              relation, user))
                     break
     except request.lookuprelay.TaskFailed:
         status = 'error_lookup'
@@ -326,36 +334,37 @@ def validate_nin_by_mobile(request, user, nin):
     msg = None
     if status == 'no_phone':
         msg = _('You have no confirmed mobile phone')
+        log.info('User {!r} has no verified mobile phone number.'.format(user))
     elif status == 'no_match':
+        log.info('User {!r} NIN is not associated with any verified mobile phone number.'.format(user))
         msg = _('The given mobile number was not associated to the given national identity number')
     elif status == 'error_lookup' or status == 'error_navet':
+        log.error('Validate NIN via mobile failed with status "{!s}" for user {!r}.'.format(status, user))
         msg = _('Sorry, we are experiencing temporary technical '
                 'problem with ${service_name}, please try again '
                 'later.')
 
-    validation_result = {'success': valid_mobile is not None, 'message': msg, 'mobile': valid_mobile}
-
-    if status == 'match' or status == 'matched_by_navet':
-        user_postal_address = request.msgrelay.get_postal_address(national_identity_number)
+    if status == 'match' or status == 'match_by_navet':
+        log.info('Validate NIN via mobile succeeded with status "{!s}" for user {!r}.'.format(status, user))
+        user_postal_address = request.msgrelay.get_full_postal_address(national_identity_number)
         if status == 'match':
             proofing_data = TeleAdressProofing(user, status, national_identity_number, valid_mobile,
                                                user_postal_address)
         else:
-            registered_postal_address = request.msgrelay.get_postal_address(registered_to_nin)
+            registered_postal_address = request.msgrelay.get_full_postal_address(registered_to_nin)
             proofing_data = TeleAdressProofingRelation(user, status, national_identity_number, valid_mobile,
                                                        user_postal_address, registered_to_nin, relation,
                                                        registered_postal_address)
-        request.idproofinglog.insert(proofing_data)
 
-    # TODO What to log ?
-    log.debug("ID-PROOFING:: nin: {nin}, by number: {mobile}, registered to: {reg_nin}, "
-              "status: {stat}, success: {success}"
-              .format(nin=national_identity_number,
-                      mobile=valid_mobile,
-                      reg_nin=registered_to_nin,
-                      stat=status,
-                      success=validation_result['success']))
+        log.info('Logging of mobile proofing data for user {!r}.'.format(user))
+        if not request.idproofinglog.log_verified_by_mobile(proofing_data):
+            log.error('Logging of mobile proofing data for user {!r} failed.'.format(user))
+            valid_mobile = None
+            msg = _('Sorry, we are experiencing temporary technical '
+                    'problem with ${service_name}, please try again '
+                    'later.')
 
+    validation_result = {'success': valid_mobile is not None, 'message': msg, 'mobile': valid_mobile}
     return validation_result
 
 class NINRegisteredMobileValidator(object):
