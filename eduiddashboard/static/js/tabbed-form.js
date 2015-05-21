@@ -39,6 +39,9 @@ var TabbedForm = function (container) {
                 container.find("a[data-toggle=tooltip]").tooltip();
                 container.find("button[data-toggle=tooltip]").tooltip();
                 container.find("label[data-toggle=tooltip]").tooltip();
+                if (url === 'nins') {
+                    window.loadNinsWizardChooser(true);
+                }
 
             }, 'html').fail(function (xhr) {
                 if (xhr.status == 401) {
@@ -51,15 +54,27 @@ var TabbedForm = function (container) {
 
         initialize_pending_actions = function () {
             $('ul.pending-actions a').click(function (e) {
-                var action_path = e.target.href.split('#')[1];
-                initialize_verification(action_path);
+                var action_path = e.target.href.split('#')[1],
+                    segments = action_path.split('/'),
+                    is_nin = segments[0] === 'nins',
+                    index = segments[2];
+                if (is_nin) {
+                    if (action_path.indexOf('/') === -1) {
+                        container.find('.nav-tabs a.main-nav-tabs[href=#' + action_path + ']').click();
+                    } else {
+                        container.find('.nav-tabs a.main-nav-tabs[href=#nins]').click();
+                        window.loadNinsVerificationChooser(index);
+                    }
+                } else {
+                    initialize_verification(action_path);
+                }
             });
         },
 
         initialize_verification = function(action_path) {
             if (action_path !== undefined && action_path !== "") {
                 if (action_path.indexOf('/') === -1) {
-                    container.find('.nav-tabs a[href=#' + action_path + ']').click();
+                    container.find('.nav-tabs a.main-nav-tabs[href=#' + action_path + ']').click();
                 } else {
                     var segments = action_path.split('/');
                     $(document).one('formready', function () {
@@ -74,13 +89,15 @@ var TabbedForm = function (container) {
                         }
                         verification_link.click();
                     });
-                    container.find('.nav-tabs a[href=#' + segments[0] + ']').click();
+                    container.find('.nav-tabs a.main-nav-tabs[href=#' + segments[0] + ']').click();
                 }
             }
         },
 
         initialize_nav_tabs = function () {
-            container.find('.nav-tabs a').click(function (e) {
+            var nav_tabs = container.find('.nav-tabs a.main-nav-tabs');
+            $(nav_tabs).unbind('click');
+            $(nav_tabs).click(function (e) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
 
@@ -114,7 +131,7 @@ var TabbedForm = function (container) {
             });
 
             if (opentab === undefined || opentab === "") {
-                container.find('.nav-tabs a').first().click();
+                container.find('.nav-tabs a.main-nav-tabs').first().click();
             } else {
                 initialize_verification(opentab);
             }

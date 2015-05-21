@@ -28,6 +28,8 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         HelpFactory, AdminFactory, is_logged)
 
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
+from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
+from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -180,6 +182,12 @@ def profile_urls(config):
     config.add_route('wizard-nins', '/nin-wizard/',
                      factory=NinsFactory)
 
+    config.add_route('nins-wizard-chooser', '/nins-wizard-chooser/',
+                     factory=NinsFactory)
+    config.add_route('nins-verification-chooser',
+                     '/nins-verification-chooser/',
+                     factory=NinsFactory)
+
 
 def admin_urls(config):
     config.add_route('admin-status', '/status/', factory=AdminFactory)
@@ -218,6 +226,14 @@ def includeme(config):
     msgrelay = MsgRelay(config.registry.settings)
     config.registry.settings['msgrelay'] = msgrelay
     config.add_request_method(get_msgrelay, 'msgrelay', reify=True)
+
+    lookuprelay = LookupMobileRelay(config.registry.settings)
+    config.registry.settings['lookuprelay'] = lookuprelay
+    config.add_request_method(get_lookuprelay, 'lookuprelay', reify=True)
+
+    idproofinglog = IDProofingLog(config.registry.settings)
+    config.registry.settings['idproofinglog'] = idproofinglog
+    config.add_request_method(get_idproofinglog, 'idproofinglog', reify=True)
 
     config.set_request_property(is_logged, 'is_logged', reify=True)
 
@@ -330,6 +346,10 @@ def main(global_config, **settings):
     settings['msg_broker_url'] = read_setting_from_env(settings,
                                                        'msg_broker_url',
                                                        'amqp://eduid_msg')
+
+    settings['lookup_mobile_broker_url'] = read_setting_from_env(settings,
+                                                                 'lookup_mobile_broker_url',
+                                                                 'amqp://lookup_mobile')
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')

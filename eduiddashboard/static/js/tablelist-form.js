@@ -91,7 +91,7 @@
                     }
                 },
                 'json');
-              });
+            });
     };
     tabbedform.changetabs_calls.push(initialize);
 }());

@@ -54,6 +54,14 @@ def get_status(request, user):
     }
 
 
+def has_confirmed_mobile(user):
+    mobiles = user.get_mobiles()
+    for m in mobiles:
+        if m['verified']:
+            return True
+    return False
+
+
 def get_tab(request):
     label = _('Mobile phone numbers')
     return {

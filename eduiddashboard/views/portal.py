@@ -19,6 +19,7 @@ from eduiddashboard.utils import (verify_auth_token,
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
+from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
@@ -64,6 +65,9 @@ def profile_editor(context, request):
             'polling_timeout_for_admin', 2000),
         'open_wizard': open_wizard,
         'datakey': datakey,
+        'has_mobile': has_confirmed_mobile(context.user),
+        'nins_wizard_chooser_url': request.route_url('nins-wizard-chooser'),
+        'nins_verification_chooser_url': request.route_url('nins-verification-chooser'),
     }
 
     return view_context
@@ -285,6 +289,24 @@ def terminate_account(context, request):
     schedule_action(request.session, 'account-termination-action')
 
     return HTTPFound(location=get_location(info))
+
+
+@view_config(route_name='nins-wizard-chooser',
+             renderer='templates/nins-wizard-chooser.jinja2',
+             request_method='GET', permission='edit')
+def nins_wizard_chooser(context, request):
+    return {
+            'has_mobile': has_confirmed_mobile(context.user),
+            }
+
+
+@view_config(route_name='nins-verification-chooser',
+             renderer='templates/nins-verification-chooser.jinja2',
+             request_method='GET', permission='edit')
+def nins_verification_chooser(context, request):
+    return {
+            'has_mobile': has_confirmed_mobile(context.user),
+            }
 
 
 @view_config(route_name='error500test')

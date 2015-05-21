@@ -1,0 +1,36 @@
+
+        <div class="modal fade" id="nins-verification-chooser" tabindex="-1" role="dialog" aria-labelledby="NINsVerifylLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="NINsVerifyLabel">{{ _('Choose NIN verification method') }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <p>
+                            {% trans %}
+                            You can confirm your NIN either via Mina meddelanden or via a registered mobile number.
+                            {% endtrans %}
+                        </p>
+                        {% if not has_mobile %}
+                        <p>
+                            {% trans %}
+                            To confirm via mobile, you need to have at least one confirmed mobile phone number.
+                            Please add and verify a mobile phone in the <a id="go-to-mobiles-tab">mobiles tab</a>.
+                            {% endtrans %}
+                        </p>
+                        {% endif %}
+                        <p>
+                            <button class="btn btn-primary" id="nins-verification-choose-mm">{{ _('Min myndighetspost') }}</button>
+                            {% if has_mobile %}
+                            <button class="btn btn-primary" id="nins-verification-choose-mb">{{ _('Mobile') }}</button>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="dismiss-verify-nin" class="btn btn-default" data-dismiss="modal">{{ _('Dismiss') }}</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div>

@@ -80,7 +80,7 @@ var EduidWizard = function (container_path, active_card, options) {
                 type: 'POST',
                 success: function (data, textStatus, jqXHR) {
                     var el, input;
-                    if (data.status === 'success') {
+                    if (data.status === 'ok') {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
@@ -117,6 +117,9 @@ var EduidWizard = function (container_path, active_card, options) {
             type: 'POST',
             success: function (data, textStatus, jqXHR){
                 wizard.reset().close();
+                if (window.dismissNinsWizardChooser){
+                    window.dismissNinsWizardChooser();
+                }
             },
             error: function (event, jqXHR, ajaxSettings, thrownError) {
                 console.debug('Hey!, there are some errors here ' +
@@ -161,7 +164,6 @@ var EduidWizard = function (container_path, active_card, options) {
         e.preventDefault();
     });
 
-    wizard.show();
     if (active_card > 1) {
         presentcard = wizard._cards[0];
         presentcard.deselect();

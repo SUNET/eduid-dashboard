@@ -69,6 +69,7 @@ class MsgRelay(object):
                                        'amqp://eduid:eduid@127.0.0.1:5672/eduid_msg'),
             'TEMPLATES_DIR': 'templates/',
             'CELERY_RESULT_BACKEND': 'amqp',
+            'CELERY_TASK_SERIALIZER': 'json',
         }
         celery.conf.update(config)
 
@@ -126,13 +127,14 @@ class MsgRelay(object):
         else:
             raise self.TaskFailed('Something goes wrong')
 
-    def nin_validator(self, reference, nin, code, language):
+    def nin_validator(self, reference, nin, code, language, recipient, message_type='mm'):
         """
             The template keywords are:
                 * sitename: eduID by default
                 * sitelink: the url dashboard in personal workmode
                 * code: the verification code
                 * nin: the nin number to verificate
+                * message_type: the type of message to send the verification code. Can only have values 'sms' or 'mm'
         """
         content = self.get_content()
 
@@ -143,7 +145,7 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin message reference: {0}, code: {1}, NIN: {2}'.format(
                      reference, code, nin))
-        self._send_message.delay('mm', reference, content, nin,
+        self._send_message.delay(message_type, reference, content, recipient,
                                  TEMPLATES_RELATION.get('nin-validator'), lang)
 
     def nin_reset_password(self, reference, nin, email, link, password_reset_timeout, language):
