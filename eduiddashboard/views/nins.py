@@ -137,7 +137,7 @@ class NINsActionsView(BaseActionsView):
         'ok': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to your "Min myndighetspost" mailbox.'),
-        'placeholder': _('National identity number confirmation code'),
+        'placeholder': _('Confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to your "Min myndighetspost" mailbox'),
     }
 
