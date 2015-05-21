@@ -170,6 +170,7 @@ def help(context, request):
         'support_email': support_email
     }
 
+    request.stats.count('dashboard/help_page_shown', 1)
     return render_to_response(template, template_context, request=request)
 
 
@@ -190,9 +191,11 @@ def token_login(context, request):
         request.session['user'] = user
         request.session['loa'] = 1
         remember_headers = remember(request, user.get('email'))
+        request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
         logger.info("Token authentication failed (eppn: {!r})".format(eppn))
+        request.stats.count('dashboard/token_login_fail', 1)
         # Show and error, the user can't be logged
         return HTTPBadRequest()
 
@@ -219,6 +222,7 @@ def set_language(context, request):
     extra_options['secure'] = asbool(settings.get('session.secure'))
 
     response.set_cookie(cookie_name, value=lang, **extra_options)
+    request.stats.count('dashboard/set_language_cookie', 1)
 
     return response
 
