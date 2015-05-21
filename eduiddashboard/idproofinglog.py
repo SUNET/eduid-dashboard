@@ -103,4 +103,4 @@ class IDProofingLog(object):
 
 
 def get_idproofinglog(request):
-    return request.registry.settings['idproofinglogger']
+    return request.registry.settings['idproofinglog']
