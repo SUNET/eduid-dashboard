@@ -326,7 +326,7 @@ class NinWizardStep1Tests(LoggedInReguestTests):
                     'norEduPersonNIN': '12341234-1234',
                     'code': '1234',
                 }, status=200)
-                self.assertEqual(response.json['status'], 'success')
+                self.assertEqual(response.json['status'], 'ok')
 
     def test_step1_not_valid_code(self):
         self.set_logged(user='johnsmith@example.org')
