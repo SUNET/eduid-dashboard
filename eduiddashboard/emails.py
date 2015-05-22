@@ -52,6 +52,7 @@ def send_verification_mail(request, email, reference=None, code=None):
     else:
         mailer.send(message)
     log.debug("Sent verification mail to user {!r} with address {!s}.".format(request.context.user, email))
+    request.stats.count('dashboard/email_send_verification_code', 1)
 
 
 def send_termination_mail(request, user):
@@ -87,6 +88,7 @@ def send_termination_mail(request, user):
     else:
         mailer.send(message)
     log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))
+    request.stats.count('dashboard/email_send_termination_mail', 1)
 
 
 def send_reset_password_mail(request, user, reset_password_link):
@@ -128,3 +130,4 @@ def send_reset_password_mail(request, user, reset_password_link):
     else:
         mailer.send(message)
     log.debug("Sent reset password mail to user {!r} with address {!s}.".format(user, email))
+    request.stats.count('dashboard/email_send_pwreset_mail', 1)

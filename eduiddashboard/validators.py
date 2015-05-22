@@ -311,6 +311,7 @@ def validate_nin_by_mobile(request, user, nin):
                 status = 'match'
                 log.info('Mobile number matched for user {!r}.'.format(user))
                 log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
+                request.stats.count('dashboard/validate_nin_by_mobile_exact_match', 1)
                 break
             elif registered_to_nin is not None and age < 18:
                 # Check if registered nin is related to given nin
@@ -325,6 +326,7 @@ def validate_nin_by_mobile(request, user, nin):
                     log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
                     log.debug('Person with NIN {!s} have relation {!s} to user: {!r}.'.format(registered_to_nin,
                                                                                               relation, user))
+                    request.stats.count('dashboard/validate_nin_by_mobile_relative_match', 1)
                     break
     except request.lookuprelay.TaskFailed:
         status = 'error_lookup'

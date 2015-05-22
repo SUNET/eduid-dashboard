@@ -77,6 +77,7 @@ class PersonalDataView(BaseFormView):
             self.request.session.flash(
                     get_localizer(self.request).translate(message),
                     queue='forms')
+            self.request.stats.count('dashboard/personal_data_saved', 1)
 
         if new_preferred_language != old_preferred_language:
             self.full_page_reload()
