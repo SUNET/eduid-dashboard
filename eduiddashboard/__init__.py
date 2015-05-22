@@ -30,6 +30,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
 from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
+from eduiddashboard.stats import get_stats_instance
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -237,6 +238,13 @@ def includeme(config):
 
     config.set_request_property(is_logged, 'is_logged', reify=True)
 
+    config.registry.settings['stats'] = get_stats_instance(settings, log)
+    # Make the result of the lambda available as request.stats
+    config.set_request_property(lambda x: x.registry.settings['stats'], 'stats', reify=True)
+
+    #
+    # Route setups
+    #
     config.add_route('home', '/', factory=HomeFactory)
     if settings['workmode'] == 'personal':
         config.include(profile_urls, route_prefix='/profile/')
@@ -439,6 +447,8 @@ def main(global_config, **settings):
         'password_entropy',
         '60',
     )
+
+    settings['stathat_username'] = read_setting_from_env(settings, 'stathat_username')
 
     jinja2_settings(settings)
 

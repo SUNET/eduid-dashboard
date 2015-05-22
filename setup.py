@@ -46,7 +46,8 @@ requires = [
     'gunicorn==18.0',
     'pwgen==0.4',
     'zxcvbn==1.0',
-    'pytz'
+    'pytz',
+    'stathat-async==0.0.3',
 ]
 
 if sys.version_info[0] < 3:

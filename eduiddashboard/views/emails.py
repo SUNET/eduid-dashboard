@@ -86,6 +86,7 @@ class EmailsActionsView(BaseActionsView):
         except UserOutOfSync:
             return self.sync_user()
 
+        self.request.stats.count('dashboard/email_set_primary', 1)
         message = _('Your primary email address was '
                     'successfully changed')
         return {'result': 'success',
@@ -114,6 +115,7 @@ class EmailsActionsView(BaseActionsView):
         except UserOutOfSync:
             return self.sync_user()
 
+        self.request.stats.count('dashboard/email_removed', 1)
         message = _('Email address was successfully removed')
         return {
             'result': 'success',

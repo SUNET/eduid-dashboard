@@ -76,6 +76,7 @@ def verify_nin(request, user, new_nin, reference):
     old_user_docs = request.db.profiles.find({
         'norEduPersonNIN': new_nin
     })
+    steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
         if old_user:
@@ -91,6 +92,7 @@ def verify_nin(request, user, new_nin, reference):
             old_user.retrieve_modified_ts(request.db.profiles)
             old_user.save(request)
             log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
+            steal_count += 1
     # Add the verified nin to the requesting user
     user.add_verified_nin(new_nin)
     user.retrieve_address(request, new_nin)
@@ -99,6 +101,8 @@ def verify_nin(request, user, new_nin, reference):
     # Reset session eduPersonIdentityProofing on NIN verification
     request.session['eduPersonIdentityProofing'] = None
     log.info('NIN verified for user {!r}.'.format(user))
+    request.stats.count('dashboard/verify_nin_stolen', steal_count)
+    request.stats.count('dashboard/verify_nin_completed', 1)
     return user, _('National identity number {obj} verified')
 
 
@@ -109,6 +113,7 @@ def verify_mobile(request, user, new_mobile):
     old_user_docs = request.db.profiles.find({
         'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}
     })
+    steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
         if old_user:
@@ -120,9 +125,12 @@ def verify_mobile(request, user, new_mobile):
             old_user.retrieve_modified_ts(request.db.profiles)
             old_user.save(request)
             log.info('Removed mobile number from user {!r}.'.format(old_user))
+            steal_count += 1
     # Add the verified mobile number to the requesting user
     user.add_verified_mobile(new_mobile)
     log.info('Mobile number verified for user {!r}.'.format(user))
+    request.stats.count('dashboard/verify_mobile_stolen', steal_count)
+    request.stats.count('dashboard/verify_mobile_completed', 1)
     return user, _('Mobile {obj} verified')
 
 
@@ -133,6 +141,7 @@ def verify_mail(request, user, new_mail):
     old_user_docs = request.db.profiles.find({
         'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}
     })
+    steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
         if old_user:
@@ -147,9 +156,12 @@ def verify_mail(request, user, new_mail):
             log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.get_mail_aliases()))
             old_user.retrieve_modified_ts(request.db.profiles)
             old_user.save(request)
+            steal_count += 1
     # Add the verified mail address to the requesting user
     user.add_verified_email(new_mail)
     log.info('Mail address verified for user {!r}.'.format(user))
+    request.stats.count('dashboard/verify_mail_stolen', steal_count)
+    request.stats.count('dashboard/verify_mail_completed', 1)
     return user, _('Email {obj} verified')
 
 
@@ -216,6 +228,7 @@ def verify_code(request, model_name, code):
     else:
         msg = get_localizer(request).translate(msg)
         request.session.flash(msg.format(obj=obj_id), queue='forms')
+        request.stats.count('dashboard/verify_code_completed', 1)
     return obj_id
 
 
