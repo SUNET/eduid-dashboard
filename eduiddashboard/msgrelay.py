@@ -208,6 +208,38 @@ class MsgRelay(object):
         else:
             raise self.TaskFailed('Something goes wrong')
 
+    def get_full_postal_address(self, nin):
+        """
+            The expected address format is:
+
+                OrderedDict([
+                    (u'Name', OrderedDict([
+                        (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                        (u'GivenNameMarking', u'20'),
+                        (u'GivenName', u'personal name'),
+                        (u'SurName', u'thesurname')
+                    ])),
+                    (u'OfficialAddress', OrderedDict([
+                        (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                        (u'Address2', u'StreetName 103'),
+                        (u'PostalCode', u'74141'),
+                        (u'City', u'STOCKHOLM')
+                    ]))
+                ])
+        """
+
+        rtask = self._get_postal_address.apply_async(args=[nin])
+        try:
+            rtask.wait()
+        except:
+            raise self.TaskFailed('Something goes wrong')
+
+        if rtask.successful():
+            result = rtask.get()
+            return result
+        else:
+            raise self.TaskFailed('Something goes wrong')
+
     def get_relations_to(self, nin, relative_nin):
         """
         Get a list of the NAVET 'Relations' type codes between a NIN and a relatives NIN.

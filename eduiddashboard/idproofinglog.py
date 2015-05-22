@@ -85,7 +85,7 @@ class IDProofingLog(object):
         self.mongodb_uri = config['mongo_uri'] if 'mongo_uri' in config else default_mongodb_uri
         self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log')
 
-    def insert(self, doc):
+    def _insert(self, doc):
         self.collection.insert(doc, safe=True)  # Make sure the write succeeded
 
     def log_verified_by_mobile(self, id_proofing_data):
@@ -97,10 +97,10 @@ class IDProofingLog(object):
         """
         doc = id_proofing_data.to_dict()
         if doc:
-            self.insert(doc)
+            self._insert(doc)
             return True
         return False
 
 
 def get_idproofinglog(request):
-    return request.registry.settings['idproofinglogger']
+    return request.registry.settings['idproofinglog']
