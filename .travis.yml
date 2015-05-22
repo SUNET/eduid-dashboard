@@ -10,6 +10,6 @@ before_install:
   - sudo apt-get install -qq -y xmlsec1
 # command to install dependencies
 install:
-  - "pip install ."
+  - "python setup.py develop"
 # command to run tests
 script: nosetests
