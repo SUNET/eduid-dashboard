@@ -25,11 +25,11 @@ class TestIDProofingLog(MongoTestCase):
             'mobile_number': 'some_mobile_number',
             'user_postal_address': {'response_data': {'some': 'data'}}
         }
-        proofing_data = TeleAdressProofing(user, **data).to_dict()
-        self.assertDictContainsSubset(data, proofing_data)
+        proofing_data = TeleAdressProofing(user, **data)
+        self.assertDictContainsSubset(data, proofing_data.to_dict())
 
         idlog = IDProofingLog(self.settings)
-        idlog.insert(proofing_data)
+        idlog.log_verified_by_mobile(proofing_data)
         result = self.collection.find()
         self.assertEquals(result.count(), 1)
         hit = result.next()
@@ -48,11 +48,11 @@ class TestIDProofingLog(MongoTestCase):
             'registered_relation': 'registered_relation_to_user',
             'registered_postal_address': {'response_data': {'some': 'data'}},
         }
-        proofing_data = TeleAdressProofingRelation(user, **data).to_dict()
-        self.assertDictContainsSubset(data, proofing_data)
+        proofing_data = TeleAdressProofingRelation(user, **data)
+        self.assertDictContainsSubset(data, proofing_data.to_dict())
 
         idlog = IDProofingLog(self.settings)
-        idlog.insert(proofing_data)
+        idlog.log_verified_by_mobile(proofing_data)
         result = self.collection.find()
         self.assertEquals(result.count(), 1)
         hit = result.next()
