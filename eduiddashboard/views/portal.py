@@ -66,8 +66,8 @@ def profile_editor(context, request):
         'open_wizard': open_wizard,
         'datakey': datakey,
         'has_mobile': has_confirmed_mobile(context.user),
-        'nins_wizard_chooser_url': request.route_url('nins-wizard-chooser'),
-        'nins_verification_chooser_url': request.route_url('nins-verification-chooser'),
+        'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
+        'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
     }
 
     return view_context
