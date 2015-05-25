@@ -340,11 +340,13 @@ def validate_nin_by_mobile(request, user, nin):
     elif status == 'no_match':
         log.info('User {!r} NIN is not associated with any verified mobile phone number.'.format(user))
         msg = _('The given mobile number was not associated to the given national identity number')
+        request.stats.count('dashboard/validate_nin_by_mobile_no_match', 1)
     elif status == 'error_lookup' or status == 'error_navet':
         log.error('Validate NIN via mobile failed with status "{!s}" for user {!r}.'.format(status, user))
         msg = _('Sorry, we are experiencing temporary technical '
                 'problem with ${service_name}, please try again '
                 'later.')
+        request.stats.count('dashboard/validate_nin_by_mobile_error', 1)
 
     if status == 'match' or status == 'match_by_navet':
         log.info('Validate NIN via mobile succeeded with status "{!s}" for user {!r}.'.format(status, user))
