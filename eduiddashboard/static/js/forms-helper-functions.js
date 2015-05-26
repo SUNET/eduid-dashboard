@@ -124,7 +124,6 @@
                           $('body').trigger('communication-error');
                         },
                         beforeSubmit: window.beforeSubmit
-        
                      },
                      extra_options = ajax_options || {};
                  console.log('Set AJAX form at ' + oid);
@@ -152,6 +151,8 @@
             var msg_verifying = $('span.dataholder#ninsform-data').data('msg_verifying');
             window.beforeSubmit = function () {
                 $('#ninsview-formadd').
+                    prop('disabled', true);
+                $('#ninsview-formadd_by_mobile').
                     prop('disabled', true).
                     after('<p class="nin-wait">' + msg_verifying + '</p>');
             };
