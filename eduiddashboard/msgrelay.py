@@ -166,7 +166,7 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin reset link message: {0} NIN: {1}'.format(
                      link, nin))
-        self._send_message.delay('mm', reference, content, nin, TEMPLATES_RELATION.get('nin-reset-password'), lang)
+        self._send_message.delay('mm', str(reference), content, nin, TEMPLATES_RELATION.get('nin-reset-password'), lang)
 
     def get_postal_address(self, nin):
         """
