@@ -204,6 +204,37 @@
                 // if format is valid, then try to send to server
                 return ret;
             };
+        },
+
+        initialize_pending_actions: function () {
+            $('ul.pending-actions a').click(function (e) {
+                var action_path = e.target.href.split('#')[1];
+                window.forms_helper_functions.initialize_verification(action_path);
+            });
+        },
+
+        initialize_verification: function(action_path) {
+            if (action_path !== undefined && action_path !== "") {
+                var container = $('.tabbable');
+                if (action_path.indexOf('/') === -1) {
+                    container.find('.nav-tabs a.main-nav-tabs[href=#' + action_path + ']').click();
+                } else {
+                    var segments = action_path.split('/');
+                    $(document).one('formready', function () {
+                        var form_container = $('.' + segments[0] + 'view-form-container');
+                        var link_selector = 'input.btn-link[name="' + segments[1] + '"]';
+                        var verification_links = form_container.find(link_selector);
+                        if (verification_links.length === 1) {
+                            var verification_link = verification_links[0];
+                        } else {
+                            var link_index = + segments[2];
+                            var verification_link = verification_links[link_index];
+                        }
+                        verification_link.click();
+                    });
+                    container.find('.nav-tabs a.main-nav-tabs[href=#' + segments[0] + ']').click();
+                }
+            }
         }
     };
 }());

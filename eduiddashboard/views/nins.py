@@ -421,7 +421,7 @@ class NinsWizard(BaseWizard):
         if result['result'] == 'ok':
             self.request.stats.count('dashboard/nin_wizard_step_1_ok', 1)
             return {
-                'status': 'ok',
+                'status': 'success',
             }
         else:
             self.request.stats.count('dashboard/nin_wizard_step_1_fail', 1)
@@ -453,7 +453,7 @@ class NinsWizard(BaseWizard):
             NINsActionsView.default_verify_messages.get('new_code_sent', ''))
         self.request.stats.count('dashboard/nin_wizard_resend_code', 1)
         return {
-            'status': 'ok',
+            'status': 'success',
             'text': text,
         }
 

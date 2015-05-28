@@ -80,7 +80,7 @@ var EduidWizard = function (container_path, active_card, options) {
                 type: 'POST',
                 success: function (data, textStatus, jqXHR) {
                     var el, input;
-                    if (data.status === 'ok') {
+                    if (data.status === 'success' || data.status === 'ok') {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {

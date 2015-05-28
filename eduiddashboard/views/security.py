@@ -28,7 +28,9 @@ from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
     convert_to_localtime, normalize_to_e_164
-from eduiddashboard import log
+
+import logging
+log = logging.getLogger(__name__)
 
 
 def change_password(request, user, old_password, new_password):
@@ -151,6 +153,7 @@ def change_password_action(request, session_info, user):
         raise HTTPUnauthorized("Wrong user")
 
     # set timestamp in session
+    log.debug('Setting Authn ts for user {}'.format(user.get_id()))
     request.session['re-authn-ts'] = datetime.utcnow()
     # send to password change form
     return HTTPFound(request.route_url('password-change'))
@@ -235,12 +238,12 @@ class PasswordsView(BaseFormView):
                 msg = _('Stale authentication info. Please try again.')
                 self.request.session.flash('error|' + msg)
                 raise HTTPFound(self.context.route_url('profile-editor'))
+        user = self.request.session.get('edit-user',
+                self.request.session.get('user'))
+        log.debug('Removing Authn ts for user {!r} before'
+                ' changing the password'.format(user.get_id()))
         del self.request.session['re-authn-ts']
         passwords_data = self.schema.serialize(passwordform)
-        if 'edit-user' in self.request.session:
-            user = self.request.session['edit-user']
-        else:
-            user = self.request.session['user']
 
         if passwords_data.get('use_custom_password') == 'true':
             # The user has entered his own password and it was verified by
