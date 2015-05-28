@@ -135,7 +135,7 @@ class NINsActionsView(BaseActionsView):
 
     data_attribute = 'norEduPersonNIN'
     special_verify_messages = {
-        'ok': _('National identity number verified'),
+        'success': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
         'request': _('A confirmation code has been sent to your "Min myndighetspost" mailbox.'),
         'placeholder': _('Confirmation code'),
@@ -194,7 +194,7 @@ class NINsActionsView(BaseActionsView):
 #            }
 
         validation = validate_nin_by_mobile(self.request, self.user, nin)
-        result = validation['success'] and 'ok' or 'error'
+        result = validation['success'] and 'success' or 'error'
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
                 mapping={
@@ -231,7 +231,7 @@ class NINsActionsView(BaseActionsView):
         self.request.stats.count('dashboard/nin_remove', 1)
         message = _('National identity number has been removed')
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 
@@ -253,7 +253,7 @@ class NINsActionsView(BaseActionsView):
         self.request.stats.count('dashboard/nin_code_resend', 1)
         message = self.verify_messages['new_code_sent']
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': message,
         }
 
@@ -343,7 +343,7 @@ class NinsView(BaseFormView):
         self.addition_with_code_validation(validated)
         self.request.stats.count('dashboard/nin_add_external', 1)
         return {
-            'status': 'ok'
+            'status': 'success'
         }
 
     def add_success_other(self, ninform):
@@ -418,10 +418,10 @@ class NinsWizard(BaseWizard):
 
         result = nins_action_view._verify_action(normalize_nin(self.datakey), data)
 
-        if result['result'] == 'ok':
+        if result['result'] == 'success':
             self.request.stats.count('dashboard/nin_wizard_step_1_ok', 1)
             return {
-                'status': 'ok',
+                'status': 'success',
             }
         else:
             self.request.stats.count('dashboard/nin_wizard_step_1_fail', 1)
@@ -453,7 +453,7 @@ class NinsWizard(BaseWizard):
             NINsActionsView.default_verify_messages.get('new_code_sent', ''))
         self.request.stats.count('dashboard/nin_wizard_resend_code', 1)
         return {
-            'status': 'ok',
+            'status': 'success',
             'text': text,
         }
 

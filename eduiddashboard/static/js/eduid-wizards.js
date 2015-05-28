@@ -80,7 +80,7 @@ var EduidWizard = function (container_path, active_card, options) {
                 type: 'POST',
                 success: function (data, textStatus, jqXHR) {
                     var el, input;
-                    if (data.status === 'ok') {
+                    if (data.status === 'success') {
                         // go to next card
                         currentCard = wizard.incrementCard();
                     } else if (data.status === 'failure') {
@@ -169,7 +169,7 @@ var EduidWizard = function (container_path, active_card, options) {
         presentcard.deselect();
         presentcard.markVisited();
         newcard = wizard.setCard(active_card-1);
-        newcard.select();
+        //newcard.select();
     }
 
     return wizard;

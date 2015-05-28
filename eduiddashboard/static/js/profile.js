@@ -4,7 +4,7 @@
       open_wizard = dataholder.data('openwizard'),
       datakey = dataholder.data('datakey'),
       wizard_nins_url = dataholder.data('wizard_nins_url'),
-      userstatus_url = dataholder.data('userstatus-url'),
+      userstatus_url = dataholder.data('userstatus_url'),
       polling_timeout = parseInt(dataholder.data('polling_timeout'));
 
   if (open_wizard === 'True') {
@@ -50,6 +50,7 @@
                 console.log('Executing wizard form script: ' + script);
                 window.forms_helper_functions[script]();
             });
+            currentwizard.show();
         });
       }
       // show progress
@@ -89,7 +90,7 @@
       });
   
       if (workmode === 'personal') {
-        $('body').on('form-submitted action-executed', function() {
+        $('body').on('form-submitted', function() {
           showStatus();
         });
   
