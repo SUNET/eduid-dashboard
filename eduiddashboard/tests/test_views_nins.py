@@ -148,7 +148,7 @@ class NinsFormTests(LoggedInReguestTests):
         }).count()
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
         self.assertEqual(nins_before - 1, nins_after)
 
     @unittest.skip('Functionality temporary removed')
@@ -206,7 +206,7 @@ class NinsFormTests(LoggedInReguestTests):
                 )
 
             response_json = json.loads(response.body)
-            self.assertEqual(response_json['result'], 'ok')
+            self.assertEqual(response_json['result'], 'success')
 
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
             old_user = User(old_user)

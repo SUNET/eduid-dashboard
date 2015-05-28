@@ -7,7 +7,6 @@
 
     var sendInfo = function(container, cls, msg) {
             if (cls === 'out_of_sync' || cls === 'error') { cls = 'danger' }
-            if (cls === 'ok') {cls = 'success'}
             var messageHTML = '<div class="alert alert-' + cls +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
@@ -28,7 +27,7 @@
                     sendInfo(dialog, data.result, data.message);
                     if (data.result === 'out_of_sync') {
                         dialog.find('.cancel-button').click();
-                    } else if (data.result == 'ok') {
+                    } else if (data.result == 'success') {
                         dialog.find('.btn').hide();
                         dialog.find('.divDialogElements').hide();
                         dialog.find('.finish-button').show();
