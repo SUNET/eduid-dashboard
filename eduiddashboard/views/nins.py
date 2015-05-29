@@ -137,9 +137,9 @@ class NINsActionsView(BaseActionsView):
     special_verify_messages = {
         'success': _('National identity number verified'),
         'error': _('The confirmation code is invalid, please try again or request a new code'),
-        'request': _('A confirmation code has been sent to your "Min myndighetspost" mailbox.'),
+        'request': _('A confirmation code has been sent to your "Mina meddelanden" mailbox.'),
         'placeholder': _('Confirmation code'),
-        'new_code_sent': _('A new confirmation code has been sent to your "Min myndighetspost" mailbox'),
+        'new_code_sent': _('A new confirmation code has been sent to your "Mina meddelanden" mailbox'),
     }
 
     def get_verification_data_id(self, data_to_verify):
