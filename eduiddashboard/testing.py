@@ -132,6 +132,7 @@ class LoggedInReguestTests(am.MongoTestCase):
             'personal_dashboard_base_url': 'http://localhost/',
             'nin_service_name': 'Mina meddelanden',
             'nin_service_url': 'http://minameddelanden.se/',
+            'mobile_service_name': 'TeleAdress',
             'available_languages': '''
                 en = English
                 sv = Svenska
