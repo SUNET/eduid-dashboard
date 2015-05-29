@@ -332,6 +332,7 @@ def main(global_config, **settings):
         'vccs_url',
         'nin_service_name',
         'nin_service_url',
+        'mobile_service_name',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:

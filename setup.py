@@ -21,7 +21,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.3.11b0'
+version = '0.3.11b1'
 
 requires = [
     'eduid_am>=0.5.3,<0.6.0-dev',

@@ -257,8 +257,8 @@ class NINReachableValidator(object):
         if msg:
             localizer = get_localizer(request)
             raise colander.Invalid(node, localizer.translate(msg, mapping={
-                'service_name': settings.get('nin_mobile_service_name'),
-                'service_url': settings.get('nin_mobile_service_url'),
+                'service_name': settings.get('nin_service_name'),
+                'service_url': settings.get('nin_service_url'),
             }))
 
 
@@ -380,11 +380,9 @@ class NINRegisteredMobileValidator(object):
         result = validate_nin_by_mobile(request, request.context.user, value)
 
         if not result['success']:
-            # TODO Get different "nin_service_name"
             localizer = get_localizer(request)
             raise colander.Invalid(node, localizer.translate(result['message'], mapping={
-                'service_name': settings.get('mobile_service_name', 'Navet'),
-                #'service_url': settings.get('nin_service_url'),
+                'service_name': settings.get('mobile_service_name', 'TeleAdress'),
             }))
 
 class ResetPasswordCodeExistsValidator(object):
