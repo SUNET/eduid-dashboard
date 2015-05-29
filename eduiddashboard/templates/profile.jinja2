@@ -67,8 +67,8 @@
           <ul class="nav nav-stacked nav-tabs navbar-nav">
               {% for tab in tabs %}
                 <li>
-                    <a href='#{{tab.id}}' class="hidden-sm" data-toggle="collapse" data-target="#profile-menu-small">{{_(tab.label)}}</a>
-                    <a href='#{{tab.id}}' class="hidden-xs">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' class="main-nav-tabs hidden-sm" data-toggle="collapse" data-target="#profile-menu-small">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' class="main-nav-tabs hidden-xs">{{_(tab.label)}}</a>
                 </li>
               {% endfor %}
           </ul>
