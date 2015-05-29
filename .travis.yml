@@ -7,9 +7,13 @@ services:
 # pysaml2 needs to find an xmlsec1 binary
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq -y xmlsec1 python-nosexcover
+  - sudo apt-get install -qq -y xmlsec1
 # command to install dependencies
 install:
-  - "python setup.py develop"
+  - python setup.py develop
+  - pip install nosexcover
 # command to run tests
-script: nosetests
+script:
+  - nosetests --plugins
+  - nosetests --help
+  - nosetests
