@@ -1,5 +1,8 @@
 import pprint
 
+from cgi import escape
+from urllib import unquote, quote
+
 from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
@@ -80,7 +83,7 @@ def forbidden_view(context, request):
     """
     user = authenticated_userid(request)
     if user:
-        # Return a plain forbbiden page
+        # Return a plain forbidden page
         try:
             reason = context.explanation
         except AttributeError:
@@ -116,7 +119,12 @@ def login_view(request):
     login_redirect_url = request.registry.settings.get(
         'saml2.login_redirect_url', '/')
 
-    came_from = request.GET.get('next', login_redirect_url)
+    try:
+        came_from = sanitize_url(request.GET.get('next', login_redirect_url))
+    except UnicodeDecodeError:
+        log.warn('A malicious user tried to crash the application '
+                 'by sending non-unicode input in the next parameter')
+        return HTTPBadRequest("Non-unicode input, please try again.")
 
     if authenticated_userid(request):
         return HTTPFound(location=came_from)
@@ -198,7 +206,6 @@ def assertion_consumer_service(request):
 @view_config(route_name='saml2-echo-attributes')
 def echo_attributes(request):
     raise NotImplementedError
-
 
 @view_config(route_name='saml2-logout')
 def logout_view(request):
@@ -359,3 +366,13 @@ def get_authn_request(request, came_from, selected_idp,
     oq_cache = OutstandingQueriesCache(request.session)
     oq_cache.set(session_id, came_from)
     return info
+
+def sanitize_url(url):
+    # If the url is not quoted we only escape it. Otherwise we
+    # have to unquote, escape and quote again before returning it.
+    # The Saml2Client expects the url to be UTF-8 encoded in accordance
+    # with RFC 3986 and therefore we return it as such.
+    if url == unquote(url):
+        return escape(url, quote = True).encode("UTF-8")
+    else:
+        return quote(escape(unquote(url), quote = True)).encode("UTF-8")
