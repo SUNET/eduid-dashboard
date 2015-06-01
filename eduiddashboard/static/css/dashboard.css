@@ -769,3 +769,77 @@ button[type=submit].btn {
         border:none;
     }
 }
+
+/* Wizard
+-------------------------------------------------- */
+
+.wizard-modal p {
+    margin: 0 0 10px;
+    padding: 0;
+}
+
+#wizard-ns-detail-servers, .wizard-additional-servers {
+    font-size:12px;
+    margin-top:10px;
+    margin-left:15px;
+}
+#wizard-ns-detail-servers > li, .wizard-additional-servers li {
+    line-height:20px;
+    list-style-type:none;
+}
+#wizard-ns-detail-servers > li > img {
+    padding-right:5px;
+}
+
+.wizard-modal .chzn-container .chzn-results {
+    max-height:150px;
+                        }
+.wizard-addl-subsection {
+    margin-bottom:40px;
+}
+.wizard-progress-container > .progress {
+    width:135px;
+}
+
+.wizard-modal .help-inline .error {
+  color: #b94a48;
+}
+
+.wizard-card > h3 {
+  color: #333;
+}
+
+@media only screen and (max-width: 598px) {
+
+div.wizard-card {
+  padding: 20px 35px 0px !important;
+}
+
+div.wizard div.wizard-steps {
+  display: none;
+}
+
+div.wizard div.wizard-dialog {
+  width: 94% !important;
+  margin-top: 15px !important;
+}
+
+div.wizard div.wizard-card-container {
+  margin-left: 0px;
+}
+
+div.wizard div.wizard-content,
+div.wizard div.wizard-body,
+div.wizard div.wizard-cards,
+div.wizard div.wizard-card-container {
+  height: auto !important;
+}
+
+div.wizard div.wizard-buttons-container > div.btn-group-single {
+  float: none !important;
+}
+
+}
+
+/* End of wizard
+-------------------------------------------------- */

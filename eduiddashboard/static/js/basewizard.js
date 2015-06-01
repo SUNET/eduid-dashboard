@@ -17,6 +17,7 @@
             showCancel: true,
             isModal: true,
             submitUrl: path,
+            contentHeight: 400,
             buttons: {
               submitText: msg_done,
               submittingText: msg_sending,
