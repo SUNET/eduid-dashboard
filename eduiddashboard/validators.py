@@ -350,6 +350,7 @@ def validate_nin_by_mobile(request, user, nin):
 
     if status == 'match' or status == 'match_by_navet':
         log.info('Validate NIN via mobile succeeded with status "{!s}" for user {!r}.'.format(status, user))
+        msg = _('Validate NIN via mobile with succeeded')
         user_postal_address = request.msgrelay.get_full_postal_address(national_identity_number)
         if status == 'match':
             proofing_data = TeleAdressProofing(user, status, national_identity_number, valid_mobile,

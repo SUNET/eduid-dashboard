@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-29 15:23+0200\n"
+"POT-Creation-Date: 2015-06-01 10:24+0200\n"
 "PO-Revision-Date: 2015-05-29 13:19+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/eduid-"
@@ -244,7 +244,7 @@ msgid "This national identity number is already in use"
 msgstr "Personnumret är redan registrerat"
 
 #: eduiddashboard/validators.py:235 eduiddashboard/validators.py:346
-#: eduiddashboard/validators.py:367
+#: eduiddashboard/validators.py:368
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -295,15 +295,19 @@ msgstr ""
 "Ditt bekräftade mobiltelefonnummer är inte kopplat till det personnummer "
 "du angav"
 
-#: eduiddashboard/validators.py:393
+#: eduiddashboard/validators.py:353
+msgid "Validate NIN via mobile with succeeded"
+msgstr ""
+
+#: eduiddashboard/validators.py:394
 msgid "The entered code does not exist"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/validators.py:408
+#: eduiddashboard/validators.py:409
 msgid "Invalid CSRF token"
 msgstr "Ogiltig CSRF kod"
 
-#: eduiddashboard/validators.py:424
+#: eduiddashboard/validators.py:425
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
