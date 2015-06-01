@@ -295,6 +295,12 @@ div.profile-filled div.title span {
 .table > tbody > tr > td.identifier {
     vertical-align:middle;
 }
+
+table.table-form td.non-identifier {
+  vertical-align:middle;
+  text-align: center !important;
+}
+
 .text-muted {
     background-color: #dd0d0d;
     color: white;
@@ -842,4 +848,14 @@ div.wizard div.wizard-buttons-container > div.btn-group-single {
 }
 
 /* End of wizard
+-------------------------------------------------- */
+
+/* Modals
+-------------------------------------------------- */
+
+h3.modal-title {
+  color: #333;
+}
+
+/* End of Modals
 -------------------------------------------------- */
