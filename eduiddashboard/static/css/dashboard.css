@@ -292,6 +292,9 @@ div.profile-filled div.title span {
     padding:10px 0;
     vertical-align:middle;
 }
+.table > tbody > tr > td.identifier {
+    vertical-align:middle;
+}
 .text-muted {
     background-color: #dd0d0d;
     color: white;
