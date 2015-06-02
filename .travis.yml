@@ -11,7 +11,7 @@ before_install:
 # command to install dependencies
 install:
   - python setup.py develop
-  - pip install nosexcover WebTest
+  - pip install nosexcover WebTest==1.4.3
 # command to run tests
 script:
   - nosetests
