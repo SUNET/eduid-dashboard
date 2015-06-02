@@ -326,9 +326,6 @@ table.table-form td.non-identifier {
 .intro:not(:first-child) {
     padding-top:40px;
 }
-.tab-content {
-    padding-top:72px;
-}
 
 .form-control {
     height:60px;
@@ -858,4 +855,32 @@ h3.modal-title {
 }
 
 /* End of Modals
+-------------------------------------------------- */
+
+/* Flash messages
+-------------------------------------------------- */
+
+div.messages-wrapper {
+}
+
+@media only screen and (max-width: 991px) {
+
+div.messages-wrapper {
+    min-height: 2px;
+    height: auto;
+}
+
+}
+
+@media only screen and (min-width: 992px) {
+
+div.messages-wrapper {
+    min-height:80px;
+    width: 70%;
+    float: right;
+}
+
+}
+
+/* End of Messages
 -------------------------------------------------- */
