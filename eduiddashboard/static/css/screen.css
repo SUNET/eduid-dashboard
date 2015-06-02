@@ -455,8 +455,9 @@ div.wizard div.wizard-dialog {
   margin-top: 15px !important;
 }
 
-div.wizard div.wizard-card-container {
-  margin-left: 0px;
+div.wizard div.wizard-card-container,
+div.wizard div.wizard-buttons-container > div.btn-group-single {
+  margin-left: 0px !important;
 }
 
 div.wizard div.wizard-content,
