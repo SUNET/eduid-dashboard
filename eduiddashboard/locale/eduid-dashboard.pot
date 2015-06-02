@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.3.11b1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-29 15:23+0200\n"
+"POT-Creation-Date: 2015-06-01 10:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -230,7 +230,7 @@ msgid "This national identity number is already in use"
 msgstr ""
 
 #: eduiddashboard/validators.py:235 eduiddashboard/validators.py:346
-#: eduiddashboard/validators.py:367
+#: eduiddashboard/validators.py:368
 msgid ""
 "Sorry, we are experiencing temporary technical problem with ${service_name}, "
 "please try again later."
@@ -268,15 +268,19 @@ msgid ""
 "number"
 msgstr ""
 
-#: eduiddashboard/validators.py:393
+#: eduiddashboard/validators.py:353
+msgid "Validate NIN via mobile with succeeded"
+msgstr ""
+
+#: eduiddashboard/validators.py:394
 msgid "The entered code does not exist"
 msgstr ""
 
-#: eduiddashboard/validators.py:408
+#: eduiddashboard/validators.py:409
 msgid "Invalid CSRF token"
 msgstr ""
 
-#: eduiddashboard/validators.py:424
+#: eduiddashboard/validators.py:425
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
