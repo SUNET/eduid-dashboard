@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-05-29 15:23+0200\n"
+"POT-Creation-Date: 2015-06-01 10:24+0200\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -260,7 +260,7 @@ msgid "This national identity number is already in use"
 msgstr "números de identificación personal"
 
 #: eduiddashboard/validators.py:235 eduiddashboard/validators.py:346
-#: eduiddashboard/validators.py:367
+#: eduiddashboard/validators.py:368
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -298,16 +298,20 @@ msgid ""
 " number"
 msgstr ""
 
-#: eduiddashboard/validators.py:393
+#: eduiddashboard/validators.py:353
+msgid "Validate NIN via mobile with succeeded"
+msgstr ""
+
+#: eduiddashboard/validators.py:394
 #, fuzzy
 msgid "The entered code does not exist"
 msgstr "Este email no ha sido registrado aún"
 
-#: eduiddashboard/validators.py:408
+#: eduiddashboard/validators.py:409
 msgid "Invalid CSRF token"
 msgstr ""
 
-#: eduiddashboard/validators.py:424
+#: eduiddashboard/validators.py:425
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -829,7 +833,7 @@ msgid ""
 "If you do not have a record in the Swedish population register\n"
 "      or if you live somewhere Else you may manually add a postal address"
 " by\n"
-"      clikcing on the button below. If you are registered please click\n"
+"      clicking on the button below. If you are registered please click\n"
 "      <a href=\"#nins\">here</a> to enter your national identity number "
 "to\n"
 "      automatically fetch your postal address.\n"
@@ -1413,13 +1417,11 @@ msgstr "números de identificación personal"
 
 #: eduiddashboard/views/nins.py:140
 #, fuzzy
-#| msgid "Please enter your confirmation code sent to your government inbox."
 msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
 msgstr "Reenviar el email de verificación"
 
 #: eduiddashboard/views/nins.py:142
 #, fuzzy
-#| msgid "Please enter your confirmation code sent to your government inbox."
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr "Reenviar el email de verificación"
 
@@ -2004,13 +2006,16 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "A confirmation code has been sent "
-#~ "to your \"Min myndighetspost\" mailbox."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A new confirmation code has been "
-#~ "sent to your \"Min myndighetspost\" "
-#~ "mailbox"
+#~ "If you do not have a record in the Swedish population register\n"
+#~ "      or if you live somewhere "
+#~ "Else you may manually add a postal"
+#~ " address by\n"
+#~ "      clikcing on the button below. "
+#~ "If you are registered please click\n"
+#~ ""
+#~ "      <a href=\"#nins\">here</a> to enter "
+#~ "your national identity number to\n"
+#~ "      automatically fetch your postal address.\n"
+#~ "    "
 #~ msgstr ""
 
