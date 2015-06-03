@@ -459,8 +459,10 @@ class NinsWizard(BaseWizard):
 
     def get_template_context(self):
         context = super(NinsWizard, self).get_template_context()
+        message = _('Add your national identity number')
+        message = get_localizer(self.request).translate(message)
         context.update({
-            'wizard_title': _('Add your national identity number'),
+            'wizard_title': message,
         })
         return context
 
