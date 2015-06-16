@@ -165,7 +165,7 @@ class Saml2RequestTests(unittest.TestCase):
             for col_name in db.collection_names():
                 if 'system' not in col_name:
                     db.drop_collection(col_name)
-                    del db
+            del db
             self.conn.drop_database(db_name)
         self.conn.disconnect()
 
