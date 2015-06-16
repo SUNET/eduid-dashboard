@@ -159,10 +159,13 @@ class Saml2RequestTests(unittest.TestCase):
         super(Saml2RequestTests, self).tearDown()
         self.testapp.reset()
         for db_name in self.conn.database_names():
-            db = self.conn.get_database(db_name)
+            if db_name == 'local':
+                continue
+            db = self.conn[db_name]
             for col_name in db.collection_names():
-                db.drop_collection(col_name)
-                del db
+                if 'system' not in col_name:
+                    db.drop_collection(col_name)
+                    del db
             self.conn.drop_database(db_name)
         self.conn.disconnect()
 
