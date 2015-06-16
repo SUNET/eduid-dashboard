@@ -24,7 +24,6 @@ class LocaleChangeTests(LoggedInReguestTests):
                                         'HTTP_REFERER': referer
                                     },
                                     status=302)
-        self.assertIsNotNone(response.cookies_set.get('lang', 'sv'))
         self.assertEqual(response.location, referer)
         response = self.testapp.get(referer, status=200)
         lang_name = read_mapping(self.settings, 'available_languages')['sv']
@@ -33,13 +32,12 @@ class LocaleChangeTests(LoggedInReguestTests):
     def test_change_language_without_referer(self):
         self.set_logged(user='johnsmith@example.com')
         response = self.testapp.get('/set_language/?lang=sv', status=302)
-        self.assertIsNotNone(response.cookies_set.get('lang', 'sv'))
         response = self.testapp.get('/profile/', status=200)
         self.assertIn('<span>Svenska</span>', response.body)
 
     def test_language_cookie(self):
         self.set_logged(user='johnsmith@example.com')
-        self.testapp.cookies['lang'] = 'sv'
+        self.testapp.set_cookie('lang', 'sv')
         response = self.testapp.get('/profile/',
                                     status=200)
         self.assertIn('<span>Svenska</span>', response.body)
