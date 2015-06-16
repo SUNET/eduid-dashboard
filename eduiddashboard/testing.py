@@ -218,7 +218,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def add_to_session(self, data):
@@ -229,7 +229,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
+        self.testapp.set_cookie(session_factory._options.get('key'), session._sess.id)
         return request
 
     def check_values(self, fields, values):

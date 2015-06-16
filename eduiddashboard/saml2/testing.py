@@ -176,7 +176,7 @@ class Saml2RequestTests(unittest.TestCase):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def dummy_request(self):
@@ -194,7 +194,7 @@ class Saml2RequestTests(unittest.TestCase):
         request = self.dummy_request()
         session = session_factory(request)
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.set_cookie('beaker.session.id', session._sess.id)
         self.pol = self.config.testing_securitypolicy(
             'user', ('editors', ),
             permissive=False, remember_result=True)
