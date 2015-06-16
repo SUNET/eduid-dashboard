@@ -283,6 +283,26 @@ class NinWizardTests(LoggedInReguestTests):
                 response = self.testapp.get('/profile/', status=200)
                 response.mustcontain('data-datakey="197412041234"')
 
+    def test_step_storage2(self):
+        self.set_logged(user='johnsmith@example.org')
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
+                CSRFTokenValidator.__call__.return_value = None
+                self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'next_step',
+                    'step': 0,
+                    'norEduPersonNIN': '197412041236',
+                    'csrf': '12345',
+                }, status=200)
+                response = self.testapp.get('/profile/', status=200)
+                response.mustcontain('data-datakey="197412041236"')
+
 
 class NinWizardStep1Tests(LoggedInReguestTests):
 
