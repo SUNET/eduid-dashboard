@@ -174,16 +174,6 @@ class LoggedInReguestTests(am.MongoTestCase):
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
         self.testapp.reset()
-        for db_name in self.conn.database_names():
-            if db_name == 'local':
-                continue
-            db = self.conn[db_name]
-            for col_name in db.collection_names():
-                if 'system' not in col_name:
-                    db.drop_collection(col_name)
-            del db
-            self.conn.drop_database(db_name)
-        self.conn.disconnect()
 
     def dummy_get_user(self, userid=''):
         return self.user
