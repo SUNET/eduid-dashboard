@@ -18,16 +18,48 @@ class LocaleChangeTests(LoggedInReguestTests):
 
     def test_change_language_with_referer(self):
         self.set_logged(user='johnsmith@example.com')
-        referer = 'http://localhost/profile/'
+        host = self.settings['dashboard_hostname']
+        referer = 'http://{hostname}/profile/'.format(hostname=host)
         response = self.testapp.get('/set_language/?lang=sv',
                                     extra_environ={
-                                        'HTTP_REFERER': referer
+                                        'HTTP_REFERER': referer,
+                                        'HTTP_HOST': host
                                     },
                                     status=302)
-        self.assertEqual(response.location, referer)
+        self.assertIsNotNone(response.cookies_set.get('lang', 'sv'))
+        self.assertEqual(referer, response.location)
         response = self.testapp.get(referer, status=200)
         lang_name = read_mapping(self.settings, 'available_languages')['sv']
         self.assertIn('<span>{0}</span>'.format(lang_name), response.body)
+
+    def test_change_language_with_invalid_referer(self):
+        self.set_logged(user='johnsmith@example.com')
+        host = self.settings['dashboard_hostname']
+        dashboard_baseurl = self.settings['dashboard_baseurl']
+        invalid_referer = 'http://attacker.controlled.site'
+        response = self.testapp.get('/set_language/?lang=sv',
+                                    extra_environ={
+                                        'HTTP_REFERER': invalid_referer,
+                                        'HTTP_HOST': host
+                                    },
+                                    status=302)
+        self.assertIsNotNone(response.cookies_set.get('lang', 'sv'))
+        self.assertEqual(dashboard_baseurl, response.location)
+
+    def test_change_language_with_invalid_host(self):
+        self.set_logged(user='johnsmith@example.com')
+        host = self.settings['dashboard_hostname']
+        dashboard_baseurl = self.settings['dashboard_baseurl']
+        referer = 'http://{hostname}/profile/'.format(hostname=host)
+        invalid_host = 'attacker.controlled.site'
+        response = self.testapp.get('/set_language/?lang=sv',
+                                    extra_environ={
+                                        'HTTP_REFERER': referer,
+                                        'HTTP_HOST': invalid_host
+                                    },
+                                    status=302)
+        self.assertIsNotNone(response.cookies_set.get('lang', 'sv'))
+        self.assertEqual(dashboard_baseurl, response.location)
 
     def test_change_language_without_referer(self):
         self.set_logged(user='johnsmith@example.com')
