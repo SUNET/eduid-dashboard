@@ -325,6 +325,8 @@ def main(global_config, **settings):
     for item in (
         'mongo_uri',
         'site.name',
+        'dashboard_hostname',
+        'dashboard_baseurl',
         'auth_shared_secret',
         'mongo_uri_am',
         'mongo_uri_authninfo',
