@@ -22,7 +22,7 @@ from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
 
 
-MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:27017/eduid_idp_authninfo_test'
+MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:%s/eduid_idp_authninfo'
 
 
 def loa(index):                                                                                                                                             
@@ -94,6 +94,8 @@ class LoggedInReguestTests(am.MongoTestCase):
     def setUp(self, settings={}):
         # Don't call DBTests.setUp because we are getting the
         # db in a different way
+        
+        super(LoggedInReguestTests, self).setUp()
 
         self.settings = {
             'auth_tk_secret': '123456',
@@ -110,9 +112,9 @@ class LoggedInReguestTests(am.MongoTestCase):
             #'session.lock_dir': '/tmp',
             #'session.webtest_varname': 'session',
             # 'session.secret': '1234',
-            'mongo_uri': am.MONGO_URI_TEST,
-            'mongo_uri_am': am.MONGO_URI_AM_TEST,
-            'mongo_uri_authninfo': MONGO_URI_AUTHNINFO_TEST,
+            'mongo_uri': am.MONGO_URI_TEST % self.port,
+            'mongo_uri_am': am.MONGO_URI_AM_TEST % self.port,
+            'mongo_uri_authninfo': MONGO_URI_AUTHNINFO_TEST % self.port,
             'testing': True,
             'jinja2.directories': [
                 'eduiddashboard:saml2/templates',
@@ -141,8 +143,6 @@ class LoggedInReguestTests(am.MongoTestCase):
             'vccs_url': 'http://localhost:8550/',
             'password_reset_timeout': '120',
         }
-        
-        super(LoggedInReguestTests, self).setUp()
 
         self.settings.update(settings)
 
@@ -159,8 +159,6 @@ class LoggedInReguestTests(am.MongoTestCase):
         self.config.registry.registerUtility(self, IDebugLogger)
 
         self.db = get_db(self.settings)
-        self.db.profiles.drop()
-        self.db.verifications.drop()
         for verification_data in self.initial_verifications:
             self.db.verifications.insert(verification_data)
 
@@ -175,9 +173,6 @@ class LoggedInReguestTests(am.MongoTestCase):
 
     def tearDown(self):
         super(LoggedInReguestTests, self).tearDown()
-        self.db.profiles.drop()
-        self.db.verifications.drop()
-        self.db.reset_passwords.drop()
         self.testapp.reset()
 
     def dummy_get_user(self, userid=''):
@@ -213,7 +208,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def add_to_session(self, data):
@@ -224,7 +219,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
+        self.testapp.set_cookie(session_factory._options.get('key'), session._sess.id)
         return request
 
     def check_values(self, fields, values):

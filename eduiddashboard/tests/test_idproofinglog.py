@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 __author__ = 'lundberg'
 
+
 from eduid_userdb import MongoDB
 from eduid_userdb.testing import MongoTestCase
+from eduid_am import testing as am
 from eduid_am.testing import MockedUserDB
 from eduiddashboard.idproofinglog import IDProofingLog, TeleAdressProofing, TeleAdressProofingRelation
 
@@ -11,11 +13,11 @@ class TestIDProofingLog(MongoTestCase):
     def setUp(self):
         super(TestIDProofingLog, self).setUp()
         self.userdb = MockedUserDB()
-        mongo_uri = self.tmp_db.get_uri('eduid_dashboard_test')
+        mongo_uri = am.MONGO_URI_TEST % self.port
         self.settings.update({
             'mongo_uri': mongo_uri,
         })
-        self.collection = MongoDB(mongo_uri).get_collection('id_proofing_log')
+        self.collection = self.conn['dashboard']['id_proofing_log']
 
     def test_teleadress_proofing(self):
         user = self.userdb.get_user('johnsmith@example.org')
@@ -30,7 +32,7 @@ class TestIDProofingLog(MongoTestCase):
 
         idlog = IDProofingLog(self.settings)
         idlog.log_verified_by_mobile(proofing_data)
-        result = self.collection.find()
+        result = self.collection.find({})
         self.assertEquals(result.count(), 1)
         hit = result.next()
         self.assertEquals(hit['eppn'], user.get_eppn())
