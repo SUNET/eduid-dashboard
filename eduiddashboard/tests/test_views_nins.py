@@ -1,5 +1,5 @@
 import json
-from mock import patch
+from mock import patch, Mock
 import unittest
 from bson import ObjectId
 from datetime import datetime
@@ -270,6 +270,7 @@ class NinWizardTests(LoggedInReguestTests):
 
         with patch.multiple(MsgRelay, nin_validator=return_true,
                             nin_reachable=return_true):
+            MsgRelay.nin_reachable = Mock(return_value=True)
             from eduiddashboard.validators import CSRFTokenValidator
             with patch.object(CSRFTokenValidator, '__call__', clear=True):
     
@@ -282,6 +283,7 @@ class NinWizardTests(LoggedInReguestTests):
                 }, status=200)
                 response = self.testapp.get('/profile/', status=200)
                 response.mustcontain('data-datakey="197412041234"')
+                self.assertEqual(MsgRelay.nin_reachable.call_count, 1)
 
     def test_step_storage2(self):
         self.set_logged(user='johnsmith@example.org')
@@ -302,6 +304,52 @@ class NinWizardTests(LoggedInReguestTests):
                 }, status=200)
                 response = self.testapp.get('/profile/', status=200)
                 response.mustcontain('data-datakey="197412041236"')
+
+    def test_resend_code(self):
+        self.set_logged(user='johnsmith@example.org')
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            MsgRelay.nin_reachable = Mock(return_value=True)
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
+                CSRFTokenValidator.__call__.return_value = None
+                response = self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'resendcode',
+                    'step': 1,
+                    'code': '',
+                    'norEduPersonNIN': '197412041236',
+                    'csrf': '12345',
+                }, status=200)
+
+                self.assertEqual(response.json['status'], 'success')
+                self.assertEqual(MsgRelay.nin_reachable.call_count, 1)
+
+    def test_resend_code_bad_nin(self):
+        self.set_logged(user='johnsmith@example.org')
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            MsgRelay.nin_reachable = Mock(return_value=True)
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
+                CSRFTokenValidator.__call__.return_value = None
+                response = self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'resendcode',
+                    'step': 1,
+                    'code': '',
+                    'norEduPersonNIN': '19741236',
+                    'csrf': '12345',
+                }, status=200)
+
+                self.assertEqual(response.json['status'], 'error')
+                self.assertEqual(MsgRelay.nin_reachable.call_count, 0)
 
 
 class NinWizardStep1Tests(LoggedInReguestTests):
