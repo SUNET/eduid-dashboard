@@ -326,15 +326,18 @@ class NinsView(BaseFormView):
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
 
-    def add_nin_external(self, data):
+    def validate_post_data(self):
         self.schema = self.schema.bind(**self.get_bind_data())
         form = self.form_class(self.schema, buttons=self.buttons,
                                **dict(self.form_options))
         self.before(form)
 
         controls = self.request.POST.items()
+        return form.validate(controls)
+
+    def add_nin_external(self, data):
         try:
-            validated = form.validate(controls)
+            validated = self.validate_post_data()
         except deform.exception.ValidationFailure as e:
             return {
                 'status': 'failure',
@@ -443,9 +446,28 @@ class NinsWizard(BaseWizard):
                         "can not be found")
             message = get_localizer(self.request).translate(message)
             return {
-                'status': 'failure',
+                'status': 'error',
                 'text': message
             }
+
+        nins_view = NinsView(self.context, self.request)
+        try:
+            nins_view.validate_post_data()
+        except deform.exception.ValidationFailure as e:
+            errors = e.error.asdict()
+            if 'norEduPersonNIN' in errors:
+                text = errors['norEduPersonNIN']
+            elif errors:
+                text = errors.values()[0]
+            else:
+                # Shouldn't happen!
+                text = _('There was an unknown error dealing with your request')
+            return {
+                'status': 'error',
+                'text': text,
+            }
+
+
         send_verification_code(self.request,
                                self.context.user,
                                self.datakey)

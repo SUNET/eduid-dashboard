@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard 0.3.11b1\n"
+"Project-Id-Version: eduid-dashboard 0.3.11\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-06-01 10:24+0200\n"
+"POT-Creation-Date: 2015-07-10 13:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgstr ""
 msgid "Reset your {site_name} password"
 msgstr ""
 
-#: eduiddashboard/models.py:22 eduiddashboard/models.py:95
+#: eduiddashboard/models.py:22 eduiddashboard/models.py:96
 #: eduiddashboard/views/security.py:395
 msgid "email"
 msgstr ""
@@ -43,109 +43,109 @@ msgstr ""
 msgid "national identity number"
 msgstr ""
 
-#: eduiddashboard/models.py:97
+#: eduiddashboard/models.py:98
 msgid "Email address"
 msgstr ""
 
-#: eduiddashboard/models.py:104
+#: eduiddashboard/models.py:105
 msgid "The Swedish national identity number should be entered as yyyymmddnnnn"
 msgstr ""
 
-#: eduiddashboard/models.py:109
+#: eduiddashboard/models.py:110
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written using"
 " international notation, starting with \"+\" and followed by 10-20 digits."
 msgstr ""
 
-#: eduiddashboard/models.py:154
+#: eduiddashboard/models.py:155
 msgid "Swedish national identity number"
 msgstr ""
 
-#: eduiddashboard/models.py:156
+#: eduiddashboard/models.py:157
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:14
 msgid "yyyymmddnnnn"
 msgstr ""
 
-#: eduiddashboard/models.py:175
+#: eduiddashboard/models.py:176
 msgid "Given name"
 msgstr ""
 
-#: eduiddashboard/models.py:180 eduiddashboard/templates/home.jinja2:29
+#: eduiddashboard/models.py:181 eduiddashboard/templates/home.jinja2:29
 msgid "Surname"
 msgstr ""
 
-#: eduiddashboard/models.py:185
+#: eduiddashboard/models.py:186
 msgid "Display name"
 msgstr ""
 
-#: eduiddashboard/models.py:187
+#: eduiddashboard/models.py:188
 msgid "Preferred language"
 msgstr ""
 
-#: eduiddashboard/models.py:202
+#: eduiddashboard/models.py:203
 msgid "Current password"
 msgstr ""
 
-#: eduiddashboard/models.py:211 eduiddashboard/models.py:280
+#: eduiddashboard/models.py:212 eduiddashboard/models.py:281
 msgid "Use my own password"
 msgstr ""
 
-#: eduiddashboard/models.py:216 eduiddashboard/models.py:285
+#: eduiddashboard/models.py:217 eduiddashboard/models.py:286
 msgid "Suggested password"
 msgstr ""
 
-#: eduiddashboard/models.py:225
+#: eduiddashboard/models.py:226
 msgid "Custom password"
 msgstr ""
 
-#: eduiddashboard/models.py:235
+#: eduiddashboard/models.py:236
 msgid "Repeat the password"
 msgstr ""
 
-#: eduiddashboard/models.py:299
+#: eduiddashboard/models.py:300
 msgid "New Password"
 msgstr ""
 
-#: eduiddashboard/models.py:306
+#: eduiddashboard/models.py:307
 msgid "Confirm New Password"
 msgstr ""
 
-#: eduiddashboard/models.py:312
+#: eduiddashboard/models.py:313
 msgid "Passwords doesn't match"
 msgstr ""
 
-#: eduiddashboard/models.py:324
+#: eduiddashboard/models.py:325
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr ""
 
-#: eduiddashboard/models.py:330
+#: eduiddashboard/models.py:331
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr ""
 
-#: eduiddashboard/models.py:336
+#: eduiddashboard/models.py:337
 msgid "Postal code"
 msgstr ""
 
-#: eduiddashboard/models.py:342
+#: eduiddashboard/models.py:343
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr ""
 
-#: eduiddashboard/models.py:355
+#: eduiddashboard/models.py:356
 msgid "mobile"
 msgstr ""
 
-#: eduiddashboard/models.py:357
+#: eduiddashboard/models.py:358
 msgid "Mobile phone number"
 msgstr ""
 
-#: eduiddashboard/models.py:373 eduiddashboard/templates/home.jinja2:17
+#: eduiddashboard/models.py:374 eduiddashboard/templates/home.jinja2:17
 msgid "Search for users"
 msgstr ""
 
-#: eduiddashboard/models.py:374
+#: eduiddashboard/models.py:375
 msgid "query"
 msgstr ""
 
@@ -771,7 +771,7 @@ msgstr ""
 msgid ""
 "If you do not have a record in the Swedish population register\n"
 "      or if you live somewhere Else you may manually add a postal address by\n"
-"      clicking on the button below. If you are registered please click\n"
+"      clikcing on the button below. If you are registered please click\n"
 "      <a href=\"#nins\">here</a> to enter your national identity number to\n"
 "      automatically fetch your postal address.\n"
 "    "
@@ -1329,29 +1329,33 @@ msgstr ""
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:376
+#: eduiddashboard/views/nins.py:379
 msgid "User data out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:378
+#: eduiddashboard/views/nins.py:381
 msgid "Your national identity number has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:390
+#: eduiddashboard/views/nins.py:393
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:437
+#: eduiddashboard/views/nins.py:440
 msgid "Add NIN with MM confirmation"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:442
+#: eduiddashboard/views/nins.py:445
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:463
+#: eduiddashboard/views/nins.py:464
+msgid "There was an unknown error dealing with your request"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:484
 msgid "Add your national identity number"
 msgstr ""
 
