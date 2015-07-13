@@ -119,6 +119,47 @@ class NinsFormTests(LoggedInReguestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'getcode')
 
+    def test_verify_existant_nin_by_mobile(self):
+        ''' '''
+        self.set_logged(user='johnsmith@example.org')
+        user = self.db.profiles.find_one({'mail': 'johnsmith@example.org'})
+        from eduid_am.user import User
+        user = User(user)
+        self.assertEqual(len(user.get_nins()), 0)
+
+        # First we add a nin...
+        nin = '200010100001'
+
+        response_form = self.testapp.get('/profile/nins/')
+        form = response_form.forms[self.formname]
+        from eduiddashboard.msgrelay import MsgRelay
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            form['norEduPersonNIN'].value = nin
+            form.submit('add')
+
+        # and then we verify it
+        self.testapp.get('/profile/nins/')
+        from eduiddashboard.views import nins
+        with patch.object(nins, 'validate_nin_by_mobile', clear=True):
+            nins.validate_nin_by_mobile.return_value = {
+                'success': True,
+                'message': u'Ok',
+                }
+            with patch.object(User, 'retrieve_address', clear=True):
+                User.retrieve_address.return_value = None
+
+                response = self.testapp.post(
+                    '/profile/nins-actions/',
+                    {'identifier': nin + '  0', 'action': 'verify_mb'}
+                )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['message'], 'Ok')
+        user = self.db.profiles.find_one({'mail': 'johnsmith@example.org'})
+        user = User(user)
+        self.assertEqual(len(user.get_nins()), 1)
+        self.assertEqual(user.get_nins()[0], nin)
+
     @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):
         self.set_logged()

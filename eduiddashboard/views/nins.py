@@ -13,6 +13,7 @@ from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard.validators import validate_nin_by_mobile
+from eduiddashboard.verifications import verify_nin
 from eduid_am.user import User
 
 from eduiddashboard.verifications import (new_verification_code,
@@ -154,8 +155,8 @@ class NINsActionsView(BaseActionsView):
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
-            verify_nin = nins[index]
-            if verify_nin != nin:
+            new_nin = nins[index]
+            if new_nin != nin:
                 return self.sync_user()
         else:
             return self.sync_user()
@@ -168,7 +169,7 @@ class NINsActionsView(BaseActionsView):
 #                'message': get_localizer(self.request).translate(message),
 #            }
 
-        return self._verify_action(verify_nin, post_data)
+        return self._verify_action(new_nin, post_data)
 
     def verify_mb_action(self, data, post_data):
         """
@@ -179,8 +180,8 @@ class NINsActionsView(BaseActionsView):
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
-            verify_nin = nins[index]
-            if verify_nin != nin:
+            new_nin = nins[index]
+            if new_nin != nin:
                 return self.sync_user()
         else:
             return self.sync_user()
@@ -195,6 +196,16 @@ class NINsActionsView(BaseActionsView):
 
         validation = validate_nin_by_mobile(self.request, self.user, nin)
         result = validation['success'] and 'success' or 'error'
+        if result == 'success':
+            verify_nin(self.request, self.user, nin)
+            try:
+                self.user.save(self.request)
+                model_name = 'norEduPersonNIN'
+                logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
+                self.request.db.verifications.remove({'model': model_name, 'datakey': nin})
+            except UserOutOfSync:
+                log.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
+                raise
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
                 mapping={

@@ -69,7 +69,7 @@ def get_not_verified_objects(request, model_name, user):
     })
 
 
-def verify_nin(request, user, new_nin, reference):
+def verify_nin(request, user, new_nin, reference=None):
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
@@ -97,7 +97,8 @@ def verify_nin(request, user, new_nin, reference):
     user.add_verified_nin(new_nin)
     user.retrieve_address(request, new_nin)
     # Connect the verification to the transaction audit log
-    request.msgrelay.postal_address_to_transaction_audit_log(reference)
+    if reference is not None:
+        request.msgrelay.postal_address_to_transaction_audit_log(reference)
     # Reset session eduPersonIdentityProofing on NIN verification
     request.session['eduPersonIdentityProofing'] = None
     log.info('NIN verified for user {!r}.'.format(user))
