@@ -202,9 +202,10 @@ class NINsActionsView(BaseActionsView):
                 self.user.save(self.request)
                 model_name = 'norEduPersonNIN'
                 logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
-                self.request.db.verifications.remove({'model': model_name, 'datakey': nin})
+                # Save the state in the verifications collection
+                save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
             except UserOutOfSync:
-                log.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
+                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
                 raise
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
@@ -477,7 +478,6 @@ class NinsWizard(BaseWizard):
                 'status': 'error',
                 'text': text,
             }
-
 
         send_verification_code(self.request,
                                self.context.user,
