@@ -473,14 +473,9 @@ def main(global_config, **settings):
     config.include('deform_bootstrap')
     config.include('pyramid_deform')
 
-    if 'development' in settings and asbool(settings['development']):
-        pass
-    else:
-        config.include('eduiddashboard.saml2')
+    config.include('eduiddashboard.saml2')
 
-    if 'testing' in settings and asbool(settings['testing']) or \
-       'development' in settings and asbool(settings['development']) or \
-       settings['debug_mode']:
+    if settings['debug_mode']:
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')
@@ -499,10 +494,5 @@ def main(global_config, **settings):
     # eudid specific configuration
     includeme(config)
 
-    if 'development' in settings and asbool(settings['development']):
-        from eduiddashboard.development import auth as local_auth
-        config = local_auth.setup_auth(config)
-        config.scan(ignore=[re.compile('.*test(s|ing).*').search, 'eduiddashboard.saml2'])
-    else:
-        config.scan(ignore=[re.compile('.*test(s|ing).*').search, 'eduiddashboard.development'])
+    config.scan(ignore=[re.compile('.*test(s|ing).*').search, 'eduiddashboard.development'])
     return config.make_wsgi_app()
