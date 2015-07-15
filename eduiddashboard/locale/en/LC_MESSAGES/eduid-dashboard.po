@@ -4,15 +4,17 @@
 # project.
 #
 # Translators:
+# Gijutsu <ascii@binary.to>, 2015
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-15 13:06+0200\n"
-"PO-Revision-Date: 2015-07-15 10:35+0000\n"
+"POT-Creation-Date: 2015-07-15 15:58+0200\n"
+"PO-Revision-Date: 2015-07-15 13:42+0000\n"
 "Last-Translator: Gijutsu <ascii@binary.to>\n"
-"Language-Team: English (http://www.transifex.com/p/eduid-"
-"dashboard/language/en/)\n"
+"Language-Team: English (United States) (http://www.transifex.com/p/eduid-"
+"dashboard/language/en_US/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -1229,15 +1231,15 @@ msgstr ""
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
 msgid "http://www.swamid.se/policy/assurance/al1"
-msgstr "http://www.swamid.se/policy/assurance/al1"
+msgstr "Unconfirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
 msgid "http://www.swamid.se/policy/assurance/al2"
-msgstr "http://www.swamid.se/policy/assurance/al2"
+msgstr "Confirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
 msgid "http://www.swamid.se/policy/assurance/al3"
-msgstr "http://www.swamid.se/policy/assurance/al3"
+msgstr "Verified"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
 #, python-format
