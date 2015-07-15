@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard 0.3.11\n"
+"Project-Id-Version: eduid-dashboard 0.3.12b0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-07-10 13:17+0200\n"
+"POT-Creation-Date: 2015-07-15 13:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -287,15 +287,15 @@ msgid ""
 "07</li><li>E-mail address: user@example.edu</li></ul>"
 msgstr ""
 
-#: eduiddashboard/verifications.py:106
+#: eduiddashboard/verifications.py:107
 msgid "National identity number {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:134
+#: eduiddashboard/verifications.py:135
 msgid "Mobile {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:165
+#: eduiddashboard/verifications.py:166
 msgid "Email {obj} verified"
 msgstr ""
 
@@ -552,11 +552,11 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:28 eduiddashboard/views/nins.py:277
+#: eduiddashboard/templates/nins-form.jinja2:28 eduiddashboard/views/nins.py:289
 msgid "Verify through Mina Meddelanden"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:33 eduiddashboard/views/nins.py:279
+#: eduiddashboard/templates/nins-form.jinja2:33 eduiddashboard/views/nins.py:291
 msgid "Verify by registered phone"
 msgstr ""
 
@@ -1141,7 +1141,7 @@ msgid "Confirm identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:119 eduiddashboard/views/nins.py:141
+#: eduiddashboard/views/__init__.py:119 eduiddashboard/views/nins.py:142
 msgid "Confirmation code"
 msgstr ""
 
@@ -1199,7 +1199,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:139
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:140
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -1297,65 +1297,65 @@ msgid ""
 "\"Pending confirmation\" link below and enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:46
+#: eduiddashboard/views/nins.py:47
 msgid "Add national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:48
+#: eduiddashboard/views/nins.py:49
 msgid "Validation required for national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:82
+#: eduiddashboard/views/nins.py:83
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:138
+#: eduiddashboard/views/nins.py:139
 msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:140
+#: eduiddashboard/views/nins.py:141
 msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:142
+#: eduiddashboard/views/nins.py:143
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:232
+#: eduiddashboard/views/nins.py:244
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:249
+#: eduiddashboard/views/nins.py:261
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:379
+#: eduiddashboard/views/nins.py:391
 msgid "User data out of sync. Please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:381
+#: eduiddashboard/views/nins.py:393
 msgid "Your national identity number has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:393
+#: eduiddashboard/views/nins.py:405
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:440
+#: eduiddashboard/views/nins.py:452
 msgid "Add NIN with MM confirmation"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:445
+#: eduiddashboard/views/nins.py:457
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:464
+#: eduiddashboard/views/nins.py:476
 msgid "There was an unknown error dealing with your request"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:484
+#: eduiddashboard/views/nins.py:495
 msgid "Add your national identity number"
 msgstr ""
 
