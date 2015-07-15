@@ -81,11 +81,11 @@ class All_StopOnFirst_Switch(object):
             current_validator = self.validator_dict['add_by_mobile']
         else:
             current_validator = self.validator_dict['add']
-            for validator in current_validator.validators:
-                try:
-                    validator(node, value)
-                except colander.Invalid as e:
-                    raise colander.Invalid(node, e.msg)
+        for validator in current_validator.validators:
+            try:
+                validator(node, value)
+            except colander.Invalid as e:
+                raise colander.Invalid(node, e.msg)
 
 
 class Email(CSRFTokenSchema):
