@@ -475,7 +475,7 @@ def main(global_config, **settings):
 
     config.include('eduiddashboard.saml2')
 
-    if settings['debug_mode']:
+    if settings['debug_mode'] or ('testing' in settings and asbool(settings['testing'])):
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')
