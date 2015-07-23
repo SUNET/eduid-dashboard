@@ -101,6 +101,8 @@ class LoggedInReguestTests(am.MongoTestCase):
             'auth_tk_secret': '123456',
             'auth_shared_secret': '123_456',
             'site.name': 'eduiID Testing',
+            'dashboard_hostname': 'dashboard.example.com',
+            'dashboard_baseurl': 'http://dashboard.example.com',
             'saml2.settings_module': path.join(path.dirname(__file__),
                                                'saml2/tests/data/saml2_settings.py'),
             'saml2.login_redirect_url': '/',

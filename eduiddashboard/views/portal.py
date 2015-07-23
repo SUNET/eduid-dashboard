@@ -202,15 +202,32 @@ def token_login(context, request):
 
 @view_config(route_name='set_language', request_method='GET')
 def set_language(context, request):
+    import re
+
     settings = request.registry.settings
     lang = request.GET.get('lang', 'en')
     if lang not in settings['available_languages']:
         return HTTPNotFound()
 
     url = request.environ.get('HTTP_REFERER', None)
-    if url is None:
-        url = request.route_path('home')
+    host = request.environ.get('HTTP_HOST', None)
+
+    dashboard_hostname = settings.get('dashboard_hostname')
+    dashboard_baseurl = settings.get('dashboard_baseurl')
+
+    # To avoid malicious redirects, using header injection, we only
+    # allow the client to be redirected to an URL that is within the
+    # predefined scope of the application.
+    allowed_url = re.compile('^(http|https)://' + dashboard_hostname + '[:]{0,1}\d{0,5}($|/)')
+    allowed_host = re.compile('^' + dashboard_hostname + '[:]{0,1}\d{0,5}$')
+
+    if url is None or not allowed_url.match(url):
+        url = dashboard_baseurl
+    elif host is None or not allowed_host.match(host):
+        url = dashboard_baseurl
+
     response = HTTPFound(location=url)
+
     cookie_domain = settings.get('lang_cookie_domain', None)
     cookie_name = settings.get('lang_cookie_name')
 
