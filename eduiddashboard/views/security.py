@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from bson import ObjectId
 import pytz
 
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized, HTTPMethodNotAllowed
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
@@ -88,6 +88,11 @@ def generate_suggested_password(request):
 
     elif request.method == 'POST':
         password = request.session.get('last_generated_password', generate_password(length=password_length))
+
+    # We should not rely solely on the configuration of the
+    # reverse proxy to filter out only GET and POST.
+    else:
+        raise HTTPMethodNotAllowed(_('Invalid request: only GET and POST accepted.'))
 
     return password
 
