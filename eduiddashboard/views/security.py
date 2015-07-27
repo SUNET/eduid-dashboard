@@ -85,16 +85,16 @@ def generate_suggested_password(request):
         password = ' '.join([password[i*4: i*4+4] for i in range(0, len(password)/4)])
 
         request.session['last_generated_password'] = password
+        return password
 
     elif request.method == 'POST':
         password = request.session.get('last_generated_password', generate_password(length=password_length))
+        return password
 
     # We should not rely solely on the configuration of the
     # reverse proxy to filter out only GET and POST.
     else:
         raise HTTPMethodNotAllowed(_('Invalid request: only GET and POST accepted.'))
-
-    return password
 
 
 def get_authn_info(request):
