@@ -194,6 +194,10 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertNotIn('Your password has been successfully updated',
                              response.body)
 
+    def test_password_form_invalid_request(self):
+        self.set_logged()
+        response_form = self.testapp.delete('/profile/password-change/', status=405)
+
     def tearDown(self):
         super(PasswordFormTests, self).tearDown()
         self.patcher.stop()
