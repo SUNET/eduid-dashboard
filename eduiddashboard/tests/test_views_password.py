@@ -194,6 +194,10 @@ class PasswordFormTests(LoggedInReguestTests):
             self.assertNotIn('Your password has been successfully updated',
                              response.body)
 
+    def test_password_form_invalid_request(self):
+        self.set_logged()
+        response_form = self.testapp.delete('/profile/password-change/', status=405)
+
     def tearDown(self):
         super(PasswordFormTests, self).tearDown()
         self.patcher.stop()
@@ -213,7 +217,7 @@ class TerminateAccountTests(LoggedInReguestTests):
         request = self.set_logged()
         response = self.testapp.get('/profile/security/')
         form = response.forms['terminate-account-form']
-        self.assertEqual(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 8)
+        self.assertGreater(len(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['passwords']), 0)
         self.assertFalse(self.db.profiles.find_one({'mail': 'johnsmith@example.com'})['terminated'])
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
