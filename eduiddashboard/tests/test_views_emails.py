@@ -183,7 +183,6 @@ class MailsFormTests(LoggedInReguestTests):
 
     def test_steal_verified_mail(self):
         self.set_logged(user='johnsmith@example.org')
-
         response_form = self.testapp.get('/profile/emails/')
 
         form = response_form.forms[self.formname]
@@ -221,3 +220,45 @@ class MailsFormTests(LoggedInReguestTests):
         old_user = User(old_user)
 
         self.assertNotIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
+
+    def test_steal_verified_mail_from_ourself(self):
+        self.set_logged(user='johnsmith@example.org')
+        user = self.db.profiles.find_one({'_id': ObjectId('901234567890123456789012')})
+        user = User(user)
+        mail = 'myuniqemail@example.info'
+
+        response_form = self.testapp.get('/profile/emails/')
+
+        self.assertNotIn(mail, response_form.body)
+
+        form = response_form.forms[self.formname]
+        form['mail'].value = mail
+
+        # Try to steal the unique email address by submitting and verifying two
+        # times that the user is the rightful owner of this email address.
+        for i in range(0,2):
+
+            with patch.object(UserDB, 'exists_by_field', clear=True):
+                UserDB.exists_by_field.return_value = False
+
+                response = form.submit('add')
+
+                self.assertEqual(response.status, '200 OK')
+                self.assertIn(mail, response.body)
+                self.assertIsNotNone(getattr(response, 'form', None))
+
+            # Get the document that contains the code needed
+            # to verify that the user owns the address.
+            email_doc = self.db.verifications.find_one({
+                'model_name': 'mailAliases',
+                'user_oid': ObjectId(user.get_id()),
+                'obj_id': mail
+            })
+
+            response = self.testapp.post(
+                '/profile/emails-actions/',
+                {'identifier': 3, 'action': 'verify', 'code': email_doc['code']}
+            )
+
+            response_json = json.loads(response.body)
+            self.assertEqual(response_json['result'], 'success')
