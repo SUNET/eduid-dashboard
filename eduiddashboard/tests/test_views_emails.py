@@ -183,6 +183,7 @@ class MailsFormTests(LoggedInReguestTests):
 
     def test_steal_verified_mail(self):
         self.set_logged(user='johnsmith@example.org')
+
         response_form = self.testapp.get('/profile/emails/')
 
         form = response_form.forms[self.formname]
