@@ -70,6 +70,7 @@ def get_not_verified_objects(request, model_name, user):
 
 
 def verify_nin(request, user, new_nin, reference=None):
+    user = User(user)
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
@@ -79,7 +80,7 @@ def verify_nin(request, user, new_nin, reference=None):
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
-        if old_user:
+        if old_user and old_user.get_id() != user.get_id():
             log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
             log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.get_nins()))
             nins = [nin for nin in old_user.get_nins() if nin != new_nin]
@@ -108,6 +109,7 @@ def verify_nin(request, user, new_nin, reference=None):
 
 
 def verify_mobile(request, user, new_mobile):
+    user = User(user)
     log.info('Trying to verify mobile number for user {!r}.'.format(user))
     log.debug('Mobile number: {!s}.'.format(new_mobile))
     # Start by removing mobile number from any other user
@@ -117,7 +119,7 @@ def verify_mobile(request, user, new_mobile):
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
-        if old_user:
+        if old_user and old_user.get_id() != user.get_id():
             log.debug('Found old user {!r} with mobile number ({!s}) already verified.'.format(old_user, new_mobile))
             log.debug('Old user mobile numbers BEFORE: {!r}.'.format(old_user.get_mobiles()))
             mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != new_mobile]
@@ -136,6 +138,7 @@ def verify_mobile(request, user, new_mobile):
 
 
 def verify_mail(request, user, new_mail):
+    user = User(user)
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
     # Start by removing mail address from any other user
@@ -145,7 +148,7 @@ def verify_mail(request, user, new_mail):
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = User(old_user_doc)
-        if old_user:
+        if old_user and old_user.get_id() != user.get_id():
             log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
             log.debug('Old user mail BEFORE: {!s}.'.format(old_user.get_mail()))
             log.debug('Old user mail aliases BEFORE: {!r}.'.format(old_user.get_mail_aliases()))
