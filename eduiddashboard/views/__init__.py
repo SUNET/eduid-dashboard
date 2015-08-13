@@ -207,16 +207,18 @@ class BaseActionsView(object):
     def resend_code_action(self, index, post_data):
         data = self.user.get(self.data_attribute, [])
 
-        # Verify that the user have not e.g. removed all entries in a
-        # separate tab and then tries to resend the code for one of them.
-        if len(data) - 1 < index:
+        # Catch the unlikely event when the user have e.g. removed all entries
+        # in a separate tab, or one in the middle and then tries to resend the
+        # code for a non-existing entry.
+        try:
+            data_to_resend = data[index]
+        except IndexError:
             message = self.verify_messages['out_of_sync']
             return {
                 'result': 'out_of_sync',
                 'message': get_localizer(self.request).translate(message),
             }
 
-        data_to_resend = data[index]
         data_id = self.get_verification_data_id(data_to_resend)
         reference, code = new_verification_code(
             self.request, self.data_attribute, data_id,
