@@ -153,10 +153,26 @@ class BaseActionsView(object):
         raise NotImplementedError()
 
     def verify_action(self, index, post_data):
-        """ Common action to verificate some given data.
+        """ Common action to verify some given data.
             You can override in subclasses
         """
-        data_to_verify = self.user.get(self.data_attribute, [])[index]
+
+        # Catch the unlikely event when the user have e.g. removed all entries
+        # in a separate tab, or one in the middle and then tries to resend the
+        # code for a non-existing entry.
+        # This is an incomplete fix since it is better if we can get the list
+        # from the UI and then check that the entry which the client want to
+        # resend the code for corresponds to the same entry we get from
+        # data[index].
+        try:
+            data_to_verify = self.user.get(self.data_attribute, [])[index]
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
+
         data_id = self.get_verification_data_id(data_to_verify)
         return self._verify_action(data_id, post_data)
 
