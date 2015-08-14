@@ -120,7 +120,8 @@ class BaseActionsView(object):
         'new_code_sent': _('A new confirmation code has been sent to you'),
         'expired': _('The confirmation code has expired. Please click on '
                      '"Resend confirmation code" to get a new one'),
-        'out_of_sync': _('The user was out of sync. Please try again.'),
+        'out_of_sync': _('Your user profile is out of sync. Please '
+                         'reload the page and try again.'),
     }
 
     def __init__(self, context, request):

@@ -388,7 +388,8 @@ class NinsView(BaseFormView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User data out of sync. Please try again.')
+            message = _('Your user profile is out of sync. Please '
+                        'reload the page and try again.')
         else:
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
