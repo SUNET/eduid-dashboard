@@ -210,6 +210,10 @@ class BaseActionsView(object):
         # Catch the unlikely event when the user have e.g. removed all entries
         # in a separate tab, or one in the middle and then tries to resend the
         # code for a non-existing entry.
+        # This is an incomplete fix since it is better if we can get the list
+        # from the UI and then check that the entry which the client want to
+        # resend the code for corresponds to the same entry we get from
+        # data[index].
         try:
             data_to_resend = data[index]
         except IndexError:
