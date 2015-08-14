@@ -108,12 +108,20 @@ class MailsFormTests(LoggedInReguestTests):
 
     def test_verify_not_existant_email(self):
         self.set_logged()
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+        verified_list_before = [m['verified'] for m in userdb_before['mailAliases']]
 
-        with self.assertRaises(IndexError):
-            self.testapp.post(
+        response = self.testapp.post(
                 '/profile/emails-actions/',
                 {'identifier': 10, 'action': 'verify'}
-            )
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+        verified_list_after = [m['verified'] for m in userdb_after['mailAliases']]
+        self.assertEqual(verified_list_before, verified_list_after)
 
     def test_verify_existant_email(self):
         self.set_logged()
