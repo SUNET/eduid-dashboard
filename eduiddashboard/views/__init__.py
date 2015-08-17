@@ -120,7 +120,8 @@ class BaseActionsView(object):
         'new_code_sent': _('A new confirmation code has been sent to you'),
         'expired': _('The confirmation code has expired. Please click on '
                      '"Resend confirmation code" to get a new one'),
-        'out_of_sync': _('The user was out of sync. Please try again.'),
+        'out_of_sync': _('Your user profile is out of sync. Please '
+                         'reload the page and try again.'),
     }
 
     def __init__(self, context, request):
@@ -153,10 +154,26 @@ class BaseActionsView(object):
         raise NotImplementedError()
 
     def verify_action(self, index, post_data):
-        """ Common action to verificate some given data.
+        """ Common action to verify some given data.
             You can override in subclasses
         """
-        data_to_verify = self.user.get(self.data_attribute, [])[index]
+
+        # Catch the unlikely event when the user have e.g. removed all entries
+        # in a separate tab, or one in the middle and then tries to resend the
+        # code for a non-existing entry.
+        # This is an incomplete fix since it is better if we can get the list
+        # from the UI and then check that the entry which the client want to
+        # resend the code for corresponds to the same entry we get from
+        # data[index].
+        try:
+            data_to_verify = self.user.get(self.data_attribute, [])[index]
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
+
         data_id = self.get_verification_data_id(data_to_verify)
         return self._verify_action(data_id, post_data)
 
@@ -206,7 +223,23 @@ class BaseActionsView(object):
 
     def resend_code_action(self, index, post_data):
         data = self.user.get(self.data_attribute, [])
-        data_to_resend = data[index]
+
+        # Catch the unlikely event when the user have e.g. removed all entries
+        # in a separate tab, or one in the middle and then tries to resend the
+        # code for a non-existing entry.
+        # This is an incomplete fix since it is better if we can get the list
+        # from the UI and then check that the entry which the client want to
+        # resend the code for corresponds to the same entry we get from
+        # data[index].
+        try:
+            data_to_resend = data[index]
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
+
         data_id = self.get_verification_data_id(data_to_resend)
         reference, code = new_verification_code(
             self.request, self.data_attribute, data_id,
