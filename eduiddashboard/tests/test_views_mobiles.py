@@ -158,6 +158,74 @@ class MobilesFormTests(LoggedInReguestTests):
         verified_mobile = userdb_after['mobile'][1]
         self.assertEqual(verified_mobile['verified'], True)
 
+    def test_setprimary_nonexistent_mobile(self):
+        self.set_logged()
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': 10, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+        self.assertEqual(userdb_before['mobile'], userdb_after['mobile'])
+
+    def test_set_primary_not_verified_mobile(self):
+        self.set_logged()
+        index = 1
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+        not_verified_mobile = userdb_before['mobile'][index]
+
+        # Make sure that the mobile that we are about
+        # to test if we can set as primary is not verified.
+        self.assertEqual(not_verified_mobile['verified'], False)
+
+        if not_verified_mobile.has_key('primary'):
+            self.assertEqual(not_verified_mobile['primary'], False)
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': index, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'bad')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+        not_primary_mobile = userdb_after['mobile'][index]
+
+        if not_verified_mobile.has_key('primary'):
+            self.assertEqual(not_primary_mobile['primary'], False)
+
+    def test_setprimary_verified_mobile(self):
+        self.set_logged()
+        index = 0
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+        verified_mobile = userdb_before['mobile'][index]
+
+        # Make sure that the mobile that we are about
+        # to set as primary is actually verified.
+        self.assertEqual(verified_mobile['verified'], True)
+
+        if verified_mobile.has_key('primary'):
+            self.assertEqual(verified_mobile['primary'], False)
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': index, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'success')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+        primary_mobile = userdb_after['mobile'][index]
+
+        self.assertEqual(primary_mobile['primary'], True)
+
     def test_steal_verified_mobile(self):
         self.set_logged(user='johnsmith@example.org')
 
