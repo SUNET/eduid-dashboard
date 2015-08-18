@@ -154,27 +154,34 @@ class MailsFormTests(LoggedInReguestTests):
 
     def test_remove_not_existant_email(self):
         self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-        emails_number = len(userdb['mailAliases'])
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+        emails_number = len(userdb_before['mailAliases'])
 
-        with self.assertRaises(IndexError):
-            self.testapp.post(
+        response = self.testapp.post(
                 '/profile/emails-actions/',
                 {'identifier': 10, 'action': 'remove'}
-            )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
         self.assertEqual(emails_number, len(userdb_after['mailAliases']))
 
     def test_setprimary_not_existant_email(self):
         self.set_logged()
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
 
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-
-        with self.assertRaises(IndexError):
-            self.testapp.post(
+        response = self.testapp.post(
                 '/profile/emails-actions/',
                 {'identifier': 10, 'action': 'setprimary'}
-            )
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+        self.assertEqual(userdb_before['mail'], userdb_after['mail'])
 
     def test_setprimary_existant_email(self):
         self.set_logged()
