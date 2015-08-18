@@ -173,8 +173,8 @@ class MailsFormTests(LoggedInReguestTests):
         userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
 
         response = self.testapp.post(
-                '/profile/emails-actions/',
-                {'identifier': 10, 'action': 'setprimary'}
+            '/profile/emails-actions/',
+            {'identifier': 10, 'action': 'setprimary'}
         )
 
         response_json = json.loads(response.body)
@@ -195,6 +195,32 @@ class MailsFormTests(LoggedInReguestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
         self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
+
+    def test_setprimary_not_verified_mail(self):
+        self.set_logged()
+        index = 2
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+        not_verified_mail = userdb_before['mailAliases'][index]
+        primary_mail = userdb_before['mail']
+
+        # Make sure that the mail address that we are about
+        # to test if we can set as primary is not verified.
+        self.assertEqual(not_verified_mail['verified'], False)
+
+        # Make sure that the mail address that we are about
+        # to test is not already set as primary.
+        self.assertNotEqual(not_verified_mail['email'], primary_mail)
+
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': index, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'bad')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
+        self.assertEqual(userdb_before, userdb_after)
 
     def test_steal_verified_mail(self):
         self.set_logged(user='johnsmith@example.org')
