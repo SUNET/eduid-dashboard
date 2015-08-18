@@ -70,7 +70,14 @@ class EmailsActionsView(BaseActionsView):
     }
 
     def setprimary_action(self, index, post_data):
-        mail = self.user.get_mail_aliases()[index]
+        try:
+            mail = self.user.get_mail_aliases()[index]
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
 
         if not mail.get('verified', False):
             message = _('You need to confirm your email address '
@@ -102,7 +109,14 @@ class EmailsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message),
             }
 
-        remove_email = emails[index]['email']
+        try:
+            remove_email = emails[index]['email']
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
 
         # By using pop(index) instead of remove(emails[index]) we avoid
         # evaluating the time zone stored together with the value of the
