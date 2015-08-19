@@ -33,13 +33,16 @@ def verifications(context, request):
         else:
             user = request.session['user']
         sync_user(request, context, user)
-        msg = _('The user was out of sync. Please try again.')
+        msg = _('Your user profile is out of sync. Please '
+                'reload the page and try again.')
         msg = get_localizer(request).translate(msg)
         request.session.flash(msg),
         raise HTTPFound(request.context.route_url('profile-editor'))
 
     if obj_id is not None:
+        request.stats.count('dashboard/verification_{!s}_ok'.format(model_name), 1)
         return HTTPFound(location=request.route_url('home'))
     else:
-        log.debug("Incorrect verification code")
+        log.debug("Incorrect verification code {!r} for model {!r}".format(code, model_name))
+        request.stats.count('dashboard/verification_{!s}_fail'.format(model_name), 1)
         raise HTTPNotFound()

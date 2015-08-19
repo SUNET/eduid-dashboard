@@ -46,7 +46,6 @@ var EduidWizard = function (container_path, active_card, options) {
 
     currentwizard = wizard;
 
-
     Wizard.prototype._onNextClick = function () {
         var jsondata,
             currentCard = this.getActiveCard(),
@@ -118,6 +117,9 @@ var EduidWizard = function (container_path, active_card, options) {
             type: 'POST',
             success: function (data, textStatus, jqXHR){
                 wizard.reset().close();
+                if (window.dismissNinsWizardChooser){
+                    window.dismissNinsWizardChooser();
+                }
             },
             error: function (event, jqXHR, ajaxSettings, thrownError) {
                 console.debug('Hey!, there are some errors here ' +
@@ -162,13 +164,12 @@ var EduidWizard = function (container_path, active_card, options) {
         e.preventDefault();
     });
 
-    wizard.show();
     if (active_card > 1) {
         presentcard = wizard._cards[0];
         presentcard.deselect();
         presentcard.markVisited();
         newcard = wizard.setCard(active_card-1);
-        newcard.select();
+        //newcard.select();
     }
 
     return wizard;

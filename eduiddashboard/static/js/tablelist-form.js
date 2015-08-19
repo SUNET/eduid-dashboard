@@ -6,7 +6,7 @@
     "use strict";
 
     var sendInfo = function(container, cls, msg) {
-            if (cls === 'out_of_sync') { cls = 'error' }
+            if (cls === 'out_of_sync' || cls === 'error') { cls = 'danger' }
             var messageHTML = '<div class="alert alert-' + cls +
     '"><button type="button" class="close" data-dismiss="alert">&times;</button>' +
             msg + '</div>';
@@ -27,7 +27,7 @@
                     sendInfo(dialog, data.result, data.message);
                     if (data.result === 'out_of_sync') {
                         dialog.find('.cancel-button').click();
-                    } else if (data.result == 'ok') {
+                    } else if (data.result == 'success') {
                         dialog.find('.btn').hide();
                         dialog.find('.divDialogElements').hide();
                         dialog.find('.finish-button').show();
@@ -66,15 +66,16 @@
             });
 
             container.find('a.verifycode').click(function (e) {
-                var identifier = $(e.target).attr('data-identifier');
+                var identifier = $(e.target).data('identifier');
                 e.preventDefault();
                 container.find('table.table tr[data-identifier=' + identifier + '] input[name=verify]').click();
             });
 
-            container.find('table.table-form input[type=button]').click(function (e) {
+            container.find('table.table-form input[type=button]').unbind('click').
+              click(function (e) {
                 var action = $(e.target).attr('name'),
-                    value = $(e.target).attr('data-index'),
-                    actions_url = $('.actions-url').attr('data-url');
+                    value = $(e.target).data('index'),
+                    actions_url = $('.actions-url').data('url');
 
                 $.post(actions_url, {
                     action: action,

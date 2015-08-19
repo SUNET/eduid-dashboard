@@ -9,6 +9,17 @@ if (window.tabbedform.changetabs_calls === undefined) {
     window.tabbedform.changetabs_calls = [];
 }
 
+jQuery.fn.initDeformCallbacks = function () {
+    "use strict";
+    if (deform.callbacks !== undefined &&
+            deform.callbacks.length === 0) {
+        $(this).find('span.scriptholder').each(function (i, e) {
+            var script = $(e).data('script');
+            console.log('Executing form script: ' + script);
+            window.forms_helper_functions[script]();
+        });
+    }
+};
 
 var TabbedForm = function (container) {
     "use strict";
@@ -21,13 +32,7 @@ var TabbedForm = function (container) {
                 };
                 target.html(data);
                 $('div.tab-pane.active button.btn-primary').enable(false);
-                if (deform.callbacks !== undefined &&
-                        deform.callbacks.length === 0) {
-                    $('form script').each(function (i, e) {
-                        var f = new Function(e.innerHTML);
-                        f();
-                    });
-                }
+                target.initDeformCallbacks();
                 deform.processCallbacks();
                 $('div.tab-pane.active button.btn-primary').enable(true);
 
@@ -44,38 +49,10 @@ var TabbedForm = function (container) {
             });
         },
 
-        initialize_pending_actions = function () {
-            $('ul.pending-actions a').click(function (e) {
-                var action_path = e.target.href.split('#')[1];
-                initialize_verification(action_path);
-            });
-        },
-
-        initialize_verification = function(action_path) {
-            if (action_path !== undefined && action_path !== "") {
-                if (action_path.indexOf('/') === -1) {
-                    container.find('.nav-tabs a[href=#' + action_path + ']').click();
-                } else {
-                    var segments = action_path.split('/');
-                    $(document).one('formready', function () {
-                        var form_container = $('.' + segments[0] + 'view-form-container');
-                        var link_selector = 'input.btn-link[name="' + segments[1] + '"]';
-                        var verification_links = form_container.find(link_selector);
-                        if (verification_links.length === 1) {
-                            var verification_link = verification_links[0];
-                        } else {
-                            var link_index = + segments[2];
-                            var verification_link = verification_links[link_index];
-                        }
-                        verification_link.click();
-                    });
-                    container.find('.nav-tabs a[href=#' + segments[0] + ']').click();
-                }
-            }
-        },
-
         initialize_nav_tabs = function () {
-            container.find('.nav-tabs a').click(function (e) {
+            var nav_tabs = container.find('.nav-tabs a.main-nav-tabs');
+            $(nav_tabs).unbind('click');
+            $(nav_tabs).click(function (e) {
                 var named_tab = e.target.href.split('#')[1],
                     url = named_tab;
 
@@ -92,7 +69,7 @@ var TabbedForm = function (container) {
 
             initialize_nav_tabs();
 
-            initialize_pending_actions();
+            window.forms_helper_functions.initialize_pending_actions();
 
             $('body').bind('formready', function () {
                 // callbacks
@@ -103,16 +80,17 @@ var TabbedForm = function (container) {
                 });
             });
 
-            $('body').bind('reloadtabs', function () {
+            $('body').one('reloadtabs', function () {
                 initialize_nav_tabs();
-                initialize_pending_actions();
+                window.forms_helper_functions.initialize_pending_actions();
             });
 
             if (opentab === undefined || opentab === "") {
-                container.find('.nav-tabs a').first().click();
+                container.find('.nav-tabs a.main-nav-tabs').first().click();
             } else {
-                initialize_verification(opentab);
+                window.forms_helper_functions.initialize_verification(opentab);
             }
+            window.tabbedform.changetabs_calls.push(window.forms_helper_functions.auto_displayname);
         };
 
     initialize();

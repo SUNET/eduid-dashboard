@@ -114,6 +114,7 @@ class Saml2RequestTests(unittest.TestCase):
         # db in a different way
 
         self.tmp_db = MongoTemporaryInstance.get_instance()
+	self.conn = self.tmp_db.conn
 
         self.settings = {
             'saml2.settings_module': path.join(path.dirname(__file__),
@@ -144,7 +145,6 @@ class Saml2RequestTests(unittest.TestCase):
         except pymongo.errors.ConnectionFailure:
             raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
                 self.settings['mongo_uri']))
-        self.db.profiles.drop()
         userdocs = []
         for userdoc in self.userdb.all_userdocs():
             newdoc = deepcopy(userdoc)
@@ -158,7 +158,16 @@ class Saml2RequestTests(unittest.TestCase):
     def tearDown(self):
         super(Saml2RequestTests, self).tearDown()
         self.testapp.reset()
-        self.db.profiles.drop()
+        for db_name in self.conn.database_names():
+            if db_name == 'local':
+                continue
+            db = self.conn[db_name]
+            for col_name in db.collection_names():
+                if 'system' not in col_name:
+                    db.drop_collection(col_name)
+            del db
+            self.conn.drop_database(db_name)
+        self.conn.disconnect()
 
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
@@ -167,7 +176,7 @@ class Saml2RequestTests(unittest.TestCase):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def dummy_request(self):
@@ -185,7 +194,7 @@ class Saml2RequestTests(unittest.TestCase):
         request = self.dummy_request()
         session = session_factory(request)
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.set_cookie('beaker.session.id', session._sess.id)
         self.pol = self.config.testing_securitypolicy(
             'user', ('editors', ),
             permissive=False, remember_result=True)

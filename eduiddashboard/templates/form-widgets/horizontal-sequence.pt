@@ -36,20 +36,12 @@
     <small id="${field.oid}-addtext">${add_subitem_text}</small>
   </a>
 
-  <script type="text/javascript">
-     deform.addCallback(
-       '${field.oid}',
-       function(oid) {
-         oid_node = $('#'+ oid);
-         deform.processSequenceButtons(oid_node, ${min_len},
-                                       ${max_len}, ${now_len},
-                                       ${orderable});
-       }
-     )
-  <tal:block condition="orderable">
-     $( "#${oid}-orderable" ).sortable({handle: "span.deformOrderbutton"});
-  </tal:block>
-  </script>
+  <span class="dataholder" id="field-oid" data-fieldoid="${field.oid}"
+                                          data-min_len="${min_len}"
+                                          data-max_len="${max_len}"
+                                          data-now_len="${now_len}"
+                                          data-orderable="${orderable}" ></span>
+  <span class="scriptholder" data-script="horizontal_sequence"></span> 
   <input type="hidden" name="__end__" value="${field.name}:sequence"/>
   <!-- /sequence -->
 </div>

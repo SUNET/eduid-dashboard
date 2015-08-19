@@ -1,5 +1,6 @@
 from datetime import datetime
 from mock import patch
+from copy import deepcopy
 
 from bson import ObjectId
 import simplejson as json

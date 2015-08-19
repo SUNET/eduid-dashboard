@@ -67,6 +67,16 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_jsdata %}
+    <span class="dataholder" id="home-data" data-sLengthMenu="{{ _("Display _MENU_ records") }}"
+                                            data-sInfo="{{ _("Showing _START_ to _END_ of _TOTAL_ entries") }}"
+                                            data-sInfoFiltered="{{ _("filtered from _MAX_ records") }}"
+                                            data-sSearch="{{ _("Filter") }}"
+                                            data-sZeroRecords="{{ _("No users matching that search query was found") }}"
+                                            data-sNext="{{ _("Next") }}"
+                                            data-sPrevious="{{ _("Previous") }}"></span>
+{% endblock %}
+
 {% block extracss %}
     <link href="{{"eduiddashboard:static/css/dataTables.bootstrap.css"|static_url}}" rel="stylesheet" media="screen">
 {% endblock %}
@@ -74,26 +84,7 @@
 {% block extrajs %}
     <script src="{{"eduiddashboard:static/js/libs/jquery.dataTables.min.js"|static_url}}"></script>
     <script src="{{"eduiddashboard:static/js/libs/jquery.dataTables.bootstrap.js"|static_url}}"></script>
+    <script src="{{"eduiddashboard:static/js/home.js"|static_url}}"></script>
     <script>
-        $(document).ready( function () {
-            $('#user-table').dataTable({
-                "oLanguage": {
-                     "sLengthMenu": "{{_("Display _MENU_ records")}}",
-                     "sInfo": "{{_("Showing _START_ to _END_ of _TOTAL_ entries")}}",
-                     "sInfoFiltered": " - {{_("filtered from _MAX_ records")}}",
-                     "sSearch": "{{_("Filter")}}:",
-                     "sZeroRecords": "{{_("No users matching that search query was found")}}.",
-                     "oPaginate": {
-                        "sNext": "{{_("Next")}}",
-                        "sPrevious": "{{_("Previous")}}"
-                     }
-                },
-                "aoColumnDefs": [
-                    { "bSearchable": false, "aTargets": [ -1 ] },
-                    { "bSortable": false, "aTargets": [ -1 ] },
-                    { "sClass": "text-center", "aTargets": [ -1 ] }
-                ]
-            });
-        } );
     </script>
 {% endblock %}

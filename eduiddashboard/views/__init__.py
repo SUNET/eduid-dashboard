@@ -74,21 +74,28 @@ class BaseFormView(FormView):
 
     def get_template_context(self):
         return {
-            'formname': self.classname
+            'formname': self.classname,
         }
 
     def failure(self, e):
-        context = super(BaseFormView, self).failure(e)
-
+        rendered = e.field.widget.serialize(e.field, e.cstruct,
+                                            request=self.request)
+        context = {
+            'form': rendered,
+            }
         context.update(self.get_template_context())
-
         return context
 
     def show(self, form):
-        context = super(BaseFormView, self).show(form)
-
+        appstruct = self.appstruct()
+        if appstruct is None:
+            rendered = form.render(request=self.request)
+        else:
+            rendered = form.render(appstruct, request=self.request)
+        context = {
+            'form': rendered,
+            }
         context.update(self.get_template_context())
-
         return context
 
     def full_page_reload(self):
@@ -106,14 +113,15 @@ class BaseFormView(FormView):
 class BaseActionsView(object):
     data_attribute = None
     default_verify_messages = {
-        'ok': _('The data has been verified'),
+        'success': _('The data has been verified'),
         'error': _('Confirmation code is invalid'),
         'request': _('Check your email for further instructions'),
         'placeholder': _('Confirmation code'),
         'new_code_sent': _('A new confirmation code has been sent to you'),
         'expired': _('The confirmation code has expired. Please click on '
                      '"Resend confirmation code" to get a new one'),
-        'out_of_sync': _('The user was out of sync. Please try again.'),
+        'out_of_sync': _('Your user profile is out of sync. Please '
+                         'reload the page and try again.'),
     }
 
     def __init__(self, context, request):
@@ -146,10 +154,26 @@ class BaseActionsView(object):
         raise NotImplementedError()
 
     def verify_action(self, index, post_data):
-        """ Common action to verificate some given data.
+        """ Common action to verify some given data.
             You can override in subclasses
         """
-        data_to_verify = self.user.get(self.data_attribute, [])[index]
+
+        # Catch the unlikely event when the user have e.g. removed all entries
+        # in a separate tab, or one in the middle and then tries to resend the
+        # code for a non-existing entry.
+        # This is an incomplete fix since it is better if we can get the list
+        # from the UI and then check that the entry which the client want to
+        # resend the code for corresponds to the same entry we get from
+        # data[index].
+        try:
+            data_to_verify = self.user.get(self.data_attribute, [])[index]
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
+
         data_id = self.get_verification_data_id(data_to_verify)
         return self._verify_action(data_id, post_data)
 
@@ -180,8 +204,8 @@ class BaseActionsView(object):
                                 'message': self.verify_messages['out_of_sync'],
                             }
                     return {
-                        'result': 'ok',
-                        'message': self.verify_messages['ok'],
+                        'result': 'success',
+                        'message': self.verify_messages['success'],
                         }
                 else:
                     log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
@@ -199,7 +223,23 @@ class BaseActionsView(object):
 
     def resend_code_action(self, index, post_data):
         data = self.user.get(self.data_attribute, [])
-        data_to_resend = data[index]
+
+        # Catch the unlikely event when the user have e.g. removed all entries
+        # in a separate tab, or one in the middle and then tries to resend the
+        # code for a non-existing entry.
+        # This is an incomplete fix since it is better if we can get the list
+        # from the UI and then check that the entry which the client want to
+        # resend the code for corresponds to the same entry we get from
+        # data[index].
+        try:
+            data_to_resend = data[index]
+        except IndexError:
+            message = self.verify_messages['out_of_sync']
+            return {
+                'result': 'out_of_sync',
+                'message': get_localizer(self.request).translate(message),
+            }
+
         data_id = self.get_verification_data_id(data_to_resend)
         reference, code = new_verification_code(
             self.request, self.data_attribute, data_id,
@@ -208,7 +248,7 @@ class BaseActionsView(object):
         self.send_verification_code(data_id, reference, code)
         msg = self.verify_messages['new_code_sent']
         return {
-            'result': 'ok',
+            'result': 'success',
             'message': msg,
         }
 
@@ -301,7 +341,7 @@ class BaseWizard(object):
             }})
         message = _('The wizard was dismissed')
         return {
-            'status': 'ok',
+            'status': 'success',
             'message': get_localizer(self.request).translate(message),
         }
 
@@ -324,7 +364,7 @@ class BaseWizard(object):
             post_data = self.request.POST
             response = action_method(post_data)
 
-            if response and response['status'] == 'ok':
+            if response and response['status'] == 'success':
                 self.next_step()
 
         elif self.request.POST['action'] == 'dismissed':

@@ -28,6 +28,9 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         HelpFactory, AdminFactory, is_logged)
 
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
+from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
+from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
+from eduiddashboard.stats import get_stats_instance
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -180,6 +183,12 @@ def profile_urls(config):
     config.add_route('wizard-nins', '/nin-wizard/',
                      factory=NinsFactory)
 
+    config.add_route('nins-wizard-chooser', '/nins-wizard-chooser/',
+                     factory=NinsFactory)
+    config.add_route('nins-verification-chooser',
+                     '/nins-verification-chooser/',
+                     factory=NinsFactory)
+
 
 def admin_urls(config):
     config.add_route('admin-status', '/status/', factory=AdminFactory)
@@ -219,8 +228,23 @@ def includeme(config):
     config.registry.settings['msgrelay'] = msgrelay
     config.add_request_method(get_msgrelay, 'msgrelay', reify=True)
 
+    lookuprelay = LookupMobileRelay(config.registry.settings)
+    config.registry.settings['lookuprelay'] = lookuprelay
+    config.add_request_method(get_lookuprelay, 'lookuprelay', reify=True)
+
+    idproofinglog = IDProofingLog(config.registry.settings)
+    config.registry.settings['idproofinglog'] = idproofinglog
+    config.add_request_method(get_idproofinglog, 'idproofinglog', reify=True)
+
     config.set_request_property(is_logged, 'is_logged', reify=True)
 
+    config.registry.settings['stats'] = get_stats_instance(settings, log)
+    # Make the result of the lambda available as request.stats
+    config.set_request_property(lambda x: x.registry.settings['stats'], 'stats', reify=True)
+
+    #
+    # Route setups
+    #
     config.add_route('home', '/', factory=HomeFactory)
     if settings['workmode'] == 'personal':
         config.include(profile_urls, route_prefix='/profile/')
@@ -301,6 +325,8 @@ def main(global_config, **settings):
     for item in (
         'mongo_uri',
         'site.name',
+        'dashboard_hostname',
+        'dashboard_baseurl',
         'auth_shared_secret',
         'mongo_uri_am',
         'mongo_uri_authninfo',
@@ -308,6 +334,7 @@ def main(global_config, **settings):
         'vccs_url',
         'nin_service_name',
         'nin_service_url',
+        'mobile_service_name',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -330,6 +357,10 @@ def main(global_config, **settings):
     settings['msg_broker_url'] = read_setting_from_env(settings,
                                                        'msg_broker_url',
                                                        'amqp://eduid_msg')
+
+    settings['lookup_mobile_broker_url'] = read_setting_from_env(settings,
+                                                                 'lookup_mobile_broker_url',
+                                                                 'amqp://lookup_mobile')
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',
                                                  'personal')
@@ -420,6 +451,8 @@ def main(global_config, **settings):
         '60',
     )
 
+    settings['stathat_username'] = read_setting_from_env(settings, 'stathat_username')
+
     jinja2_settings(settings)
 
     config = Configurator(settings=settings,
@@ -442,14 +475,9 @@ def main(global_config, **settings):
     config.include('deform_bootstrap')
     config.include('pyramid_deform')
 
-    if 'development' in settings and asbool(settings['development']):
-        pass
-    else:
-        config.include('eduiddashboard.saml2')
+    config.include('eduiddashboard.saml2')
 
-    if 'testing' in settings and asbool(settings['testing']) or \
-       'development' in settings and asbool(settings['development']) or \
-       settings['debug_mode']:
+    if settings['debug_mode'] or ('testing' in settings and asbool(settings['testing'])):
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')
@@ -468,10 +496,5 @@ def main(global_config, **settings):
     # eudid specific configuration
     includeme(config)
 
-    if 'development' in settings and asbool(settings['development']):
-        from eduiddashboard.development import auth as local_auth
-        config = local_auth.setup_auth(config)
-        config.scan(ignore=[re.compile('.*test(s|ing).*').search, 'eduiddashboard.saml2'])
-    else:
-        config.scan(ignore=[re.compile('.*test(s|ing).*').search, 'eduiddashboard.development'])
+    config.scan(ignore=[re.compile('.*test(s|ing).*').search, 'eduiddashboard.development'])
     return config.make_wsgi_app()

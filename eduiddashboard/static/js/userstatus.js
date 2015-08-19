@@ -31,7 +31,7 @@ var userstatus = {
       $('.pending-actions').empty();
       $('.pending-actions').html(pendingActionsHTML);
       $('body').trigger('reloadtabs');
-
+      window.forms_helper_functions.initialize_pending_actions();
     });
   }
 };

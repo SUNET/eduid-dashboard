@@ -21,13 +21,14 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.3.8-dev'
+version = '0.4.0b0'
 
 requires = [
     'eduid_am>=0.6.0-dev',
-    'eduid_msg>=0.8.6',
-    'eduid_userdb >= 0.0.0',
+    'eduid_msg>=0.8.7,<0.9.0-dev',
     'vccs_client>=0.4.1',
+    'eduid_lookup_mobile>=0.0.4',
+    'eduid_userdb>=0.0.2',
     'pysaml2==1.2.0beta2',
 
     'pymongo>=2.8,<3',
@@ -39,14 +40,16 @@ requires = [
     'pyramid_mailer==0.11',
     'pyramid_tm==0.7',
     'colander==1.0b1',
-    'deform==0.9.8',
+    'deform==2.0a2',
     'deform_bootstrap==0.2.9',
     'pycountry==1.2',
     'eventlet==0.14.0',
     'gunicorn==18.0',
     'pwgen==0.4',
     'zxcvbn==1.0',
-    'pytz'
+    'pytz',
+    'stathat-async==0.0.3',
+    'markupsafe>=0.23',
 ]
 
 if sys.version_info[0] < 3:
@@ -56,7 +59,7 @@ if sys.version_info[0] < 3:
 
 
 test_requires = [
-    'WebTest==1.4.3',
+    'WebTest==2.0.18',
     'mock==1.0.1',
 ]
 

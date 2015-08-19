@@ -1,5 +1,5 @@
 import json
-from mock import patch
+from mock import patch, Mock
 import unittest
 from bson import ObjectId
 from datetime import datetime
@@ -159,6 +159,47 @@ class NinsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'getcode')
 
+    def test_verify_existant_nin_by_mobile(self):
+        ''' '''
+        email = self.no_nin_user_email
+        self.set_logged(email)
+        user = self.userdb.get_user_by_mail(email)
+
+        self.assertEqual(len(user.get_nins()), 0)
+
+        # First we add a nin...
+        nin = '200010100001'
+
+        response_form = self.testapp.get('/profile/nins/')
+        form = response_form.forms[self.formname]
+        from eduiddashboard.msgrelay import MsgRelay
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            form['norEduPersonNIN'].value = nin
+            form.submit('add')
+
+        # and then we verify it
+        self.testapp.get('/profile/nins/')
+        from eduiddashboard.views import nins
+        with patch.object(nins, 'validate_nin_by_mobile', clear=True):
+            nins.validate_nin_by_mobile.return_value = {
+                'success': True,
+                'message': u'Ok',
+                }
+            with patch.object(OldUser, 'retrieve_address', clear=True):
+                OldUser.retrieve_address.return_value = None
+
+                response = self.testapp.post(
+                    '/profile/nins-actions/',
+                    {'identifier': nin + '  0', 'action': 'verify_mb'}
+                )
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['message'], 'Ok')
+        user = self.db.profiles.find_one({'mail': email})
+        user = OldUser(user)
+        self.assertEqual(len(user.get_nins()), 1)
+        self.assertEqual(user.get_nins()[0], nin)
+
     @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):
         self.set_logged()
@@ -188,7 +229,7 @@ class NinsFormTests(LoggedInRequestTests):
         }).count()
 
         response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'ok')
+        self.assertEqual(response_json['result'], 'success')
         self.assertEqual(nins_before - 1, nins_after)
 
     @unittest.skip('Functionality temporary removed')
@@ -247,7 +288,7 @@ class NinsFormTests(LoggedInRequestTests):
                 )
 
             response_json = json.loads(response.body)
-            self.assertEqual(response_json['result'], 'ok')
+            self.assertEqual(response_json['result'], 'success')
 
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
             old_user = OldUser(old_user)
@@ -272,7 +313,7 @@ class NinWizardTests(LoggedInRequestTests):
     def test_no_display_wizard(self):
         self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/profile/', status=200)
-        self.assertNotIn('openwizard', response.body)
+        response.mustcontain('data-openwizard="False"')
 
     def test_not_logged_not_display_wizard(self):
         """ Redirect to saml views if no logged session """
@@ -318,16 +359,63 @@ class NinWizardTests(LoggedInRequestTests):
         with patch.multiple(MsgRelay, nin_validator=return_true,
                             nin_reachable=return_true):
             from eduiddashboard.validators import CSRFTokenValidator
-            with patch.object(CSRFTokenValidator, '__call__'):
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
                 CSRFTokenValidator.__call__.return_value = None
                 self.testapp.post('/profile/nin-wizard/', {
                     'action': 'next_step',
                     'step': 0,
-                    'norEduPersonNIN': '196701101234',
-                    'csrf': '1234',
+                    'norEduPersonNIN': '197412041236',
+                    'csrf': '12345',
                 }, status=200)
                 response = self.testapp.get('/profile/', status=200)
-                response.mustcontain('initial_card = 1')
+                response.mustcontain('data-datakey="197412041236"')
+
+    def test_resend_code(self):
+        self.set_logged(email=self.no_nin_user_email)
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            MsgRelay.nin_reachable = Mock(return_value=True)
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
+                CSRFTokenValidator.__call__.return_value = None
+                response = self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'resendcode',
+                    'step': 1,
+                    'code': '',
+                    'norEduPersonNIN': '197412041236',
+                    'csrf': '12345',
+                }, status=200)
+
+                self.assertEqual(response.json['status'], 'success')
+                self.assertEqual(MsgRelay.nin_reachable.call_count, 1)
+
+    def test_resend_code_bad_nin(self):
+        self.set_logged(email=self.no_nin_user_email)
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.multiple(MsgRelay, nin_validator=return_true,
+                            nin_reachable=return_true):
+            MsgRelay.nin_reachable = Mock(return_value=True)
+            from eduiddashboard.validators import CSRFTokenValidator
+            with patch.object(CSRFTokenValidator, '__call__', clear=True):
+    
+                CSRFTokenValidator.__call__.return_value = None
+                response = self.testapp.post('/profile/nin-wizard/', {
+                    'action': 'resendcode',
+                    'step': 1,
+                    'code': '',
+                    'norEduPersonNIN': '19741236',
+                    'csrf': '12345',
+                }, status=200)
+
+                self.assertEqual(response.json['status'], 'error')
+                self.assertEqual(MsgRelay.nin_reachable.call_count, 0)
 
 
 class NinWizardStep1Tests(LoggedInRequestTests):
@@ -374,7 +462,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                     'norEduPersonNIN': '12341234-1234',
                     'code': '1234',
                 }, status=200)
-                self.assertEqual(response.json['status'], 'ok')
+                self.assertEqual(response.json['status'], 'success')
 
     def test_step1_not_valid_code(self):
         self.set_logged(email=self.no_nin_user_email)

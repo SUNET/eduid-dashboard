@@ -117,17 +117,20 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_verify_not_existing_mobile(self):
         self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-        verified_list = [m['verified'] for m in userdb['mobile']]
+        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
+        verified_list_before = [m['verified'] for m in userdb_before['mobile']]
 
-        with self.assertRaises(IndexError):
-            self.testapp.post(
+        response = self.testapp.post(
                 '/profile/mobiles-actions/',
                 {'identifier': 10, 'action': 'verify'}
-            )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
         verified_list_after = [m['verified'] for m in userdb_after['mobile']]
-        self.assertEqual(verified_list, verified_list_after)
+        self.assertEqual(verified_list_before, verified_list_after)
 
     def test_verify_not_existing_code(self):
         self.set_logged()
@@ -194,7 +197,7 @@ class MobilesFormTests(LoggedInRequestTests):
                 )
 
                 response_json = json.loads(response.body)
-                self.assertEqual(response_json['result'], 'ok')
+                self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)

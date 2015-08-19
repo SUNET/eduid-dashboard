@@ -3,6 +3,7 @@ import re
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
+from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.renderers import render_to_response
 from pyramid.security import remember
 from pyramid.view import view_config
@@ -18,6 +19,7 @@ from eduiddashboard.utils import (verify_auth_token,
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
+from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
@@ -63,6 +65,9 @@ def profile_editor(context, request):
             'polling_timeout_for_admin', 2000),
         'open_wizard': open_wizard,
         'datakey': datakey,
+        'has_mobile': has_confirmed_mobile(context.user),
+        'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
+        'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
     }
 
     return view_context
@@ -165,6 +170,7 @@ def help(context, request):
         'support_email': support_email
     }
 
+    request.stats.count('dashboard/help_page_shown', 1)
     return render_to_response(template, template_context, request=request)
 
 
@@ -185,24 +191,43 @@ def token_login(context, request):
         request.session['user'] = user
         request.session['loa'] = 1
         remember_headers = remember(request, user.get('email'))
+        request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
         logger.info("Token authentication failed (eppn: {!r})".format(eppn))
+        request.stats.count('dashboard/token_login_fail', 1)
         # Show and error, the user can't be logged
         return HTTPBadRequest()
 
 
 @view_config(route_name='set_language', request_method='GET')
 def set_language(context, request):
+    import re
+
     settings = request.registry.settings
     lang = request.GET.get('lang', 'en')
     if lang not in settings['available_languages']:
         return HTTPNotFound()
 
     url = request.environ.get('HTTP_REFERER', None)
-    if url is None:
-        url = request.route_path('home')
+    host = request.environ.get('HTTP_HOST', None)
+
+    dashboard_hostname = settings.get('dashboard_hostname')
+    dashboard_baseurl = settings.get('dashboard_baseurl')
+
+    # To avoid malicious redirects, using header injection, we only
+    # allow the client to be redirected to an URL that is within the
+    # predefined scope of the application.
+    allowed_url = re.compile('^(http|https)://' + dashboard_hostname + '[:]{0,1}\d{0,5}($|/)')
+    allowed_host = re.compile('^' + dashboard_hostname + '[:]{0,1}\d{0,5}$')
+
+    if url is None or not allowed_url.match(url):
+        url = dashboard_baseurl
+    elif host is None or not allowed_host.match(host):
+        url = dashboard_baseurl
+
     response = HTTPFound(location=url)
+
     cookie_domain = settings.get('lang_cookie_domain', None)
     cookie_name = settings.get('lang_cookie_name')
 
@@ -214,6 +239,7 @@ def set_language(context, request):
     extra_options['secure'] = asbool(settings.get('session.secure'))
 
     response.set_cookie(cookie_name, value=lang, **extra_options)
+    request.stats.count('dashboard/set_language_cookie', 1)
 
     return response
 
@@ -284,6 +310,24 @@ def terminate_account(context, request):
     schedule_action(request.session, 'account-termination-action')
 
     return HTTPFound(location=get_location(info))
+
+
+@view_config(route_name='nins-wizard-chooser',
+             renderer='templates/nins-wizard-chooser.jinja2',
+             request_method='GET', permission='edit')
+def nins_wizard_chooser(context, request):
+    return {
+            'has_mobile': has_confirmed_mobile(context.user),
+            }
+
+
+@view_config(route_name='nins-verification-chooser',
+             renderer='templates/nins-verification-chooser.jinja2',
+             request_method='GET', permission='edit')
+def nins_verification_chooser(context, request):
+    return {
+            'has_mobile': has_confirmed_mobile(context.user),
+            }
 
 
 @view_config(route_name='error500test')

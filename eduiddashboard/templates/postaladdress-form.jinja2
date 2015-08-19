@@ -60,21 +60,7 @@
   <h5>{% trans %}Alternative postal address{% endtrans %}</h5>
  {{ form|safe }}
 </div>
-{% endblock %}
 
+<span class="scriptholder" data-script="postaladdress"></span>
 
-{% block extrajs %}
-<script>
- window.deform && deform.addCallback(
-    'postaladdressview-form',
-    function() {
-       $('button.alternative-postal-address-button').click(function (){
-           $(this).toggleClass('hide');
-           $('.alternative-postal-address-form').toggleClass('hide');
-       });
-
-       $("#postaladderessview-form div.controls input").first().focus();
-    }
-);
-</script>
 {% endblock %}

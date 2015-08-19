@@ -22,7 +22,7 @@
   </head>
   <body>
     <div id='wrap'>
-      <div class="container" style="position: relative">
+      <div class="container position-relative">
 
         <div class="masthead">
           {% block loasquare %}
@@ -42,9 +42,9 @@
             <li class="{% block nav_class_home %}{% endblock %}"><a href="{{ request.route_path('home') }}">{{ _("Home") }}</a></li>
             <li class="{% block nav_class_help %}{% endblock %}"><a href="{{ request.route_path('help') }}">{{ _("Help") }}</a></li>
             {% if request.is_logged %}
-            <li><a href="{{ 'saml2-logout'|route_url }}">{{ _("Logout") }}</a></li>
+            <li><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></li>
             {% else %}
-            <li><a href="{{ 'saml2-login'|route_url }}">{{ _("Login") }}</a></li>
+            <li><a href="{{ request.route_path('saml2-login') }}">{{ _("Login") }}</a></li>
             {% endif %}
             <li class="nav-separator hidden-xs"></li>
           </ul>
@@ -87,7 +87,7 @@
     <div id="footer">
         <div class="container">
             <p>
-              &copy; SUNET 2013-2014
+              &copy; SUNET 2013-2015
               <span class="pull-right">
                 {% for lang,label in request.registry.settings.get('available_languages', {}).items() %}
                     <span class="langselector">
@@ -102,59 +102,18 @@
             </p>
         </div>
     </div>
+    {% block extra_jsdata %}
+    {% endblock %}
 
-    <script src="{{'deform:static/scripts/jquery-1.7.2.min.js'|static_url}}"></script>
+    <script src="{{'deform:static/scripts/jquery-2.0.3.min.js'|static_url}}"></script>
+    <script src="{{'deform:static/scripts/jquery-2.0.3.min.map'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/pwstrength-bootstrap-1.1.1.min.js'|static_url}}"></script>
     <!--[if IE]>
-    <script type="text/javascript">
-        if (!(window.console && console.log)) {
-            (function() {
-                var noop = function() {};
-                var methods = ['assert', 'clear', 'count', 'debug', 'dir', 'dirxml', 'error', 'exception', 'group', 'groupCollapsed', 'groupEnd', 'info', 'log', 'markTimeline', 'profile', 'profileEnd', 'markTimeline', 'table', 'time', 'timeEnd', 'timeStamp', 'trace', 'warn'];
-                var console = window.console = {};
-                for (var i = 0; i < methods.length; i++) {
-                    console[methods[i]] = noop;
-                }
-            }());
-        }
-    </script>
+    <script type="text/javascript" src="{{'eduiddashboard:static/js/base-ie.js'|static_url}}"></script>
     <![endif]-->
-    <script>
-      if (window.messagesTimer === undefined) {
-          window.messagesTimer = null;
-      }
-
-      var clearMessages = function() {
-        if (window.messagesTimer) {
-          window.clearTimeout(window.messagesTimer);
-        }
-        $('.alert').not('.fixed').fadeOut(400, function (){
-          $(this).remove();
-        });
-      };
-
-      var setMessagesTimer = function () {
-        window.messagesTimer = window.setTimeout(clearMessages, 10000);
-      };
-
-      window.messagesResetTimer = function (index) {
-        window.clearTimeout(window.messagesTimer);
-        // do a fancy effect
-        window.setMessagesTimer();
-        $($('.alert')[index]).animate({opacity: 0.25}, 150).delay(150).animate({opacity: 1}, 150);
-
-      };
-
-      $(document).ready(function () {
-        $(document).ready(function () {$('div#content-block').show()});
-        $('a.null-link').click(function (e) {
-            e.preventDefault();
-        });
-        setMessagesTimer();
-      });
-    </script>
+    <script type="text/javascript" src="{{'eduiddashboard:static/js/base.js'|static_url}}"></script>
     {% block extrajs %}
     {% endblock %}
 

@@ -68,6 +68,7 @@ class MsgRelay(object):
                                        'amqp://eduid:eduid@127.0.0.1:5672/eduid_msg'),
             'TEMPLATES_DIR': 'templates/',
             'CELERY_RESULT_BACKEND': 'amqp',
+            'CELERY_TASK_SERIALIZER': 'json',
         }
         celery.conf.update(config)
 
@@ -125,13 +126,14 @@ class MsgRelay(object):
         else:
             raise self.TaskFailed('Something goes wrong')
 
-    def nin_validator(self, reference, nin, code, language):
+    def nin_validator(self, reference, nin, code, language, recipient, message_type='mm'):
         """
             The template keywords are:
                 * sitename: eduID by default
                 * sitelink: the url dashboard in personal workmode
                 * code: the verification code
                 * nin: the nin number to verificate
+                * message_type: the type of message to send the verification code. Can only have values 'sms' or 'mm'
         """
         content = self.get_content()
 
@@ -142,7 +144,7 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin message reference: {0}, code: {1}, NIN: {2}'.format(
                      reference, code, nin))
-        self._send_message.delay('mm', reference, content, nin,
+        self._send_message.delay(message_type, reference, content, recipient,
                                  TEMPLATES_RELATION.get('nin-validator'), lang)
 
     def nin_reset_password(self, reference, nin, email, link, password_reset_timeout, language):
@@ -163,7 +165,7 @@ class MsgRelay(object):
         lang = self.get_language(language)
         logger.debug('SENT nin reset link message: {0} NIN: {1}'.format(
                      link, nin))
-        self._send_message.delay('mm', reference, content, nin, TEMPLATES_RELATION.get('nin-reset-password'), lang)
+        self._send_message.delay('mm', str(reference), content, nin, TEMPLATES_RELATION.get('nin-reset-password'), lang)
 
     def get_postal_address(self, nin):
         """
@@ -202,6 +204,38 @@ class MsgRelay(object):
         if rtask.successful():
             result = rtask.get()
             return parse_address_dict(result)
+        else:
+            raise self.TaskFailed('Something goes wrong')
+
+    def get_full_postal_address(self, nin):
+        """
+            The expected address format is:
+
+                OrderedDict([
+                    (u'Name', OrderedDict([
+                        (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                        (u'GivenNameMarking', u'20'),
+                        (u'GivenName', u'personal name'),
+                        (u'SurName', u'thesurname')
+                    ])),
+                    (u'OfficialAddress', OrderedDict([
+                        (u'@xmlns:xsi', u'http://www.w3.org/2001/XMLSchema-instance'),
+                        (u'Address2', u'StreetName 103'),
+                        (u'PostalCode', u'74141'),
+                        (u'City', u'STOCKHOLM')
+                    ]))
+                ])
+        """
+
+        rtask = self._get_postal_address.apply_async(args=[nin])
+        try:
+            rtask.wait()
+        except:
+            raise self.TaskFailed('Something goes wrong')
+
+        if rtask.successful():
+            result = rtask.get()
+            return result
         else:
             raise self.TaskFailed('Something goes wrong')
 

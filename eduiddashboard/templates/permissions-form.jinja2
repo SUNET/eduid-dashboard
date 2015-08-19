@@ -9,15 +9,10 @@
 {% endblock %}
 
 
-{% block extrajs %}
-<script>
-  if ($('#{{ formname }}-form').length > 0) {
-      window.beforeSubmit = function (arr, $form, options) {
-          var q=confirm("{{_('Are you sure you want to save your permission changes?')}}");
-          if (!q) {
-            return false
-          }
-      }
-  }
-</script>
+{% block extra_jsdata %}
+<span class="dataholder" id="permissionsform-data" data-formname="{{ formname }}"
+                                                   data-msg_confirm="{{_('Are you sure you want to save your permission changes?')}}"></span>
+
+<span class="scriptholder" data-script="permissions"></span>
+
 {% endblock %}

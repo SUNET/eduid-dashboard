@@ -392,6 +392,12 @@ table.passwords {
 div#account-deletion-intro {
     margin-top: 35px;
 }
+
+form#start-password-change-form {
+    float: left;
+    margin-right: 50px;
+}
+
 /* End of reset password view styles
 -------------------------------------------------- */
 
@@ -430,10 +436,38 @@ div#account-deletion-intro {
   color: #b94a48;
 }
 
+@media only screen and (min-width: 598px) {
+
 .wizard-body .wizard-steps {
     height:298px !important;
 }
 
+}
+
+@media only screen and (max-width: 598px) {
+
+div.wizard div.wizard-steps {
+  display: none;
+}
+
+div.wizard div.wizard-dialog {
+  width: 94% !important;
+  margin-top: 15px !important;
+}
+
+div.wizard div.wizard-card-container,
+div.wizard div.wizard-buttons-container > div.btn-group-single {
+  margin-left: 0px !important;
+}
+
+div.wizard div.wizard-content,
+div.wizard div.wizard-body,
+div.wizard div.wizard-cards,
+div.wizard div.wizard-card-container {
+  height: auto !important;
+}
+
+}
 
 /* End of wizard
 -------------------------------------------------- */
@@ -475,6 +509,43 @@ div#account-deletion-intro {
 .has-spinner.btn-lg.loading .spinner {
     width: 19px;
 }
+
+/* removing inlines */
+
+div.position-relative {
+    position: relative;
+}
+
+div.profile-filled-large {
+    padding-top: 80px;
+}
+
+div.profile-filled-small {
+    padding-top: 40px;
+}
+
+span.deformOrderbutton {
+    padding-right: 0.4em;
+    float:right;
+}
+
+span.deformClosebutton {
+    padding-right: 0.4em;
+}
+
+span.deformSeqItem.form-inline div {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+span.deformOrderbuttonActive:before {
+    content:"\2195";
+    margin-right: 5px;
+}
+
+
+/* end of removing inlines
+---------------------------  */
 
 /* End of Spinner on buttons
 -------------------------------------------------- */
@@ -653,4 +724,25 @@ div#profile-menu-small {
   *border-left-color: #ffffff;
 }
 
+}
+
+/* wizard */
+
+button.wizard-next {
+    margin-left: 0 !important;
+}
+
+div.wizard-steps {
+    height: 295px !important;
+    width: 36%;
+}
+
+a#go-to-mobiles-tab {
+    cursor: pointer;
+}
+
+/* end wizard */
+
+p.eduid-strong {
+    font-weight: 600;
 }

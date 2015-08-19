@@ -27,10 +27,10 @@ from eduid_am.celery import celery, get_attribute_manager
 import logging
 logger = logging.getLogger(__name__)
 
-MONGO_URI_TEST = 'mongodb://localhost:27017/eduid_signup_test'
-MONGO_URI_TEST_AM = 'mongodb://localhost:27017/eduid_am_test'
-MONGO_URI_TEST_TOU = 'mongodb://localhost:27017/eduid_tou_test'
-MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:27017/eduid_idp_authninfo_test'
+MONGO_URI_TEST = 'mongodb://localhost:%p/eduid_signup_test'
+MONGO_URI_TEST_AM = 'mongodb://localhost:%p/eduid_am_test'
+MONGO_URI_TEST_TOU = 'mongodb://localhost:%p/eduid_tou_test'
+MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:%p/eduid_idp_authninfo_test'
 
 
 SETTINGS = {
@@ -70,6 +70,7 @@ SETTINGS = {
     'personal_dashboard_base_url': 'http://localhost/',
     'nin_service_name': 'Mina meddelanden',
     'nin_service_url': 'http://minameddelanden.se/',
+    'mobile_service_name': 'TeleAdress',
     'available_languages': '''
             en = English
             sv = Svenska
@@ -77,6 +78,8 @@ SETTINGS = {
     'default_country_code': '+46',
     'vccs_url': 'http://localhost:8550/',
     'password_reset_timeout': '120',
+    'dashboard_hostname': 'dashboard.example.com',
+    'dashboard_baseurl': 'http://dashboard.example.com',
     }
 
 
@@ -244,7 +247,7 @@ class LoggedInRequestTests(MongoTestCase):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def add_to_session(self, data):
@@ -255,7 +258,7 @@ class LoggedInRequestTests(MongoTestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
+        self.testapp.set_cookie(session_factory._options.get('key'), session._sess.id)
         return request
 
     def check_values(self, fields, values, ignore_not_found=[]):

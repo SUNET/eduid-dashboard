@@ -9,6 +9,7 @@ from eduid_userdb.userdb import UserDB
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import normalize_to_e_164
+from eduiddashboard.idproofinglog import TeleAdressProofing, TeleAdressProofingRelation
 from eduiddashboard import log
 
 
@@ -201,11 +202,13 @@ class NINUniqueValidator(object):
             'verified': False
         })
 
-        if 'add' in request.POST:
-            if unverified_user_nins.count() > 0 or value in user_nins:
-                err = _("This national identity number is already in use")
-                raise colander.Invalid(node,
-                        get_localizer(request).translate(err))
+        # Search the request.POST for any post that starts with "add"
+        for post_value in request.POST:
+            if post_value.startswith('add'):
+                if unverified_user_nins.count() > 0 or value in user_nins:
+                    err = _("This national identity number is already in use")
+                    raise colander.Invalid(node,
+                            get_localizer(request).translate(err))
 
 
 class NINReachableValidator(object):
@@ -258,6 +261,130 @@ class NINReachableValidator(object):
                 'service_url': settings.get('nin_service_url'),
             }))
 
+
+def _get_age(nin):
+    import time
+
+    current_year = int(time.strftime("%Y"))
+    current_month = int(time.strftime("%m"))
+    current_day = int(time.strftime("%d"))
+
+    birth_year = int(nin[:4])
+    birth_month = int(nin[4:6])
+    birth_day = int(nin[6:8])
+
+    age = current_year - birth_year
+
+    if current_month < birth_month or (current_month == birth_month and current_day < birth_day):
+        age -= 1
+
+    return age
+
+
+def validate_nin_by_mobile(request, user, nin):
+    log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
+    log.debug('NIN: {!s}.'.format(nin))
+    from eduid_lookup_mobile.utilities import format_NIN
+    # Get list of verified mobile numbers
+    verified_mobiles = []
+    for one_mobile in user.get_mobiles():
+        if one_mobile['verified']:
+            verified_mobiles.append(one_mobile['mobile'])
+
+    national_identity_number = format_NIN(nin)
+    status = 'no_phone'
+    valid_mobile = None
+    registered_to_nin = None
+
+    age = _get_age(national_identity_number)
+
+    try:
+        for mobile_number in verified_mobiles:
+            status = 'no_match'
+            # Get the registered owner of the mobile number
+            registered_to_nin = request.lookuprelay.find_NIN_by_mobile(mobile_number)
+            registered_to_nin = format_NIN(registered_to_nin)
+
+            if registered_to_nin == national_identity_number:
+                # Check if registered nin was the given nin
+                valid_mobile = mobile_number
+                status = 'match'
+                log.info('Mobile number matched for user {!r}.'.format(user))
+                log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
+                request.stats.count('dashboard/validate_nin_by_mobile_exact_match', 1)
+                break
+            elif registered_to_nin is not None and age < 18:
+                # Check if registered nin is related to given nin
+                relation = request.msgrelay.get_relations_to(national_identity_number, registered_to_nin)
+                # TODO All relations?
+                #valid_relations = ['M', 'B', 'FA', 'MO', 'VF']
+                valid_relations = ['FA', 'MO']
+                if any(r in relation for r in valid_relations):
+                    valid_mobile = mobile_number
+                    status = 'match_by_navet'
+                    log.info('Mobile number matched for user {!r} via navet.'.format(user))
+                    log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
+                    log.debug('Person with NIN {!s} have relation {!s} to user: {!r}.'.format(registered_to_nin,
+                                                                                              relation, user))
+                    request.stats.count('dashboard/validate_nin_by_mobile_relative_match', 1)
+                    break
+    except request.lookuprelay.TaskFailed:
+        status = 'error_lookup'
+    except request.msgrelay.TaskFailed:
+        status = 'error_navet'
+
+    msg = None
+    if status == 'no_phone':
+        msg = _('You have no confirmed mobile phone')
+        log.info('User {!r} has no verified mobile phone number.'.format(user))
+    elif status == 'no_match':
+        log.info('User {!r} NIN is not associated with any verified mobile phone number.'.format(user))
+        msg = _('The given mobile number was not associated to the given national identity number')
+        request.stats.count('dashboard/validate_nin_by_mobile_no_match', 1)
+    elif status == 'error_lookup' or status == 'error_navet':
+        log.error('Validate NIN via mobile failed with status "{!s}" for user {!r}.'.format(status, user))
+        msg = _('Sorry, we are experiencing temporary technical '
+                'problem with ${service_name}, please try again '
+                'later.')
+        request.stats.count('dashboard/validate_nin_by_mobile_error', 1)
+
+    if status == 'match' or status == 'match_by_navet':
+        log.info('Validate NIN via mobile succeeded with status "{!s}" for user {!r}.'.format(status, user))
+        msg = _('Validate NIN via mobile with succeeded')
+        user_postal_address = request.msgrelay.get_full_postal_address(national_identity_number)
+        if status == 'match':
+            proofing_data = TeleAdressProofing(user, status, national_identity_number, valid_mobile,
+                                               user_postal_address)
+        else:
+            registered_postal_address = request.msgrelay.get_full_postal_address(registered_to_nin)
+            proofing_data = TeleAdressProofingRelation(user, status, national_identity_number, valid_mobile,
+                                                       user_postal_address, registered_to_nin, relation,
+                                                       registered_postal_address)
+
+        log.info('Logging of mobile proofing data for user {!r}.'.format(user))
+        if not request.idproofinglog.log_verified_by_mobile(proofing_data):
+            log.error('Logging of mobile proofing data for user {!r} failed.'.format(user))
+            valid_mobile = None
+            msg = _('Sorry, we are experiencing temporary technical '
+                    'problem with ${service_name}, please try again '
+                    'later.')
+
+    validation_result = {'success': valid_mobile is not None, 'message': msg, 'mobile': valid_mobile}
+    return validation_result
+
+class NINRegisteredMobileValidator(object):
+    """ Validator that checks so the primary mobile number is registered on the given national identity number """
+
+    def __call__(self, node, value):
+        request = node.bindings.get('request')
+        settings = request.registry.settings
+        result = validate_nin_by_mobile(request, request.context.user, value)
+
+        if not result['success']:
+            localizer = get_localizer(request)
+            raise colander.Invalid(node, localizer.translate(result['message'], mapping={
+                'service_name': settings.get('mobile_service_name', 'TeleAdress'),
+            }))
 
 class ResetPasswordCodeExistsValidator(object):
 

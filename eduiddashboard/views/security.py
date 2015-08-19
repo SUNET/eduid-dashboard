@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from bson import ObjectId
 import pytz
 
-from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized
+from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPUnauthorized, HTTPMethodNotAllowed
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
@@ -28,7 +28,9 @@ from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
     convert_to_localtime, normalize_to_e_164
-from eduiddashboard import log
+
+import logging
+log = logging.getLogger(__name__)
 
 
 def change_password(request, user, old_password, new_password):
@@ -83,11 +85,16 @@ def generate_suggested_password(request):
         password = ' '.join([password[i*4: i*4+4] for i in range(0, len(password)/4)])
 
         request.session['last_generated_password'] = password
+        return password
 
     elif request.method == 'POST':
         password = request.session.get('last_generated_password', generate_password(length=password_length))
+        return password
 
-    return password
+    # We should not rely solely on the configuration of the
+    # reverse proxy to filter out only GET and POST.
+    else:
+        raise HTTPMethodNotAllowed(_('Invalid request: only GET and POST accepted.'))
 
 
 def get_authn_info(request):
@@ -151,6 +158,7 @@ def change_password_action(request, session_info, user):
         raise HTTPUnauthorized("Wrong user")
 
     # set timestamp in session
+    log.debug('Setting Authn ts for user {}'.format(user.get_id()))
     request.session['re-authn-ts'] = datetime.utcnow()
     # send to password change form
     return HTTPFound(request.route_url('password-change'))
@@ -235,12 +243,12 @@ class PasswordsView(BaseFormView):
                 msg = _('Stale authentication info. Please try again.')
                 self.request.session.flash('error|' + msg)
                 raise HTTPFound(self.context.route_url('profile-editor'))
+        user = self.request.session.get('edit-user',
+                self.request.session.get('user'))
+        log.debug('Removing Authn ts for user {!r} before'
+                ' changing the password'.format(user.get_id()))
         del self.request.session['re-authn-ts']
         passwords_data = self.schema.serialize(passwordform)
-        if 'edit-user' in self.request.session:
-            user = self.request.session['edit-user']
-        else:
-            user = self.request.session['user']
 
         if passwords_data.get('use_custom_password') == 'true':
             # The user has entered his own password and it was verified by
@@ -378,9 +386,11 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         try:
             user = self._search_user(email_or_username)
             log.debug("Reset password via email initiated for user {!r}".format(user))
+            self.request.stats.count('dashboard/pwreset_email_init', 1)
         except self.request.userdb.exceptions.UserDoesNotExist:
             log.debug("Tried to initiate reset password via email but user {!r} does not exist".format(
                 email_or_username))
+            self.request.stats.count('dashboard/pwreset_email_init_unknown_user', 1)
             user = None
 
         if user is not None:
@@ -415,8 +425,10 @@ class ResetPasswordNINView(BaseResetPasswordView):
         try:
             user = self._search_user(email_or_username)
             log.debug("Reset password via mm initiated for user {!r}.".format(user))
+            self.request.stats.count('dashboard/pwreset_mm_init', 1)
         except self.request.userdb.exceptions.UserDoesNotExist:
             log.debug("Tried to initiate reset password via mm but user {!r} does not exist".format(email_or_username))
+            self.request.stats.count('dashboard/pwreset_mm_init_unknown_user', 1)
             user = None
 
         if user is not None:
@@ -466,6 +478,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
 
         if password_reset is None:
+            self.request.stats.count('dashboard/pwreset_code_not_found', 1)
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
         date = datetime.now(pytz.utc)
@@ -473,6 +486,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         reset_date = password_reset['created_at'] + timedelta(minutes=reset_timeout)
         if reset_date < date:
             self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
+            self.request.stats.count('dashboard/pwreset_code_expired', 1)
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
         return super(ResetPasswordStep2View, self).__call__()
@@ -495,9 +509,11 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if form_data.get('use_custom_password') == 'true':
             log.debug("Password change for user {!r} (custom password).".format(user.get_id()))
             new_password = form_data.get('custom_password')
+            self.request.stats.count('dashboard/pwreset_custom_password', 1)
         else:
             log.debug("Password change for user {!r} (suggested password).".format(user.get_id()))
             new_password = self.get_suggested_password()
+            self.request.stats.count('dashboard/pwreset_generated_password', 1)
 
         new_password = new_password.replace(' ', '')
 
@@ -505,10 +521,13 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         ok = change_password(self.request, user, '', new_password)
 
         if ok:
+            self.request.stats.count('dashboard/pwreset_changed_password', 1)
             if password_reset['mechanism'] == 'email':
                 # TODO: Re-send verification code in advance?
                 nins = user.get_nins()
+                reset_nin_count = 0
                 if nins:
+                    # XXX shouldn't the downgrade of NIN to unverified be done to *ALL* the user's NINs?
                     nin = nins[-1]
                     if nin is not None:
                         self.request.db.profiles.update({
@@ -526,9 +545,12 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                             "$set": {"verified": False}
                         })
                         update_attributes('eduid_dashboard', str(user['_id']))
+                        reset_nin_count += 1
+                    self.request.stats.count('dashboard/pwreset_downgraded_NINs', reset_nin_count)
             url = self.request.route_url('profile-editor')
             reset = True
         else:
+            self.request.stats.count('dashboard/pwreset_password_change_failed', 1)
             url = self.request.route_url('reset-password')
             reset = False
         return {
