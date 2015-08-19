@@ -19,6 +19,7 @@ from eduid_userdb.userdb import UserDB
 import eduid_userdb.exceptions
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.saml2 import includeme as saml2_includeme
+from eduiddashboard.testing import get_db
 from eduid_userdb.testing import MongoTemporaryInstance
 
 
@@ -48,7 +49,7 @@ class MockedUserDB(UserDB):
 
     def get_user(self, userid):
         if userid not in self.test_users:
-            raise self.exceptions.UserDoesNotExist
+            raise self.exceptions.UserDoesNotExist('Unknown user')
         return OldUser(self.test_users.get(userid))
     
     def all_users(self):
