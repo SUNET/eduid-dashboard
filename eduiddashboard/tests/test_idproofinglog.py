@@ -3,9 +3,6 @@ __author__ = 'lundberg'
 
 
 from eduiddashboard.idproofinglog import IDProofingLog, TeleAdressProofing, TeleAdressProofingRelation
-
-from eduid_userdb.dashboard import UserDBWrapper as UserDB
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
 
@@ -13,7 +10,7 @@ class TestIDProofingLog(LoggedInRequestTests):
 
     def setUp(self):
         super(TestIDProofingLog, self).setUp()
-        self.collection = self.conn['dashboard']['id_proofing_log']
+        self.collection = self.conn['eduid_dashboard']['id_proofing_log']
 
     def test_teleadress_proofing(self):
         user = self.userdb.get_user('johnsmith@example.org')
