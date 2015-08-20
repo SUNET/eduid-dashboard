@@ -1,11 +1,12 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class PermissionsFormTestsAdminMode(LoggedInReguestTests):
+class PermissionsFormTestsAdminMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    # Patch some parts of the mock users in eduid_userdb.testing.MongoTestCase
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -16,8 +17,24 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
     }]
 
     def setUp(self, settings={}):
+        # Make sure the default permission mappings are set here - the mappings
+        # are changed in test_config_permissions.py and that affects this test too :( :(
         settings.update({
-            'workmode': 'admin'
+            'workmode': 'admin',
+            'available_permissions': """
+urn:mace:eduid.se:role:ra
+urn:mace:eduid.se:role:admin
+urn:mace:eduid.se:role:manager
+urn:mace:eduid.se:role:consultant
+urn:mace:eduid.se:role:student
+urn:mace:eduid.se:role:teacher
+urn:mace:eduid.se:role:helpdesk
+            """,
+            'permissions_mapping': """
+personal =
+helpdesk = urn:mace:eduid.se:role:ra
+admin = urn:mace:eduid.se:role:admin
+            """
         })
         super(PermissionsFormTestsAdminMode, self).setUp(settings=settings)
 
@@ -32,7 +49,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
                          status=302)
 
     def test_logged_withoutpermissions_get(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
@@ -52,7 +69,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
                                 ['urn:mace:eduid.se:role:admin'])
 
     def test_logged_remove_admin_permissions(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email ='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.org/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
@@ -65,7 +82,7 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
         self.values_are_checked(res.form.fields.get('checkbox'),
                                 ['urn:mace:eduid.se:role:ra'])
 
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
@@ -77,7 +94,9 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
         self.assertIsNotNone(getattr(res, 'form', None))
 
         self.check_values(res.form.fields.get('checkbox'),
-                          ['urn:mace:eduid.se:role:admin', 'dirty-permissions'])
+                          ['urn:mace:eduid.se:role:admin', 'dirty-permissions'],
+                          ignore_not_found = ['dirty-permissions']
+                          )
 
         res = res.form.submit('save')
 
@@ -85,11 +104,11 @@ class PermissionsFormTestsAdminMode(LoggedInReguestTests):
                                 ['urn:mace:eduid.se:role:admin'])
 
 
-class PermissionsFormTestsPersonalMode(LoggedInReguestTests):
+class PermissionsFormTestsPersonalMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:ra',

@@ -2,11 +2,11 @@ import json
 
 from mock import patch
 
-from eduid_am.userdb import UserDB
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb.userdb import UserDB
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-# class PostalAddressFormTests(LoggedInReguestTests):
+# class PostalAddressFormTests(LoggedInRequestTests):
 
 #     formname = 'postaladdressview-form'
 

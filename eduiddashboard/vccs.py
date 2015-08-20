@@ -27,14 +27,14 @@ def check_password(vccs_url, password, user, vccs=None):
 
     :param vccs_url: URL to VCCS authentication backend
     :param password: plaintext password
-    :param user: user dict
+    :param user: User object
     :param vccs: optional vccs client instance
 
     :type vccs_url: string
     :type password: string
-    :type user: dict
+    :type user: OldUser
     :type vccs: None or VCCSClient
-    :rtype: bool or dict
+    :rtype: False or dict
     """
     passwords = user.get_passwords()
     for password_dict in passwords:
@@ -74,7 +74,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
 
     :type vccs_url: string
     :type old_password: string
-    :type user: User
+    :type user: OldUser
     :rtype: bool
     """
     password_id = ObjectId()
@@ -84,13 +84,18 @@ def add_credentials(vccs_url, old_password, new_password, user):
 
     passwords = user.get_passwords()
     old_factor = None
+    checked_password = None
+    # remember if an old password was supplied or not, without keeping it in
+    # memory longer than we have to
+    old_password_supplied = bool(old_password)
     if passwords and old_password:
         # Find the old credential to revoke
-        old_password = check_password(vccs_url, old_password, user, vccs=vccs)
-        if not old_password:
+        checked_password = check_password(vccs_url, old_password, user, vccs=vccs)
+        del old_password  # don't need it anymore, try to forget it
+        if not checked_password:
             return False
         old_factor = vccs_client.VCCSRevokeFactor(
-            str(old_password['id']),
+            str(checked_password['id']),
             'changing password',
             reference='dashboard',
         )
@@ -105,11 +110,12 @@ def add_credentials(vccs_url, old_password, new_password, user):
     if old_factor:
         # Use the user_id_hint inserted by check_password() until we know all
         # credentials use str(user['_id']) as user_id.
-        vccs.revoke_credentials(old_password['user_id_hint'], [old_factor])
-        passwords.remove(old_password)
+        vccs.revoke_credentials(checked_password['user_id_hint'], [old_factor])
+        passwords = [x for x in passwords if x['id'] != checked_password['id']]
         log.debug("Revoked old credential {!s} (user {!s})".format(
             old_factor.credential_id, user.get_id()))
-    elif not old_password:
+
+    if not old_password_supplied:
         # TODO: Revoke all current credentials on password reset for now
         revoked = []
         for password in passwords:

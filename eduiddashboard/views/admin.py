@@ -3,7 +3,7 @@ __author__ = 'lundberg'
 
 from pyramid.view import view_config
 
-from eduid_am.db import MongoDB
+from eduid_userdb.db import MongoDB
 from eduiddashboard.i18n import TranslationString as _
 
 import logging

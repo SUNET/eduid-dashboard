@@ -6,15 +6,16 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
+from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
 from eduiddashboard.verifications import verify_nin
-from eduid_am.user import User
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
@@ -100,27 +101,35 @@ def get_not_verified_nins_list(request, user):
     :return: List of NINs pending confirmation
     :rtype: [string]
     """
-    active_nins = user.get_nins()
-    nins = []
-    verifications = request.db.verifications
-    not_verified_nins = verifications.find({
+    users_nins = user.get_nins()
+    res = []
+    user_already_verified = []
+    user_not_verified = []
+    verifications = request.db.verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
-    if active_nins:
-        active_nin = active_nins[-1]
-        nin_found = False
-        for nin in not_verified_nins:
-            if active_nin == nin['obj_id']:
-                nin_found = True
-            elif nin_found and not nin['verified']:
-                nins.append(nin['obj_id'])
-    else:
-        for nin in not_verified_nins:
-            if not nin['verified']:
-                nins.append(nin['obj_id'])
+    if users_nins:
+        if isinstance(users_nins[0], dict):
+            for this in users_nins:
+                if this['verified']:
+                    user_already_verified.append(this['number'])
+                else:
+                    user_not_verified.append(this['number'])
+        else:
+            # old style, list of strings (understood to be verified)
+            user_already_verified = users_nins
+    for this in verifications:
+        if this['verified']:
+            if this['obj_id'] in user_not_verified:
+                # Found to be verified after all, filter out from user_not_verified
+                user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
+        else:
+            if this['obj_id'] not in user_already_verified:
+                res.append(this['obj_id'])
+    res += user_not_verified
     # As we no longer remove verification documents make the list items unique
-    return list(set(nins))
+    return list(set(res))
 
 
 def get_active_nin(self):
@@ -331,6 +340,7 @@ class NinsView(BaseFormView):
         newnin = normalize_nin(newnin)
 
         send_verification_code(self.request, self.user, newnin)
+        return True
 
     def add_success_personal(self, ninform, msg):
         self.addition_with_code_validation(ninform)
@@ -372,7 +382,7 @@ class NinsView(BaseFormView):
             })
 
         if old_user:
-            old_user = User(old_user)
+            old_user = OldUser(old_user)
             old_user.retrieve_modified_ts(self.request.db.profiles)
             nins = [nin for nin in old_user.get_nins() if nin != newnin]
             old_user.set_nins(nins)

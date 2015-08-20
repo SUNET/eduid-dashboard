@@ -1,8 +1,8 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import read_mapping
 
 
-class LocaleChangeTests(LoggedInReguestTests):
+class LocaleChangeTests(LoggedInRequestTests):
 
     def setUp(self, settings={}):
 
@@ -10,13 +10,13 @@ class LocaleChangeTests(LoggedInReguestTests):
         self.default_language = 'en'
 
     def test_get_default_lang(self):
-        self.set_logged(user='johnsmith@example.com')
-        response = self.testapp.get('/profile/', status=200)
+        self.set_logged(email ='johnsmith@example.com')
+        response = self.testapp.get('/profile/')
         lang_name = read_mapping(self.settings, 'available_languages')[self.default_language]
-        self.assertIn('<span>{0}</span>'.format(lang_name), response.body)
+        response.mustcontain('<span>{0}</span>'.format(lang_name))
 
     def test_change_language_with_referer(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email = 'johnsmith@example.com')
         host = self.settings['dashboard_hostname']
         referer = 'http://{hostname}/profile/'.format(hostname=host)
         response = self.testapp.get('/set_language/?lang=sv',
@@ -31,7 +31,7 @@ class LocaleChangeTests(LoggedInReguestTests):
         self.assertEqual(referer, response.location)
 
     def test_change_language_with_invalid_referer(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email='johnsmith@example.com')
         host = self.settings['dashboard_hostname']
         dashboard_baseurl = self.settings['dashboard_baseurl']
         invalid_referer = 'http://attacker.controlled.site'
@@ -47,7 +47,7 @@ class LocaleChangeTests(LoggedInReguestTests):
         self.assertEqual(dashboard_baseurl, response.location)
 
     def test_change_language_with_invalid_host(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email = 'johnsmith@example.com')
         host = self.settings['dashboard_hostname']
         dashboard_baseurl = self.settings['dashboard_baseurl']
         referer = 'http://{hostname}/profile/'.format(hostname=host)
@@ -64,16 +64,17 @@ class LocaleChangeTests(LoggedInReguestTests):
         self.assertEqual(dashboard_baseurl, response.location)
 
     def test_change_language_without_referer(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/set_language/?lang=sv', status=302)
+        self.assertEqual('sv', self.testapp.cookies.get('lang', None))
         response = self.testapp.get('/profile/', status=200)
         cookies = self.testapp.cookies
         self.assertIsNotNone(cookies.get('lang', None))
         self.assertEqual('sv', cookies.get('lang', None))
-        self.assertIn('<span>Svenska</span>', response.body)
+        response.mustcontain('<span>Svenska</span>')
 
     def test_language_cookie(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email = 'johnsmith@example.com')
         self.testapp.set_cookie('lang', 'sv')
         response = self.testapp.get('/profile/', status=200)
         cookies = self.testapp.cookies
@@ -84,8 +85,8 @@ class LocaleChangeTests(LoggedInReguestTests):
         # escaping around the value when testing it.
         self.assertEqual('"sv"', cookies.get('lang', None))
 
-        self.assertIn('<span>Svenska</span>', response.body)
+        response.mustcontain('<span>Svenska</span>')
 
     def test_change_language_not_available(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email ='johnsmith@example.com')
         self.testapp.get('/set_language/?lang=ph', status=404)
