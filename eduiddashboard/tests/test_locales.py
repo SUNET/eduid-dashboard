@@ -13,8 +13,7 @@ class LocaleChangeTests(LoggedInRequestTests):
         self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/profile/')
         lang_name = read_mapping(self.settings, 'available_languages')[self.default_language]
-        self.assertIn('<span>{0}</span>'.format(lang_name),
-                      response.body)
+        response.mustcontain('<span>{0}</span>'.format(lang_name))
 
     def test_change_language_with_referer(self):
         self.set_logged(email = 'johnsmith@example.com')
@@ -72,7 +71,7 @@ class LocaleChangeTests(LoggedInRequestTests):
         cookies = self.testapp.cookies
         self.assertIsNotNone(cookies.get('lang', None))
         self.assertEqual('sv', cookies.get('lang', None))
-        self.assertIn('<span>Svenska</span>', response.body)
+        response.mustcontain('<span>Svenska</span>')
 
     def test_language_cookie(self):
         self.set_logged(email = 'johnsmith@example.com')
@@ -86,7 +85,7 @@ class LocaleChangeTests(LoggedInRequestTests):
         # escaping around the value when testing it.
         self.assertEqual('"sv"', cookies.get('lang', None))
 
-        self.assertIn('<span>Svenska</span>', response.body)
+        response.mustcontain('<span>Svenska</span>')
 
     def test_change_language_not_available(self):
         self.set_logged(email ='johnsmith@example.com')
