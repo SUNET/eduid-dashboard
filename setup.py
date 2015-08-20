@@ -24,8 +24,8 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 version = '0.4.0b0'
 
 requires = [
-    'eduid_am>=0.6.0-dev',
-    'eduid_msg>=0.8.7,<0.9.0-dev',
+    'eduid_am>=0.6.0b0',
+    'eduid_msg>=0.9.0b0',
     'vccs_client>=0.4.1',
     'eduid_lookup_mobile>=0.0.4',
     'eduid_userdb>=0.0.2',
