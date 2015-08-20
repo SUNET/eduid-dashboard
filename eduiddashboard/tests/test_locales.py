@@ -67,7 +67,7 @@ class LocaleChangeTests(LoggedInRequestTests):
     def test_change_language_without_referer(self):
         self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/set_language/?lang=sv', status=302)
-        self.assertIsNotNone(response.cookies_set.get('lang', 'sv'))
+        self.assertEqual('sv', self.testapp.cookies.get('lang', None))
         response = self.testapp.get('/profile/', status=200)
         cookies = self.testapp.cookies
         self.assertIsNotNone(cookies.get('lang', None))
