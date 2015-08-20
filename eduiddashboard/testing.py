@@ -14,7 +14,7 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_userdb import MongoDB, UserDB
+from eduid_userdb import UserDB
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUserDB
 from eduid_userdb.testing import MongoTestCase
@@ -27,10 +27,10 @@ from eduid_am.celery import celery, get_attribute_manager
 import logging
 logger = logging.getLogger(__name__)
 
-MONGO_URI_TEST = 'mongodb://localhost:%p/eduid_signup_test'
-MONGO_URI_TEST_AM = 'mongodb://localhost:%p/eduid_am_test'
-MONGO_URI_TEST_TOU = 'mongodb://localhost:%p/eduid_tou_test'
-MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:%p/eduid_idp_authninfo_test'
+#MONGO_URI_TEST = 'mongodb://localhost:%p/eduid_signup_test'
+#MONGO_URI_TEST_AM = 'mongodb://localhost:%p/eduid_am_test'
+#MONGO_URI_TEST_TOU = 'mongodb://localhost:%p/eduid_tou_test'
+#MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:%p/eduid_idp_authninfo_test'
 
 
 SETTINGS = {
@@ -127,16 +127,6 @@ class MockedTask(object):
 
     def apply_async(self, *args, **kwargs):
         return MockedResult(self.retval, self.failed)
-
-
-def get_db(settings):
-    mongo_replicaset = settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'])
-    return mongodb.get_database()
 
 
 class LoggedInRequestTests(MongoTestCase):

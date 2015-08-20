@@ -15,12 +15,14 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_userdb.userdb import UserDB
 import eduid_userdb.exceptions
+from eduid_userdb.userdb import UserDB, MongoDB
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduiddashboard.saml2 import includeme as saml2_includeme
-from eduiddashboard.testing import get_db
 from eduid_userdb.testing import MongoTemporaryInstance
+from eduiddashboard.saml2 import includeme as saml2_includeme
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MockedUserDB(UserDB):
@@ -79,6 +81,17 @@ class ObjectFactory(object):
         self.request = request
 
 
+def get_db(settings):
+    mongo_replicaset = settings.get('mongo_replicaset', None)
+    if mongo_replicaset is not None:
+        mongodb = MongoDB(db_uri=settings['mongo_uri'],
+                          replicaSet=mongo_replicaset)
+    else:
+        mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    logger.warning("Using a raw MongoDB instance: {!r} (mongo_uri: {!r})".format(mongodb, settings['mongo_uri']))
+    return mongodb.get_database()
+
+
 def saml2_main(global_config, **settings):
     """ This function returns a WSGI application.
 
@@ -114,7 +127,7 @@ class Saml2RequestTests(unittest.TestCase):
         # db in a different way
 
         self.tmp_db = MongoTemporaryInstance.get_instance()
-	self.conn = self.tmp_db.conn
+        self.conn = self.tmp_db.conn
 
         self.settings = {
             'saml2.settings_module': path.join(path.dirname(__file__),
