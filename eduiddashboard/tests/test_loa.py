@@ -1,7 +1,7 @@
-from eduiddashboard.testing import LoggedInReguestTests, loa
+from eduiddashboard.testing import LoggedInRequestTests, loa
 
 
-class LoaTestsAdminMode(LoggedInReguestTests):
+class LoaTestsAdminMode(LoggedInRequestTests):
 
     def setUp(self, settings={}):
         settings.update({
@@ -11,7 +11,7 @@ class LoaTestsAdminMode(LoggedInReguestTests):
 
     def test_edit_with_lower_than_the_required_loa(self):
         self.set_logged(
-            user='johnsmith@example.com',
+            email ='johnsmith@example.com',
             extra_session_data={
                 'eduPersonAssurance': loa(1),
                 'eduPersonIdentityProofing': loa(3),
@@ -22,7 +22,7 @@ class LoaTestsAdminMode(LoggedInReguestTests):
 
     def test_edit_with_lower_than_the_required_loa_2(self):
         self.set_logged(
-            user='johnsmith@example.com',
+            email ='johnsmith@example.com',
             extra_session_data={
                 'eduPersonAssurance': loa(2),
                 'eduPersonIdentityProofing': loa(3),
@@ -33,7 +33,7 @@ class LoaTestsAdminMode(LoggedInReguestTests):
 
     def test_edit_with_the_required_loa(self):
         self.set_logged(
-            user='johnsmith@example.com',
+            email ='johnsmith@example.com',
             extra_session_data={
                 'eduPersonAssurance': loa(3),
                 'eduPersonIdentityProofing': loa(3),
@@ -44,7 +44,7 @@ class LoaTestsAdminMode(LoggedInReguestTests):
 
     def test_edit_with_lower_loa(self):
         self.set_logged(
-            user='johnsmith@example.com',
+            email ='johnsmith@example.com',
             extra_session_data={
                 'eduPersonAssurance': loa(1),
                 'eduPersonIdentityProofing': loa(3),
@@ -56,7 +56,7 @@ class LoaTestsAdminMode(LoggedInReguestTests):
 
     def test_edit_with_required_loa(self):
         self.set_logged(
-            user='johnsmith@example.com',
+            email ='johnsmith@example.com',
             extra_session_data={
                 'eduPersonAssurance': loa(3),
                 'eduPersonIdentityProofing': loa(3),
@@ -66,7 +66,7 @@ class LoaTestsAdminMode(LoggedInReguestTests):
                          status=200)
 
 
-class LoaTestsPersonalMode(LoggedInReguestTests):
+class LoaTestsPersonalMode(LoggedInRequestTests):
 
     def setUp(self, settings={}):
         settings.update({
@@ -75,7 +75,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
         super(LoaTestsPersonalMode, self).setUp(settings=settings)
 
     def test_edit_with_lower_loa(self):
-        self.set_logged(user='johnsmith@example.com',
+        self.set_logged(email ='johnsmith@example.com',
                         extra_session_data={
                             'eduPersonAssurance': loa(1),
                             'eduPersonIdentityProofing': loa(2),
@@ -85,7 +85,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                          status=200)
 
     def test_edit_with_max_loa(self):
-        self.set_logged(user='johnsmith@example.com',
+        self.set_logged(email ='johnsmith@example.com',
                         extra_session_data={
                             'eduPersonAssurance': loa(2),
                             'eduPersonIdentityProofing': loa(2),
@@ -95,7 +95,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                          status=200)
 
     def test_edit_with_lower_loa_credentials(self):
-        self.set_logged(user='johnsmith@example.com',
+        self.set_logged(email ='johnsmith@example.com',
                         extra_session_data={
                             'eduPersonAssurance': loa(1),
                             'eduPersonIdentityProofing': loa(2),
@@ -105,7 +105,7 @@ class LoaTestsPersonalMode(LoggedInReguestTests):
                          status=200)  # TODO: revert to 401 when we re-enable step-up auth for security based on AL
 
     def test_edit_with_max_loa_credentials(self):
-        self.set_logged(user='johnsmith@example.com',
+        self.set_logged(email ='johnsmith@example.com',
                         extra_session_data={
                             'eduPersonAssurance': loa(2),
                             'eduPersonIdentityProofing': loa(2),

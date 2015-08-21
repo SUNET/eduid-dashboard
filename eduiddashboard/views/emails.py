@@ -6,7 +6,7 @@ from datetime import datetime
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email

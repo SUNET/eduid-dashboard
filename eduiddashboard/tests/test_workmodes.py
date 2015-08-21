@@ -1,7 +1,7 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class PersonalWorkmodeTests(LoggedInReguestTests):
+class PersonalWorkmodeTests(LoggedInRequestTests):
 
     def setUp(self, settings={}):
         super(PersonalWorkmodeTests, self).setUp(settings={
@@ -30,7 +30,7 @@ class PersonalWorkmodeTests(LoggedInReguestTests):
         self.testapp.get('/users/johnsmith@example.com/emails/', status=404)
 
 
-class AdminModeTests(LoggedInReguestTests):
+class AdminModeTests(LoggedInRequestTests):
 
     def setUp(self, settings={}):
         super(AdminModeTests, self).setUp(settings={

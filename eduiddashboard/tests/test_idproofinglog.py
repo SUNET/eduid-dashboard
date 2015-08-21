@@ -2,22 +2,15 @@
 __author__ = 'lundberg'
 
 
-from eduid_userdb import MongoDB
-from eduid_userdb.testing import MongoTestCase
-from eduid_am import testing as am
-from eduid_am.testing import MockedUserDB
 from eduiddashboard.idproofinglog import IDProofingLog, TeleAdressProofing, TeleAdressProofingRelation
+from eduiddashboard.testing import LoggedInRequestTests
 
-class TestIDProofingLog(MongoTestCase):
+
+class TestIDProofingLog(LoggedInRequestTests):
 
     def setUp(self):
         super(TestIDProofingLog, self).setUp()
-        self.userdb = MockedUserDB()
-        mongo_uri = am.MONGO_URI_TEST % self.port
-        self.settings.update({
-            'mongo_uri': mongo_uri,
-        })
-        self.collection = self.conn['dashboard']['id_proofing_log']
+        self.collection = self.conn['eduid_dashboard']['id_proofing_log']
 
     def test_teleadress_proofing(self):
         user = self.userdb.get_user('johnsmith@example.org')

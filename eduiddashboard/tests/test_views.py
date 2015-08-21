@@ -1,7 +1,7 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class ViewTests(LoggedInReguestTests):
+class ViewTests(LoggedInRequestTests):
 
     def test_home_view(self):
         self.set_logged()
