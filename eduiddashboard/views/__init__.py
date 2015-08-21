@@ -9,7 +9,7 @@ from pyramid.renderers import render_to_response
 
 from pyramid_deform import FormView
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_short_hash
@@ -24,7 +24,7 @@ def get_dummy_status(request, user):
 
 
 def sync_user(request, context, old_user):
-    user = request.userdb.get_user_by_oid(old_user.get_id())
+    user = request.userdb.get_user_by_id(old_user.get_id())
     user.retrieve_modified_ts(request.db.profiles)
     if context.workmode == 'personal':
         request.session['user'] = user

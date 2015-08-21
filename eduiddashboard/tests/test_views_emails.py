@@ -4,12 +4,12 @@ import re
 
 from mock import patch
 
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb.dashboard import UserDBWrapper as UserDB
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class MailsFormTests(LoggedInReguestTests):
+class MailsFormTests(LoggedInRequestTests):
 
     formname = 'emailsview-form'
 
@@ -223,7 +223,7 @@ class MailsFormTests(LoggedInReguestTests):
         self.assertEqual(userdb_before, userdb_after)
 
     def test_steal_verified_mail(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/emails/')
 
@@ -240,7 +240,7 @@ class MailsFormTests(LoggedInReguestTests):
             self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
 
@@ -259,14 +259,14 @@ class MailsFormTests(LoggedInReguestTests):
         self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertNotIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
 
     def test_steal_verified_mail_from_ourself(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email='johnsmith@example.org')
         user = self.db.profiles.find_one({'_id': ObjectId('901234567890123456789012')})
-        user = User(user)
+        user = OldUser(user)
         mail = 'myuniqemail@example.info'
 
         response_form = self.testapp.get('/profile/emails/')

@@ -1,11 +1,11 @@
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class PermissionsAlternativePemissionsInAdminMode(LoggedInReguestTests):
+class PermissionsAlternativePemissionsInAdminMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -47,17 +47,17 @@ class PermissionsAlternativePemissionsInAdminMode(LoggedInReguestTests):
                          status=302)
 
     def test_logged_withoutpermissions_get(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
 
 
-class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInReguestTests):
+class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -89,7 +89,7 @@ class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInReguestTests):
               self).setUp(settings=settings)
 
     def test_logged_get(self):
-        self.set_logged(user='johnsmith@example.com')
+        self.set_logged(email ='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.com/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
@@ -99,17 +99,17 @@ class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInReguestTests):
                          status=302)
 
     def test_logged_withoutpermissions_get(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
 
 
-class PermissionsAlternativePemissionsInPersonalMode(LoggedInReguestTests):
+class PermissionsAlternativePemissionsInPersonalMode(LoggedInRequestTests):
 
     formname = 'permissionsview-form'
 
-    users = [{
+    mock_users_patches = [{
         'mail': 'johnsmith@example.com',
         'eduPersonEntitlement': [
             'urn:mace:eduid.se:role:admin',
@@ -154,6 +154,6 @@ class PermissionsAlternativePemissionsInPersonalMode(LoggedInReguestTests):
         self.testapp.get('/profile/personaldata/', status=302)
 
     def test_logged_withoutpermissions_get(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/profile/', status=200)
