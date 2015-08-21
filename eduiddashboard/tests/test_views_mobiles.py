@@ -202,7 +202,7 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_setprimary_verified_mobile(self):
         self.set_logged()
-        index = 0
+        index = 2
         userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
         verified_mobile = userdb_before['mobile'][index]
 
