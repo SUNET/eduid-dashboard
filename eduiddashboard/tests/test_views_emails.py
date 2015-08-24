@@ -8,6 +8,8 @@ from eduid_userdb.dashboard import UserDBWrapper as UserDB
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
+from eduid_userdb.dashboard import DashboardUser
+
 
 class MailsFormTests(LoggedInRequestTests):
 
@@ -108,20 +110,30 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_verify_not_existant_email(self):
         self.set_logged()
-        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
-        verified_list_before = [m['verified'] for m in userdb_before['mailAliases']]
+        self.userdb.UserClass = DashboardUser
 
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        assert isinstance(old_user, DashboardUser)
+
+        # Make a post that attempts to verify a non-existant mail address,
+        # so no change is expected in the database.
         response = self.testapp.post(
                 '/profile/emails-actions/',
-                {'identifier': 10, 'action': 'verify'}
+                {'identifier': len(old_user.mail_addresses.to_list()), 'action': 'verify'}
         )
 
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
-        verified_list_after = [m['verified'] for m in userdb_after['mailAliases']]
-        self.assertEqual(verified_list_before, verified_list_after)
+        # Check that mail addresses was not updated. Sort of redundant since
+        # we checked that we got an out of sync condition above.
+        new_user = self.userdb.get_user_by_id(self.user['_id'])
+        assert isinstance(new_user, DashboardUser)
+
+        old_addresses = old_user.mail_addresses.to_list_of_dicts()
+        new_addresses = new_user.mail_addresses.to_list_of_dicts()
+
+        self.assertEqual(old_addresses, new_addresses)
 
     def test_verify_existant_email(self):
         self.set_logged()
