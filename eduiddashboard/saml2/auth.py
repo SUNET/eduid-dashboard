@@ -91,30 +91,27 @@ def authenticate(request, session_info):
     if session_info is None:
         raise TypeError('Session info is None')
 
-    user_main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-
-    attribute_values = get_saml_attribute(session_info, user_main_attribute)
+    attribute_values = get_saml_attribute(session_info, 'eduPersonPrincipalName')
     if not attribute_values:
-        log.error('Could not find attribute {!r} in the SAML assertion'.format(user_main_attribute))
+        log.error('Could not find attribute eduPersonPrincipalName in the SAML assertion')
         return None
 
     saml_user = attribute_values[0]
 
-    # If user_main_attribute is eduPersonPrincipalName, there value might be scoped
-    # and the scope (e.g. "@example.com") might have to be removed before looking
+    # eduPersonPrincipalName might be scoped and the scope (e.g. "@example.com") might have to be removed before looking
     # for the user in the database.
     strip_suffix = request.registry.settings.get('saml2.strip_saml_user_suffix')
     if strip_suffix:
         if saml_user.endswith(strip_suffix):
             saml_user = saml_user[:-len(strip_suffix)]
 
-    log.debug('Looking for user with {!r} == {!r}'.format(user_main_attribute, saml_user))
+    log.debug('Looking for user with eduPersonPrincipalName == {!r}'.format(saml_user))
     try:
-        user = request.userdb.get_user(saml_user)
+        user = request.userdb.get_user_by_eppn(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:
-        log.error('No user with {!r} = {!r} found'.format(user_main_attribute, saml_user))
+        log.error('No user with eduPersonPrincipalName = {!r} found'.format(saml_user))
     except request.userdb.exceptions.MultipleUsersReturned:
-        log.error("There are more than one user with {!r} = {!r}".format(user_main_attribute, saml_user))
+        log.error("There are more than one user with eduPersonPrincipalName = {!r}".format(saml_user))
     else:
         user.retrieve_modified_ts(request.db.profiles)
         return user
@@ -130,15 +127,14 @@ def login(request, session_info, user):
     :param user: Information about user as returned by authenticate()
     :return:
     """
-    main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    log.info("User {!r} logging in ({!r}: {!r})".format(user['_id'], main_attribute, user[main_attribute]))
-    request.session[main_attribute] = user[main_attribute]
+    log.info("User {!r} logging in (eduPersonPrincipalName: {!r})".format(user['_id'], user['eduPersonPrincipalName']))
+    request.session['eduPersonPrincipalName'] = user['eduPersonPrincipalName']
     request.session['user'] = user
     request.session['eduPersonAssurance'] = get_loa(
         request.registry.settings.get('available_loa'),
         session_info
     )
-    remember_headers = remember(request, user[main_attribute])
+    remember_headers = remember(request, user['eduPersonPrincipalName'])
     return remember_headers
 
 
