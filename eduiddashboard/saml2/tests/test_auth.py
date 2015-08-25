@@ -43,7 +43,6 @@ class AuthTests(Saml2RequestTests):
         session_info = self.get_fake_session_info()
 
         user = authenticate(request, session_info)
-        print user
 
         # The user provide exists
         self.assertEqual([user['mail']], session_info['ava']['mail'])
