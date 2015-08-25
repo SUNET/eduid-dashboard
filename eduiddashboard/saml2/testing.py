@@ -69,13 +69,14 @@ def saml2_main(global_config, **settings):
     config.include('pyramid_jinja2')
     _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
     config.registry.settings['userdb'] = _userdb
-
+    config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
     mongodb = MongoDB(db_uri=settings['mongo_uri'])
     authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
     config.registry.settings['db'] = mongodb.get_database()
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
 
     saml2_includeme(config)
 
