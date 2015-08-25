@@ -98,8 +98,8 @@ def authenticate(request, session_info):
 
     saml_user = attribute_values[0]
 
-    # eduPersonPrincipalName might be scoped and the scope (e.g. "@example.com") might have to be removed before looking
-    # for the user in the database.
+    # eduPersonPrincipalName might be scoped and the scope (e.g. "@example.com") 
+    # might have to be removed before looking for the user in the database.
     strip_suffix = request.registry.settings.get('saml2.strip_saml_user_suffix')
     if strip_suffix:
         if saml_user.endswith(strip_suffix):
