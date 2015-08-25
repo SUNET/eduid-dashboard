@@ -142,9 +142,8 @@ def home(context, request):
 @view_config(route_name='session-reload',
              request_method='GET', permission='edit')
 def session_reload(context, request):
-    main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    userid = request.session.get('user').get(main_attribute)
-    user = request.userdb.get_user(userid)
+    eppn = request.session.get('user').get('eduPersonPrincipalName')
+    user = request.userdb.get_user_by_eppn(eppn)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
 
@@ -186,7 +185,7 @@ def token_login(context, request):
 
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
-        user = request.userdb.get_user(eppn)
+        user = request.userdb.get_user_by_eppn(eppn)
         request.session['mail'] = user.get('email'),
         request.session['user'] = user
         request.session['loa'] = 1

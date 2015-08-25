@@ -82,6 +82,11 @@ def auth_response(session_id, uid):
                             FriendlyName="mail">
                 <saml:AttributeValue xsi:nil="true" xsi:type="xs:string">{uid}</saml:AttributeValue>
             </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
+                            Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6"
+                            FriendlyName="eduPersonPrincipalName">
+                <saml:AttributeValue xsi:nil="true" xsi:type="xs:string">{uid}</saml:AttributeValue>
+            </saml:Attribute>
         </saml:AttributeStatement>
     </saml:Assertion>
 </samlp:Response>"""

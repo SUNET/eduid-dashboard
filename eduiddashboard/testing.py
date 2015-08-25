@@ -200,7 +200,7 @@ class LoggedInRequestTests(MongoTestCase):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduid_userdb.dashboard.UserDBWrapper.get_user',
+        patcher = patch('eduid_userdb.dashboard.UserDBWrapper.get_user_by_eppn',
                         self.dummy_get_user)
         patcher.start()
 
