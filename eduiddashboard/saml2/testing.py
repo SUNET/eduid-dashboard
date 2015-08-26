@@ -1,10 +1,6 @@
 import re
-from copy import deepcopy
-from datetime import datetime
-import unittest
 from os import path
 
-import pymongo
 from webtest import TestApp, TestRequest
 
 from pyramid.config import Configurator
@@ -17,7 +13,7 @@ from pyramid import testing
 
 from eduid_userdb.userdb import MongoDB
 from eduid_userdb.dashboard import UserDBWrapper
-from eduid_userdb.testing import MongoTestCase
+from eduiddashboard.testing import OldUserMongoTestCase
 from eduiddashboard.saml2 import includeme as saml2_includeme
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -88,7 +84,7 @@ def dummy_groups_callback(userid, request):
     return ['']
 
 
-class Saml2RequestTests(MongoTestCase):
+class Saml2RequestTests(OldUserMongoTestCase):
     """Base TestCase for those tests usign saml2 that need a full environment
        setup
     """
@@ -118,7 +114,7 @@ class Saml2RequestTests(MongoTestCase):
 
         mongo_settings = {
             'mongo_uri': self.mongodb_uri('eduid_dashboard'),
-            'mongo_uri_am': self.mongodb_uri('eduid_userdb'),
+            'mongo_uri_am': self.mongodb_uri('eduid_am'),
             'mongo_uri_authninfo': self.mongodb_uri('authninfo'),
         }
         self.settings.update(mongo_settings)
