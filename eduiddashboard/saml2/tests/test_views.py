@@ -67,7 +67,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session_id = self.add_outstanding_query(came_from)
 
-        saml_response = auth_response(session_id, "user1@example.com")
+        saml_response = auth_response(session_id, "hubba-bubba@test")
 
         res = self.testapp.post('/saml2/acs/', params={
             'SAMLResponse': base64.b64encode(saml_response),
@@ -90,7 +90,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session_id = self.add_outstanding_query(came_from)
 
-        saml_response = auth_response(session_id, "user1@example.com")
+        saml_response = auth_response(session_id, "hubba-bubba@test")
 
         res = self.testapp.post('/saml2/acs/', params={
             'SAMLResponse': base64.b64encode(saml_response),
@@ -155,7 +155,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session_id = self.add_outstanding_query(came_from)
 
-        saml_response = auth_response(session_id, "user1@example.com")
+        saml_response = auth_response(session_id, "hubba-bubba@test")
 
         # Log in through IDP SAMLResponse
         res = self.testapp.post('/saml2/acs/', params={

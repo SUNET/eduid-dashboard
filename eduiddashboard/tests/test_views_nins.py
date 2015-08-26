@@ -351,8 +351,8 @@ class NinWizardTests(LoggedInRequestTests):
         self.set_logged(email=self.no_nin_user_email)
 
         # Make sure the user doesn't already have a nin
-        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
-        self.assertEqual(user.nins.to_list(), [])
+        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
+        self.assertEqual(user.get_nins(), [])
 
         from eduiddashboard.msgrelay import MsgRelay
 
