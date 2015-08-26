@@ -16,8 +16,8 @@ from pyramid import testing
 
 from eduid_userdb import UserDB
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduid_userdb.dashboard import DashboardUserDB
-from eduid_userdb.testing import MongoTestCase
+from eduid_userdb.dashboard import DashboardUserDB, UserDBWrapper
+from eduid_userdb.testing import MongoTestCase, MockedUserDB, MongoTemporaryInstance, INITIAL_VERIFICATIONS
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
@@ -129,19 +129,94 @@ class MockedTask(object):
         return MockedResult(self.retval, self.failed)
 
 
-class LoggedInRequestTests(MongoTestCase):
+class OldUserMongoTestCase(MongoTestCase):
+
+    # Overide setup as MongoTestCase is very userdb centric
+    def setUp(self, celery, get_attribute_manager, userdb_use_old_format=True):
+        """
+        Test case initialization.
+
+        To not get a circular dependency between eduid-userdb and eduid-am, celery
+        and get_attribute_manager needs to be imported in the place where this
+        module is called.
+
+        Usage:
+
+            from eduid_am.celery import celery, get_attribute_manager
+
+            class MyTest(MongoTestCase):
+
+                def setUp(self):
+                    super(MyTest, self).setUp(celery, get_attribute_manager)
+                    ...
+
+        :param celery: module
+        :param get_attribute_manager: callable
+        :return:
+        """
+        super(MongoTestCase, self).setUp()
+        self.tmp_db = MongoTemporaryInstance.get_instance()
+        self.conn = self.tmp_db.conn
+        self.port = self.tmp_db.port
+        self.am_settings = {
+            'BROKER_TRANSPORT': 'memory',
+            'BROKER_URL': 'memory://',
+            'CELERY_EAGER_PROPAGATES_EXCEPTIONS': True,
+            'CELERY_ALWAYS_EAGER': True,
+            'CELERY_RESULT_BACKEND': "cache",
+            'CELERY_CACHE_BACKEND': 'memory',
+            'MONGO_URI': self.tmp_db.get_uri('eduid_am'),
+            'MONGO_DBNAME': 'eduid_am',
+        }
+
+        mongo_settings = {
+            'mongo_replicaset': None,
+            'mongo_uri_am': self.tmp_db.get_uri('eduid_am'),
+            'mongo_uri': self.mongodb_uri('eduid_dashboard'),
+            'mongo_uri_authninfo': self.mongodb_uri('authninfo'),
+        }
+
+        if getattr(self, 'settings', None) is None:
+            self.settings = mongo_settings
+        else:
+            self.settings.update(mongo_settings)
+        celery.conf.update(self.am_settings)
+
+        self.am = get_attribute_manager(celery)
+
+        for db_name in self.conn.database_names():
+            self.conn.drop_database(db_name)
+
+        # Be sure to tell AttributeManager.get_userdb() about the temporary
+        # mongodb instance.
+        self.am.default_db_uri = self.settings['mongo_uri_am']
+        self.amdb = UserDBWrapper(self.am_settings['MONGO_URI'])
+
+        self.initial_verifications = (getattr(self, 'initial_verifications', None)
+                                      or INITIAL_VERIFICATIONS)
+        self.amdb._drop_whole_collection()
+
+        # Set up test users in the MongoDB. Read the users from MockedUserDB, which might
+        # be overridden by subclasses.
+        _foo_userdb = self.MockedUserDB(self.mock_users_patches)
+        for userdoc in _foo_userdb.all_userdocs():
+            this = deepcopy(userdoc)  # deep-copy to not have side effects between tests
+            user = OldUser(data=this)
+            self.amdb.save(user, check_sync=False, old_format=userdb_use_old_format)
+
+
+class LoggedInRequestTests(OldUserMongoTestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
     def setUp(self, settings={}, skip_on_fail=False, std_user='johnsmith@example.com'):
-        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
-        #if getattr(self, 'settings', None) is None:
         self.settings = SETTINGS
         self.settings.update(settings)
+        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
         mongo_settings = {
             'mongo_uri': self.mongodb_uri('eduid_dashboard'),
-            'mongo_uri_am': self.mongodb_uri('eduid_userdb'),
+            'mongo_uri_am': self.mongodb_uri('eduid_am'),
             'mongo_uri_authninfo': self.mongodb_uri('authninfo'),
         }
 
