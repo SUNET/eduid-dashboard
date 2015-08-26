@@ -268,6 +268,8 @@ def account_termination_action(request, session_info, user):
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
 
+    logger.info("Terminating user {!s}".format(user))
+
     # revoke all user credentials
     revoke_all_credentials(settings.get('vccs_url'), user)
     user.set_passwords([])
@@ -275,10 +277,12 @@ def account_termination_action(request, session_info, user):
     # flag account as terminated
     user.set_terminated()
     user.save(request, check_sync=False)
+    request.context.propagate_user_changes(user)
 
     # email the user
     send_termination_mail(request, user)
 
+    logger.debug("Logging out after terminating user {!s}".format(user))
     # logout
     next_page = request.POST.get('RelayState', '/')
     request.session['next_page'] = next_page

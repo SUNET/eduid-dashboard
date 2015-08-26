@@ -4,12 +4,15 @@ import re
 import time
 import pytz
 from pwgen import pwgen
+from datetime import datetime
 
 from pyramid.i18n import TranslationString as _
 
 from eduiddashboard.compat import text_type
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
+
+from eduid_userdb.exceptions import UserDBValueError
 
 from pyramid.httpexceptions import HTTPForbidden
 
@@ -191,3 +194,43 @@ def convert_to_localtime(dt):
     dt = dt.replace(tzinfo=pytz.utc)
     dt = dt.astimezone(tz)
     return dt
+
+
+def retrieve_modified_ts(user, dashboard_userdb):
+    """
+    When loading a user from the central userdb, the modified_ts has to be
+    loaded from the dashboard private userdb (since it is not propagated to
+    'attributes' by the eduid-am worker).
+
+    This need should go away once there is a global version number on the user document.
+
+    :param user: User object from the central userdb
+    :param dashboard_userdb: Dashboard private userdb
+
+    :type user: eduid_userdb.User
+    :type dashboard_userdb: eduid_userdb.dashboard.DashboardUserDB
+
+    :return: None
+    """
+    try:
+        userid = user.user_id
+    except UserDBValueError:
+        logger.debug("User {!s} has no id, setting modified_ts to None".format(user))
+        user.modified_ts = None
+        return
+
+    dashboard_user = dashboard_userdb.get_user_by_id(userid)
+    if dashboard_user is None:
+        logger.debug("User {!s} not found in {!s}, setting modified_ts to None".format(user, dashboard_userdb))
+        user.modified_ts = None
+        return
+
+    if dashboard_user.modified_ts is None:
+        dashboard_user.modified_ts = True  # use current time
+        logger.debug("Updating user {!s} with new modified_ts: {!s}".format(
+            dashboard_user, dashboard_user.modified_ts))
+        dashboard_userdb.save(dashboard_user)
+
+    user.modified_ts = dashboard_user.modified_ts
+    logger.debug("Updating {!s} with modified_ts from dashboard user {!s}: {!s}".format(
+        user, dashboard_user, dashboard_user.modified_ts))

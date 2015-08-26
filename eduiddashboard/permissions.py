@@ -7,7 +7,7 @@ from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
 
 import logging
 logger = logging.getLogger(__name__)
@@ -28,7 +28,22 @@ class RootFactory(object):
         return []
 
     def propagate_user_changes(self, user):
-        update_attributes.delay('eduid_dashboard', str(user['_id']))
+        """
+        Use Celery to ask eduid-am worker to propagate changes from our
+        private DashboardUserDB into the central UserDB.
+
+        :param user: User object
+
+        :type user: DasboardLegacyUser or DashboardUser
+        :return:
+        """
+        if isinstance(user, OldUser):
+            update_attributes.delay('eduid_dashboard', str(user.get_id()))
+            return
+        elif isinstance(user, DashboardUser):
+            update_attributes.delay('eduid_dashboard', str(user.user_id))
+        else:
+            raise ValueError('Can only propagate changes for DashboardLegacyUser or DashboardUser')
 
 
 def is_logged(request):
@@ -154,7 +169,6 @@ class BaseFactory(object):
         # Get the modified_ts from the user document in the dashboards private user
         # database, since that is where we will be writing any updates
         user.retrieve_modified_ts(self.request.db.profiles)
-        assert user.get_modified_ts() is not None
 
         return user
 

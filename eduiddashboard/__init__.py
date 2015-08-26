@@ -15,8 +15,8 @@ from pyramid.interfaces import IStaticURLInfo
 from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
-from eduid_userdb.db import MongoDB
-from eduid_userdb.dashboard import UserDBWrapper
+from eduid_userdb import MongoDB, UserDB
+from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
 from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
@@ -223,6 +223,15 @@ def includeme(config):
     _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+
+    # same DB using new style users
+    config.registry.settings['userdb_new'] = UserDB(config.registry.settings['mongo_uri_am'])
+    config.add_request_method(lambda x: x.registry.settings['userdb_new'], 'userdb_new', reify=True)
+
+    # Set up handle to Dashboards private UserDb (DashboardUserDB)
+    _dashboard_userdb = DashboardUserDB(config.registry.settings['mongo_uri'])
+    config.registry.settings['dashboard_userdb'] = _dashboard_userdb
+    config.add_request_method(lambda x: x.registry.settings['dashboard_userdb'], 'dashboard_userdb', reify=True)
 
     msgrelay = MsgRelay(config.registry.settings)
     config.registry.settings['msgrelay'] = msgrelay

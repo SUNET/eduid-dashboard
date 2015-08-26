@@ -213,23 +213,26 @@ class TerminateAccountTests(LoggedInRequestTests):
     def test_reset_password_unterminates_account(self):
         email = 'johnsmith@example.com'
         # Set up a bunch of faked passwords to make sure they are all revoked
-        user = self.dashboard_db.get_user_by_mail(email)
+        user = self.userdb_new.get_user_by_mail(email)
         for i in range(7):
             pw = Password(credential_id=ObjectId(),
                           salt=str(i) * 64,
                           application='dashboard_unittest',
                           )
             user.passwords.add(pw)
-        self.dashboard_db.save(user)
+        self.userdb_new.save(user)
+
+        logging.log(logging.DEBUG, "Fetching /profile/security\n\n" + ('-=-' * 30) + "\n\n")
 
         request = self.set_logged(email=email)
         response = self.testapp.get('/profile/security/')
         form = response.forms['terminate-account-form']
 
-        # Verify the user has eight passwords and is NOT terminated at this point
-        user = self.dashboard_db.get_user_by_mail(email)
+        # Verify the user has eight passwords
+        user = self.userdb_new.get_user_by_mail(email)
         self.assertEqual(len(user.passwords.to_list_of_dicts()), 8)
-        self.assertFalse(user.terminated)
+
+        logging.log(logging.DEBUG, "Submitting termination request\n\n" + ('-=-' * 30) + "\n\n")
 
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
@@ -257,8 +260,10 @@ class TerminateAccountTests(LoggedInRequestTests):
 
         # Verify the user doesn't have ANY passwords and IS terminated at this point
         user = self.dashboard_db.get_user_by_mail(email)
-        self.assertEqual(len(user.passwords.to_list_of_dicts()), 0)
+        self.assertEqual(user.passwords.count, 0)
         self.assertTrue(user.terminated)
+
+        logging.log(logging.DEBUG, "Password reset of terminated user\n\n" + ('-=-' * 30) + "\n\n")
 
         # Do a password reset, which should resurrect the terminated user
         hash_code = '123456'
