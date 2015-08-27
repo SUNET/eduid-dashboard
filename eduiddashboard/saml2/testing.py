@@ -63,11 +63,11 @@ def saml2_main(global_config, **settings):
 
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
-    _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
+    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
     mongodb = MongoDB(db_uri=settings['mongo_uri'])
-    authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+    authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
@@ -112,12 +112,7 @@ class Saml2RequestTests(MongoTestCase):
         if not self.settings.get('groups_callback', None):
             self.settings['groups_callback'] = dummy_groups_callback
 
-        mongo_settings = {
-            'mongo_uri': self.mongodb_uri('eduid_dashboard'),
-            'mongo_uri_am': self.mongodb_uri('eduid_am'),
-            'mongo_uri_authninfo': self.mongodb_uri('authninfo'),
-        }
-        self.settings.update(mongo_settings)
+        self.settings['mongo_uri'] = self.mongodb_uri('')
 
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
@@ -134,8 +129,6 @@ class Saml2RequestTests(MongoTestCase):
 
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
-        request.userdb = self.userdb
-        request.db = self.db
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]

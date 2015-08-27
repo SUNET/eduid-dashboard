@@ -15,9 +15,8 @@ from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
 from eduid_userdb import UserDB
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduid_userdb.dashboard import DashboardUserDB, UserDBWrapper
-from eduid_userdb.testing import MongoTestCase, MockedUserDB, MongoTemporaryInstance, INITIAL_VERIFICATIONS
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUserDB
+from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
@@ -26,11 +25,6 @@ from eduid_am.celery import celery, get_attribute_manager
 
 import logging
 logger = logging.getLogger(__name__)
-
-#MONGO_URI_TEST = 'mongodb://localhost:%p/eduid_signup_test'
-#MONGO_URI_TEST_AM = 'mongodb://localhost:%p/eduid_am_test'
-#MONGO_URI_TEST_TOU = 'mongodb://localhost:%p/eduid_tou_test'
-#MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:%p/eduid_idp_authninfo_test'
 
 
 SETTINGS = {
@@ -48,9 +42,6 @@ SETTINGS = {
     #'session.lock_dir': '/tmp',
     #'session.webtest_varname': 'session',
     # 'session.secret': '1234',
-    #'mongo_uri': MONGO_URI_TEST,
-    #'mongo_uri_am': MONGO_URI_TEST_AM,
-    #'mongo_uri_authninfo': MONGO_URI_AUTHNINFO_TEST,
     'testing': True,
     'jinja2.directories': [
         'eduiddashboard:saml2/templates',
@@ -139,14 +130,7 @@ class LoggedInRequestTests(MongoTestCase):
         super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True,
                                                 userdb_db_name='eduid_am')
 
-        mongo_settings = {
-            'mongo_uri': self.mongodb_uri(''),
-            'mongo_uri_am': self.mongodb_uri('eduid_am'),
-            'mongo_uri_authninfo': self.mongodb_uri('authninfo'),
-        }
-
-        self.settings.update(mongo_settings)
-
+        self.settings['mongo_uri'] = self.mongodb_uri('')
         try:
             app = eduiddashboard_main({}, **self.settings)
         except pymongo.errors.ConnectionFailure:
@@ -168,7 +152,7 @@ class LoggedInRequestTests(MongoTestCase):
         self.user = OldUser(data=_userdoc)
 
         #self.db = get_db(self.settings)
-        self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb in old format (OldUser)
+        self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
         self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_userdb')   # central userdb in new format (User)
         self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
         # Clean up the dashboards private database collections

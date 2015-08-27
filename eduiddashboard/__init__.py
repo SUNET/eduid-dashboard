@@ -205,11 +205,11 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'],
+        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo',
                               replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(db_uri=settings['mongo_uri'])
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
 
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
@@ -220,7 +220,7 @@ def includeme(config):
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
-    _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
+    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
@@ -328,8 +328,6 @@ def main(global_config, **settings):
         'dashboard_hostname',
         'dashboard_baseurl',
         'auth_shared_secret',
-        'mongo_uri_am',
-        'mongo_uri_authninfo',
         'personal_dashboard_base_url',
         'vccs_url',
         'nin_service_name',
