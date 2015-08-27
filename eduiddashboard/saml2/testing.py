@@ -13,7 +13,7 @@ from pyramid import testing
 
 from eduid_userdb.userdb import MongoDB
 from eduid_userdb.dashboard import UserDBWrapper
-from eduiddashboard.testing import OldUserMongoTestCase
+from eduiddashboard.testing import MongoTestCase
 from eduiddashboard.saml2 import includeme as saml2_includeme
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -71,8 +71,8 @@ def saml2_main(global_config, **settings):
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
-    config.registry.settings['db'] = mongodb.get_database()
-    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
+    config.registry.settings['db'] = mongodb.get_database('eduid_dashboard')
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'), 'db', reify=True)
 
     saml2_includeme(config)
 
@@ -84,7 +84,7 @@ def dummy_groups_callback(userid, request):
     return ['']
 
 
-class Saml2RequestTests(OldUserMongoTestCase):
+class Saml2RequestTests(MongoTestCase):
     """Base TestCase for those tests usign saml2 that need a full environment
        setup
     """

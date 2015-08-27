@@ -69,6 +69,7 @@ class MsgRelay(object):
             'TEMPLATES_DIR': 'templates/',
             'CELERY_RESULT_BACKEND': 'amqp',
             'CELERY_TASK_SERIALIZER': 'json',
+            'MONGO_URI': settings.get('mongo_uri'),  # only needed when testing I think
         }
         celery.conf.update(config)
 
