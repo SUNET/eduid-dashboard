@@ -127,13 +127,13 @@ class MailsFormTests(LoggedInRequestTests):
 
         # Check that mail addresses was not updated. Sort of redundant since
         # we checked that we got an out of sync condition above.
-        new_user = self.userdb.get_user_by_id(self.user['_id'])
-        assert isinstance(new_user, DashboardUser)
+        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        assert isinstance(updated_user, DashboardUser)
 
         old_addresses = old_user.mail_addresses.to_list_of_dicts()
-        new_addresses = new_user.mail_addresses.to_list_of_dicts()
+        updated_addresses = updated_user.mail_addresses.to_list_of_dicts()
 
-        self.assertEqual(old_addresses, new_addresses)
+        self.assertEqual(old_addresses, updated_addresses)
 
     def test_verify_existant_email(self):
         self.set_logged()
@@ -179,10 +179,10 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        new_user = self.userdb.get_user_by_id(self.user['_id'])
-        new_amount_of_addresses = len(new_user.mail_addresses.to_list_of_dicts())
+        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_amount_of_addresses = len(updated_user.mail_addresses.to_list_of_dicts())
 
-        self.assertEqual(old_amount_of_addresses, new_amount_of_addresses)
+        self.assertEqual(old_amount_of_addresses, updated_amount_of_addresses)
 
     def test_setprimary_not_existant_email(self):
         self.set_logged()
@@ -200,10 +200,10 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        new_user = self.userdb.get_user_by_id(self.user['_id'])
-        new_primary_mail = new_user.mail_addresses.primary.email
+        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_primary_mail = updated_user.mail_addresses.primary.email
 
-        self.assertEqual(old_primary_mail, new_primary_mail)
+        self.assertEqual(old_primary_mail, updated_primary_mail)
 
     def test_setprimary_existant_email(self):
         self.set_logged()
@@ -243,10 +243,10 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'bad')
 
-        new_user = self.userdb.get_user_by_id(self.user['_id'])
-        new_primary_mail = new_user.mail_addresses.primary.email
+        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_primary_mail = updated_user.mail_addresses.primary.email
 
-        self.assertEqual(old_primary_mail, new_primary_mail)
+        self.assertEqual(old_primary_mail, updated_primary_mail)
 
     def test_steal_verified_mail(self):
         self.set_logged(email ='johnsmith@example.org')
