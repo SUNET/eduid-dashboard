@@ -12,7 +12,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_85(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         self.add_to_session({'user': user})
@@ -22,7 +22,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_71(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -33,7 +33,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_57(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -45,7 +45,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_42(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -58,7 +58,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_28(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -72,7 +72,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_14(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -87,7 +87,7 @@ class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_0(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None

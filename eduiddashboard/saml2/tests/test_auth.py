@@ -47,7 +47,7 @@ class AuthTests(Saml2RequestTests):
         # The user provide exists
         self.assertEqual([user['mail']], session_info['ava']['mail'])
 
-        user = authenticate(request, self.get_fake_session_info('notexists@example.com'))
+        user = authenticate(request, self.get_fake_session_info('doesnotexist@test'))
         # The user does not exist
         self.assertIsNone(user)
 

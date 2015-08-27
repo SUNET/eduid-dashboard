@@ -13,7 +13,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         self.collection = self.conn['eduid_dashboard']['id_proofing_log']
 
     def test_teleadress_proofing(self):
-        user = self.userdb.get_user('johnsmith@example.org')
+        user = self.userdb.get_user_by_mail('johnsmith@example.org')
         data = {
             'reason': 'matched',
             'nin': 'some_nin',
@@ -33,7 +33,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         self.assertEquals(hit['proofing_method'], 'TeleAdress')
 
     def test_teleadress_proofing_relation(self):
-        user = self.userdb.get_user('johnsmith@example.org')
+        user = self.userdb.get_user_by_mail('johnsmith@example.org')
         data = {
             'reason': 'matched_by_navet',
             'nin': 'some_nin',
