@@ -127,8 +127,7 @@ class LoggedInRequestTests(MongoTestCase):
 
         self.settings = SETTINGS
         self.settings.update(settings)
-        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True,
-                                                userdb_db_name='eduid_am')
+        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
         self.settings['mongo_uri'] = self.mongodb_uri('')
         try:
