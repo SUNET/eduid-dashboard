@@ -154,8 +154,6 @@ class BaseFactory(object):
         # Get the modified_ts from the user document in the dashboards private user
         # database, since that is where we will be writing any updates
         user.retrieve_modified_ts(self.request.db.profiles)
-        assert user.get_modified_ts() is not None
-
         return user
 
     def route_url(self, route, **kw):
