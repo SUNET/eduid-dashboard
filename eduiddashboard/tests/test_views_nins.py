@@ -264,8 +264,7 @@ class NinsFormTests(LoggedInRequestTests):
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)
 
-        nins_list = [x['number'] for x in old_user.get_nins()]
-        self.assertIn(nin, nins_list)
+        self.assertIn(nin, old_user.get_nins())
 
         nin_doc = self.db.verifications.find_one({
             'model_name': 'norEduPersonNIN',
