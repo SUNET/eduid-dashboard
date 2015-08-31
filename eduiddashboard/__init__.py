@@ -215,8 +215,10 @@ def includeme(config):
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
-    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'), 'db', reify=True)
-    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database('authninfo'), 'authninfodb', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'),
+                                'db', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database('eduid_idp_authninfo'),
+                                'authninfodb', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
