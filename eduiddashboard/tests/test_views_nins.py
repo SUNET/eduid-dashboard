@@ -264,8 +264,7 @@ class NinsFormTests(LoggedInRequestTests):
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)
 
-        nins_list = [x['number'] for x in old_user.get_nins()]
-        self.assertIn(nin, nins_list)
+        self.assertIn(nin, old_user.get_nins())
 
         nin_doc = self.db.verifications.find_one({
             'model_name': 'norEduPersonNIN',
@@ -351,8 +350,8 @@ class NinWizardTests(LoggedInRequestTests):
         self.set_logged(email=self.no_nin_user_email)
 
         # Make sure the user doesn't already have a nin
-        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
-        self.assertEqual(user.nins.to_list(), [])
+        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
+        self.assertEqual(user.get_nins(), [])
 
         from eduiddashboard.msgrelay import MsgRelay
 

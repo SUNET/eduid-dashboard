@@ -205,22 +205,22 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'],
+        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo',
                               replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(db_uri=settings['mongo_uri'])
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
 
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
-    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
-    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database(), 'authninfodb', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'), 'db', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database('authninfo'), 'authninfodb', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
-    _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
+    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
@@ -337,8 +337,6 @@ def main(global_config, **settings):
         'dashboard_hostname',
         'dashboard_baseurl',
         'auth_shared_secret',
-        'mongo_uri_am',
-        'mongo_uri_authninfo',
         'personal_dashboard_base_url',
         'vccs_url',
         'nin_service_name',
