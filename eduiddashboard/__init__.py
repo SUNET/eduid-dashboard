@@ -346,9 +346,11 @@ def main(global_config, **settings):
 
     # configure Celery broker
     broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
-    celery.conf.update({'BROKER_URL': broker_url,
-                        'CELERY_TASK_SERIALIZER': 'json',
-                        })
+    celery.conf.update({
+        'MONGO_URI': settings.get('mongo_uri'),
+        'BROKER_URL': broker_url,
+        'CELERY_TASK_SERIALIZER': 'json',
+    })
     settings['celery'] = celery
     settings['broker_url'] = broker_url
 
