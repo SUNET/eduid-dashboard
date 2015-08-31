@@ -225,7 +225,7 @@ def includeme(config):
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
     # same DB using new style users
-    config.registry.settings['userdb_new'] = UserDB(config.registry.settings['mongo_uri_am'])
+    config.registry.settings['userdb_new'] = UserDB(config.registry.settings['mongo_uri'], db_name='eduid_am')
     config.add_request_method(lambda x: x.registry.settings['userdb_new'], 'userdb_new', reify=True)
 
     # Set up handle to Dashboards private UserDb (DashboardUserDB)

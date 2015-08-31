@@ -153,7 +153,7 @@ class LoggedInRequestTests(MongoTestCase):
 
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
-        self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_userdb')   # central userdb in new format (User)
+        self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_am')   # central userdb in new format (User)
         self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
         # Clean up the dashboards private database collections
         logger.debug("Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
