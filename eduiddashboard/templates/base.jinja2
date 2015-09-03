@@ -21,48 +21,60 @@
     {% endblock %}
   </head>
   <body>
-    <div id='wrap'>
-        <header id="header" class="header">
-            <div class="logo"></div>
-            <div id="mobile-nav">
-                <span></span>
+    <div id='wrap container'>
+      <header id="header" class="header">
+        <div class="logo"></div>
+        <nav class="navbar navbar-default" id="eduid-dashboard-navbar">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">
+                <div id="eduid-logo-small" class="logo"></div>
+              </a>
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-dashboard-menu" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
             </div>
-            <nav>
-                <ul> 
-                    <!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
-                    <li>
-                        <a href="/">{{ _("Student") }}</a>
-                    </li>
-                    <li>
-                        <a href="/">{{ _("Tekniker") }}</a>
-                    </li>
-                    <li>
-                        <a href="/">{{ _("Personal") }}</a>
-                    </li>
-                    <li>
-                        <a href="{{ request.route_path('help') }}">{{ _("Faq") }}</a>
-                    </li>
-                </ul>
-                <div class="buttons">
-                    {% if request.is_logged %}
-                        <div class="button log-out"><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></div>
-                    {% else %}
-                        <div class="button log-in"><a href="{{ request.route_path('saml2-login') }}">{{ _("Login") }}</a></div>
-                    {% endif %}
+            <div class="collapse navbar-collapse" id="eduid-dashboard-menu">
+              <ul  class="nav navbar-nav">
+                      <!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
+                <li>
+                  <a href="/">{{ _("Student") }}</a>
+                </li>
+                <li>
+                  <a href="/">{{ _("Tekniker") }}</a>
+                </li>
+                <li>
+                  <a href="/">{{ _("Personal") }}</a>
+                </li>
+                <li>
+                  <a href="{{ request.route_path('help') }}">{{ _("Faq") }}</a>
+                </li>
+              </ul>
+              <div class="buttons nav navbar-nav navbar-right">
+              {% if request.is_logged %}
+                <div class="button log-out"><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></div>
+              {% else %}
+                <div class="button log-in"><a href="{{ request.route_path('saml2-login') }}">{{ _("Login") }}</a></div>
+              {% endif %}
                     <!-- This is the same #eduid-header-loa as in previous version of the site -->
-                    {% block loasquare %}
-                    <div class="loa-big hidden-xs" id="eduid-header-loa">
-                        {% with loa=request.context.get_max_loa() %}
-                            {% if user is defined %}                                                                                                                                                                                                                                        
-                                {{ user.get('mail') }}                                                                                                                                                                                                                                        
-                            {% endif %}
-                            ({{_(loa)}})
-                        {% endwith %}
-                    </div>
-                    {% endblock %}
+              {% block loasquare %}
+                <div class="loa-big hidden-xs" id="eduid-header-loa">
+                {% with loa=request.context.get_max_loa() %}
+                    {% if user is defined %}
+                        {{ user.get('mail') }}
+                    {% endif %}
+                        ({{_(loa)}})
+                {% endwith %}
                 </div>
-            </nav>
-        </header>
+              {% endblock %}
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
     
       <div class="container position-relative">
 
