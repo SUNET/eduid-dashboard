@@ -15,20 +15,20 @@
     {% if active_nin %}
         <tr class='ninrow' data-identifier="0">
             <td class='identifier'>{{ active_nin }}</td>
-            <td><span class='nobutton'>{{_("Verified")}}</span></td>
-            <td><span class='nobutton'>{{_("Active")}}</span></td>
-            <td></td>
+            <td class='non-identifier'><span class='nobutton'>{{_("Verified")}}</span></td>
+            <td class='non-identifier'><span class='nobutton'>{{_("Active")}}</span></td>
+            <td class='non-identifier'></td>
         </tr>
     {% endif %}
     {% if not_verified_nins %}
       {% for nin in not_verified_nins %}
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
-          <td>
+          <td class='non-identifier'>
             <input type='button' class='btn btn-link' value="{{_('Verify through Mina Meddelanden')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
           </td>
-          <td>
+          <td class='non-identifier'>
             {% if has_mobile %}
             <input type='button' class='btn btn-link verify_mb' value="{{_('Verify by registered phone')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
