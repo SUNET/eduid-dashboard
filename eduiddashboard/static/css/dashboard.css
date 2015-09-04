@@ -1,5 +1,6 @@
 ﻿body, 
-.well {
+.well,
+div.wizard-content {
     background-color:#bbded9;
     background-image:url(../img/texture.png);
 }
@@ -185,17 +186,20 @@ input:focus {
     padding-left:0;
     padding-right:0;
 }
-#profile-menu-large ul {
+#profile-menu-large ul,
+ul.wizard-nav-list {
     border-right:none;
 }
-#profile-menu-large li {
+#profile-menu-large li,
+ul.wizard-nav-list li {
     position:relative;
     color:#000;
     padding-left:0;
     border-bottom: 1px solid #629c92;
 }
 
-#profile-menu-large li:last-child {
+#profile-menu-large li:last-child,
+ul.wizard-nav-list li:last-child {
     border:none;
 }
 #profile-menu-large li#profile-filled-li:after,
@@ -221,11 +225,17 @@ input:focus {
 
 #profile-menu-large li.active,
 #profile-menu-large li:hover,
+ul.wizard-nav-list li.active,
+ul.wizard-nav-list li.already-visited:hover,
 .nav>li>a:hover, 
 .nav>li>a:focus {
     position:relative;
     background-color:#fff; 
 } 
+ul.wizard-nav-list > li.active a.wizard-nav-link,
+ul.wizard-nav-list li.already-visited a.wizard-nav-link {
+    color: #111 !important;
+}
 #profile-menu-large li.active a,
 #profile-menu-large li:hover a {
     padding-left:30px;
@@ -240,7 +250,9 @@ input:focus {
     margin-bottom:0;
 }
 #profile-menu-large li.active:after,
-#profile-menu-large li:hover:after {
+#profile-menu-large li:hover:after,
+ul.wizard-nav-list li.active:after,
+ul.wizard-nav-list li.already-visited:hover:after {
     content:'';
     display:block;
     position:absolute;
@@ -250,9 +262,12 @@ input:focus {
 	height: 0; 
 	border-top: 22px solid transparent;
 	border-bottom: 22px solid transparent;
-	
 	border-left: 20px solid #fff;
 }
+ul.wizard-nav-list li a span.glyphicon {
+    display: none;
+}
+
 .nav-tabs>li.active>a, 
 .nav-tabs>li.active>a:hover, 
 .nav-tabs>li.active>a:focus,
@@ -263,6 +278,8 @@ input:focus {
 .nav-tabs {
     border-bottom:none;
 }
+
+.
 
 /*
    Progress bar
@@ -718,6 +735,11 @@ button[type=submit].btn {
 .wizard-modal p {
     margin: 0 0 10px;
     padding: 0;
+}
+
+div.wizard-steps,
+ul.wizard-nav-list > li > a {
+    background-color: transparent !important;
 }
 
 #wizard-ns-detail-servers, .wizard-additional-servers {
