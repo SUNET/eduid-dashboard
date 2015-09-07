@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.3.12.6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-08-14 14:53+0200\n"
+"POT-Creation-Date: 2015-09-07 16:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1228,20 +1228,20 @@ msgstr ""
 msgid "Error: You only have one email address and it  can not be removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:119
+#: eduiddashboard/views/emails.py:125
 msgid "Email address was successfully removed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:144
+#: eduiddashboard/views/emails.py:150
 msgid "Add email address"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:182 eduiddashboard/views/mobiles.py:203
+#: eduiddashboard/views/emails.py:188 eduiddashboard/views/mobiles.py:203
 #: eduiddashboard/views/personal.py:76
 msgid "Changes saved"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:187
+#: eduiddashboard/views/emails.py:193
 msgid ""
 "A confirmation email has been sent to your email address. Please enter your "
 "confirmation code <a href=\"#\" class=\"verifycode\" data-"
