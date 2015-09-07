@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class IDProofingData(object):
-    _required_keys = ['created', 'eppn']
 
     def __init__(self, user):
+        self._required_keys = ['created', 'eppn']
         self.data = dict()
         self.data['created'] = datetime.utcnow()
         self.data['eppn'] = user.get_eppn()

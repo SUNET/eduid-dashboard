@@ -24,11 +24,11 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 version = '0.3.12.6'
 
 requires = [
-    'eduid_am>=0.5.3,<0.5.9',
+    'eduid_am==0.5.4.2',
     'eduid_msg>=0.8.7,<0.9.0-dev',
     'vccs_client>=0.4.1',
     'eduid_lookup_mobile>=0.0.4',
-    'eduid_userdb>=0.0.2',
+    'eduid_userdb==0.0.3',
     'pysaml2==1.2.0beta2',
     'pymongo>=2.8,<3',
     'pyramid==1.4.1',
