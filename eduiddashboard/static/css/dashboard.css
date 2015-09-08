@@ -330,8 +330,16 @@ ul.nav-tabs > li#profile-filled-li {
 }
 .table > tbody > tr.mobile-row td input,
 .table > tbody > tr.ninrow td input {
-    height: 42px;
-    margin-top: -15px;
+    height: 38px;
+    line-height: 1.42857;
+    margin-bottom: 0 !important;
+}
+.table > tbody > tr.mobile-row td input.remove-mobile,
+.table > tbody > tr.ninrow td input.remove-nin {
+    background-color: #DD0D0D;
+    color: #fff;
+    padding: 0 25px;
+    width: auto;
 }
 
 .table > tbody > tr > td.identifier {
