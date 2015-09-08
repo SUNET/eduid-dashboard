@@ -756,6 +756,9 @@ button[type=submit].btn {
     #header .logo {
         margin:10px;
     }
+    div.wizard-card-container {
+        height: auto;
+    }
 }
 
 @media only screen and (max-width: 1279px) {
