@@ -727,6 +727,7 @@ button[type=submit].btn {
         margin: 7.5px 0px;
     }
     /* Modals */
+    div.modal.fade.wizard,
     div.modal-dialog {
         margin-top: 70px;
     }
