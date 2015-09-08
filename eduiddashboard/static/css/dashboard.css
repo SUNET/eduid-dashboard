@@ -504,7 +504,14 @@ button[type=submit].btn {
 	font-weight: normal;
 	font-style: normal;
 }
-@media only screen and (min-width: 960px) and (max-width: 1024px) {
+
+@media only screen and (min-width: 1024px) and (max-width: 1160px) {
+    .header nav li {
+        margin:0 15px;
+    }
+}
+
+@media only screen and (min-width: 960px) and (max-width: 1023px) {
     .header {
         padding-left:23px;
         padding-right:20px;
@@ -710,6 +717,18 @@ button[type=submit].btn {
         float:none;
         margin-top: 10px;
         margin: 7.5px 0px;
+    }
+    /* Modals */
+    div.modal-dialog {
+        margin-top: 70px;
+    }
+
+    div.modal-dialog div.modal-footer {
+        text-align: center;
+    }
+
+    div.modal-dialog div.modal-footer a {
+        margin: 5px;
     }
 }
 @media only screen and (min-width: 768px) {
