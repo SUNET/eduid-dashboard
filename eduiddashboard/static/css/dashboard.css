@@ -319,13 +319,21 @@ ul.nav-tabs > li#profile-filled-li {
 #ninsview-form .btn {
     display:block;
 }
-.table > tbody > tr.emailrow td {
+.table > tbody > tr.emailrow td,
+.table > tbody > tr.mobile-row td,
+.table > tbody > tr.ninrow td {
     background-color:#bbded9!important;
     border-color:#629c92;
     border-bottom:1px solid #629c92;
     padding:10px 0;
     vertical-align:middle;
 }
+.table > tbody > tr.mobile-row td input,
+.table > tbody > tr.ninrow td input {
+    height: 42px;
+    margin-top: -15px;
+}
+
 .table > tbody > tr > td.identifier {
     vertical-align:middle;
 }
@@ -353,7 +361,9 @@ table.table-form td.non-identifier {
     background-color: #bbded9;
     border:none;
 }
-.table-form.emails .nobutton {
+.table-form.emails .nobutton,
+.table-form.mobiles .nobutton,
+.table-form.nins .nobutton {
     text-transform: uppercase;
     font-weight: bold;
 }
