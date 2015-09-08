@@ -843,6 +843,19 @@ div.wizard div.wizard-card-container {
 div.wizard div.wizard-buttons-container > div.btn-group-single {
   float: none !important;
 }
+}
+
+@media only screen and (min-width: 598px) and (max-width: 767px)  {
+
+div.wizard-buttons-container .btn {
+        margin-left:auto;
+        margin-right:auto;
+        width:auto;
+        max-width:100%;
+        padding-left: 30px;
+        padding-right: 30px;
+        font-size:13px
+    }
 
 }
 
