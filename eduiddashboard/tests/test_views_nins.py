@@ -506,7 +506,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
         self.assertIn('code', response.json['data'])
 
     def test_step0_after_step1_same_nin(self):
-        self.set_logged(email=self.no_nin_user_email)
+        self.set_logged(user='johnsmith@example.org')
 
         from eduiddashboard.msgrelay import MsgRelay
 
@@ -543,7 +543,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                     self.assertEqual(resp_step0.json['status'], 'failure')
 
     def test_step0_after_step1_different_nin(self):
-        self.set_logged(email=self.no_nin_user_email)
+        self.set_logged(user='johnsmith@example.org')
 
         from eduiddashboard.msgrelay import MsgRelay
 
