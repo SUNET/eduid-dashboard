@@ -4,12 +4,14 @@
 {% endblock %}
 
 {% block contents %}
+<div class="jumbotron eduid-notfound">
 
-<div class="alert">{{ _("The requested page doesn't exists.") }}</div>
+<h2>{{ _("The requested page doesn't exists.") }}</h2>
 
 {% trans %}
-  <p>Sorry, but the requested page doesn't exists.</p>
+  <p>Sorry, but the requested page doesn't exist.</p>
   <p>Error code 404</p>
 {% endtrans %}
 
+</div>
 {% endblock %}

@@ -1,5 +1,6 @@
 ﻿body, 
 .well,
+.container .jumbotron,
 div.wizard-content {
     background-color:#bbded9;
     background-image:url(../img/texture.png);
