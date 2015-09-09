@@ -57,7 +57,15 @@
               {% if request.is_logged %}
                 <div class="button log-out"><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></div>
               {% else %}
-                <div class="button log-in"><a href="{{ request.route_path('saml2-login') }}">{{ _("Login") }}</a></div>
+                <div class="button orange">
+                        <!-- Link leads to signup page -->
+                  <a href="{{ request.registry.settings['signup_base_url'] }}">{{ _("Sign up") }}</a>
+                </div>
+                  <div class="button white-border">
+                        <!-- Link leads to login page -->
+                    <a href="{{ request.registry.settings['personal_dashboard_base_url'] }}">{{ _("Sign in") }}</a>
+                  </div>
+                </div>
               {% endif %}
                     <!-- This is the same #eduid-header-loa as in previous version of the site -->
               {% block loasquare %}

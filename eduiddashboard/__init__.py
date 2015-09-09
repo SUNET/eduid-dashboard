@@ -331,6 +331,7 @@ def main(global_config, **settings):
         'dashboard_baseurl',
         'auth_shared_secret',
         'personal_dashboard_base_url',
+        'signup_base_url',
         'vccs_url',
         'nin_service_name',
         'nin_service_url',

@@ -59,6 +59,7 @@ SETTINGS = {
             safe_context_route_url = eduiddashboard.filters:safe_context_route_url
             """,
     'personal_dashboard_base_url': 'http://localhost/',
+    'signup_base_url': 'http://localhost/',
     'nin_service_name': 'Mina meddelanden',
     'nin_service_url': 'http://minameddelanden.se/',
     'mobile_service_name': 'TeleAdress',
