@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-07 16:00+0200\n"
+"POT-Creation-Date: 2015-09-09 12:25+0200\n"
 "PO-Revision-Date: 2015-08-14 13:00+0000\n"
 "Last-Translator: Gijutsu <ascii@binary.to>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
@@ -240,12 +240,18 @@ msgid ""
 "active"
 msgstr "Personnumret kunde inte hittas, är inte bekräftat eller inte aktivt"
 
-#: eduiddashboard/validators.py:209
+#: eduiddashboard/validators.py:211
 msgid "This national identity number is already in use"
 msgstr "Personnumret är redan registrerat"
 
-#: eduiddashboard/validators.py:235 eduiddashboard/validators.py:346
-#: eduiddashboard/validators.py:368
+#: eduiddashboard/validators.py:218
+#, fuzzy
+#| msgid "Confirm national identity number"
+msgid "You have already confirmed this national identity number"
+msgstr "Bekräfta personnummer"
+
+#: eduiddashboard/validators.py:245 eduiddashboard/validators.py:356
+#: eduiddashboard/validators.py:378
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -253,7 +259,7 @@ msgstr ""
 "Vi har för närvarande tekniska problem med ${service_name}, vänligen "
 "försök igen senare."
 
-#: eduiddashboard/validators.py:241
+#: eduiddashboard/validators.py:251
 msgid ""
 "This national identity number is not registered with \"${service_name}\"."
 " Please register at <a href=\"${service_url}\" "
@@ -262,7 +268,7 @@ msgstr ""
 "Personnumret finns inte registrerat hos ${service_name}. Registrera dig "
 "här <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:246
+#: eduiddashboard/validators.py:256
 msgid ""
 "Your registration process with \"${service_name}\" is not complete. "
 "Please visit <a href=\"${service_url}\" "
@@ -272,7 +278,7 @@ msgstr ""
 "din registrering vänligen besök <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:251
+#: eduiddashboard/validators.py:261
 msgid ""
 "According to \"${service_name}\" you have opted out to receive messages "
 "from SUNET (eduID). In order to receive a confirmation code from us, you "
@@ -284,11 +290,11 @@ msgstr ""
 "blockeringen hos <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:338
+#: eduiddashboard/validators.py:348
 msgid "You have no confirmed mobile phone"
 msgstr "Du har inget bekräftat mobiltelefonnummer"
 
-#: eduiddashboard/validators.py:342
+#: eduiddashboard/validators.py:352
 msgid ""
 "The given mobile number was not associated to the given national identity"
 " number"
@@ -296,19 +302,19 @@ msgstr ""
 "Ditt bekräftade mobiltelefonnummer är inte kopplat till det personnummer "
 "du angav"
 
-#: eduiddashboard/validators.py:353
+#: eduiddashboard/validators.py:363
 msgid "Validate NIN via mobile with succeeded"
 msgstr "Personnummer bekräftat via mobiltelefonnummer"
 
-#: eduiddashboard/validators.py:394
+#: eduiddashboard/validators.py:404
 msgid "The entered code does not exist"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/validators.py:409
+#: eduiddashboard/validators.py:419
 msgid "Invalid CSRF token"
 msgstr "Ogiltig CSRF kod"
 
-#: eduiddashboard/validators.py:425
+#: eduiddashboard/validators.py:435
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
