@@ -141,8 +141,10 @@
     </div>
   </div>
 
-  {% if open_wizard %}
-  <div class="openwizard hide"></div>
+  {% if enable_mm_verification %}
+    {% if open_wizard %}
+    <div class="openwizard hide"></div>
+    {% endif  %}
   {% endif  %}
 
   {% if context.workmode != "personal" %}
@@ -154,18 +156,24 @@
 
 
 {% block extracss %}
+  {% if enable_mm_verification %}
     <link href="{{'eduiddashboard:static/css/bootstrap-wizard.css'|static_url}}" rel="stylesheet" media="screen">
+  {% endif %}
 {% endblock %}
 
 {% block extra_jsdata %}
 <span class="dataholder" id="profile-data" data-workmode="{{ workmode }}"
-                                           data-openwizard="{{ open_wizard }}"
+                                           {% if enable_mm_verification %}
+                                             data-openwizard="{{ open_wizard }}"
+                                           {% endif %}
                                            {% if datakey is defined and datakey %}
                                              data-datakey="{{ datakey }}"
                                            {% else %}
                                              data-datakey=""
                                            {% endif %}
-                                           data-wizard_nins_url="{{ context.safe_route_url('wizard-nins') }}"
+                                           {% if enable_mm_verification %}
+                                             data-wizard_nins_url="{{ context.safe_route_url('wizard-nins') }}"
+                                           {% endif %}
                                            data-userstatus_url="{{ context.safe_route_url('userstatus') }}"
                                            data-polling_timeout="{{ polling_timeout_for_admin }}"
                                            data-profile_filled="{{ profile_filled }}"
@@ -184,10 +192,10 @@
 <script src="{{'eduiddashboard:static/js/forms-helper-functions.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/proofing.js'|static_url}}"></script>
+{% if enable_mm_verification %}
 <script src="{{'eduiddashboard:static/js/libs/bootstrap-wizard.js'|static_url}}"></script>
-
-
 <script src="{{'eduiddashboard:static/js/eduid-wizards.js'|static_url}}"></script>
+{% endif %}
 <script src="{{'eduiddashboard:static/js/tablelist-form.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/libs/zxcvbn-async.js'|static_url}}"></script>

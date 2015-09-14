@@ -282,6 +282,8 @@ def _get_age(nin):
 
 
 def validate_nin_by_mobile(request, user, nin):
+    if True:
+        return {'success': False, 'message': 'ho ho ho', 'mobile': '123123456'}
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN

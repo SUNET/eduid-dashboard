@@ -320,6 +320,11 @@ class NinsFormTestsDisableMM(LoggedInRequestTests):
         self.assertNotIn('You can access your governmental inbox using',
                 response_form.body)
 
+    def test_get_wizard_nin(self):
+        self.set_logged(email=self.no_nin_user_email)
+        response = self.testapp.get('/profile/', status=200)
+        self.assertNotIn('openwizard', response.body)
+
 
 class NinWizardTests(LoggedInRequestTests):
 
