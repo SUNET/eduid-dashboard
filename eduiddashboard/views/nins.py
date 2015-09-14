@@ -46,7 +46,7 @@ def get_status(request, user):
 
     if not all_nins and not unverified_nins:
         pending_actions = _('Add national identity number')
-    if unverified_nins:
+    if unverified_nins and request.registry.settings.get('enable_mm_verification'):
         pending_actions = _('Validation required for national identity number')
         pending_action_type = 'verify'
         verification_needed = len(unverified_nins) - 1
@@ -292,18 +292,22 @@ class NinsView(BaseFormView):
 
     route = 'nins'
 
-    # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
-    # from the button, must trigger the "add" validation part of a nin.
-    buttons = (deform.Button(name='add',
-                             title=_('Verify through Mina Meddelanden')),
-               deform.Button(name='add_by_mobile',
-                             title=_('Verify by registered phone'),
-                             css_class='btn btn-primary'),
-               )
-
     bootstrap_form_style = 'form-inline'
 
     get_active_nin = get_active_nin
+
+    def __init__(self, *args, **kwargs):
+        super(NinsView, self).__init__(*args, **kwargs)
+
+        # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
+        # from the button, must trigger the "add" validation part of a nin.
+        self.buttons = ()
+        if self.request.registry.settings.get('enable_mm_verification'):
+            self.buttons += (deform.Button(name='add',
+                             title=_('Verify through Mina Meddelanden')),)
+        self.buttons += (deform.Button(name='add_by_mobile',
+                             title=_('Verify by registered phone'),
+                             css_class='btn btn-primary'),)
 
     def appstruct(self):
         return {}
@@ -320,17 +324,22 @@ class NinsView(BaseFormView):
         context = super(NinsView, self).get_template_context()
 
         settings = self.request.registry.settings
+        enable_mm = settings.get('enable_mm_verification')
 
         context.update({
             'nins': self.user.get_nins(),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
             'active_nin': self.get_active_nin(),
-            'nin_service_url': settings.get('nin_service_url'),
-            'nin_service_name': settings.get('nin_service_name'),
             'open_wizard': nins_open_wizard(self.context, self.request),
             'has_mobile': has_confirmed_mobile(self.user),
+            'enable_mm_verification': enable_mm,
         })
+        if enable_mm:
+            context.update({
+                'nin_service_url': settings.get('nin_service_url'),
+                'nin_service_name': settings.get('nin_service_name'),
+            })
 
         return context
 
@@ -511,7 +520,8 @@ class NinsWizard(BaseWizard):
         return context
 
 def nins_open_wizard(context, request):
-    if context.workmode != 'personal':
+    if (context.workmode != 'personal' or
+            not request.registry.settings.get('enable_mm_verification')):
         return (False, None)
     ninswizard = NinsWizard(context, request)
 

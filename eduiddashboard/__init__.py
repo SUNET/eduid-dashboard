@@ -324,7 +324,11 @@ def main(global_config, **settings):
                                                          'lang_cookie_name',
                                                          'lang')
 
-    for item in (
+    settings['enable_mm_verification'] = read_setting_from_env_bool(settings,
+                                                    'enable_mm_verification',
+                                                    default=True)
+
+    required_settings = (
         'mongo_uri',
         'site.name',
         'dashboard_hostname',
@@ -332,10 +336,15 @@ def main(global_config, **settings):
         'auth_shared_secret',
         'personal_dashboard_base_url',
         'vccs_url',
-        'nin_service_name',
-        'nin_service_url',
         'mobile_service_name',
-    ):
+        )
+    if settings['enable_mm_verification']:
+        required_settings += (
+            'nin_service_name',
+            'nin_service_url',
+            )
+
+    for item in required_settings:
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
             raise ConfigurationError(
