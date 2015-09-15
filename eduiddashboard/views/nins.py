@@ -467,11 +467,6 @@ class NinsWizard(BaseWizard):
                 }
             }
 
-    def get_template_context(self):
-        context = super(NinsWizard,self).get_template_context()
-        context['title'] = _('Add NIN with MM confirmation')
-        return context
-
     def resendcode(self):
         if self.datakey is None:
             message = _("Your national identity number confirmation request "
