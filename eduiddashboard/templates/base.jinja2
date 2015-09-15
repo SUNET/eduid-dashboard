@@ -30,14 +30,10 @@
               <a class="navbar-brand" href="#">
                 <div id="eduid-logo-small" class="logo"></div>
               </a>
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-dashboard-menu" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
+              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-dashboard-menu" aria-expanded="false">
+              </span>
             </div>
-            <div class="collapse navbar-collapse" id="eduid-dashboard-menu">
+            <div class="collapse navbar-collapse text-center" id="eduid-dashboard-menu">
               <ul  class="nav navbar-nav">
                       <!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
                 <li>
@@ -130,6 +126,7 @@
     <script type="text/javascript" src="{{'eduiddashboard:static/js/base-ie.js'|static_url}}"></script>
     <![endif]-->
     <script type="text/javascript" src="{{'eduiddashboard:static/js/base.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/mobilemenu.js'|static_url}}"></script>
     {% block extrajs %}
     {% endblock %}
 
