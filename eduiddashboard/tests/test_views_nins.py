@@ -54,6 +54,7 @@ class NinsFormTests(LoggedInRequestTests):
         response_form.mustcontain(self.formname)
 
         self.assertNotIn('johnsmith@example.info', response_form.body)
+        self.assertIn('Verify through Mina Meddelanden', response_form.body)
 
         form = response_form.forms[self.formname]
         nin = '200010100001'
@@ -293,6 +294,36 @@ class NinsFormTests(LoggedInRequestTests):
             old_user = OldUser(old_user)
 
             self.assertNotIn(nin, old_user.get_nins())
+
+
+class NinsFormTestsDisableMM(LoggedInRequestTests):
+
+    formname = 'ninsview-form'
+
+    def setUp(self):
+        disable_mm = {'enable_mm_verification': 'false'}
+        super(NinsFormTestsDisableMM, self).setUp(settings=disable_mm)
+        # these tests want the self.user user to not have a NIN
+        self.no_nin_user_email = 'johnsmith@example.org'
+        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
+        user.set_nins([])
+        self.userdb.save(user)
+
+    def test_add_valid_nin(self):
+        self.set_logged(email=self.no_nin_user_email)
+
+        response_form = self.testapp.get('/profile/nins/')
+        response_form.mustcontain(self.formname)
+
+        self.assertNotIn('johnsmith@example.info', response_form.body)
+        self.assertNotIn('Verify through Mina Meddelanden', response_form.body)
+        self.assertNotIn('You can access your governmental inbox using',
+                response_form.body)
+
+    def test_get_wizard_nin(self):
+        self.set_logged(email=self.no_nin_user_email)
+        response = self.testapp.get('/profile/', status=200)
+        self.assertNotIn('openwizard', response.body)
 
 
 class NinWizardTests(LoggedInRequestTests):
