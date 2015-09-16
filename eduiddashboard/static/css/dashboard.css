@@ -1,6 +1,8 @@
 ﻿body, 
 .well,
-div.wizard-content {
+.container .jumbotron,
+div.wizard-content,
+div.modal-dialog .modal-content {
     background-color:#bbded9;
     background-image:url(../img/texture.png);
 }
@@ -92,12 +94,8 @@ input:focus {
 .header .logo {
     float: left;
     margin: 0; }
-.header nav {
-      margin-top:4px;
-  }
 .header nav li {
     list-style: none;
-    float: left;
     margin: 0 30px;
     line-height: 40px; }
 .header nav li.current-menu-item a {
@@ -319,13 +317,29 @@ ul.nav-tabs > li#profile-filled-li {
 #ninsview-form .btn {
     display:block;
 }
-.table > tbody > tr.emailrow td {
+.table > tbody > tr.emailrow td,
+.table > tbody > tr.mobile-row td,
+.table > tbody > tr.ninrow td {
     background-color:#bbded9!important;
     border-color:#629c92;
     border-bottom:1px solid #629c92;
     padding:10px 0;
     vertical-align:middle;
 }
+.table > tbody > tr.mobile-row td input,
+.table > tbody > tr.ninrow td input {
+    height: 38px;
+    line-height: 1.42857;
+    margin-bottom: 0 !important;
+}
+.table > tbody > tr.mobile-row td input.remove-mobile,
+.table > tbody > tr.ninrow td input.remove-nin {
+    background-color: #DD0D0D;
+    color: #fff;
+    padding: 0 25px;
+    width: auto;
+}
+
 .table > tbody > tr > td.identifier {
     vertical-align:middle;
 }
@@ -353,7 +367,9 @@ table.table-form td.non-identifier {
     background-color: #bbded9;
     border:none;
 }
-.table-form.emails .nobutton {
+.table-form.emails .nobutton,
+.table-form.mobiles .nobutton,
+.table-form.nins .nobutton {
     text-transform: uppercase;
     font-weight: bold;
 }
@@ -494,7 +510,14 @@ button[type=submit].btn {
 	font-weight: normal;
 	font-style: normal;
 }
-@media only screen and (min-width: 960px) and (max-width: 1024px) {
+
+@media only screen and (min-width: 1024px) and (max-width: 1160px) {
+    .header nav li {
+        margin:0 15px;
+    }
+}
+
+@media only screen and (min-width: 960px) and (max-width: 1023px) {
     .header {
         padding-left:23px;
         padding-right:20px;
@@ -683,7 +706,7 @@ button[type=submit].btn {
     }
 
     nav.navbar.navbar-default#eduid-dashboard-navbar {
-        background-color: #58B78C;
+        background-color: #333;
         border-color: #333;
     }
 
@@ -694,12 +717,86 @@ button[type=submit].btn {
 
     div#eduid-dashboard-menu ul.nav.navbar-nav li a {
         color: #eee;
+        display: block;
+        padding: 10px 0;
+        width: 100%;
+        border-bottom: 1px solid #CCC;
+    }
+
+    div#eduid-dashboard-menu ul.nav.navbar-nav li a:hover {
+        color: #aaa;
     }
 
     div#eduid-dashboard-menu > div.buttons.nav {
         float:none;
         margin-top: 10px;
         margin: 7.5px 0px;
+    }
+    /* Modals */
+    div.modal-dialog {
+        margin-top: 70px;
+    }
+
+    div.modal-dialog div.modal-footer {
+        text-align: center;
+    }
+
+    div.modal-dialog div.modal-footer a {
+        margin: 5px;
+    }
+
+    #eduid-dashboard-navbar div.navbar-header > span, 
+    #eduid-dashboard-navbar div.navbar-header > span:before, 
+    #eduid-dashboard-navbar div.navbar-header > span:after {
+        cursor: pointer;
+        border-radius: 2px;
+        height: 5px;
+        width: 35px;
+        right: 0;
+        background: white;
+        position: absolute;
+        display: block;
+        content: '';
+        border-color: transparent;
+        padding: 0;
+        margin-left: -15px;
+        border: 0;
+
+        -webkit-transition: all 250ms;
+        -moz-transition: all 250ms;
+        -o-transition: all 250ms;
+        transition: all 250ms;
+    }
+    #eduid-dashboard-navbar div.navbar-header > span {
+        top:10px;
+    }
+    #eduid-dashboard-navbar div.navbar-header > span:before {
+        top: -10px;
+    }
+    #eduid-dashboard-navbar div.navbar-header > span:after {
+        bottom: -10px; 
+    }
+    #eduid-dashboard-navbar div.navbar-header > span.open {
+        background-color: transparent;
+    }
+    #eduid-dashboard-navbar div.navbar-header > span.open:before {
+        top: 0;
+
+        -webkit-transform: rotate(45deg);
+        -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        -o-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+    #eduid-dashboard-navbar div.navbar-header > span.open:after {
+        bottom:0;
+
+        -webkit-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+
     }
 }
 @media only screen and (min-width: 768px) {
@@ -713,10 +810,6 @@ button[type=submit].btn {
 
     div#eduid-logo-small {
         display: none;
-    }
-
-    #header .logo {
-        margin:10px;
     }
 }
 
@@ -802,6 +895,19 @@ div.wizard div.wizard-card-container {
 div.wizard div.wizard-buttons-container > div.btn-group-single {
   float: none !important;
 }
+}
+
+@media only screen and (min-width: 598px) and (max-width: 767px)  {
+
+div.wizard-buttons-container .btn {
+        margin-left:auto;
+        margin-right:auto;
+        width:auto;
+        max-width:100%;
+        padding-left: 30px;
+        padding-right: 30px;
+        font-size:13px
+    }
 
 }
 
@@ -813,6 +919,13 @@ div.wizard div.wizard-buttons-container > div.btn-group-single {
 
 h3.modal-title {
   color: #333;
+}
+
+div.modal-content > div.modal-header,
+div.modal-content > div.modal-body,
+div.modal-content > div.modal-footer {
+    background-color:#bbded9;
+    background-image:url(../img/texture.png);
 }
 
 /* End of Modals
