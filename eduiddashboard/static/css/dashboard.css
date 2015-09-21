@@ -317,6 +317,15 @@ ul.nav-tabs > li#profile-filled-li {
 #ninsview-form .btn {
     display:block;
 }
+
+#ninsview-formNoMM {
+    pointer-events: auto;
+}
+
+.popover-title {
+    color: black;
+}
+
 .table > tbody > tr.emailrow td,
 .table > tbody > tr.mobile-row td,
 .table > tbody > tr.ninrow td {
@@ -456,6 +465,11 @@ table.table-form td.non-identifier {
 .btn-warning:hover {
     background:#dd650d;
     border-color:#dd650d;
+}
+.btn-primary.disabled,
+.btn-primary.disabled:hover {
+    background: #8ccbb5;
+    border-color:#8ccbb5;
 }
 input[type=submit].btn,
 button[type=submit].btn {
