@@ -1,8 +1,27 @@
 
 (function () {
 
+    function addDisableMmPopover() {
+        var disabled_mm_button = $("#ninsview-formNoMM");
+        if (disabled_mm_button.length > 0) {
+            console.log("Mina Meddelanden disabled");
+            var title = $('span.dataholder#disabled_mm').data('title');
+            var content = $('span.dataholder#disabled_mm').data('content');
+
+            disabled_mm_button.click( function (e) {
+                e.preventDefault();
+            });
+            disabled_mm_button.popover({
+                title: title,
+                content: content,
+                trigger: 'focus',
+                placement: 'auto'
+            })
+        }
+    }
+
     window.forms_helper_functions = {
-        
+
         passwords: function () {
             $('#changePassword').click(function (e) {
                 $('#changePasswordDialog').modal('show');
@@ -156,6 +175,8 @@
                     prop('disabled', true).
                     after('<p class="nin-wait">' + msg_verifying + '</p>');
             };
+            // Popover for disabled MM button
+            addDisableMmPopover();
         },
 
         basewizard: function () {

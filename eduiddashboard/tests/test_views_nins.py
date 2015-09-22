@@ -315,10 +315,10 @@ class NinsFormTestsDisableMM(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/nins/')
         response_form.mustcontain(self.formname)
 
+        self.assertIn('ninsview-formNoMM', response_form.body)
         self.assertNotIn('johnsmith@example.info', response_form.body)
-        self.assertNotIn('Verify through Mina Meddelanden', response_form.body)
         self.assertNotIn('You can access your governmental inbox using',
-                response_form.body)
+                         response_form.body)
 
     def test_get_wizard_nin(self):
         self.set_logged(email=self.no_nin_user_email)
