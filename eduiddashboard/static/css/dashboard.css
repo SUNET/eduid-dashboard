@@ -467,7 +467,9 @@ table.table-form td.non-identifier {
     border-color:#dd650d;
 }
 .btn-primary.disabled,
-.btn-primary.disabled:hover {
+.btn-primary.disabled:hover,
+.btn-primary.disabled:active,
+.btn-primary.disabled:focus {
     background: #8ccbb5;
     border-color:#8ccbb5;
 }

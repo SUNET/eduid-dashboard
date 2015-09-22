@@ -14,7 +14,8 @@
             disabled_mm_button.popover({
                 title: title,
                 content: content,
-                trigger: 'hover'
+                trigger: 'focus',
+                placement: 'auto'
             })
         }
     }
