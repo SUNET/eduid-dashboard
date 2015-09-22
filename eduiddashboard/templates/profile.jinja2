@@ -2,45 +2,49 @@
 
 {% block nav_class_home %}active{% endblock %}
 
-{% block title %}
-  <div class='row'>
-    <div class='col-md-6'>
-
-      {% if context.workmode == 'personal' %}
-      <h3>{{ _("Profile") }}</h3>
-      {% else %}
-      <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
-      {% endif %}
-
-        {% if pending_actions %}
-          <ul class='list-unstyled pending-actions'>
-          {% for formid, msg, action, index in pending_actions %}
-            {% if index == -1 %}
-            <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
-            {% else %}
-            <li><a href='#{{ formid }}/{{ action }}/{{ index }}'>{{ _(msg) }}</a></li>
-            {% endif %}
-          {% endfor %}
-          </ul>
-        {% endif %}
-
-    </div>
-
-  </div>
-{% endblock %}
-
-
 {% block contents %}
 
-  <div class='profile-combo tabbable well row'>
-    <div class="tabs-left col-md-3 hidden-xs hidden-sm" id="profile-menu-large">
-        <ul class='nav nav-tabs nav-stacked'>
+<div class='profile-combo tabbable well row'>
+    <div class='col-md-3'>
+        <div class="profile-head">
+
+             <div class="messages-wrapper hidden-lg hidden-md" id="eduid-header-messages">
+               <div class="messages">
+               {% for message in request.session.pop_flash() %}
+                 <div class="alert alert-{{ message|get_flash_message_type }}">
+                   <button type="button" class="close" data-dismiss="alert">&times;</button>
+                   {{ message|get_flash_message_text }}
+                 </div>
+               {% endfor %}
+               </div>
+             </div>
+
+            {% if context.workmode == 'personal' %}
+                <h3>{{ _("Profile") }}</h3>
+            {% else %}
+                <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
+            {% endif %}
+
+            {% if pending_actions %}
+                <ul class='list-unstyled pending-actions'>
+                {% for formid, msg, action, index in pending_actions %}
+                    {% if index == -1 %}
+                    <li><a href='#{{ formid }}'>{{ _(msg) }}</a></li>
+                    {% else %}
+                    <li><a href='#{{ formid }}/{{ action }}/{{ index }}'>{{ _(msg) }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="tabs-left hidden-xs" id="profile-menu-large">
+          <ul class='nav nav-tabs nav-stacked'>
           {% for tab in tabs %}
-          <li>
-            <a class="main-nav-tabs" href='#{{tab.id}}'>{{_(tab.label)}}</a>
-          </li>
-          {% endfor %}
             <li>
+              <a class="main-nav-tabs" href='#{{tab.id}}'>{{_(tab.label)}}</a>
+            </li>
+          {% endfor %}
+            <li id="profile-filled-li">
               <div class='profile-filled profile-filled-large'>
                 <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
                 <div class="progress progress-striped">
@@ -48,14 +52,22 @@
                 </div>
               </div>
             </li>
+            <li id="profile-menu-help">
+              <div class="help">
+                <a href="{{ request.route_path('help') }}">
+                  {{ _('Help') }}
+                </a>
+              </div>
+            </li>
 
-        </ul>
+          </ul>
+        </div>
     </div>
 
-    <nav class="navbar navbar-default hidden-md hidden-lg" role="navigation">
+    <nav class="navbar navbar-default hidden-sm hidden-md hidden-lg" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#profile-menu-small">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#profile-menu-small" aria-expanded="false">
             <span class="sr-only">{{_("Toggle navigation")}}</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -63,12 +75,11 @@
           </button>
         </div>
     
-        <div class="collapse collapsed navbar-collapse" id="profile-menu-small">
+        <div class="collapse navbar-collapse" id="profile-menu-small">
           <ul class="nav nav-stacked nav-tabs navbar-nav">
               {% for tab in tabs %}
                 <li>
-                    <a href='#{{tab.id}}' class="main-nav-tabs hidden-sm" data-toggle="collapse" data-target="#profile-menu-small">{{_(tab.label)}}</a>
-                    <a href='#{{tab.id}}' class="main-nav-tabs hidden-xs">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' class="main-nav-tabs hidden-sm">{{_(tab.label)}}</a>
                 </li>
               {% endfor %}
           </ul>
@@ -76,7 +87,18 @@
       </div>
     </nav>
 
-    <div class='tab-content info-container col-md-9'>
+     <div class="messages-wrapper visible-lg-inline-block visible-md-inline-block" id="eduid-header-messages">
+       <div class="messages">
+       {% for message in request.session.pop_flash() %}
+         <div class="alert alert-{{ message|get_flash_message_type }}">
+           <button type="button" class="close" data-dismiss="alert">&times;</button>
+           {{ message|get_flash_message_text }}
+         </div>
+       {% endfor %}
+       </div>
+     </div>
+
+    <div class='tab-content info-container col-md-8 col-md-offset-1'>
       <div class='tab-pane active'></div>
     </div>
 
@@ -84,6 +106,11 @@
       <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
       <div class="progress progress-striped">
         <div class="progress-bar profile-filled-progress-bar"></div>
+      </div>
+      <div class="help">
+        <a href="{{ request.route_path('help') }}">
+          {{ _('Help') }}
+        </a>
       </div>
     </div>
   </div>
@@ -114,8 +141,10 @@
     </div>
   </div>
 
-  {% if open_wizard %}
-  <div class="openwizard hide"></div>
+  {% if enable_mm_verification %}
+    {% if open_wizard %}
+    <div class="openwizard hide"></div>
+    {% endif  %}
   {% endif  %}
 
   {% if context.workmode != "personal" %}
@@ -127,18 +156,24 @@
 
 
 {% block extracss %}
+  {% if enable_mm_verification %}
     <link href="{{'eduiddashboard:static/css/bootstrap-wizard.css'|static_url}}" rel="stylesheet" media="screen">
+  {% endif %}
 {% endblock %}
 
 {% block extra_jsdata %}
 <span class="dataholder" id="profile-data" data-workmode="{{ workmode }}"
-                                           data-openwizard="{{ open_wizard }}"
+                                           {% if enable_mm_verification %}
+                                             data-openwizard="{{ open_wizard }}"
+                                           {% endif %}
                                            {% if datakey is defined and datakey %}
                                              data-datakey="{{ datakey }}"
                                            {% else %}
                                              data-datakey=""
                                            {% endif %}
-                                           data-wizard_nins_url="{{ context.safe_route_url('wizard-nins') }}"
+                                           {% if enable_mm_verification %}
+                                             data-wizard_nins_url="{{ context.safe_route_url('wizard-nins') }}"
+                                           {% endif %}
                                            data-userstatus_url="{{ context.safe_route_url('userstatus') }}"
                                            data-polling_timeout="{{ polling_timeout_for_admin }}"
                                            data-profile_filled="{{ profile_filled }}"
@@ -151,17 +186,16 @@
 <script src="{{'deform:static/scripts/jquery.form-3.09.js'|static_url}}"></script>
 
 <script src="{{'deform:static/scripts/deform.js'|static_url}}"></script>
-<script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
 
 <script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/forms-helper-functions.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/proofing.js'|static_url}}"></script>
+{% if enable_mm_verification %}
 <script src="{{'eduiddashboard:static/js/libs/bootstrap-wizard.js'|static_url}}"></script>
-
-
 <script src="{{'eduiddashboard:static/js/eduid-wizards.js'|static_url}}"></script>
+{% endif %}
 <script src="{{'eduiddashboard:static/js/tablelist-form.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/libs/zxcvbn-async.js'|static_url}}"></script>

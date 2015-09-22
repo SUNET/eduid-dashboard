@@ -4,8 +4,9 @@
 {% endblock %}
 
 {% block contents %}
+<div class="jumbotron eduid-notfound">
 
-<div class="alert">{{ _("An error happened.") }}</div>
+<h2>{{ _("An error happened.") }}</h2>
 
 {% trans %}
   <p>Sorry, but the requested page is unavailable due to a server hiccup.</p>
@@ -15,4 +16,5 @@
 
 <p>{{ msg }}</p>
 
+</div>
 {% endblock %}

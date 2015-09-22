@@ -205,22 +205,24 @@ def includeme(config):
     if mongo_replicaset is not None:
         mongodb = MongoDB(db_uri=settings['mongo_uri'],
                           replicaSet=mongo_replicaset)
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'],
+        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo',
                               replicaSet=mongo_replicaset)
     else:
         mongodb = MongoDB(db_uri=settings['mongo_uri'])
-        authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
 
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
 
-    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
-    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database(), 'authninfodb', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'),
+                                'db', reify=True)
+    config.set_request_property(lambda x: x.registry.settings['authninfodb'].get_database('eduid_idp_authninfo'),
+                                'authninfodb', reify=True)
 
     # Create userdb instance and store it in our config,
     # and make a getter lambda for pyramid to retreive it
-    _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
+    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
@@ -322,20 +324,28 @@ def main(global_config, **settings):
                                                          'lang_cookie_name',
                                                          'lang')
 
-    for item in (
+    settings['enable_mm_verification'] = read_setting_from_env_bool(settings,
+                                                    'enable_mm_verification',
+                                                    default=True)
+
+    required_settings = (
         'mongo_uri',
         'site.name',
         'dashboard_hostname',
         'dashboard_baseurl',
         'auth_shared_secret',
-        'mongo_uri_am',
-        'mongo_uri_authninfo',
         'personal_dashboard_base_url',
+        'signup_base_url',
         'vccs_url',
-        'nin_service_name',
-        'nin_service_url',
         'mobile_service_name',
-    ):
+        )
+    if settings['enable_mm_verification']:
+        required_settings += (
+            'nin_service_name',
+            'nin_service_url',
+            )
+
+    for item in required_settings:
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
             raise ConfigurationError(
@@ -348,9 +358,11 @@ def main(global_config, **settings):
 
     # configure Celery broker
     broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
-    celery.conf.update({'BROKER_URL': broker_url,
-                        'CELERY_TASK_SERIALIZER': 'json',
-                        })
+    celery.conf.update({
+        'MONGO_URI': settings.get('mongo_uri'),
+        'BROKER_URL': broker_url,
+        'CELERY_TASK_SERIALIZER': 'json',
+    })
     settings['celery'] = celery
     settings['broker_url'] = broker_url
 
