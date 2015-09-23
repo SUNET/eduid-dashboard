@@ -147,7 +147,7 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_phones = updated_user.phone_numbers.to_list_of_dicts()
 
         self.assertEqual(old_phones, updated_phones)
@@ -183,7 +183,6 @@ class MobilesFormTests(LoggedInRequestTests):
         self.userdb.UserClass = DashboardUser
 
         old_user = self.userdb.get_user_by_id(self.user['_id'])
-        assert isinstance(old_user, DashboardUser)
 
         old_phones = old_user.phone_numbers.to_list_of_dicts()
         amount_of_phone_numbers = len(old_phones)
@@ -196,7 +195,7 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_phones = updated_user.phone_numbers.to_list_of_dicts()
 
         self.assertEqual(old_phones, updated_phones)
@@ -226,12 +225,11 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'bad')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_primary_mobile = updated_user.phone_numbers.primary.number
 
         self.assertEqual(old_primary_phone, updated_primary_mobile)
 
-    @unittest.skip('Setting primary phone number not propagating')
     def test_setprimary_verified_mobile(self):
         self.set_logged()
         self.userdb.UserClass = DashboardUser
@@ -256,7 +254,7 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_phone_to_test = updated_user.phone_numbers.find('+34607507507')
 
         self.assertEqual(updated_phone_to_test.is_primary, True)
