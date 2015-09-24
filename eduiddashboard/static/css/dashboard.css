@@ -573,6 +573,16 @@ div.modal.wizard > div.wizard-dialog {
         font-size: 10px;
     }
 }
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+
+    div#profile-menu-large li#profile-filled-li,
+    div#profile-menu-large li#profile-menu-help {
+        display: none;
+    }
+    div#profile-menu-large ul {
+        margin-bottom: 50px;
+    }
+}
 @media only screen and (min-width: 768px) and (max-width: 959px) {
     .header {
         padding-left:23px;
