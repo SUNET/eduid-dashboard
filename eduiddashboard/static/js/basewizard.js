@@ -18,6 +18,7 @@
             isModal: true,
             submitUrl: path,
             contentHeight: 400,
+            contentWidth: 650,
             buttons: {
               submitText: msg_done,
               submittingText: msg_sending,

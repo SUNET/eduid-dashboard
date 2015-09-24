@@ -47,8 +47,6 @@ label {
     font-family:'Roboto-Regular';
 }
 input {
-    width:100%;
-    height:60px;
     padding:0 20px;
     border-radius: 0;
     box-shadow: none;
@@ -277,8 +275,6 @@ ul.wizard-nav-list li a span.glyphicon {
     border-bottom:none;
 }
 
-.
-
 /*
    Progress bar
 */
@@ -479,6 +475,29 @@ button[type=submit].btn {
     margin-top: 20px;
 }
 
+form#passwordsview-form div#item-deformField3 > label.control-label,
+form#resetpasswordstep2view-form div#item-deformField2 > label.control-label {
+    float: left;
+}
+form#passwordsview-form div.checkbox,
+form#resetpasswordstep2view-form div.checkbox {
+    display: inline-block;
+    margin-left: 15px;
+    padding-top: 6px;
+}
+
+/*  Forms  */
+
+div.controls > span.uneditable-input {
+    padding-top: 18px;
+}
+
+div.modal.wizard > div.wizard-dialog {
+  width: 650px;
+  margin-top: 60px !important;
+}
+
+
 /* Fontface */
 @font-face {
 	font-family: 'Roboto-Light';
@@ -564,6 +583,16 @@ button[type=submit].btn {
     #eduid-header-loa {
         padding: 0 15px;
         font-size: 10px;
+    }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+
+    div#profile-menu-large li#profile-filled-li,
+    div#profile-menu-large li#profile-menu-help {
+        display: none;
+    }
+    div#profile-menu-large ul {
+        margin-bottom: 50px;
     }
 }
 @media only screen and (min-width: 768px) and (max-width: 959px) {
@@ -684,6 +713,13 @@ button[type=submit].btn {
         max-width:100%;
         padding:0;
         font-size:13px
+    }
+    button#changePassword.btn {
+        margin-left: 0 !important;
+    }
+    form#passwordsview-form div.checkbox,
+    form#resetpasswordstep2view-form div.checkbox {
+        padding-top: 0px;
     }
     
     /* Footer */
@@ -882,7 +918,12 @@ ul.wizard-nav-list > li > a {
   color: #333;
 }
 
-@media only screen and (max-width: 598px) {
+.wizard-header h3.modal-title.wizard-title {
+  color: #fff;
+}
+
+
+@media only screen and (max-width: 650px) {
 
 div.wizard-card {
   padding: 20px 35px 0px !important;
@@ -913,7 +954,7 @@ div.wizard div.wizard-buttons-container > div.btn-group-single {
 }
 }
 
-@media only screen and (min-width: 598px) and (max-width: 767px)  {
+@media only screen and (min-width: 651px) and (max-width: 767px)  {
 
 div.wizard-buttons-container .btn {
         margin-left:auto;
