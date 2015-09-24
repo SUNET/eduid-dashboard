@@ -476,10 +476,6 @@ div.controls > span.uneditable-input {
     padding-top: 18px;
 }
 
-fieldset {
-  max-width: 500px;
-}
-
 div.modal.wizard > div.wizard-dialog {
   width: 650px;
   margin-top: 60px !important;
