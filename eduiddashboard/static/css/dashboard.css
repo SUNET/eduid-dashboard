@@ -47,8 +47,6 @@ label {
     font-family:'Roboto-Regular';
 }
 input {
-    width:100%;
-    height:60px;
     padding:0 20px;
     border-radius: 0;
     box-shadow: none;
@@ -277,8 +275,6 @@ ul.wizard-nav-list li a span.glyphicon {
     border-bottom:none;
 }
 
-.
-
 /*
    Progress bar
 */
@@ -462,6 +458,33 @@ button[type=submit].btn {
     display: block;
     margin-top: 20px;
 }
+
+form#passwordsview-form div#item-deformField3 > label.control-label,
+form#resetpasswordstep2view-form div#item-deformField2 > label.control-label {
+    float: left;
+}
+form#passwordsview-form div.checkbox,
+form#resetpasswordstep2view-form div.checkbox {
+    display: inline-block;
+    margin-left: 15px;
+    padding-top: 6px;
+}
+
+/*  Forms  */
+
+div.controls > span.uneditable-input {
+    padding-top: 18px;
+}
+
+fieldset {
+  max-width: 500px;
+}
+
+div.modal.wizard > div.wizard-dialog {
+  width: 650px;
+  margin-top: 60px !important;
+}
+
 
 /* Fontface */
 @font-face {
@@ -668,6 +691,10 @@ button[type=submit].btn {
         max-width:100%;
         padding:0;
         font-size:13px
+    }
+    form#passwordsview-form div.checkbox,
+    form#resetpasswordstep2view-form div.checkbox {
+        padding-top: 0px;
     }
     
     /* Footer */
