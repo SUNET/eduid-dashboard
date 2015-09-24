@@ -893,7 +893,12 @@ ul.wizard-nav-list > li > a {
   color: #333;
 }
 
-@media only screen and (max-width: 598px) {
+.wizard-header h3.modal-title.wizard-title {
+  color: #fff;
+}
+
+
+@media only screen and (max-width: 650px) {
 
 div.wizard-card {
   padding: 20px 35px 0px !important;
@@ -924,7 +929,7 @@ div.wizard div.wizard-buttons-container > div.btn-group-single {
 }
 }
 
-@media only screen and (min-width: 598px) and (max-width: 767px)  {
+@media only screen and (min-width: 651px) and (max-width: 767px)  {
 
 div.wizard-buttons-container .btn {
         margin-left:auto;
