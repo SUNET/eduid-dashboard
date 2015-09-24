@@ -51,7 +51,7 @@ def profile_editor(context, request):
     max_loa = get_max_available_loa(context.get_groups())
     max_loa = context.loa_to_int(loa=max_loa)
 
-    (open_wizard, datakey) = nins_open_wizard(context, request)
+    enable_mm = request.registry.settings.get('enable_mm_verification')
 
     view_context = {
         'tabs': tabs,
@@ -63,12 +63,17 @@ def profile_editor(context, request):
         'max_loa': max_loa,
         'polling_timeout_for_admin': request.registry.settings.get(
             'polling_timeout_for_admin', 2000),
-        'open_wizard': open_wizard,
-        'datakey': datakey,
         'has_mobile': has_confirmed_mobile(context.user),
-        'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
-        'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
+        'enable_mm_verification': enable_mm,
     }
+    if enable_mm:
+        (open_wizard, datakey) = nins_open_wizard(context, request)
+        view_context.update({
+            'open_wizard': open_wizard,
+            'datakey': datakey,
+            'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
+            'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
+        })
 
     return view_context
 

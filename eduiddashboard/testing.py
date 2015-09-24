@@ -126,7 +126,7 @@ class LoggedInRequestTests(MongoTestCase):
 
     def setUp(self, settings={}, skip_on_fail=False, std_user='johnsmith@example.com'):
 
-        self.settings = SETTINGS
+        self.settings = deepcopy(SETTINGS)
         self.settings.update(settings)
         super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 

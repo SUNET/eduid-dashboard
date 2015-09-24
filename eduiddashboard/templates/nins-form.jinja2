@@ -25,8 +25,10 @@
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
           <td class='non-identifier'>
+            {% if enable_mm_verification %}
             <input type='button' class='btn btn-link' value="{{_('Verify through Mina Meddelanden')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
+            {% endif %}
           </td>
           <td class='non-identifier'>
             {% if has_mobile %}
@@ -60,9 +62,11 @@
 {% endblock %}
 
 {% block askdialog_extra_info %}
-  {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
+  {% if enable_mm_verification %}
+    {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
         You can access your governmental inbox using <a href="{{nin_service_url}}" target="_blank">{{nin_service_name}}</a>
-  {% endtrans %}
+    {% endtrans %}
+  {% endif %}
 {% endblock %}
 
 {% block extra_jsdata %}
