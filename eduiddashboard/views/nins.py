@@ -6,14 +6,16 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
+from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduid_am.user import User
+from eduiddashboard.verifications import verify_nin
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
@@ -44,7 +46,7 @@ def get_status(request, user):
 
     if not all_nins and not unverified_nins:
         pending_actions = _('Add national identity number')
-    if unverified_nins:
+    if unverified_nins and request.registry.settings.get('enable_mm_verification'):
         pending_actions = _('Validation required for national identity number')
         pending_action_type = 'verify'
         verification_needed = len(unverified_nins) - 1
@@ -99,27 +101,35 @@ def get_not_verified_nins_list(request, user):
     :return: List of NINs pending confirmation
     :rtype: [string]
     """
-    active_nins = user.get_nins()
-    nins = []
-    verifications = request.db.verifications
-    not_verified_nins = verifications.find({
+    users_nins = user.get_nins()
+    res = []
+    user_already_verified = []
+    user_not_verified = []
+    verifications = request.db.verifications.find({
         'model_name': 'norEduPersonNIN',
         'user_oid': user.get_id(),
     }, sort=[('timestamp', 1)])
-    if active_nins:
-        active_nin = active_nins[-1]
-        nin_found = False
-        for nin in not_verified_nins:
-            if active_nin == nin['obj_id']:
-                nin_found = True
-            elif nin_found and not nin['verified']:
-                nins.append(nin['obj_id'])
-    else:
-        for nin in not_verified_nins:
-            if not nin['verified']:
-                nins.append(nin['obj_id'])
+    if users_nins:
+        if isinstance(users_nins[0], dict):
+            for this in users_nins:
+                if this['verified']:
+                    user_already_verified.append(this['number'])
+                else:
+                    user_not_verified.append(this['number'])
+        else:
+            # old style, list of strings (understood to be verified)
+            user_already_verified = users_nins
+    for this in verifications:
+        if this['verified']:
+            if this['obj_id'] in user_not_verified:
+                # Found to be verified after all, filter out from user_not_verified
+                user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
+        else:
+            if this['obj_id'] not in user_already_verified:
+                res.append(this['obj_id'])
+    res += user_not_verified
     # As we no longer remove verification documents make the list items unique
-    return list(set(nins))
+    return list(set(res))
 
 
 def get_active_nin(self):
@@ -154,8 +164,8 @@ class NINsActionsView(BaseActionsView):
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
-            verify_nin = nins[index]
-            if verify_nin != nin:
+            new_nin = nins[index]
+            if new_nin != nin:
                 return self.sync_user()
         else:
             return self.sync_user()
@@ -168,7 +178,7 @@ class NINsActionsView(BaseActionsView):
 #                'message': get_localizer(self.request).translate(message),
 #            }
 
-        return self._verify_action(verify_nin, post_data)
+        return self._verify_action(new_nin, post_data)
 
     def verify_mb_action(self, data, post_data):
         """
@@ -179,8 +189,8 @@ class NINsActionsView(BaseActionsView):
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
-            verify_nin = nins[index]
-            if verify_nin != nin:
+            new_nin = nins[index]
+            if new_nin != nin:
                 return self.sync_user()
         else:
             return self.sync_user()
@@ -195,6 +205,17 @@ class NINsActionsView(BaseActionsView):
 
         validation = validate_nin_by_mobile(self.request, self.user, nin)
         result = validation['success'] and 'success' or 'error'
+        if result == 'success':
+            verify_nin(self.request, self.user, nin)
+            try:
+                self.user.save(self.request)
+                model_name = 'norEduPersonNIN'
+                logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
+                # Save the state in the verifications collection
+                save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
+            except UserOutOfSync:
+                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
+                raise
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
                 mapping={
@@ -271,18 +292,27 @@ class NinsView(BaseFormView):
 
     route = 'nins'
 
-    # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
-    # from the button, must trigger the "add" validation part of a nin.
-    buttons = (deform.Button(name='add',
-                             title=_('Verify through Mina Meddelanden')),
-               deform.Button(name='add_by_mobile',
-                             title=_('Verify by registered phone'),
-                             css_class='btn btn-primary'),
-               )
-
     bootstrap_form_style = 'form-inline'
 
     get_active_nin = get_active_nin
+
+    def __init__(self, *args, **kwargs):
+        super(NinsView, self).__init__(*args, **kwargs)
+
+        # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
+        # from the button, must trigger the "add" validation part of a nin.
+        self.buttons = ()
+        if self.request.registry.settings.get('enable_mm_verification'):
+            self.buttons += (deform.Button(name='add',
+                             title=_('Verify through Mina Meddelanden')),)
+        else:
+            # Add a disabled button to for information purposes when Mina Meddelanden is disabled
+            self.buttons += (deform.Button(name='NoMM',
+                                           title=_('Verify through Mina Meddelanden'),
+                                           css_class='btn btn-primary disabled'),)
+        self.buttons += (deform.Button(name='add_by_mobile',
+                                       title=_('Verify by registered phone'),
+                                       css_class='btn btn-primary'),)
 
     def appstruct(self):
         return {}
@@ -299,17 +329,22 @@ class NinsView(BaseFormView):
         context = super(NinsView, self).get_template_context()
 
         settings = self.request.registry.settings
+        enable_mm = settings.get('enable_mm_verification')
 
         context.update({
             'nins': self.user.get_nins(),
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
             'active_nin': self.get_active_nin(),
-            'nin_service_url': settings.get('nin_service_url'),
-            'nin_service_name': settings.get('nin_service_name'),
             'open_wizard': nins_open_wizard(self.context, self.request),
             'has_mobile': has_confirmed_mobile(self.user),
+            'enable_mm_verification': enable_mm,
         })
+        if enable_mm:
+            context.update({
+                'nin_service_url': settings.get('nin_service_url'),
+                'nin_service_name': settings.get('nin_service_name'),
+            })
 
         return context
 
@@ -319,6 +354,7 @@ class NinsView(BaseFormView):
         newnin = normalize_nin(newnin)
 
         send_verification_code(self.request, self.user, newnin)
+        return True
 
     def add_success_personal(self, ninform, msg):
         self.addition_with_code_validation(ninform)
@@ -326,15 +362,18 @@ class NinsView(BaseFormView):
         msg = get_localizer(self.request).translate(msg)
         self.request.session.flash(msg, queue='forms')
 
-    def add_nin_external(self, data):
+    def validate_post_data(self):
         self.schema = self.schema.bind(**self.get_bind_data())
         form = self.form_class(self.schema, buttons=self.buttons,
                                **dict(self.form_options))
         self.before(form)
 
         controls = self.request.POST.items()
+        return form.validate(controls)
+
+    def add_nin_external(self, data):
         try:
-            validated = form.validate(controls)
+            validated = self.validate_post_data()
         except deform.exception.ValidationFailure as e:
             return {
                 'status': 'failure',
@@ -357,7 +396,7 @@ class NinsView(BaseFormView):
             })
 
         if old_user:
-            old_user = User(old_user)
+            old_user = OldUser(old_user)
             old_user.retrieve_modified_ts(self.request.db.profiles)
             nins = [nin for nin in old_user.get_nins() if nin != newnin]
             old_user.set_nins(nins)
@@ -373,7 +412,8 @@ class NinsView(BaseFormView):
         try:
             self.user.save(self.request)
         except UserOutOfSync:
-            message = _('User data out of sync. Please try again.')
+            message = _('Your user profile is out of sync. Please '
+                        'reload the page and try again.')
         else:
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
@@ -432,20 +472,33 @@ class NinsWizard(BaseWizard):
                 }
             }
 
-    def get_template_context(self):
-        context = super(NinsWizard,self).get_template_context()
-        context['title'] = _('Add NIN with MM confirmation')
-        return context
-
     def resendcode(self):
         if self.datakey is None:
             message = _("Your national identity number confirmation request "
                         "can not be found")
             message = get_localizer(self.request).translate(message)
             return {
-                'status': 'failure',
+                'status': 'error',
                 'text': message
             }
+
+        nins_view = NinsView(self.context, self.request)
+        try:
+            nins_view.validate_post_data()
+        except deform.exception.ValidationFailure as e:
+            errors = e.error.asdict()
+            if 'norEduPersonNIN' in errors:
+                text = errors['norEduPersonNIN']
+            elif errors:
+                text = errors.values()[0]
+            else:
+                # Shouldn't happen!
+                text = _('There was an unknown error dealing with your request')
+            return {
+                'status': 'error',
+                'text': text,
+            }
+
         send_verification_code(self.request,
                                self.context.user,
                                self.datakey)
@@ -459,13 +512,16 @@ class NinsWizard(BaseWizard):
 
     def get_template_context(self):
         context = super(NinsWizard, self).get_template_context()
+        message = _('Add your national identity number')
+        message = get_localizer(self.request).translate(message)
         context.update({
-            'wizard_title': _('Add your national identity number'),
+            'wizard_title': message,
         })
         return context
 
 def nins_open_wizard(context, request):
-    if context.workmode != 'personal':
+    if (context.workmode != 'personal' or
+            not request.registry.settings.get('enable_mm_verification')):
         return (False, None)
     ninswizard = NinsWizard(context, request)
 

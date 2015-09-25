@@ -77,14 +77,15 @@ class All_StopOnFirst_Switch(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
 
-        for key in self.validator_dict.keys():
-            if key in request.POST:
-                current_validator = self.validator_dict[key]
-                for validator in current_validator.validators:
-                    try:
-                        validator(node, value)
-                    except colander.Invalid as e:
-                        raise colander.Invalid(node, e.msg)
+        if 'add_by_mobile' in request.POST:
+            current_validator = self.validator_dict['add_by_mobile']
+        else:
+            current_validator = self.validator_dict['add']
+        for validator in current_validator.validators:
+            try:
+                validator(node, value)
+            except colander.Invalid as e:
+                raise colander.Invalid(node, e.msg)
 
 
 class Email(CSRFTokenSchema):

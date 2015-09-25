@@ -6,7 +6,7 @@ from datetime import datetime
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
@@ -101,8 +101,14 @@ class EmailsActionsView(BaseActionsView):
                 'result': 'error',
                 'message': get_localizer(self.request).translate(message),
             }
+
         remove_email = emails[index]['email']
-        emails.remove(emails[index])
+
+        # By using pop(index) instead of remove(emails[index]) we avoid
+        # evaluating the time zone stored together with the value of the
+        # key 'added_timestamp' that leads to "TypeError: can't compare
+        # offset-naive and offset-aware datetimes".
+        emails.pop(index)
 
         self.user.set_mail_aliases(emails)
         primary_email = self.user.get_mail()

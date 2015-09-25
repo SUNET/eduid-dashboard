@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.views import sync_user
 from eduiddashboard.verifications import verify_code, get_verification_code
 from eduiddashboard.i18n import TranslationString as _
@@ -33,7 +33,8 @@ def verifications(context, request):
         else:
             user = request.session['user']
         sync_user(request, context, user)
-        msg = _('The user was out of sync. Please try again.')
+        msg = _('Your user profile is out of sync. Please '
+                'reload the page and try again.')
         msg = get_localizer(request).translate(msg)
         request.session.flash(msg),
         raise HTTPFound(request.context.route_url('profile-editor'))

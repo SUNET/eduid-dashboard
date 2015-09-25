@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from eduid_msg.celery import celery, get_message_relay
-import eduid_msg.tasks
 from eduid_msg.tasks import send_message, is_reachable, get_postal_address, set_audit_log_postal_address, get_relations_to
 
 import logging
@@ -70,6 +69,7 @@ class MsgRelay(object):
             'TEMPLATES_DIR': 'templates/',
             'CELERY_RESULT_BACKEND': 'amqp',
             'CELERY_TASK_SERIALIZER': 'json',
+            'MONGO_URI': settings.get('mongo_uri'),  # only needed when testing I think
         }
         celery.conf.update(config)
 

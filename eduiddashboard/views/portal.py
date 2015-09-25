@@ -51,7 +51,7 @@ def profile_editor(context, request):
     max_loa = get_max_available_loa(context.get_groups())
     max_loa = context.loa_to_int(loa=max_loa)
 
-    (open_wizard, datakey) = nins_open_wizard(context, request)
+    enable_mm = request.registry.settings.get('enable_mm_verification')
 
     view_context = {
         'tabs': tabs,
@@ -63,12 +63,17 @@ def profile_editor(context, request):
         'max_loa': max_loa,
         'polling_timeout_for_admin': request.registry.settings.get(
             'polling_timeout_for_admin', 2000),
-        'open_wizard': open_wizard,
-        'datakey': datakey,
         'has_mobile': has_confirmed_mobile(context.user),
-        'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
-        'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
+        'enable_mm_verification': enable_mm,
     }
+    if enable_mm:
+        (open_wizard, datakey) = nins_open_wizard(context, request)
+        view_context.update({
+            'open_wizard': open_wizard,
+            'datakey': datakey,
+            'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
+            'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
+        })
 
     return view_context
 
@@ -142,9 +147,8 @@ def home(context, request):
 @view_config(route_name='session-reload',
              request_method='GET', permission='edit')
 def session_reload(context, request):
-    main_attribute = request.registry.settings.get('saml2.user_main_attribute')
-    userid = request.session.get('user').get(main_attribute)
-    user = request.userdb.get_user(userid)
+    eppn = request.session.get('user').get('eduPersonPrincipalName')
+    user = request.userdb.get_user_by_eppn(eppn)
     request.session['user'] = user
     raise HTTPFound(request.route_path('home'))
 
@@ -186,7 +190,7 @@ def token_login(context, request):
 
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
-        user = request.userdb.get_user(eppn)
+        user = request.userdb.get_user_by_eppn(eppn)
         request.session['mail'] = user.get('email'),
         request.session['user'] = user
         request.session['loa'] = 1
@@ -202,15 +206,32 @@ def token_login(context, request):
 
 @view_config(route_name='set_language', request_method='GET')
 def set_language(context, request):
+    import re
+
     settings = request.registry.settings
     lang = request.GET.get('lang', 'en')
     if lang not in settings['available_languages']:
         return HTTPNotFound()
 
     url = request.environ.get('HTTP_REFERER', None)
-    if url is None:
-        url = request.route_path('home')
+    host = request.environ.get('HTTP_HOST', None)
+
+    dashboard_hostname = settings.get('dashboard_hostname')
+    dashboard_baseurl = settings.get('dashboard_baseurl')
+
+    # To avoid malicious redirects, using header injection, we only
+    # allow the client to be redirected to an URL that is within the
+    # predefined scope of the application.
+    allowed_url = re.compile('^(http|https)://' + dashboard_hostname + '[:]{0,1}\d{0,5}($|/)')
+    allowed_host = re.compile('^' + dashboard_hostname + '[:]{0,1}\d{0,5}$')
+
+    if url is None or not allowed_url.match(url):
+        url = dashboard_baseurl
+    elif host is None or not allowed_host.match(host):
+        url = dashboard_baseurl
+
     response = HTTPFound(location=url)
+
     cookie_domain = settings.get('lang_cookie_domain', None)
     cookie_name = settings.get('lang_cookie_name')
 

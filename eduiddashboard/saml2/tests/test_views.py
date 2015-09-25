@@ -47,7 +47,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
-        request = DummyRequest()
+        request = self.dummy_request()
         session = session_factory(request)
         session.persist()
         # ensure that session id is a NCName valid
@@ -58,7 +58,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session.persist()
 
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.set_cookie('beaker.session.id', session._sess.id)
 
         return session._sess.id
 
@@ -67,7 +67,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session_id = self.add_outstanding_query(came_from)
 
-        saml_response = auth_response(session_id, "user1@example.com")
+        saml_response = auth_response(session_id, "hubba-bubba@test")
 
         res = self.testapp.post('/saml2/acs/', params={
             'SAMLResponse': base64.b64encode(saml_response),
@@ -90,13 +90,13 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session_id = self.add_outstanding_query(came_from)
 
-        saml_response = auth_response(session_id, "user1@example.com")
+        saml_response = auth_response(session_id, "hubba-bubba@test")
 
         res = self.testapp.post('/saml2/acs/', params={
             'SAMLResponse': base64.b64encode(saml_response),
             'RelayState': came_from,
         })
-        cookies = res.cookies_set
+        cookies = self.testapp.cookies
 
         res = self.testapp.get('/saml2/logout/',
                                headers={'cookies': cookies['auth_tkt']})
@@ -155,7 +155,7 @@ class Saml2ViewsTests(Saml2RequestTests):
 
         session_id = self.add_outstanding_query(came_from)
 
-        saml_response = auth_response(session_id, "user1@example.com")
+        saml_response = auth_response(session_id, "hubba-bubba@test")
 
         # Log in through IDP SAMLResponse
         res = self.testapp.post('/saml2/acs/', params={

@@ -1,17 +1,9 @@
 # -*- encoding: utf-8 -*-
 
-import json
-from bson import ObjectId
-import re
-
-from mock import patch
-
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class PersonalDataFormTests(LoggedInReguestTests):
+class PersonalDataFormTests(LoggedInRequestTests):
 
     formname = 'personaldataview-form'
 

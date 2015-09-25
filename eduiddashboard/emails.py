@@ -46,8 +46,8 @@ def send_verification_mail(request, email, reference=None, code=None):
         ),
     )
 
-    # Development
-    if request.registry.settings.get("development", '') == 'true':
+    # DEBUG
+    if request.registry.settings.get('debug_mode', False):
         print message.body
     else:
         mailer.send(message)
@@ -82,8 +82,8 @@ def send_termination_mail(request, user):
         ),
     )
 
-    # Development
-    if request.registry.settings.get("development", '') == 'true':
+    # DEBUG
+    if request.registry.settings.get('debug_mode', False):
         print message.body
     else:
         mailer.send(message)
@@ -124,8 +124,8 @@ def send_reset_password_mail(request, user, reset_password_link):
         ),
     )
 
-    # Development
-    if request.registry.settings.get("development", '') == 'true':
+    # DEBUG
+    if request.registry.settings.get('debug_mode', False):
         print message.body
     else:
         mailer.send(message)

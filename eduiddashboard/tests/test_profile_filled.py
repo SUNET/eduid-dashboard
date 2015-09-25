@@ -1,15 +1,8 @@
 import json
-from bson import ObjectId
-import re
-
-from mock import patch
-
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduiddashboard.testing import LoggedInRequestTests
 
 
-class ProfileFilledTests(LoggedInReguestTests):
+class ProfileFilledTests(LoggedInRequestTests):
 
     def test_profile_filled_100(self):
         self.set_logged()
@@ -19,7 +12,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_85(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         self.add_to_session({'user': user})
@@ -29,7 +22,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_71(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -40,7 +33,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_57(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -52,7 +45,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_42(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -65,7 +58,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_28(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -79,7 +72,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_14(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None
@@ -94,7 +87,7 @@ class ProfileFilledTests(LoggedInReguestTests):
 
     def test_profile_filled_0(self):
         self.set_logged()
-        user = self.userdb.get_user('johnsmith@example.com')
+        user = self.userdb.get_user_by_mail('johnsmith@example.com')
         user.retrieve_modified_ts(self.db.profiles)
         user._mongo_doc['sn'] = None
         user._mongo_doc['displayName'] = None

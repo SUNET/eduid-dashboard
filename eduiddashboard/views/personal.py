@@ -4,11 +4,10 @@ from deform import Button
 from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
-from eduid_am.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 
-from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView
 
 

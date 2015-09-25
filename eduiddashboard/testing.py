@@ -14,15 +14,65 @@ from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_am.db import MongoDB
-from eduid_am.user import User
-from eduid_am import testing as am
+from eduid_userdb import UserDB
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUserDB
+from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
 
+from eduid_am.celery import celery, get_attribute_manager
 
-MONGO_URI_AUTHNINFO_TEST = 'mongodb://localhost:27017/eduid_idp_authninfo_test'
+import logging
+logger = logging.getLogger(__name__)
+
+
+SETTINGS = {
+    'auth_tk_secret': '123456',
+    'auth_shared_secret': '123_456',
+    'site.name': 'eduiID Testing',
+    'saml2.settings_module': path.join(path.dirname(__file__),
+                                       'saml2/tests/data/saml2_settings.py'),
+    'saml2.login_redirect_url': '/',
+    'saml2.logout_redirect_url': '/',
+    'saml2.user_main_attribute': 'mail',
+    # Required only if not dont want mongodb
+    # 'groups_callback': dummy_groups_callback,
+    #'session.type': 'memory',
+    #'session.lock_dir': '/tmp',
+    #'session.webtest_varname': 'session',
+    # 'session.secret': '1234',
+    'testing': True,
+    'jinja2.directories': [
+        'eduiddashboard:saml2/templates',
+        'eduiddashboard:/templates'
+    ],
+    'jinja2.undefined': 'strict',
+    'jinja2.filters': """
+            route_url = pyramid_jinja2.filters:route_url_filter
+            static_url = pyramid_jinja2.filters:static_url_filter
+            get_flash_message_text = eduiddashboard.filters:get_flash_message_text
+            get_flash_message_type = eduiddashboard.filters:get_flash_message_type
+            address_type_text = eduiddashboard.filters:address_type_text
+            country_name = eduiddashboard.filters:country_name
+            context_route_url = eduiddashboard.filters:context_route_url
+            safe_context_route_url = eduiddashboard.filters:safe_context_route_url
+            """,
+    'personal_dashboard_base_url': 'http://localhost/',
+    'signup_base_url': 'http://localhost/',
+    'nin_service_name': 'Mina meddelanden',
+    'nin_service_url': 'http://minameddelanden.se/',
+    'mobile_service_name': 'TeleAdress',
+    'available_languages': '''
+            en = English
+            sv = Svenska
+            ''',
+    'default_country_code': '+46',
+    'vccs_url': 'http://localhost:8550/',
+    'password_reset_timeout': '120',
+    'dashboard_hostname': 'dashboard.example.com',
+    'dashboard_baseurl': 'http://dashboard.example.com',
+    }
 
 
 def loa(index):                                                                                                                                             
@@ -71,86 +121,23 @@ class MockedTask(object):
         return MockedResult(self.retval, self.failed)
 
 
-def get_db(settings):
-    mongo_replicaset = settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'])
-    return mongodb.get_database()
-
-
-
-class LoggedInReguestTests(am.MongoTestCase):
+class LoggedInRequestTests(MongoTestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
-    MockedUserDB = am.MockedUserDB
+    def setUp(self, settings={}, skip_on_fail=False, std_user='johnsmith@example.com'):
 
-    user = User(am.MOCKED_USER_STANDARD)
-    user.set_modified_ts(datetime.datetime.utcnow())
-    users = []
-
-    def setUp(self, settings={}):
-        # Don't call DBTests.setUp because we are getting the
-        # db in a different way
-
-        self.settings = {
-            'auth_tk_secret': '123456',
-            'auth_shared_secret': '123_456',
-            'site.name': 'eduiID Testing',
-            'saml2.settings_module': path.join(path.dirname(__file__),
-                                               'saml2/tests/data/saml2_settings.py'),
-            'saml2.login_redirect_url': '/',
-            'saml2.logout_redirect_url': '/',
-            'saml2.user_main_attribute': 'mail',
-            # Required only if not dont want mongodb
-            # 'groups_callback': dummy_groups_callback,
-            #'session.type': 'memory',
-            #'session.lock_dir': '/tmp',
-            #'session.webtest_varname': 'session',
-            # 'session.secret': '1234',
-            'mongo_uri': am.MONGO_URI_TEST,
-            'mongo_uri_am': am.MONGO_URI_AM_TEST,
-            'mongo_uri_authninfo': MONGO_URI_AUTHNINFO_TEST,
-            'testing': True,
-            'jinja2.directories': [
-                'eduiddashboard:saml2/templates',
-                'eduiddashboard:/templates'
-            ],
-            'jinja2.undefined': 'strict',
-            'jinja2.filters': """
-                route_url = pyramid_jinja2.filters:route_url_filter
-                static_url = pyramid_jinja2.filters:static_url_filter
-                get_flash_message_text = eduiddashboard.filters:get_flash_message_text
-                get_flash_message_type = eduiddashboard.filters:get_flash_message_type
-                address_type_text = eduiddashboard.filters:address_type_text
-                country_name = eduiddashboard.filters:country_name
-                context_route_url = eduiddashboard.filters:context_route_url
-                safe_context_route_url = eduiddashboard.filters:safe_context_route_url
-            """,
-            'personal_dashboard_base_url': 'http://localhost/',
-            'nin_service_name': 'Mina meddelanden',
-            'nin_service_url': 'http://minameddelanden.se/',
-            'mobile_service_name': 'TeleAdress',
-            'available_languages': '''
-                en = English
-                sv = Svenska
-            ''',
-            'default_country_code': '+46',
-            'vccs_url': 'http://localhost:8550/',
-            'password_reset_timeout': '120',
-        }
-        
-        super(LoggedInReguestTests, self).setUp()
-
+        self.settings = deepcopy(SETTINGS)
         self.settings.update(settings)
+        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
+        self.settings['mongo_uri'] = self.mongodb_uri('')
         try:
             app = eduiddashboard_main({}, **self.settings)
         except pymongo.errors.ConnectionFailure:
-            raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
-                self.settings['mongo_uri']))
+            if skip_on_fail:
+                raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
+                    self.settings['mongo_uri']))
+            raise
 
         self.testapp = TestApp(app)
 
@@ -158,23 +145,37 @@ class LoggedInReguestTests(am.MongoTestCase):
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
 
-        self.db = get_db(self.settings)
+        self.userdb = app.registry.settings['userdb']
+        _userdoc = self.userdb.get_user_by_mail(std_user)
+        self.assertIsNotNone(_userdoc, "Could not load the standard test user {!r} from the database {!s}".format(
+            std_user, self.userdb))
+        self.user = OldUser(data=_userdoc)
+
+        #self.db = get_db(self.settings)
+        self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
+        self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_userdb')   # central userdb in new format (User)
+        self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
+        # Clean up the dashboards private database collections
+        logger.debug("Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         self.db.profiles.drop()
         self.db.verifications.drop()
+        self.db.reset_passwords.drop()
+
+        # Copy all the users from the eduid userdb into the dashboard applications userdb
+        # since otherwise the out-of-sync check will trigger on every save to the dashboard
+        # applications database because there is no document there with the right modified_ts
+        for userdoc in self.userdb._get_all_userdocs():
+            logger.debug("COPYING USER INTO PROFILES:\n{!s}".format(userdoc))
+            self.db.profiles.insert(userdoc)
+
         for verification_data in self.initial_verifications:
             self.db.verifications.insert(verification_data)
 
-        userdocs = []
-        #ts = datetime.datetime.utcnow()
-        for userdoc in self.userdb.all_userdocs():
-            newdoc = deepcopy(userdoc)
-        #    newdoc['modified_ts'] = ts
-            userdocs.append(newdoc)
-        self.db.profiles.insert(userdocs)
-
-
     def tearDown(self):
-        super(LoggedInReguestTests, self).tearDown()
+        super(LoggedInRequestTests, self).tearDown()
+        logger.debug("tearDown: Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
+        for userdoc in self.db.profiles.find({}):
+            assert OldUser(userdoc)
         self.db.profiles.drop()
         self.db.verifications.drop()
         self.db.reset_passwords.drop()
@@ -184,7 +185,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         return self.user
 
     def set_mocked_get_user(self):
-        patcher = patch('eduid_am.userdb.UserDB.get_user',
+        patcher = patch('eduid_userdb.dashboard.UserDBWrapper.get_user_by_eppn',
                         self.dummy_get_user)
         patcher.start()
 
@@ -196,9 +197,17 @@ class LoggedInReguestTests(am.MongoTestCase):
         request.registry.settings = self.settings
         return request
 
-    def set_logged(self, user='johnsmith@example.com', extra_session_data={}):
-        request = self.set_user_cookie(user)
-        user_obj = self.userdb.get_user(user)
+    def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
+        request = self.set_user_cookie(email)
+        user_obj = self.userdb.get_user_by_mail(email, raise_on_missing=True)
+        if not user_obj:
+            logging.error("User {!s} not found in database {!r}. Users:".format(email, self.userdb))
+            for this in self.userdb._get_all_userdocs():
+                this_user = OldUser(this)
+                logging.debug("  User: {!s}".format(this_user))
+        # user only exists in eduid-userdb, so need to clear modified-ts to be able
+        # to save it to eduid-dashboard.profiles
+        user_obj.set_modified_ts(None)
         session_data = {
             'user': user_obj,
             'eduPersonAssurance': loa(3),
@@ -213,7 +222,7 @@ class LoggedInReguestTests(am.MongoTestCase):
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def add_to_session(self, data):
@@ -224,16 +233,24 @@ class LoggedInReguestTests(am.MongoTestCase):
         for key, value in data.items():
             session[key] = value
         session.persist()
-        self.testapp.cookies[session_factory._options.get('key')] = session._sess.id
+        self.testapp.set_cookie(session_factory._options.get('key'), session._sess.id)
         return request
 
-    def check_values(self, fields, values):
+    def check_values(self, fields, values, ignore_not_found=[]):
         for field in fields:
             if field.attrs['type'] == 'checkbox':
+                # A webtest.app.Checkbox only has a value if it is checked (!)
                 old_status = field.checked
                 field.checked = True
-                if field.value not in values:
+                if field.value in values:
+                    logger.debug("Checked checkbox {!r} (value {!r})".format(field.id, field.value))
+                    values.remove(field.value)
+                else:
+                    # restore the checkbox whose value was not found in values
                     field.checked = old_status
+        values = [x for x in values if x not in ignore_not_found]
+        self.assertEqual(values, [], "Failed checking one or more checkboxes: {!r}".format(values))
+
 
     def values_are_checked(self, fields, values):
         checked = [f.value for f in fields if f.value is not None]

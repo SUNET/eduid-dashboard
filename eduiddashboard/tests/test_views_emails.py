@@ -4,12 +4,14 @@ import re
 
 from mock import patch
 
-from eduid_am.userdb import UserDB
-from eduid_am.user import User
-from eduiddashboard.testing import LoggedInReguestTests
+from eduid_userdb.dashboard import UserDBWrapper as UserDB
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduiddashboard.testing import LoggedInRequestTests
+
+from eduid_userdb.dashboard import DashboardUser
 
 
-class MailsFormTests(LoggedInReguestTests):
+class MailsFormTests(LoggedInRequestTests):
 
     formname = 'emailsview-form'
 
@@ -108,12 +110,30 @@ class MailsFormTests(LoggedInReguestTests):
 
     def test_verify_not_existant_email(self):
         self.set_logged()
+        self.userdb.UserClass = DashboardUser
 
-        with self.assertRaises(IndexError):
-            self.testapp.post(
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        assert isinstance(old_user, DashboardUser)
+
+        # Make a post that attempts to verify a non-existant mail address,
+        # so no change is expected in the database.
+        response = self.testapp.post(
                 '/profile/emails-actions/',
-                {'identifier': 10, 'action': 'verify'}
-            )
+                {'identifier': len(old_user.mail_addresses.to_list()), 'action': 'verify'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        # Check that mail addresses was not updated. Sort of redundant since
+        # we checked that we got an out of sync condition above.
+        new_user = self.userdb.get_user_by_id(self.user['_id'])
+        assert isinstance(new_user, DashboardUser)
+
+        old_addresses = old_user.mail_addresses.to_list_of_dicts()
+        new_addresses = new_user.mail_addresses.to_list_of_dicts()
+
+        self.assertEqual(old_addresses, new_addresses)
 
     def test_verify_existant_email(self):
         self.set_logged()
@@ -182,7 +202,7 @@ class MailsFormTests(LoggedInReguestTests):
         self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
 
     def test_steal_verified_mail(self):
-        self.set_logged(user='johnsmith@example.org')
+        self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/emails/')
 
@@ -199,7 +219,7 @@ class MailsFormTests(LoggedInReguestTests):
             self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
 
@@ -218,6 +238,48 @@ class MailsFormTests(LoggedInReguestTests):
         self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = User(old_user)
+        old_user = OldUser(old_user)
 
         self.assertNotIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
+
+    def test_steal_verified_mail_from_ourself(self):
+        self.set_logged(email='johnsmith@example.org')
+        user = self.db.profiles.find_one({'_id': ObjectId('901234567890123456789012')})
+        user = OldUser(user)
+        mail = 'myuniqemail@example.info'
+
+        response_form = self.testapp.get('/profile/emails/')
+
+        self.assertNotIn(mail, response_form.body)
+
+        form = response_form.forms[self.formname]
+        form['mail'].value = mail
+
+        # Try to steal the unique email address by submitting and verifying two
+        # times that the user is the rightful owner of this email address.
+        for i in range(0,2):
+
+            with patch.object(UserDB, 'exists_by_field', clear=True):
+                UserDB.exists_by_field.return_value = False
+
+                response = form.submit('add')
+
+                self.assertEqual(response.status, '200 OK')
+                self.assertIn(mail, response.body)
+                self.assertIsNotNone(getattr(response, 'form', None))
+
+            # Get the document that contains the code needed
+            # to verify that the user owns the address.
+            email_doc = self.db.verifications.find_one({
+                'model_name': 'mailAliases',
+                'user_oid': ObjectId(user.get_id()),
+                'obj_id': mail
+            })
+
+            response = self.testapp.post(
+                '/profile/emails-actions/',
+                {'identifier': 3, 'action': 'verify', 'code': email_doc['code']}
+            )
+
+            response_json = json.loads(response.body)
+            self.assertEqual(response_json['result'], 'success')

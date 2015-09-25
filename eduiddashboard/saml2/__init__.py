@@ -47,7 +47,6 @@ def includeme(config):
         'saml2.settings_module',
         'saml2.login_redirect_url',
         'saml2.logout_redirect_url',
-        'saml2.user_main_attribute',
     ):
         settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
@@ -58,15 +57,6 @@ def includeme(config):
 
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
-
-    if settings.get('testing', False):
-        from eduiddashboard.saml2.testing import MockedUserDB
-
-        # Create mock userdb instance and store it in our config,
-        # and make a getter lambda for pyramid to retreive it
-        userdb = MockedUserDB()
-        config.registry.settings['userdb'] = userdb
-        config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
 
     config = configure_auth(config, settings)
     # saml2 views

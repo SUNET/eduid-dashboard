@@ -3,4 +3,4 @@ recursive-include eduiddashboard *.jinja2 *.xml *.txt *.pt
 recursive-include eduiddashboard *.ico *.png *.css *.gif *.jpg *.html
 recursive-include eduiddashboard *.pot *.po *.mo *.svg
 recursive-include eduiddashboard *.js *.map
-recursive-include eduiddashboard glyphicons*.woff glyphicons*.ttf
+recursive-include eduiddashboard glyphicons*.woff glyphicons*.ttf roboto*.woff roboto*.ttf

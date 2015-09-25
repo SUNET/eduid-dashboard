@@ -1,10 +1,6 @@
 import re
-from copy import deepcopy
-from datetime import datetime
-import unittest
 from os import path
 
-import pymongo
 from webtest import TestApp, TestRequest
 
 from pyramid.config import Configurator
@@ -15,50 +11,14 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_am.userdb import UserDB
-import eduid_am.exceptions
-from eduid_am.user import User
-from eduid_am import testing as am
+from eduid_userdb.userdb import MongoDB
+from eduid_userdb.dashboard import UserDBWrapper
+from eduiddashboard.testing import MongoTestCase
 from eduiddashboard.saml2 import includeme as saml2_includeme
-from eduiddashboard.testing import get_db
+from eduid_am.celery import celery, get_attribute_manager
 
-
-class MockedUserDB(UserDB):
-
-    test_users = {
-        'user1@example.com': {
-            '_id': 1,
-            'mail': 'user1@example.com',
-            'first_name': 'User',
-            'last_name': '1',
-            'screen_name': 'user1',
-            'modified_ts': datetime.utcnow(),
-        },
-        'user2@example.com': {
-            '_id': 2,
-            'mail': 'user2@example.com',
-            'first_name': 'User',
-            'last_name': '2',
-            'screen_name': 'user2',
-            'modified_ts': datetime.utcnow(),
-        },
-    }
-
-    def __init__(self):
-        self.exceptions = eduid_am.exceptions
-
-    def get_user(self, userid):
-        if userid not in self.test_users:
-            raise self.exceptions.UserDoesNotExist
-        return User(self.test_users.get(userid))
-    
-    def all_users(self):
-        for user in self.test_users.values():
-            yield User(deepcopy(user))
-
-    def all_userdocs(self):
-        for user in self.test_users.values():
-            yield deepcopy(user)
+import logging
+logger = logging.getLogger(__name__)
 
 
 class RootFactory(object):
@@ -79,6 +39,17 @@ class ObjectFactory(object):
         self.request = request
 
 
+def get_db(settings):
+    mongo_replicaset = settings.get('mongo_replicaset', None)
+    if mongo_replicaset is not None:
+        mongodb = MongoDB(db_uri=settings['mongo_uri'],
+                          replicaSet=mongo_replicaset)
+    else:
+        mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    logger.warning("Using a raw MongoDB instance: {!r} (mongo_uri: {!r})".format(mongodb, settings['mongo_uri']))
+    return mongodb.get_database()
+
+
 def saml2_main(global_config, **settings):
     """ This function returns a WSGI application.
 
@@ -92,7 +63,16 @@ def saml2_main(global_config, **settings):
 
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
-    config.set_request_property(lambda x: get_db(settings), 'db', reify=True)
+    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
+    config.registry.settings['userdb'] = _userdb
+    config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+    mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
+    config.registry.settings['mongodb'] = mongodb
+    config.registry.settings['authninfodb'] = authninfodb
+    config.registry.settings['db_conn'] = mongodb.get_connection
+    config.registry.settings['db'] = mongodb.get_database('eduid_dashboard')
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'), 'db', reify=True)
 
     saml2_includeme(config)
 
@@ -104,23 +84,21 @@ def dummy_groups_callback(userid, request):
     return ['']
 
 
-class Saml2RequestTests(unittest.TestCase):
+class Saml2RequestTests(MongoTestCase):
     """Base TestCase for those tests usign saml2 that need a full environment
        setup
     """
 
     def setUp(self, settings={}):
-        # Don't call DBTests.setUp because we are getting the
-        # db in a different way
+        super(Saml2RequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
         self.settings = {
             'saml2.settings_module': path.join(path.dirname(__file__),
                                                'tests/data/saml2_settings.py'),
             'saml2.login_redirect_url': '/',
             'saml2.logout_redirect_url': '/',
-            'saml2.user_main_attribute': 'mail',
+            'saml2.strip_saml_user_suffix': '@test',
             'auth_tk_secret': '123456',
-            'mongo_uri': am.MONGO_URI_TEST,
             'testing': True,
             'jinja2.directories': 'eduiddashboard:saml2/templates',
             'jinja2.undefined': 'strict',
@@ -134,38 +112,27 @@ class Saml2RequestTests(unittest.TestCase):
         if not self.settings.get('groups_callback', None):
             self.settings['groups_callback'] = dummy_groups_callback
 
+        self.settings['mongo_uri'] = self.mongodb_uri('')
+
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
-        self.userdb = MockedUserDB()
-        try:
-            self.db = get_db(self.settings)
-        except pymongo.errors.ConnectionFailure:
-            raise unittest.SkipTest("requires accessible MongoDB server on {!r}".format(
-                self.settings['mongo_uri']))
-        self.db.profiles.drop()
-        userdocs = []
-        for userdoc in self.userdb.all_userdocs():
-            newdoc = deepcopy(userdoc)
-            userdocs.append(newdoc)
-        self.db.profiles.insert(userdocs)
 
         self.config = testing.setUp()
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
+        self.userdb = app.registry.settings['userdb']
+        self.db = app.registry.settings['db']
 
     def tearDown(self):
         super(Saml2RequestTests, self).tearDown()
         self.testapp.reset()
-        self.db.profiles.drop()
 
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
-        request.userdb = self.userdb
-        request.db = self.db
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]
-        self.testapp.cookies['auth_tkt'] = cookie_value
+        self.testapp.set_cookie('auth_tkt', cookie_value)
         return request
 
     def dummy_request(self):
@@ -183,13 +150,13 @@ class Saml2RequestTests(unittest.TestCase):
         request = self.dummy_request()
         session = session_factory(request)
         session.persist()
-        self.testapp.cookies['beaker.session.id'] = session._sess.id
+        self.testapp.set_cookie('beaker.session.id', session._sess.id)
         self.pol = self.config.testing_securitypolicy(
             'user', ('editors', ),
             permissive=False, remember_result=True)
         return request
 
-    def get_fake_session_info(self, user=None):
+    def get_fake_session_info(self, eppn=None):
         session_info = {
             'authn_info': [
                 ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', [])
@@ -198,17 +165,18 @@ class Saml2RequestTests(unittest.TestCase):
             'not_on_or_after': 1371671386,
             'came_from': u'/',
             'ava': {
-                'cn': ['Usuario1'],
+                'cn': ['John'],
                 'objectclass': ['top', 'inetOrgPerson', 'person', 'eduPerson'],
                 'userpassword': ['1234'],
                 'edupersonaffiliation': ['student'],
-                'sn': ['last name'],
-                'mail': ['user1@example.com']
+                'sn': ['Smith'],
+                'mail': ['johnsmith@example.com'],
+                'eduPersonPrincipalName': ['hubba-bubba@test']
             },
             'issuer': 'https://idp.example.com/saml/saml2/idp/metadata.php'
         }
 
-        if user is not None:
-            session_info['ava']['mail'] = user
+        if eppn is not None:
+            session_info['ava']['eduPersonPrincipalName'] = eppn
 
         return session_info

@@ -514,6 +514,7 @@ div.wizard div.wizard-card-container {
 
 div.position-relative {
     position: relative;
+    clear: both;
 }
 
 div.profile-filled-large {
@@ -730,10 +731,6 @@ div#profile-menu-small {
 
 button.wizard-next {
     margin-left: 0 !important;
-}
-
-div.btn-group-single {
-    margin-left: 26%;
 }
 
 div.wizard-steps {

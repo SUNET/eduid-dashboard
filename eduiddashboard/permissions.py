@@ -1,14 +1,13 @@
 import re
 
 from pyramid.httpexceptions import HTTPNotFound, HTTPForbidden, HTTPFound
-from pyramid.settings import asbool
 from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 
 from eduid_am.tasks import update_attributes
-from eduid_am.user import User
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 
 import logging
 logger = logging.getLogger(__name__)
@@ -86,6 +85,8 @@ class BaseFactory(object):
             raise HTTPForbidden(_('You do not have sufficient permissions to access this user'))
 
         self.__acl__ = self.acls[self.workmode]
+        #logger.debug("Using ACL {!r} for work-mode {!r}".format(self.acls[self.workmode], self.workmode))
+        return None
 
     def authorize(self):
         """You must overwrite this method is you want to get another
@@ -119,26 +120,40 @@ class BaseFactory(object):
         return True
 
     def get_user(self):
+        """
+        Get the current user.
 
+        In 'personal' mode, this is the logged in user. In 'admin' mode, it is the
+        'edit-user' user from the session, or the user indicated by the matchdict
+        'userid'. Matchdict is a part of the URL extracted by Pyramid with routes like
+        '/users/{userid}/'.
+
+        :return: User object
+        :rtype: OldUser()
+        """
         # Cache user until the request is completed
         if self.user is not None:
             return self.user
 
-        user = None
         if self.workmode == 'personal':
-            user = self.request.session.get('user', User({}))
-        else:
+            user = self.request.session.get('user', OldUser({}))
+        elif self.workmode == 'admin' or self.workmode == 'helpdesk':
             user = self.request.session.get('edit-user', None)
             if user is None:
                 userid = self.request.matchdict.get('userid', '')
                 if EMAIL_RE.match(userid):
-                    user = self.request.userdb.get_user(userid)
+                    user = self.request.userdb.get_user_by_mail(userid)
                 elif OID_RE.match(userid):
                     user = self.request.userdb.get_user_by_oid(userid)
                 if not user:
                     raise HTTPNotFound()
-                user.retrieve_modified_ts(self.request.db.profiles)
                 self.request.session['edit-user'] = user
+        else:
+            raise NotImplementedError("Unknown workmode: {!s}".format(self.workmode))
+
+        # Get the modified_ts from the user document in the dashboards private user
+        # database, since that is where we will be writing any updates
+        user.retrieve_modified_ts(self.request.db.profiles)
         return user
 
     def route_url(self, route, **kw):
@@ -160,14 +175,14 @@ class BaseFactory(object):
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
-        userid = self.user.get(self.main_attribute)
-        self.user = self.request.userdb.get_user(userid)
+        eppn = self.user.get('eduPersonPrincipalName')
+        self.user = self.request.userdb.get_user_by_eppn(eppn)
         self.user.retrieve_modified_ts(self.request.db.profiles)
 
     def update_session_user(self):
-        user = self.request.session.get('user', User({}))
-        userid = user.get(self.main_attribute, None)
-        user = self.request.userdb.get_user(userid)
+        user = self.request.session.get('user', OldUser({}))
+        eppn = user.get('eduPersonPrincipalName')
+        user = self.request.userdb.get_user(eppn)
         self.user = user
         self.user.retrieve_modified_ts(self.request.db.profiles)
         if self.workmode == 'personal':
@@ -179,26 +194,31 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             # Only update session if user is the same as currently in session
             user = self.request.session.get('user')
-            newuser = User(newuser)
+            newuser = OldUser(newuser)
             if user.get_id() == newuser.get_id():
                 self.request.session['user'] = newuser
         else:
             user_session = self.request.session['user'].get(self.main_attribute)
             if user_session == newuser[self.main_attribute]:
-                newuser = User(newuser)
+                newuser = OldUser(newuser)
                 self.request.session['edit-user'] = newuser
 
         update_attributes.delay('eduid_dashboard', str(newuser['_id']))
 
     def get_groups(self, userid=None, request=None):
-        user = self.request.session.get('user', User({}))
+        user = self.request.session.get('user', None)
+        if not user:
+            logger.debug("No user found in request.session (userid {!r})".format(userid))
+            user = OldUser({})
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         if required_urn is '':
             return ['']
-        elif required_urn in user.get_entitlements():
+        if required_urn in user.get_entitlements():
             return [self.workmode]
+        logger.debug("Required URN {!r} not found in user {!r} entitlements: {!r}".format(
+            required_urn, user, user.get_entitlements()))
         return []
 
     def get_loa(self):
@@ -209,7 +229,7 @@ class BaseFactory(object):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)
         if max_loa is None:
             max_loa = self.request.userdb.get_identity_proofing(
-                self.request.session.get('user', User({})))
+                self.request.session.get('user', OldUser({})))
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
@@ -225,7 +245,7 @@ class BaseFactory(object):
             return 1
 
     def session_user_display(self):
-        user = self.request.session.get('user', User({}))
+        user = self.request.session.get('user', OldUser({}))
         display_name = user.get_display_name()
         if display_name:
             return display_name
@@ -277,7 +297,7 @@ class BaseCredentialsFactory(BaseFactory):
 class HomeFactory(BaseFactory):
 
     def get_user(self):
-        return self.request.session.get('user', User({}))
+        return self.request.session.get('user', OldUser({}))
 
 
 class HelpFactory(BaseFactory):
@@ -328,6 +348,7 @@ class PermissionsFactory(BaseFactory):
 class VerificationsFactory(BaseFactory):
 
     def get_user(self):
+        logger.debug("Looking for verification code {!r}".format(self.request.matchdict['code']))
         verification_code = self.request.db.verifications.find_one({
             'code': self.request.matchdict['code'],
         })
