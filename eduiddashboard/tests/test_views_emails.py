@@ -113,7 +113,6 @@ class MailsFormTests(LoggedInRequestTests):
         self.userdb.UserClass = DashboardUser
 
         old_user = self.userdb.get_user_by_id(self.user['_id'])
-        assert isinstance(old_user, DashboardUser)
 
         # Make a post that attempts to verify a non-existant mail address,
         # so no change is expected in the database.
@@ -127,8 +126,7 @@ class MailsFormTests(LoggedInRequestTests):
 
         # Check that mail addresses was not updated. Sort of redundant since
         # we checked that we got an out of sync condition above.
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
-        assert isinstance(updated_user, DashboardUser)
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
 
         old_addresses = old_user.mail_addresses.to_list_of_dicts()
         updated_addresses = updated_user.mail_addresses.to_list_of_dicts()
@@ -179,7 +177,7 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_amount_of_addresses = len(updated_user.mail_addresses.to_list_of_dicts())
 
         self.assertEqual(old_amount_of_addresses, updated_amount_of_addresses)
@@ -200,7 +198,7 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_primary_mail = updated_user.mail_addresses.primary.email
 
         self.assertEqual(old_primary_mail, updated_primary_mail)
@@ -243,7 +241,7 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'bad')
 
-        updated_user = self.userdb.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
         updated_primary_mail = updated_user.mail_addresses.primary.email
 
         self.assertEqual(old_primary_mail, updated_primary_mail)
