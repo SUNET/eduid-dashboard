@@ -13,7 +13,7 @@ from pyramid import testing
 
 from eduid_userdb.userdb import MongoDB
 from eduid_userdb.dashboard import UserDBWrapper
-from eduiddashboard.testing import OldUserMongoTestCase
+from eduiddashboard.testing import MongoTestCase
 from eduiddashboard.saml2 import includeme as saml2_includeme
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -63,16 +63,16 @@ def saml2_main(global_config, **settings):
 
     config.include('pyramid_beaker')
     config.include('pyramid_jinja2')
-    _userdb = UserDBWrapper(config.registry.settings['mongo_uri_am'])
+    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
     mongodb = MongoDB(db_uri=settings['mongo_uri'])
-    authninfodb = MongoDB(db_uri=settings['mongo_uri_authninfo'])
+    authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
     config.registry.settings['db_conn'] = mongodb.get_connection
-    config.registry.settings['db'] = mongodb.get_database()
-    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database(), 'db', reify=True)
+    config.registry.settings['db'] = mongodb.get_database('eduid_dashboard')
+    config.set_request_property(lambda x: x.registry.settings['mongodb'].get_database('eduid_dashboard'), 'db', reify=True)
 
     saml2_includeme(config)
 
@@ -84,7 +84,7 @@ def dummy_groups_callback(userid, request):
     return ['']
 
 
-class Saml2RequestTests(OldUserMongoTestCase):
+class Saml2RequestTests(MongoTestCase):
     """Base TestCase for those tests usign saml2 that need a full environment
        setup
     """
@@ -112,12 +112,7 @@ class Saml2RequestTests(OldUserMongoTestCase):
         if not self.settings.get('groups_callback', None):
             self.settings['groups_callback'] = dummy_groups_callback
 
-        mongo_settings = {
-            'mongo_uri': self.mongodb_uri('eduid_dashboard'),
-            'mongo_uri_am': self.mongodb_uri('eduid_am'),
-            'mongo_uri_authninfo': self.mongodb_uri('authninfo'),
-        }
-        self.settings.update(mongo_settings)
+        self.settings['mongo_uri'] = self.mongodb_uri('')
 
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
@@ -134,8 +129,6 @@ class Saml2RequestTests(OldUserMongoTestCase):
 
     def set_user_cookie(self, user_id):
         request = TestRequest.blank('', {})
-        request.userdb = self.userdb
-        request.db = self.db
         request.registry = self.testapp.app.registry
         remember_headers = remember(request, user_id)
         cookie_value = remember_headers[0][1].split('"')[1]

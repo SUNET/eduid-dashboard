@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class IDProofingData(object):
-    _required_keys = ['created', 'eppn']
 
     def __init__(self, user):
+        self._required_keys = ['created', 'eppn']
         self.data = dict()
         self.data['created'] = datetime.utcnow()
         self.data['eppn'] = user.get_eppn()
@@ -78,12 +78,8 @@ class TeleAdressProofingRelation(TeleAdressProofing):
 
 class IDProofingLog(object):
     def __init__(self, config):
-        default_mongodb_host = 'localhost'
-        default_mongodb_port = 27017
-        default_mongodb_name = 'eduid_dashboard'
-        default_mongodb_uri = 'mongodb://%s:%d/%s' % (default_mongodb_host, default_mongodb_port, default_mongodb_name)
-        self.mongodb_uri = config['mongo_uri'] if 'mongo_uri' in config else default_mongodb_uri
-        self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log')
+        self.mongodb_uri = config['mongo_uri']
+        self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log', database_name='eduid_dashboard')
 
     def _insert(self, doc):
         self.collection.insert(doc, safe=True)  # Make sure the write succeeded

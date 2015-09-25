@@ -2,9 +2,11 @@ import json
 from bson import ObjectId
 
 from mock import patch
+import unittest
 
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard.msgrelay import MsgRelay
 
@@ -95,12 +97,26 @@ class MobilesFormTests(LoggedInRequestTests):
 
         response = self.testapp.post(
             '/profile/mobiles-actions/',
-            {'identifier': 0, 'action': 'remove'}
+            {'identifier': 1, 'action': 'remove'}
         )
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
         self.assertEqual(mobiles_number - 1, len(userdb_after['mobile']))
+
+    def test_remove_primary_mobile(self):
+        """ Expect zero numbers after removing the primary one when the primary one was the only verified number. """
+        self.skipTest("Requires some new logic in dashboard when removing the primary number")
+        self.set_logged()
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': 0, 'action': 'remove'}
+        )
+        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'success')
+        self.assertEqual(0, len(userdb_after['mobile']))
 
     def test_remove_not_existant_mobile(self):
         self.set_logged()
@@ -117,20 +133,24 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_verify_not_existing_mobile(self):
         self.set_logged()
-        userdb_before = self.db.profiles.find_one({'_id': self.user['_id']})
-        verified_list_before = [m['verified'] for m in userdb_before['mobile']]
+        self.userdb.UserClass = DashboardUser
+
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_phones = old_user.phone_numbers.to_list_of_dicts()
+        amount_of_phone_numbers = len(old_phones)
 
         response = self.testapp.post(
-                '/profile/mobiles-actions/',
-                {'identifier': 10, 'action': 'verify'}
+            '/profile/mobiles-actions/',
+            {'identifier': amount_of_phone_numbers, 'action': 'verify'}
         )
 
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        userdb_after = self.db.profiles.find_one({'_id': self.user['_id']})
-        verified_list_after = [m['verified'] for m in userdb_after['mobile']]
-        self.assertEqual(verified_list_before, verified_list_after)
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_phones = updated_user.phone_numbers.to_list_of_dicts()
+
+        self.assertEqual(old_phones, updated_phones)
 
     def test_verify_not_existing_code(self):
         self.set_logged()
@@ -158,7 +178,89 @@ class MobilesFormTests(LoggedInRequestTests):
         verified_mobile = userdb_after['mobile'][1]
         self.assertEqual(verified_mobile['verified'], True)
 
+    def test_setprimary_nonexistent_mobile(self):
+        self.set_logged()
+        self.userdb.UserClass = DashboardUser
+
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+
+        old_phones = old_user.phone_numbers.to_list_of_dicts()
+        amount_of_phone_numbers = len(old_phones)
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': amount_of_phone_numbers, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_phones = updated_user.phone_numbers.to_list_of_dicts()
+
+        self.assertEqual(old_phones, updated_phones)
+
+    def test_set_primary_not_verified_mobile(self):
+        self.set_logged()
+        self.userdb.UserClass = DashboardUser
+        index = 1
+
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_primary_phone = old_user.phone_numbers.primary.number
+        phone_to_test = old_user.phone_numbers.find('+34 6096096096')
+
+        # Make sure that the phone number that we are about
+        # to test if we can set as primary is not verified.
+        self.assertEqual(phone_to_test.is_verified, False)
+
+        # Make sure that the phone number that we are about
+        # to test is not already set as primary.
+        self.assertEqual(phone_to_test.is_primary, False)
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': index, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'bad')
+
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_primary_mobile = updated_user.phone_numbers.primary.number
+
+        self.assertEqual(old_primary_phone, updated_primary_mobile)
+
+    def test_setprimary_verified_mobile(self):
+        self.set_logged()
+        self.userdb.UserClass = DashboardUser
+        index = 2
+
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        phone_to_test = old_user.phone_numbers.find('+34607507507')
+
+        # Make sure that the phone number that we are
+        # about to set as primary is actually verified.
+        self.assertEqual(phone_to_test.is_verified, True)
+
+        # Make sure that the phone number that we are about
+        # to test is not already set as primary.
+        self.assertEqual(phone_to_test.is_primary, False)
+
+        response = self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': index, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'success')
+
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_phone_to_test = updated_user.phone_numbers.find('+34607507507')
+
+        self.assertEqual(updated_phone_to_test.is_primary, True)
+
     def test_steal_verified_mobile(self):
+        self.skipTest("Requires new logic in Dashboard to re-assign primary mobile of user who looses their primary")
         self.set_logged(email ='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/mobiles/')

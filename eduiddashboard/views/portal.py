@@ -51,7 +51,7 @@ def profile_editor(context, request):
     max_loa = get_max_available_loa(context.get_groups())
     max_loa = context.loa_to_int(loa=max_loa)
 
-    (open_wizard, datakey) = nins_open_wizard(context, request)
+    enable_mm = request.registry.settings.get('enable_mm_verification')
 
     view_context = {
         'tabs': tabs,
@@ -63,12 +63,17 @@ def profile_editor(context, request):
         'max_loa': max_loa,
         'polling_timeout_for_admin': request.registry.settings.get(
             'polling_timeout_for_admin', 2000),
-        'open_wizard': open_wizard,
-        'datakey': datakey,
         'has_mobile': has_confirmed_mobile(context.user),
-        'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
-        'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
+        'enable_mm_verification': enable_mm,
     }
+    if enable_mm:
+        (open_wizard, datakey) = nins_open_wizard(context, request)
+        view_context.update({
+            'open_wizard': open_wizard,
+            'datakey': datakey,
+            'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
+            'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
+        })
 
     return view_context
 
@@ -268,6 +273,8 @@ def account_termination_action(request, session_info, user):
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
 
+    logger.info("Terminating user {!s}".format(user))
+
     # revoke all user credentials
     revoke_all_credentials(settings.get('vccs_url'), user)
     user.set_passwords([])
@@ -275,10 +282,12 @@ def account_termination_action(request, session_info, user):
     # flag account as terminated
     user.set_terminated()
     user.save(request, check_sync=False)
+    request.context.propagate_user_changes(user)
 
     # email the user
     send_termination_mail(request, user)
 
+    logger.debug("Logging out after terminating user {!s}".format(user))
     # logout
     next_page = request.POST.get('RelayState', '/')
     request.session['next_page'] = next_page
