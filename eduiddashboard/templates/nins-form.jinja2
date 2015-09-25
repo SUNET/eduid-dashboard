@@ -15,20 +15,22 @@
     {% if active_nin %}
         <tr class='ninrow' data-identifier="0">
             <td class='identifier'>{{ active_nin }}</td>
-            <td><span class='nobutton'>{{_("Verified")}}</span></td>
-            <td><span class='nobutton'>{{_("Active")}}</span></td>
-            <td></td>
+            <td class='non-identifier'><span class='nobutton'>{{_("Verified")}}</span></td>
+            <td class='non-identifier'><span class='nobutton'>{{_("Active")}}</span></td>
+            <td class='non-identifier'></td>
         </tr>
     {% endif %}
     {% if not_verified_nins %}
       {% for nin in not_verified_nins %}
       <tr class='ninrow' data-identifier="{{ loop.index0 }}">
           <td class='identifier'>{{ nin }}</td>
-          <td>
+          <td class='non-identifier'>
+            {% if enable_mm_verification %}
             <input type='button' class='btn btn-link' value="{{_('Verify through Mina Meddelanden')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
+            {% endif %}
           </td>
-          <td>
+          <td class='non-identifier'>
             {% if has_mobile %}
             <input type='button' class='btn btn-link verify_mb' value="{{_('Verify by registered phone')}}"
                  data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
@@ -60,12 +62,15 @@
 {% endblock %}
 
 {% block askdialog_extra_info %}
-  {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
+  {% if enable_mm_verification %}
+    {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
         You can access your governmental inbox using <a href="{{nin_service_url}}" target="_blank">{{nin_service_name}}</a>
-  {% endtrans %}
+    {% endtrans %}
+  {% endif %}
 {% endblock %}
 
 {% block extra_jsdata %}
     <span class="dataholder" id="ninsform-data" data-msg_verifying="{{ _("We are verifying that the provided identity number is valid, please wait.") }}"></span>
+    <span class="dataholder" id="disabled_mm" data-title="{{ _("Mina Meddelanden disabled") }}" data-content="{{ _("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu convallis augue, eget laoreet erat. Suspendisse ac tortor aliquam velit semper rutrum. Mauris nec lorem velit. Vivamus nec libero non.") }}"></span>
     <span class="scriptholder" data-script="nins"></span>
 {% endblock %}

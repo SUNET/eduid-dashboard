@@ -25,7 +25,7 @@ def get_dummy_status(request, user):
 
 def sync_user(request, context, old_user):
     user = request.userdb.get_user_by_id(old_user.get_id())
-    user.retrieve_modified_ts(request.db.profiles)
+#    user.retrieve_modified_ts(request.db.profiles)
     if context.workmode == 'personal':
         request.session['user'] = user
     else:

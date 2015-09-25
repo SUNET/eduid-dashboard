@@ -16,7 +16,7 @@
       {% for mobile in mobiles %}
       <tr class='mobile-row' data-identifier="{{ loop.index0 }}">
         <td class='identifier'>{{ mobile.mobile }}</td>
-        <td>
+        <td class='non-identifier'>
         {% if mobile.verified|default(False) %}
           {% if mobile.primary|default(False) %}
             <span class="nobutton">{{ _('Primary') }}</span>
@@ -29,11 +29,10 @@
                    data-index='{{ loop.index0 }}' name='verify'>
         {% endif %}
         </td>
-        <td>
-            <input type='button' class='btn btn-link' value="{{_('Remove')}}"
+        <td class='non-identifier'>
+            <input type='button' class='btn btn-link remove-mobile' value="{{_('Remove')}}"
                    data-index='{{ loop.index0 }}' name='remove'>
         </td>
-        <td>
       </tr>
       {% endfor %}
     </table>

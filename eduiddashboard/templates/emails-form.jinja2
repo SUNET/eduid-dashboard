@@ -16,7 +16,7 @@
       {% for mail in mails %}
       <tr class='emailrow' data-identifier="{{ loop.index0 }}">
         <td class='identifier'>{{ mail.email }}</td>
-        <td>
+        <td class='non-identifier'>
         {% if mail.verified %}
           {% if mail.email == primary_email %}
             <span class="nobutton">{{ _('Primary') }}</span>
@@ -29,7 +29,7 @@
                    data-index='{{ loop.index0 }}' name='verify'>
         {% endif %}
         </td>
-        <td>
+        <td class='non-identifier'>
           {% if mail.email != primary_email %}
             <input type='button' class='btn btn-link' value="{{_('Remove')}}"
                    data-index='{{ loop.index0 }}' name='remove'>

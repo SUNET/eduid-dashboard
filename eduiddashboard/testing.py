@@ -60,6 +60,7 @@ SETTINGS = {
             safe_context_route_url = eduiddashboard.filters:safe_context_route_url
             """,
     'personal_dashboard_base_url': 'http://localhost/',
+    'signup_base_url': 'http://localhost/',
     'nin_service_name': 'Mina meddelanden',
     'nin_service_url': 'http://minameddelanden.se/',
     'mobile_service_name': 'TeleAdress',
@@ -126,7 +127,7 @@ class LoggedInRequestTests(MongoTestCase):
 
     def setUp(self, settings={}, skip_on_fail=False, std_user='johnsmith@example.com'):
 
-        self.settings = SETTINGS
+        self.settings = deepcopy(SETTINGS)
         self.settings.update(settings)
         super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
