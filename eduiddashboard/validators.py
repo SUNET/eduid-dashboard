@@ -65,7 +65,10 @@ class PasswordValidator(object):
             # password
             return
 
-        veredict = zxcvbn.password_strength(value)
+        # Get a users e-mail addresses to make sure a user does not use one of those as password
+        mail_addresses = [item['email'] for item in request.session['user'].get_mail_aliases()]
+
+        veredict = zxcvbn.password_strength(value, user_inputs=mail_addresses)
 
         if veredict.get('entropy', 0) < password_min_entropy:
             err = _('The password complexity is too weak.')

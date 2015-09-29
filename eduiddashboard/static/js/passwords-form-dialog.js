@@ -1,6 +1,7 @@
 (function () {
     var dataholder = $('span.dataholder#password-form-dialog-data'),
         password_min_entropy = parseInt(dataholder.data('entropy')),
+        user_input = $.parseJSON(dataholder.data('user_input')),
         msg_stronger = dataholder.data('msg_stronger'),
         msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,
@@ -122,7 +123,7 @@
         check_custom_password = function () {
             var custom_password = get_password('custom_password'),
                 repeated_password = get_password('repeated_password'),
-                verdict = zxcvbn(custom_password, ["eduid"]),
+                verdict = zxcvbn(custom_password, ["eduid"].concat(user_input)),
                 suggested_password = $('.suggested-password').html().split(' ').join(''),
                 messages = [],
                 password_field = get_input("custom_password");

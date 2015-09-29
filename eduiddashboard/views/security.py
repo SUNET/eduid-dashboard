@@ -257,11 +257,16 @@ class PasswordsView(BaseFormView):
 
     def get_template_context(self):
         context = super(PasswordsView, self).get_template_context()
+        # Collect the users mail addresses for use with zxcvbn
+        mail_addresses = []
+        for item in self.request.session['user'].get_mail_aliases():
+            mail_addresses.append(item['email'])
 
         context.update({
             'message': getattr(self, 'message', ''),
             'changed': getattr(self, 'changed', False),
-            'authninfo': get_authn_info(self.request)
+            'authninfo': get_authn_info(self.request),
+            'user_input': json.dumps(mail_addresses)
         })
         return context
 
@@ -371,9 +376,15 @@ class BaseResetPasswordView(FormView):
         }
 
     def get_template_context(self):
-        return {
+        context = {
             'intro_message': self.intro_message
         }
+        # Collect the users mail addresses for use with zxcvbn
+        mail_addresses = []
+        for item in self.request.session['user'].get_mail_aliases():
+            mail_addresses.append(item['email'])
+        context['user_input'] = json.dumps(mail_addresses)
+        return context
 
     def failure(self, e):
         context = super(BaseResetPasswordView, self).failure(e)
