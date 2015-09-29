@@ -3,11 +3,6 @@ import imp
 
 from eduiddashboard import log
 
-from cgi import escape
-from urllib import unquote, quote
-
-from pyramid.httpexceptions import HTTPBadRequest
-
 
 def get_saml2_config(module_path):
 
@@ -63,28 +58,3 @@ def get_saml_attribute(session_info, attr_name):
     for saml_attr, local_fields in attributes.items():
         if saml_attr.lower() == attr_name:
             return attributes[saml_attr]
-
-def sanitize_url(url):
-    """
-    Sanitize an URL
-
-    If the URL is not quoted we only escape it. Otherwise we
-    have to unquote, escape and quote again before returning it.
-    The Saml2Client expects the url to be UTF-8 encoded in accordance
-    with RFC 3986 and therefore we return it as such.
-
-    :param url: The URL to sanitize
-    :return: A sanitized URL
-
-    :type url: string()
-    :rtype: string()
-    """
-    try:
-        if url == unquote(url):
-            return escape(url, quote = True).encode("UTF-8")
-        else:
-            return quote(escape(unquote(url), quote = True)).encode("UTF-8")
-    except UnicodeDecodeError:
-        log.warn('A malicious user tried to crash the application '
-                 'by sending non-unicode input in the next parameter')
-        raise HTTPBadRequest("Non-unicode input, please try again.")

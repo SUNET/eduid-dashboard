@@ -15,7 +15,8 @@ from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
                                   get_max_available_loa,
-                                  get_available_tabs)
+                                  get_available_tabs,
+                                  sanitize_get)
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
@@ -209,7 +210,7 @@ def set_language(context, request):
     import re
 
     settings = request.registry.settings
-    lang = request.GET.get('lang', 'en')
+    lang = sanitize_get(request, 'lang', 'en')
     if lang not in settings['available_languages']:
         return HTTPNotFound()
 

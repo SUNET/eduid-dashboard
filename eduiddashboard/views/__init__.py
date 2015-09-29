@@ -12,7 +12,7 @@ from pyramid_deform import FormView
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.utils import get_short_hash
+from eduiddashboard.utils import get_short_hash, sanitize_get
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
@@ -307,7 +307,7 @@ class BaseWizard(object):
         if self.request.POST:
             return self.request.POST.get(self.model, None)
         elif self.request.GET:
-            return self.request.GET.get(self.model, None)
+            return sanitize_get(self.request, self.model, None)
         return None
 
     def get_object(self):

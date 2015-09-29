@@ -16,7 +16,8 @@ from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
-from eduiddashboard.saml2.utils import get_saml2_config, get_location, sanitize_url
+from eduiddashboard.saml2.utils import get_saml2_config, get_location
+from eduiddashboard.utils import sanitize_input, sanitize_get, sanitize_session_get
 from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
@@ -116,12 +117,12 @@ def login_view(request):
     login_redirect_url = request.registry.settings.get(
         'saml2.login_redirect_url', '/')
 
-    came_from = sanitize_url(request.GET.get('next', login_redirect_url))
+    came_from = sanitize_get(request, 'next', login_redirect_url)
 
     if authenticated_userid(request):
         return HTTPFound(location=came_from)
 
-    selected_idp = request.GET.get('idp', None)
+    selected_idp = sanitize_get(request, 'idp', None)
     if selected_idp is not None:
         request.session['selected_idp'] = selected_idp
 
@@ -257,13 +258,13 @@ def logout_service(request):
     settings = request.registry.settings
 
     logout_redirect_url = settings.get('saml2.logout_redirect_url')
-    next_page = request.session.get('next_page', logout_redirect_url)
-    next_page = request.GET.get('next_page', next_page)
+    next_page = sanitize_session_get(request, 'next_page', logout_redirect_url)
+    next_page = sanitize_get(request, 'next_page', next_page)
 
     if 'SAMLResponse' in request.GET:  # we started the logout
         log.debug('Receiving a logout response from the IdP')
         response = client.parse_logout_request_response(
-            request.GET['SAMLResponse'],
+            sanitize_input(request.GET['SAMLResponse']),
             BINDING_HTTP_REDIRECT
         )
         state.sync()
@@ -288,10 +289,10 @@ def logout_service(request):
             return HTTPFound(location=next_page, headers=headers)
         else:
             http_info = client.handle_logout_request(
-                request.GET['SAMLRequest'],
+                sanitize_input(request.GET['SAMLRequest']),
                 subject_id,
                 BINDING_HTTP_REDIRECT,
-                relay_state=request.GET['RelayState']
+                relay_state=sanitize_input(request.GET['RelayState'])
             )
             state.sync()
             location = get_location(http_info)

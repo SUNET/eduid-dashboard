@@ -1,4 +1,6 @@
+from bleach import clean
 from hashlib import sha256
+from urllib import unquote, quote
 from uuid import uuid4
 import re
 import time
@@ -11,9 +13,10 @@ from eduiddashboard.compat import text_type
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 MAX_LOA_ROL = {
@@ -86,10 +89,10 @@ def filter_tabs(tabs, remove_tabs):
 
 
 def get_available_tabs(context, request):
-
-    from eduiddashboard.views import (emails, personal, postal_address,
+    from eduiddashboard.views import (emails, personal,
                                       mobiles, nins, permissions,
                                       get_dummy_status)
+
     default_tabs = [
         personal.get_tab(request),
         nins.get_tab(request),
@@ -191,3 +194,102 @@ def convert_to_localtime(dt):
     dt = dt.replace(tzinfo=pytz.utc)
     dt = dt.astimezone(tz)
     return dt
+
+
+def sanitize_get(request, *args):
+    """
+    Sanitize the GET request by using bleach as recommended by OWASP and
+    take care of illegal UTF-8, which is not properly handled in webob as
+    seen in this unfixed bug: https://github.com/Pylons/webob/issues/161.
+
+    :param request: The webob request object
+    :param args: The arguments to send to webob
+    :return: A sanitized GET request
+    """
+    try:
+        return sanitize_input(request.GET.get(*args))
+    except UnicodeDecodeError:
+        logger.warn('A malicious user tried to crash the application '
+                    'by sending non-unicode input in a GET request')
+        raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def sanitize_session_get(request, *args):
+    """
+    Sanitize the GET request by using bleach as recommended by OWASP and
+    take care of illegal UTF-8, which is not properly handled in webob as
+    seen in this unfixed bug: https://github.com/Pylons/webob/issues/161.
+
+    :param request: The webob request object
+    :param args: The arguments to send to webob
+    :return: A sanitized GET request
+    """
+    try:
+        return sanitize_input(request.session.get(*args))
+    except UnicodeDecodeError:
+        logger.warn('A malicious user tried to crash the application '
+                    'by sending non-unicode input in a GET request')
+        raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def sanitize_input(untrusted_text):
+    """
+    Sanitize user input
+
+    Clean user input using bleach as recommended by OWASP.
+
+    :param untrusted_text User input to sanitize
+    :return: Sanitized user input
+
+    :type untrusted_text: string()
+    :rtype: string()
+    """
+    try:
+
+        if untrusted_text is None:
+            # If we are given None then there's nothing to clean
+            return None
+
+        elif is_percent_encoded(untrusted_text):
+            # If the untrusted_text is percent encoded we have to:
+            # 1. Decode it so we can process it.
+            # 2. Clean it to remove dangerous characters.
+            # 3. Percent encode it before returning it back.
+            # 4. Encode it to UTF-8 since this is what we expect.
+
+            decoded_text = unquote(untrusted_text)
+            cleaned_text = clean(decoded_text)
+            percent_encoded_text = quote(cleaned_text)
+            utf8_encoded_text = percent_encoded_text.encode("UTF-8")
+
+            if decoded_text != cleaned_text:
+                logger.warn('Some potential harmful characters were '
+                            'removed from untrusted user input.')
+
+            return utf8_encoded_text
+
+        else:
+            # If the untrusted_text is not percent encoded we only have to:
+            # 1. Clean it to remove dangerous characters.
+            # 2. Encode it to UTF-8 since this is what we expect.
+
+            cleaned_text = clean(untrusted_text)
+
+            if untrusted_text != cleaned_text:
+                logger.warn('Some potential harmful characters were '
+                            'removed from untrusted user input.')
+
+            return cleaned_text.encode("UTF-8")
+
+    except KeyError:
+        logger.warn('A malicious user tried to crash the application by '
+                    'sending illegal UTF-8 in an URI or other untrusted '
+                    'user input.')
+        raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def is_percent_encoded(text):
+    if text == unquote(text):
+        return True
+    else:
+        return False

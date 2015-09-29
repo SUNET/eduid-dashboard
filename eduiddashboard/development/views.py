@@ -7,6 +7,7 @@ from pyramid.view import view_config
 from .auth import login
 
 from eduiddashboard import log
+from eduiddashboard.utils import sanitize_get
 
 
 @view_config(route_name='saml2-login')
@@ -14,7 +15,7 @@ def login_view(request):
     login_redirect_url = request.registry.settings.get(
         'saml2.login_redirect_url', '/')
 
-    came_from = request.GET.get('next', login_redirect_url)
+    came_from = sanitize_get(request, 'next', login_redirect_url)
     if authenticated_userid(request):
         return HTTPFound(location=came_from)
 
