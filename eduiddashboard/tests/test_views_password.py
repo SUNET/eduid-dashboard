@@ -316,15 +316,25 @@ TEST_USER = {
         }],
     }
 
-TEST_VERIFICATIONS = [{
-    '_id': ObjectId('234567890123456789012301'),
-    'code': '9d392d',
-    'model_name': 'email',
-    'obj_id': 'johnnysmith3@example.com',
-    'user_oid': ObjectId("012345678901234567890123"),
-    'timestamp': datetime.utcnow(),
-    'verified': False,
-}]
+TEST_VERIFICATIONS = [
+    {
+        '_id': ObjectId('234567890123456789012301'),
+        'code': '9d392d',
+        'model_name': 'email',
+        'obj_id': 'johnnysmith3@example.com',
+        'user_oid': ObjectId("012345678901234567890123"),
+        'timestamp': datetime.utcnow(),
+        'verified': False,
+    }, {
+        '_id': ObjectId('234567890123456789012302'),
+        'code': '9d392e',
+        'model_name': 'norEduPersonNIN',
+        'obj_id': '197801011234',
+        'user_oid': ObjectId("012345678901234567890123"),
+        'timestamp': datetime.utcnow(),
+        'verified': True,
+    }]
+
 
 
 def return_true(*args, **kwargs):
@@ -388,6 +398,32 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             self.assertEqual(response.status, '302 Found')
         reset_passwords_after = list(self.db.reset_passwords.find())
         self.assertEqual(len(reset_passwords_after), 1)
+
+    def test_unverify_nin_and_mobile(self):
+        # Reset user password via e-mail
+        email = 'johnnysmith1@example.org'
+        hash_code = '123456'
+        date = datetime.now(pytz.utc)
+        self.db.reset_passwords.insert({
+            'email': email,
+            'hash_code': hash_code,
+            'mechanism': 'email',
+            'created_at': date
+        }, safe=True)
+        response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
+        self.assertIn('Please choose a new password for your eduID account', response.text)
+        form = response.forms['resetpasswordstep2view-form']
+        with patch('eduiddashboard.vccs.get_vccs_client'):
+            from eduiddashboard.vccs import get_vccs_client
+            get_vccs_client.return_value = FakeVCCSClient()
+            form_resp = form.submit('reset')
+
+        # Verify the user has no nins and no verified phone numbers
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(len(user.passwords.to_list_of_dicts()), 1)
+        self.assertEqual(user.nins.count, 0)
+        for mobile in user.phone_numbers.to_list_of_dicts():
+            self.assertEqual(mobile['verified'], False)
 
     def test_reset_password_mina(self):
         response_form = self.testapp.get('/profile/reset-password/mina/')
