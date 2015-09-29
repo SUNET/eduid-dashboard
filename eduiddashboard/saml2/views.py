@@ -263,8 +263,14 @@ def logout_service(request):
 
     if 'SAMLResponse' in request.GET:  # we started the logout
         log.debug('Receiving a logout response from the IdP')
+
+        # SAMLResponse is allowed to contain a lot of the
+        # potentially harmful characters that we normally
+        # would want to remove from user input.
+        # However, if the SAMLResponse is ever to be rendered
+        # and displayed, then it should of course be cleaned.
         response = client.parse_logout_request_response(
-            sanitize_input(request.GET['SAMLResponse']),
+            request.GET['SAMLResponse'],
             BINDING_HTTP_REDIRECT
         )
         state.sync()
@@ -288,11 +294,17 @@ def logout_service(request):
             headers = logout(request)
             return HTTPFound(location=next_page, headers=headers)
         else:
+
+            # SAMLRequest and RelayState are allowed to contain a lot
+            # of the potentially harmful characters that we normally
+            # would want to remove from user input.
+            # However, if they are ever to be rendered and
+            # displayed, then they should of course be cleaned.
             http_info = client.handle_logout_request(
-                sanitize_input(request.GET['SAMLRequest']),
+                request.GET['SAMLRequest'],
                 subject_id,
                 BINDING_HTTP_REDIRECT,
-                relay_state=sanitize_input(request.GET['RelayState'])
+                relay_state=request.GET['RelayState']
             )
             state.sync()
             location = get_location(http_info)
