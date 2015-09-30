@@ -1,6 +1,7 @@
 (function () {
     var dataholder = $('span.dataholder#reset-password2-data'),
         password_min_entropy = parseInt(dataholder.data('min_entropy')),
+        user_input = dataholder.data('user_input'),
         msg_stronger = dataholder.data('msg_stronger'),
         msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,
@@ -72,7 +73,7 @@
         },
 
         update_save_button = function () {
-            var save_btn = pwdialog.find("button[name=save]"),
+            var save_btn = pwdialog.find("button[name=reset]"),
                 enable_button = true;
 
             if (enable_button) {
@@ -105,7 +106,7 @@
         check_custom_password = function () {
             var custom_password = get_password('custom_password'),
                 repeated_password = get_password('repeated_password'),
-                verdict = zxcvbn(custom_password, ["eduid"]),
+                verdict = zxcvbn(custom_password, ["eduid"].concat(user_input)),
                 suggested_password = $('.suggested-password').html().split(' ').join(''),
                 messages = [],
                 password_field = get_input("custom_password");
