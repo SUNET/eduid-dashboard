@@ -225,7 +225,7 @@ class NINReachableValidator(object):
         request = node.bindings.get('request')
         settings = request.registry.settings
 
-        if settings.get('debug_mode', False):
+        if settings.get('developer_mode', False):
             return
         
         msg = None
