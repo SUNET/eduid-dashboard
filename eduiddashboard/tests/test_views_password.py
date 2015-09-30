@@ -459,7 +459,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         hash_code = '123456'
         date = datetime.now(pytz.utc)
         self.db.reset_passwords.insert({
-            'email': 'johnnysmith3@example.com',
+            'email': 'johnnysmith2@example.com',
             'hash_code': hash_code,
             'mechanism': 'email',
             'created_at': date
@@ -471,7 +471,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         hash_code = '123456'
         wrong_code = '654321'
         self.db.reset_passwords.insert({
-            'email': 'johnnysmith3@example.com',
+            'email': 'johnnysmith2@example.com',
             'hash_code': hash_code,
             'mechanism': 'email',
             'verified': False,
