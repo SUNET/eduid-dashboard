@@ -380,10 +380,12 @@ class BaseResetPasswordView(FormView):
             'intro_message': self.intro_message
         }
         # Collect the users mail addresses for use with zxcvbn
-        mail_addresses = []
-        for item in self.request.session['user'].get_mail_aliases():
-            mail_addresses.append(item['email'])
-        context['user_input'] = json.dumps(mail_addresses)
+        user = self.request.session.get('user', None)
+        if user:
+            mail_addresses = []
+            for item in user.get_mail_aliases():
+                mail_addresses.append(item['email'])
+            context['user_input'] = json.dumps(mail_addresses)
         return context
 
     def failure(self, e):
@@ -518,6 +520,18 @@ class ResetPasswordStep2View(BaseResetPasswordView):
     def __init__(self, context, request):
         super(ResetPasswordStep2View, self).__init__(context, request)
         self._password = None
+
+    def get_template_context(self):
+        context = super(ResetPasswordStep2View, self).get_template_context()
+        # Collect the users mail addresses for use with zxcvbn
+        hash_code = self.request.matchdict['code']
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+        user = self.request.userdb.get_user_by_mail(password_reset['email'])
+        mail_addresses = []
+        for item in user.get_mail_aliases():
+            mail_addresses.append(item['email'])
+        context['user_input'] = json.dumps(mail_addresses)
+        return context
 
     def appstruct(self):
         passwords_dict = {

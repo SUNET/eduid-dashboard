@@ -1,7 +1,7 @@
 (function () {
     var dataholder = $('span.dataholder#reset-password2-data'),
         password_min_entropy = parseInt(dataholder.data('min_entropy')),
-        user_input = $.parseJSON(dataholder.data('user_input')),
+        user_input = dataholder.data('user_input'),
         msg_stronger = dataholder.data('msg_stronger'),
         msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,
@@ -73,7 +73,7 @@
         },
 
         update_save_button = function () {
-            var save_btn = pwdialog.find("button[name=save]"),
+            var save_btn = pwdialog.find("button[name=reset]"),
                 enable_button = true;
 
             if (enable_button) {

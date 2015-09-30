@@ -1,7 +1,7 @@
 (function () {
     var dataholder = $('span.dataholder#password-form-dialog-data'),
         password_min_entropy = parseInt(dataholder.data('entropy')),
-        user_input = $.parseJSON(dataholder.data('user_input')),
+        user_input = dataholder.data('user_input'),
         msg_stronger = dataholder.data('msg_stronger'),
         msg_again = dataholder.data('msg_again'),
         pwquality_errors = undefined,
