@@ -295,9 +295,9 @@ def main(global_config, **settings):
     """
     settings = dict(settings)
 
-    settings['debug_mode'] = read_setting_from_env_bool(settings,
-                                                        'debug_mode',
-                                                        default=False)
+    settings['developer_mode'] = read_setting_from_env_bool(settings,
+                                                       'developer_mode',
+                                                       default=False)
 
     # read pyramid_mailer options
     for key, default in (
@@ -489,7 +489,7 @@ def main(global_config, **settings):
 
     config.include('eduiddashboard.saml2')
 
-    if settings['debug_mode'] or ('testing' in settings and asbool(settings['testing'])):
+    if settings['developer_mode'] or ('testing' in settings and asbool(settings['testing'])):
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')

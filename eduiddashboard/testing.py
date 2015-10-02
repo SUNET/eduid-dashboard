@@ -3,7 +3,6 @@ import datetime
 from copy import deepcopy
 
 from mock import patch
-import pymongo
 
 import unittest
 
@@ -13,6 +12,9 @@ from pyramid.interfaces import ISessionFactory, IDebugLogger
 from pyramid.security import remember
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
+
+import pymongo
+from bson import ObjectId
 
 from eduid_userdb import UserDB
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUserDB
@@ -73,6 +75,41 @@ SETTINGS = {
     'dashboard_hostname': 'dashboard.example.com',
     'dashboard_baseurl': 'http://dashboard.example.com',
     }
+
+
+INITIAL_VERIFICATIONS = [{
+    '_id': ObjectId('234567890123456789012301'),
+    'code': '9d392c',
+    'model_name': 'mobile',
+    'obj_id': '+34 6096096096',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.datetime.utcnow(),
+    'verified': False,
+}, {
+    '_id': ObjectId(),
+    'code': '123123',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '210987654321',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.datetime.utcnow(),
+    'verified': False,
+}, {
+    '_id': ObjectId(),
+    'code': '123124',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '197801011234',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.datetime.utcnow(),
+    'verified': True,
+}, {
+    '_id': ObjectId(),
+    'code': '123124',
+    'model_name': 'norEduPersonNIN',
+    'obj_id': '123456789050',
+    'user_oid': ObjectId("012345678901234567890123"),
+    'timestamp': datetime.datetime.utcnow(),
+    'verified': False,
+}]
 
 
 def loa(index):                                                                                                                                             
@@ -164,9 +201,12 @@ class LoggedInRequestTests(MongoTestCase):
         # Copy all the users from the eduid userdb into the dashboard applications userdb
         # since otherwise the out-of-sync check will trigger on every save to the dashboard
         # applications database because there is no document there with the right modified_ts
-        for userdoc in self.userdb._get_all_userdocs():
+        for userdoc in self.userdb._get_all_docs():
             logger.debug("COPYING USER INTO PROFILES:\n{!s}".format(userdoc))
             self.db.profiles.insert(userdoc)
+
+        self.initial_verifications = (getattr(self, 'initial_verifications', None)
+                                      or INITIAL_VERIFICATIONS)
 
         for verification_data in self.initial_verifications:
             self.db.verifications.insert(verification_data)

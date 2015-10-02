@@ -126,6 +126,47 @@ def get_authn_info(request):
     return authninfo
 
 
+def unverify_user_nins(request, user):
+    """
+    :param request: request object
+    :type request:
+    :param user: user object
+    :type user:
+    :return: True
+    :rtype: boolean
+
+    Remove all NINs from the user and set all previous NIN verifications to verified = False.
+    """
+    user.set_nins([])
+    user.save(request)
+    # Do not remove the verification as we no longer allow users to remove a already verified nin
+    # even if it gets unverified by a e-mail password reset.
+    request.db.verifications.update({
+        "user_oid": user.get_id(),
+        "model_name": "norEduPersonNIN",
+    }, {
+        "$set": {"verified": False}
+    })
+    return True
+
+
+def unverify_user_mobiles(request, user):
+    """
+    :param request: request object
+    :type request:
+    :param user: user object
+    :type user:
+    :return: True
+    :rtype: boolean
+
+    Set all verified mobile phone number to verified = False.
+    """
+    for mobile in user.get_mobiles():
+        mobile['verified'] = False
+    user.save(request)
+    return True
+
+
 @view_config(route_name='start-password-change',
              request_method='POST',
              permission='edit')
@@ -216,11 +257,16 @@ class PasswordsView(BaseFormView):
 
     def get_template_context(self):
         context = super(PasswordsView, self).get_template_context()
+        # Collect the users mail addresses for use with zxcvbn
+        mail_addresses = []
+        for item in self.request.session['user'].get_mail_aliases():
+            mail_addresses.append(item['email'])
 
         context.update({
             'message': getattr(self, 'message', ''),
             'changed': getattr(self, 'changed', False),
-            'authninfo': get_authn_info(self.request)
+            'authninfo': get_authn_info(self.request),
+            'user_input': json.dumps(mail_addresses)
         })
         return context
 
@@ -330,9 +376,17 @@ class BaseResetPasswordView(FormView):
         }
 
     def get_template_context(self):
-        return {
+        context = {
             'intro_message': self.intro_message
         }
+        # Collect the users mail addresses for use with zxcvbn
+        user = self.request.session.get('user', None)
+        if user:
+            mail_addresses = []
+            for item in user.get_mail_aliases():
+                mail_addresses.append(item['email'])
+            context['user_input'] = json.dumps(mail_addresses)
+        return context
 
     def failure(self, e):
         context = super(BaseResetPasswordView, self).failure(e)
@@ -467,6 +521,18 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         super(ResetPasswordStep2View, self).__init__(context, request)
         self._password = None
 
+    def get_template_context(self):
+        context = super(ResetPasswordStep2View, self).get_template_context()
+        # Collect the users mail addresses for use with zxcvbn
+        hash_code = self.request.matchdict['code']
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+        user = self.request.userdb.get_user_by_mail(password_reset['email'])
+        mail_addresses = []
+        for item in user.get_mail_aliases():
+            mail_addresses.append(item['email'])
+        context['user_input'] = json.dumps(mail_addresses)
+        return context
+
     def appstruct(self):
         passwords_dict = {
             'suggested_password': self.get_suggested_password()
@@ -523,30 +589,16 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if ok:
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
             if password_reset['mechanism'] == 'email':
-                # TODO: Re-send verification code in advance?
-                nins = user.get_nins()
-                reset_nin_count = 0
-                if nins:
-                    # XXX shouldn't the downgrade of NIN to unverified be done to *ALL* the user's NINs?
-                    nin = nins[-1]
-                    if nin is not None:
-                        self.request.db.profiles.update({
-                            "_id": user.get_id()
-                        }, {
-                            "$set": {"norEduPersonNIN": []}
-                        })
-                        # Do not remove the verification as we no longer allow users to remove a already verified nin
-                        # even if it gets unverified by a e-mail password reset.
-                        self.request.db.verifications.update({
-                            "user_oid": user.get_id(),
-                            "model_name": "norEduPersonNIN",
-                            "obj_id": nin
-                        }, {
-                            "$set": {"verified": False}
-                        })
-                        update_attributes('eduid_dashboard', str(user['_id']))
-                        reset_nin_count += 1
-                    self.request.stats.count('dashboard/pwreset_downgraded_NINs', reset_nin_count)
+                user.retrieve_modified_ts(self.request.db.profiles)
+                if user.get_nins():
+                    nin_count = len(user.get_nins())
+                    unverify_user_nins(self.request, user)
+                    self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
+                if user.get_mobiles():
+                    # We need to unverify a users phone numbers to make sure that an attacker can not
+                    # verify the account again without control over the users phone number
+                    unverify_user_mobiles(self.request, user)
+                update_attributes('eduid_dashboard', str(user['_id']))
             url = self.request.route_url('profile-editor')
             reset = True
         else:
