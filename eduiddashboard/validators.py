@@ -8,7 +8,7 @@ from eduid_userdb.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
-from eduiddashboard.utils import normalize_to_e_164
+from eduiddashboard.utils import normalize_to_e_164, sanitize_input
 from eduiddashboard.idproofinglog import TeleAdressProofing, TeleAdressProofingRelation
 from eduiddashboard import log
 
@@ -84,6 +84,21 @@ class PermissionsValidator(object):
                     node,
                     get_localizer(request).translate(err)
                 )
+
+
+class MaliciousInputValidator(object):
+
+    def __call__(self, node, value):
+        """
+        Check the input for potentially harmful content
+        """
+        request = node.bindings.get('request')
+        localizer = get_localizer(request)
+
+        if value != sanitize_input(value, strip_characters=True):
+            err = _("Some of the characters you entered are "
+                    "not allowed, please try again.")
+            raise colander.Invalid(node, localizer.translate(err))
 
 
 class EmailUniqueValidator(object):

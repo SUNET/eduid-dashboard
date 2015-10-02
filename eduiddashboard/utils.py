@@ -232,13 +232,32 @@ def sanitize_session_get(request, *args):
         raise HTTPBadRequest("Non-unicode input, please try again.")
 
 
-def sanitize_input(untrusted_text):
+def sanitize_post_get(request, *args):
     """
-    Sanitize user input
+    Sanitize the POST request by using bleach as recommended by OWASP and
+    take care of illegal UTF-8, which is not properly handled in webob as
+    seen in this unfixed bug: https://github.com/Pylons/webob/issues/161.
 
-    Clean user input using bleach as recommended by OWASP.
+    :param request: The webob request object
+    :param args: The arguments to send to webob
+    :return: A sanitized POST request
+    """
+    try:
+        return sanitize_input(request.POST.get(*args))
+    except UnicodeDecodeError:
+        logger.warn('A malicious user tried to crash the application '
+                    'by sending non-unicode input in a POST request')
+        raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def sanitize_input(untrusted_text, strip_characters=False):
+    """
+    Sanitize user input by escaping or removing potentially
+    harmful input using a whitelist-based approach with
+    bleach as recommended by OWASP.
 
     :param untrusted_text User input to sanitize
+    :param strip_characters Set to True to remove instead of escaping harmful input
     :return: Sanitized user input
 
     :type untrusted_text: string()
@@ -253,33 +272,43 @@ def sanitize_input(untrusted_text):
         elif is_percent_encoded(untrusted_text):
             # If the untrusted_text is percent encoded we have to:
             # 1. Decode it so we can process it.
-            # 2. Clean it to remove dangerous characters.
-            # 3. Percent encode it before returning it back.
-            # 4. Encode it to UTF-8 since this is what we expect.
+            # 2. Encode it to UTF-8 since bleach assumes this encoding
+            # 3. Clean it to remove dangerous characters.
+            # 4. Percent encode it before returning it back.
 
             decoded_text = unquote(untrusted_text)
-            cleaned_text = clean(decoded_text)
-            percent_encoded_text = quote(cleaned_text)
-            utf8_encoded_text = percent_encoded_text.encode("UTF-8")
 
-            if decoded_text != cleaned_text:
+            if not isinstance(decoded_text, unicode):
+                decoded_text_in_utf8 = decoded_text.encode("UTF-8")
+            else:
+                decoded_text_in_utf8 = decoded_text
+
+            cleaned_text = clean(decoded_text_in_utf8, strip=strip_characters)
+            percent_encoded_text = quote(cleaned_text)
+
+            if decoded_text_in_utf8 != cleaned_text:
                 logger.warn('Some potential harmful characters were '
                             'removed from untrusted user input.')
 
-            return utf8_encoded_text
+            return percent_encoded_text
 
         else:
             # If the untrusted_text is not percent encoded we only have to:
-            # 1. Clean it to remove dangerous characters.
-            # 2. Encode it to UTF-8 since this is what we expect.
+            # 1. Encode it to UTF-8 since bleach assumes this encoding
+            # 2. Clean it to remove dangerous characters.
 
-            cleaned_text = clean(untrusted_text)
+            if not isinstance(untrusted_text, unicode):
+                text_in_utf8 = untrusted_text.encode("UTF-8")
+            else:
+                text_in_utf8 = untrusted_text
 
-            if untrusted_text != cleaned_text:
+            cleaned_text = clean(text_in_utf8, strip=strip_characters)
+
+            if text_in_utf8 != cleaned_text:
                 logger.warn('Some potential harmful characters were '
                             'removed from untrusted user input.')
 
-            return cleaned_text.encode("UTF-8")
+            return cleaned_text
 
     except KeyError:
         logger.warn('A malicious user tried to crash the application by '
@@ -289,7 +318,7 @@ def sanitize_input(untrusted_text):
 
 
 def is_percent_encoded(text):
-    if text == unquote(text):
+    if text != unquote(text):
         return True
     else:
         return False

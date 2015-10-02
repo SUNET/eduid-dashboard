@@ -16,8 +16,11 @@ from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
+from eduiddashboard.utils import (sanitize_get,
+                                  sanitize_session_get,
+                                  sanitize_post_get)
+
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
-from eduiddashboard.utils import sanitize_input, sanitize_get, sanitize_session_get
 from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
@@ -107,7 +110,7 @@ def login_action(request, session_info, user):
     _set_name_id(request.session, session_info['name_id'])
 
     # redirect the user to the view where he came from
-    relay_state = request.POST.get('RelayState', '/')
+    relay_state = sanitize_post_get(request, 'RelayState', '/')
     log.debug('Redirecting to the RelayState: ' + relay_state)
     return HTTPFound(location=relay_state, headers=headers)
 
@@ -200,6 +203,7 @@ def assertion_consumer_service(request):
 def echo_attributes(request):
     raise NotImplementedError
 
+
 @view_config(route_name='saml2-logout')
 def logout_view(request):
     """SAML Logout Request initiator
@@ -263,12 +267,6 @@ def logout_service(request):
 
     if 'SAMLResponse' in request.GET:  # we started the logout
         log.debug('Receiving a logout response from the IdP')
-
-        # SAMLResponse is allowed to contain a lot of the
-        # potentially harmful characters that we normally
-        # would want to remove from user input.
-        # However, if the SAMLResponse is ever to be rendered
-        # and displayed, then it should of course be cleaned.
         response = client.parse_logout_request_response(
             request.GET['SAMLResponse'],
             BINDING_HTTP_REDIRECT
@@ -294,12 +292,6 @@ def logout_service(request):
             headers = logout(request)
             return HTTPFound(location=next_page, headers=headers)
         else:
-
-            # SAMLRequest and RelayState are allowed to contain a lot
-            # of the potentially harmful characters that we normally
-            # would want to remove from user input.
-            # However, if they are ever to be rendered and
-            # displayed, then they should of course be cleaned.
             http_info = client.handle_logout_request(
                 request.GET['SAMLRequest'],
                 subject_id,
