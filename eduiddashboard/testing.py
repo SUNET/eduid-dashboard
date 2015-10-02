@@ -201,7 +201,7 @@ class LoggedInRequestTests(MongoTestCase):
         # Copy all the users from the eduid userdb into the dashboard applications userdb
         # since otherwise the out-of-sync check will trigger on every save to the dashboard
         # applications database because there is no document there with the right modified_ts
-        for userdoc in self.userdb._get_all_userdocs():
+        for userdoc in self.userdb._get_all_docs():
             logger.debug("COPYING USER INTO PROFILES:\n{!s}".format(userdoc))
             self.db.profiles.insert(userdoc)
 
