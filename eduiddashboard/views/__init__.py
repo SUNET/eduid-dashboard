@@ -14,7 +14,8 @@ from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import (get_short_hash,
                                   sanitize_get,
-                                  sanitize_post_get)
+                                  sanitize_post_get,
+                                  sanitize_post_multidict)
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
@@ -361,7 +362,7 @@ class BaseWizard(object):
 
     def post(self):
         if self.request.POST['action'] == 'next_step':
-            step = sanitize_post_get(self.request, 'step')
+            step = sanitize_post_multidict(self.request, 'step')
             action_method = getattr(self, 'step_%s' % step)
             post_data = self.request.POST
             response = action_method(post_data)
