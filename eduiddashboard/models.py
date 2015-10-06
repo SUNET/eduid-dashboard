@@ -93,8 +93,8 @@ class Email(CSRFTokenSchema):
     mail = colander.SchemaNode(colander.String(),
                                preparer=EmailNormalizer(),
                                validator=colander.All(colander.Email(),
-                                                      EmailUniqueValidator(),
-                                                      MaliciousInputValidator()),
+                                                      MaliciousInputValidator(),
+                                                      EmailUniqueValidator()),
                                title=_('email'),
                                widget=deform.widget.TextInputWidget(
                                    mask=_('Email address'),
@@ -133,14 +133,14 @@ class NIN(CSRFTokenSchema):
     validator_switch = All_StopOnFirst_Switch(
         {'add': All_StopOnFirst(
             NINFormatValidator,
+            MaliciousInputValidator(),
             NINUniqueValidator(),
-            NINReachableValidator(),
-            MaliciousInputValidator()
+            NINReachableValidator()
         ), 'add_by_mobile': All_StopOnFirst(
             NINFormatValidator,
+            MaliciousInputValidator(),
             NINUniqueValidator(),
-            NINRegisteredMobileValidator(),
-            MaliciousInputValidator()
+            NINRegisteredMobileValidator()
         )})
 
     """
@@ -364,8 +364,8 @@ class Mobile(CSRFTokenSchema):
     mobile = colander.SchemaNode(colander.String(),
                                  validator=colander.All(
                                      MobileFormatValidator,
-                                     MobilePhoneUniqueValidator(),
-                                     MaliciousInputValidator()
+                                     MaliciousInputValidator(),
+                                     MobilePhoneUniqueValidator()
                                  ),
                                  title=_('mobile'),
                                  widget=deform.widget.TextInputWidget(
