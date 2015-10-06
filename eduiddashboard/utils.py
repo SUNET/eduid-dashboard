@@ -198,16 +198,23 @@ def convert_to_localtime(dt):
 
 def sanitize_get(request, *args):
     """
-    Sanitize the GET request by using bleach as recommended by OWASP and
-    take care of illegal UTF-8, which is not properly handled in webob as
-    seen in this unfixed bug: https://github.com/Pylons/webob/issues/161.
+    Wrapper around request.GET.get() to sanitize the GET request by using
+    bleach as recommended by OWASP and take care of illegal UTF-8, which
+    is not properly handled in webob as seen in this unfixed bug:
+    https://github.com/Pylons/webob/issues/161.
 
     :param request: The webob request object
     :param args: The arguments to send to webob
     :return: A sanitized GET request
     """
+    if request.content_type == "application/x-www-form-urlencoded":
+        use_percent_encoding = True
+    else:
+        use_percent_encoding = False
+
     try:
-        return sanitize_input(request.GET.get(*args))
+        return sanitize_input(request.GET.get(*args),
+                              percent_encoded=use_percent_encoding)
     except UnicodeDecodeError:
         logger.warn('A malicious user tried to crash the application '
                     'by sending non-unicode input in a GET request')
@@ -216,16 +223,23 @@ def sanitize_get(request, *args):
 
 def sanitize_session_get(request, *args):
     """
-    Sanitize the GET request by using bleach as recommended by OWASP and
-    take care of illegal UTF-8, which is not properly handled in webob as
-    seen in this unfixed bug: https://github.com/Pylons/webob/issues/161.
+    Wrapper around request.session.get() to sanitize the GET request by using
+    bleach as recommended by OWASP and take care of illegal UTF-8, which
+    is not properly handled in webob as seen in this unfixed bug:
+    https://github.com/Pylons/webob/issues/161.
 
     :param request: The webob request object
     :param args: The arguments to send to webob
     :return: A sanitized GET request
     """
+    if request.content_type == "application/x-www-form-urlencoded":
+        use_percent_encoding = True
+    else:
+        use_percent_encoding = False
+
     try:
-        return sanitize_input(request.session.get(*args))
+        return sanitize_input(request.session.get(*args),
+                              percent_encoded=use_percent_encoding)
     except UnicodeDecodeError:
         logger.warn('A malicious user tried to crash the application '
                     'by sending non-unicode input in a GET request')
@@ -234,23 +248,63 @@ def sanitize_session_get(request, *args):
 
 def sanitize_post_get(request, *args):
     """
-    Sanitize the POST request by using bleach as recommended by OWASP and
-    take care of illegal UTF-8, which is not properly handled in webob as
-    seen in this unfixed bug: https://github.com/Pylons/webob/issues/161.
+    Wrapper around self.request.POST.get() to sanitize the POST request by
+    using bleach as recommended by OWASP and take care of illegal UTF-8,
+    which is not properly handled in webob as seen in this unfixed bug:
+    https://github.com/Pylons/webob/issues/161.
 
     :param request: The webob request object
     :param args: The arguments to send to webob
     :return: A sanitized POST request
     """
+    if request.content_type == "application/x-www-form-urlencoded":
+        use_percent_encoding = True
+    else:
+        use_percent_encoding = False
+
     try:
-        return sanitize_input(request.POST.get(*args))
+        return sanitize_input(request.POST.get(*args),
+                              percent_encoded=use_percent_encoding)
     except UnicodeDecodeError:
         logger.warn('A malicious user tried to crash the application '
                     'by sending non-unicode input in a POST request')
         raise HTTPBadRequest("Non-unicode input, please try again.")
 
 
-def sanitize_input(untrusted_text, strip_characters=False):
+def sanitize_post_multidict(request, post_parameter):
+    """
+    Wrapper around self.request.POST['parameter'] to sanitize the POST request
+    by using bleach as recommended by OWASP and take care of illegal UTF-8,
+    which is not properly handled in webob as seen in this unfixed bug:
+    https://github.com/Pylons/webob/issues/161.
+
+    :param request: The webob request object
+    :param post_parameter: The post parameter
+    :return: A sanitized POST request
+    """
+    if request.content_type == "application/x-www-form-urlencoded":
+        use_percent_encoding = True
+    else:
+        use_percent_encoding = False
+
+    try:
+        return sanitize_input(request.POST[post_parameter],
+                              percent_encoded=use_percent_encoding)
+    except KeyError:
+        logger.warn('An unexpected error occurred: POST parameter {!r} '
+                    'could not be found in the request.'.format(post_parameter))
+
+        # Re-raise the exception to not change the
+        # expected logic of the wrapped function.
+        raise
+
+    except UnicodeDecodeError:
+        logger.warn('A malicious user tried to crash the application '
+                    'by sending non-unicode input in a POST request')
+        raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def sanitize_input(untrusted_text, strip_characters=False, percent_encoded=False):
     """
     Sanitize user input by escaping or removing potentially
     harmful input using a whitelist-based approach with
@@ -258,67 +312,77 @@ def sanitize_input(untrusted_text, strip_characters=False):
 
     :param untrusted_text User input to sanitize
     :param strip_characters Set to True to remove instead of escaping harmful input
+    :param percent_encoded Set to False if input is not percent encoded
     :return: Sanitized user input
 
-    :type untrusted_text: string()
-    :rtype: string()
+    :type untrusted_text: str | unicode
+    :rtype: str | unicode
     """
-    try:
 
-        if untrusted_text is None:
-            # If we are given None then there's nothing to clean
-            return None
+    if untrusted_text is None:
+        # If we are given None then there's nothing to clean
+        return None
 
-        elif is_percent_encoded(untrusted_text):
-            # If the untrusted_text is percent encoded we have to:
-            # 1. Decode it so we can process it.
-            # 2. Encode it to UTF-8 since bleach assumes this encoding
-            # 3. Clean it to remove dangerous characters.
-            # 4. Percent encode it before returning it back.
+    elif percent_encoded:
+        # If the untrusted_text is percent encoded we have to:
+        # 1. Decode it so we can process it.
+        # 2. Encode it to UTF-8 since bleach assumes this encoding
+        # 3. Clean it to remove dangerous characters.
+        # 4. Percent encode it before returning it back.
 
-            decoded_text = unquote(untrusted_text)
+        decoded_text = unquote(untrusted_text)
 
-            if not isinstance(decoded_text, unicode):
-                decoded_text_in_utf8 = decoded_text.encode("UTF-8")
-            else:
-                decoded_text_in_utf8 = decoded_text
-
-            cleaned_text = clean(decoded_text_in_utf8, strip=strip_characters)
-            percent_encoded_text = quote(cleaned_text)
-
-            if decoded_text_in_utf8 != cleaned_text:
-                logger.warn('Some potential harmful characters were '
-                            'removed from untrusted user input.')
-
-            return percent_encoded_text
-
+        if not isinstance(decoded_text, unicode):
+            decoded_text_in_utf8 = decoded_text.encode("UTF-8")
         else:
-            # If the untrusted_text is not percent encoded we only have to:
-            # 1. Encode it to UTF-8 since bleach assumes this encoding
-            # 2. Clean it to remove dangerous characters.
+            decoded_text_in_utf8 = decoded_text
 
-            if not isinstance(untrusted_text, unicode):
-                text_in_utf8 = untrusted_text.encode("UTF-8")
-            else:
-                text_in_utf8 = untrusted_text
+        cleaned_text = __safe_clean(decoded_text_in_utf8, strip_characters)
+        percent_encoded_text = quote(cleaned_text)
 
-            cleaned_text = clean(text_in_utf8, strip=strip_characters)
+        if decoded_text_in_utf8 != cleaned_text:
+            logger.warn('Some potential harmful characters were '
+                        'removed from untrusted user input.')
 
-            if text_in_utf8 != cleaned_text:
-                logger.warn('Some potential harmful characters were '
-                            'removed from untrusted user input.')
+        return percent_encoded_text
 
-            return cleaned_text
+    else:
+        # If the untrusted_text is not percent encoded we only have to:
+        # 1. Encode it to UTF-8 since bleach assumes this encoding
+        # 2. Clean it to remove dangerous characters.
 
+        if not isinstance(untrusted_text, unicode):
+            text_in_utf8 = untrusted_text.encode("UTF-8")
+        else:
+            text_in_utf8 = untrusted_text
+
+        cleaned_text = __safe_clean(text_in_utf8, strip_characters)
+
+        if text_in_utf8 != cleaned_text:
+            logger.warn('Some potential harmful characters were '
+                        'removed from untrusted user input.')
+
+        return cleaned_text
+
+
+def __safe_clean(untrusted_text, strip_characters=False):
+    """
+    Wrapper for the clean function of bleach to be able
+    to catch when illegal UTF-8 is processed.
+
+    :param untrusted_text: Text to sanitize
+    :param strip_characters: Set to True to remove instead of escaping
+    :return: Sanitized text
+
+    :type untrusted_text: str | unicode
+    :rtype: str | unicode
+    """
+
+    try:
+        return clean(untrusted_text, strip=strip_characters)
     except KeyError:
         logger.warn('A malicious user tried to crash the application by '
                     'sending illegal UTF-8 in an URI or other untrusted '
                     'user input.')
         raise HTTPBadRequest("Non-unicode input, please try again.")
 
-
-def is_percent_encoded(text):
-    if text != unquote(text):
-        return True
-    else:
-        return False
