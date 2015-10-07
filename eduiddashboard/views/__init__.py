@@ -14,7 +14,7 @@ from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import (get_short_hash,
                                   sanitize_get,
-                                  sanitize_post_get,
+                                  sanitize_post_key,
                                   sanitize_post_multidict)
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
@@ -308,7 +308,7 @@ class BaseWizard(object):
 
     def get_datakey(self):
         if self.request.POST:
-            return sanitize_post_get(self.request, self.model, None)
+            return sanitize_post_key(self.request, self.model, None)
         elif self.request.GET:
             return sanitize_get(self.request, self.model, None)
         return None

@@ -18,7 +18,7 @@ from pyramid.view import view_config, forbidden_view_config
 
 from eduiddashboard.utils import (sanitize_get,
                                   sanitize_session_get,
-                                  sanitize_post_get)
+                                  sanitize_post_key)
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
@@ -110,7 +110,7 @@ def login_action(request, session_info, user):
     _set_name_id(request.session, session_info['name_id'])
 
     # redirect the user to the view where he came from
-    relay_state = sanitize_post_get(request, 'RelayState', '/')
+    relay_state = sanitize_post_key(request, 'RelayState', '/')
     log.debug('Redirecting to the RelayState: ' + relay_state)
     return HTTPFound(location=relay_state, headers=headers)
 

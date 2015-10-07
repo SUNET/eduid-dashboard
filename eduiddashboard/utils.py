@@ -246,7 +246,7 @@ def sanitize_session_get(request, *args):
         raise HTTPBadRequest("Non-unicode input, please try again.")
 
 
-def sanitize_post_get(request, *args):
+def sanitize_post_key(request, *args):
     """
     Wrapper around self.request.POST.get() to sanitize the POST request by
     using bleach as recommended by OWASP and take care of illegal UTF-8,
