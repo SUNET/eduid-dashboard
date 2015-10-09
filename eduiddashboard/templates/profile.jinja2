@@ -52,11 +52,9 @@
                 </div>
               </div>
             </li>
-            <li id="profile-menu-help">
-              <div class="help">
-                <a href="{{ request.route_path('help') }}">
-                  {{ _('Help') }}
-                </a>
+            <li id="profile-menu-eppn-li">
+              <div class="profile-menu-eppn">
+                <p class="eppn-text-muted">eduID identifier: {{ user.eduPersonPrincipalName }}</p>
               </div>
             </li>
 
@@ -107,13 +105,10 @@
       <div class="progress progress-striped">
         <div class="progress-bar profile-filled-progress-bar"></div>
       </div>
-      <div class="help">
-        <a href="{{ request.route_path('help') }}">
-          {{ _('Help') }}
-        </a>
+      <div class="profile-menu-eppn hidden-md hidden-lg">
+          <p class="eppn-text-muted">eduID identifier: {{ user.eduPersonPrincipalName }}</p>
       </div>
     </div>
-  </div>
 
   <div id="askDialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="askDialogPrompt" aria-hidden="true">
     <div class="modal-dialog">

@@ -199,13 +199,20 @@ ul.wizard-nav-list li:last-child {
     border:none;
 }
 #profile-menu-large li#profile-filled-li:after,
-#profile-menu-large li#profile-menu-help:after {
+#profile-menu-large li#profile-menu-help:after,
+#profile-menu-large li#profile-menu-eppn-li:after {
     display:none;
 }
+
 #profile-menu-large li#profile-filled-li:hover,
 #profile-menu-large li#profile-menu-help:hover {
     background-color: transparent;
 }
+
+#profile-menu-eppn-li {
+    margin-top: 25px;
+}
+
 #profile-menu-large li a {
     padding-left:10px;
     border-radius:0;
@@ -307,6 +314,9 @@ ul.nav-tabs > li#profile-filled-li {
     padding-top: 80px;
 }
 
+.eppn-text-muted {
+    color: #777;
+}
 
 /*--------------------------------------------------*/
 
@@ -588,7 +598,8 @@ div.modal.wizard > div.wizard-dialog {
 @media only screen and (min-width: 768px) and (max-width: 991px) {
 
     div#profile-menu-large li#profile-filled-li,
-    div#profile-menu-large li#profile-menu-help {
+    div#profile-menu-large li#profile-menu-help,
+    div#profile-menu-large li#profile-menu-eppn-li {
         display: none;
     }
     div#profile-menu-large ul {
