@@ -13,9 +13,9 @@ pyramid_tm==0.7
 colander==1.0b1
 deform==2.0a2
 deform_bootstrap==0.2.9
-pycountry==1.2
-eventlet==0.14.0
-gunicorn==18.0
+pycountry==1.17
+eventlet==0.17.4
+gunicorn==19.3.0
 pwgen==0.4
 zxcvbn==1.0
 pytz
@@ -51,9 +51,9 @@ pyramid_tm==0.7
 colander==1.0b1
 deform==2.0a2
 deform_bootstrap==0.2.9
-pycountry==1.2
-eventlet==0.14.0
-gunicorn==18.0
+pycountry==1.17
+eventlet==0.17.4
+gunicorn==19.3.0
 pwgen==0.4
 zxcvbn==1.0
 pytz
