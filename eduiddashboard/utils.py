@@ -198,78 +198,32 @@ def convert_to_localtime(dt):
 
 def sanitize_get(request, *args):
     """
-    Wrapper around request.GET.get() to sanitize the GET request by using
-    bleach as recommended by OWASP and take care of illegal UTF-8, which
-    is not properly handled in webob as seen in this unfixed bug:
-    https://github.com/Pylons/webob/issues/161.
-
-    :param request: The webob request object
-    :param args: The arguments to send to webob
-    :return: A sanitized GET request
+    Wrapper around request.GET.get() to sanitize untrusted user input.
     """
-    try:
-        return sanitize_input(request.GET.get(*args),
-                              content_type=request.content_type)
-    except UnicodeDecodeError:
-        logger.warn('A malicious user tried to crash the application '
-                    'by sending non-unicode input in a GET request')
-        raise HTTPBadRequest("Non-unicode input, please try again.")
+    return _sanitize_common(request, request.GET, *args)
 
 
 def sanitize_session_get(request, *args):
     """
-    Wrapper around request.session.get() to sanitize the GET request by using
-    bleach as recommended by OWASP and take care of illegal UTF-8, which
-    is not properly handled in webob as seen in this unfixed bug:
-    https://github.com/Pylons/webob/issues/161.
-
-    :param request: The webob request object
-    :param args: The arguments to send to webob
-    :return: A sanitized GET request
+    Wrapper around request.session.get() to sanitize untrusted input.
     """
-    try:
-        return sanitize_input(request.session.get(*args),
-                              content_type=request.content_type)
-    except UnicodeDecodeError:
-        logger.warn('A malicious user tried to crash the application '
-                    'by sending non-unicode input in a GET request')
-        raise HTTPBadRequest("Non-unicode input, please try again.")
+    return sanitize_input(request.session.get(*args),
+                          content_type=request.content_type)
 
 
 def sanitize_post_key(request, *args):
     """
-    Wrapper around self.request.POST.get() to sanitize the POST request by
-    using bleach as recommended by OWASP and take care of illegal UTF-8,
-    which is not properly handled in webob as seen in this unfixed bug:
-    https://github.com/Pylons/webob/issues/161.
-
-    :param request: The webob request object
-    :param args: The arguments to send to webob
-    :return: A sanitized POST request
+    Wrapper around self.request.POST.get() to sanitize untrusted user input.
     """
-    try:
-        return sanitize_input(request.POST.get(*args),
-                              content_type=request.content_type)
-    except UnicodeDecodeError:
-        logger.warn('A malicious user tried to crash the application '
-                    'by sending non-unicode input in a POST request')
-        raise HTTPBadRequest("Non-unicode input, please try again.")
+    return _sanitize_common(request, request.POST, *args)
 
 
 def sanitize_post_multidict(request, post_parameter):
     """
-    Wrapper around self.request.POST['parameter'] to sanitize the POST request
-    by using bleach as recommended by OWASP and take care of illegal UTF-8,
-    which is not properly handled in webob as seen in this unfixed bug:
-    https://github.com/Pylons/webob/issues/161.
-
-    :param request: The webob request object
-    :param post_parameter: The post parameter
-    :return: A sanitized POST request
+    Wrapper around self.request.POST['parameter'] to sanitize user input.
     """
     try:
-        return sanitize_input(request.POST[post_parameter],
-                              content_type=request.content_type)
+        return _sanitize_common(request, request.POST, post_parameter)
     except KeyError:
         logger.warn('An unexpected error occurred: POST parameter {!r} '
                     'could not be found in the request.'.format(post_parameter))
@@ -278,9 +232,27 @@ def sanitize_post_multidict(request, post_parameter):
         # expected logic of the wrapped function.
         raise
 
+
+def _sanitize_common(request, data, *args):
+    """
+    Wrapper around request.GET.get() to sanitize the GET request by using
+    bleach as recommended by OWASP and take care of illegal UTF-8, which
+    is not properly handled in webob as seen in this unfixed bug:
+    https://github.com/Pylons/webob/issues/161.
+
+    :param request: The webob request object
+    :param data: Dict to look up data in
+    :param args: Parameter name and possibly default value
+
+    :return: Sanitized user input
+    :rtype: str | unicode
+    """
+    try:
+        return sanitize_input(data.get(*args),
+                              content_type=request.content_type)
     except UnicodeDecodeError:
         logger.warn('A malicious user tried to crash the application '
-                    'by sending non-unicode input in a POST request')
+                    'by sending non-unicode input in a GET request')
         raise HTTPBadRequest("Non-unicode input, please try again.")
 
 
