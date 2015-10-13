@@ -207,8 +207,7 @@ def sanitize_session_get(request, *args):
     """
     Wrapper around request.session.get() to sanitize untrusted input.
     """
-    return sanitize_input(request.session.get(*args),
-                          content_type=request.content_type)
+    return _sanitize_common(request, request.session, *args)
 
 
 def sanitize_post_key(request, *args):
