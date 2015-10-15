@@ -510,6 +510,16 @@ div.modal.wizard > div.wizard-dialog {
   margin-top: 60px !important;
 }
 
+#chpass-form-buttons {
+    text-align: center;
+    width: 100%;
+}
+
+#chpass-form-buttons button,
+#chpass-form-buttons a {
+    display: inline-block;
+    margin: 10px auto 0;
+}
 
 /* Fontface */
 @font-face {
