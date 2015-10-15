@@ -363,6 +363,9 @@ table.table-form td.non-identifier {
   vertical-align:middle;
   text-align: center !important;
 }
+table.table-striped tr > td:first-child {
+    padding-left: 10px;
+}
 
 .text-muted {
     background-color: #dd0d0d;
