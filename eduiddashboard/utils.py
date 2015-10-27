@@ -200,21 +200,27 @@ def sanitize_get(request, *args):
     """
     Wrapper around request.GET.get() to sanitize untrusted user input.
     """
-    return _sanitize_common(request, request.GET, *args)
+    return _sanitize_common(request, 'GET', *args)
 
 
 def sanitize_session_get(request, *args):
     """
     Wrapper around request.session.get() to sanitize untrusted input.
     """
-    return _sanitize_common(request, request.session, *args)
+    return _sanitize_common(request, 'session', *args)
+
+def sanitize_cookies_get(request, *args):
+    """
+    Wrapper around request.cookie.get() to sanitize untrusted input.
+    """
+    return _sanitize_common(request, 'cookies', *args)
 
 
 def sanitize_post_key(request, *args):
     """
     Wrapper around self.request.POST.get() to sanitize untrusted user input.
     """
-    return _sanitize_common(request, request.POST, *args)
+    return _sanitize_common(request, 'POST', *args)
 
 
 def sanitize_post_multidict(request, post_parameter):
@@ -222,7 +228,7 @@ def sanitize_post_multidict(request, post_parameter):
     Wrapper around self.request.POST['parameter'] to sanitize user input.
     """
     try:
-        return _sanitize_common(request, request.POST, post_parameter)
+        return _sanitize_common(request, 'POST', post_parameter)
     except KeyError:
         logger.warn('An unexpected error occurred: POST parameter {!r} '
                     'could not be found in the request.'.format(post_parameter))
@@ -232,7 +238,7 @@ def sanitize_post_multidict(request, post_parameter):
         raise
 
 
-def _sanitize_common(request, data, *args):
+def _sanitize_common(request, function_attribute, *args):
     """
     Wrapper around request.GET.get() to sanitize the GET request by using
     bleach as recommended by OWASP and take care of illegal UTF-8, which
@@ -240,18 +246,23 @@ def _sanitize_common(request, data, *args):
     https://github.com/Pylons/webob/issues/161.
 
     :param request: The webob request object
-    :param data: Dict to look up data in
+    :param function_attribute: Function attribute returning the desired information
     :param args: Parameter name and possibly default value
 
     :return: Sanitized user input
     :rtype: str | unicode
     """
     try:
-        return sanitize_input(data.get(*args),
-                              content_type=request.content_type)
+        if hasattr(request, 'content_type'):
+            return sanitize_input(getattr(request, function_attribute).get(*args),
+                                  content_type=request.content_type)
+        else:
+            # The DummyRequest class used for testing has no attribute content_type
+            return sanitize_input(getattr(request, function_attribute).get(*args))
     except UnicodeDecodeError:
         logger.warn('A malicious user tried to crash the application '
-                    'by sending non-unicode input in a GET request')
+                    'by sending non-unicode input in a {!r} request'
+                    .format(function_attribute))
         raise HTTPBadRequest("Non-unicode input, please try again.")
 
 

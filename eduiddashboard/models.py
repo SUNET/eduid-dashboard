@@ -17,6 +17,7 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        ResetPasswordFormValidator,
                                        MaliciousInputValidator)
 from eduiddashboard.widgets import permissions_widget
+from eduiddashboard.utils import sanitize_post_key
 
 
 SEARCHER_ATTTRIBUTE_TYPES = [
@@ -78,7 +79,7 @@ class All_StopOnFirst_Switch(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
 
-        if 'add_by_mobile' in request.POST:
+        if sanitize_post_key(request, 'add_by_mobile') is not None:
             current_validator = self.validator_dict['add_by_mobile']
         else:
             current_validator = self.validator_dict['add']

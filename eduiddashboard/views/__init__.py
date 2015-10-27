@@ -141,7 +141,7 @@ class BaseActionsView(object):
                         request).translate(self.special_verify_messages[msgid])
 
     def __call__(self):
-        action = self.request.POST['action']
+        action = sanitize_post_multidict(self.request, 'action')
         action_method = getattr(self, '%s_action' % action)
         post_data = self.request.POST
         try:
@@ -361,7 +361,7 @@ class BaseWizard(object):
         return HTTPMethodNotAllowed()
 
     def post(self):
-        if self.request.POST['action'] == 'next_step':
+        if sanitize_post_multidict(self.request, 'action') == 'next_step':
             step = sanitize_post_multidict(self.request, 'step')
             action_method = getattr(self, 'step_%s' % step)
             post_data = self.request.POST
@@ -370,7 +370,7 @@ class BaseWizard(object):
             if response and response['status'] == 'success':
                 self.next_step()
 
-        elif self.request.POST['action'] == 'dismissed':
+        elif sanitize_post_multidict(self.request, 'action') == 'dismissed':
             response = self.dismiss_wizard()
 
         elif callable(getattr(self, self.request.POST['action'], None)):

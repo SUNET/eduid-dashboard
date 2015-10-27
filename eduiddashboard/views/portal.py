@@ -16,7 +16,8 @@ from eduiddashboard.utils import (verify_auth_token,
                                   get_pending_actions,
                                   get_max_available_loa,
                                   get_available_tabs,
-                                  sanitize_get)
+                                  sanitize_get,
+                                  sanitize_post_key)
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
@@ -110,7 +111,7 @@ def home(context, request):
     users = None
     showresults = False
 
-    if 'query' in request.GET:
+    if sanitize_get(request, 'query') is not None:
         controls = request.GET.items()
         try:
             searcher_data = searcher_form.validate(controls)
@@ -181,13 +182,13 @@ def help(context, request):
 
 @view_config(route_name='token-login', request_method='POST')
 def token_login(context, request):
-    eppn = request.POST.get('eppn')
-    token = request.POST.get('token')
-    nonce = request.POST.get('nonce')
-    timestamp = request.POST.get('ts')
+    eppn = sanitize_post_key(request, 'eppn')
+    token = sanitize_post_key(request, 'token')
+    nonce = sanitize_post_key(request, 'nonce')
+    timestamp = sanitize_post_key(request, 'ts')
     shared_key = request.registry.settings.get('auth_shared_secret')
 
-    next_url = request.POST.get('next_url', '/')
+    next_url = sanitize_post_key(request, 'next_url', '/')
 
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
@@ -286,7 +287,7 @@ def account_termination_action(request, session_info, user):
     send_termination_mail(request, user)
 
     # logout
-    next_page = request.POST.get('RelayState', '/')
+    next_page = sanitize_post_key(request, 'RelayState', '/')
     request.session['next_page'] = next_page
     return logout_view(request)
 
@@ -303,7 +304,7 @@ def terminate_account(context, request):
     settings = request.registry.settings
 
     # check csrf
-    csrf = request.POST.get('csrf')
+    csrf = sanitize_post_key(request, 'csrf')
     if csrf != request.session.get_csrf_token():
         return HTTPBadRequest()
 

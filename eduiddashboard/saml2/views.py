@@ -157,7 +157,7 @@ def assertion_consumer_service(request):
     ''' '''
     action = get_action(request.session)
 
-    if 'SAMLResponse' not in request.POST:
+    if sanitize_post_key(request, 'SAMLResponse') is None:
         raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
@@ -265,7 +265,7 @@ def logout_service(request):
     next_page = sanitize_session_get(request, 'next_page', logout_redirect_url)
     next_page = sanitize_get(request, 'next_page', next_page)
 
-    if 'SAMLResponse' in request.GET:  # we started the logout
+    if sanitize_get(request, 'SAMLResponse') is not None: # we started the logout
         log.debug('Receiving a logout response from the IdP')
         response = client.parse_logout_request_response(
             request.GET['SAMLResponse'],
@@ -279,7 +279,8 @@ def logout_service(request):
             log.error('Unknown error during the logout')
             return HTTPBadRequest('Error during logout')
 
-    elif 'SAMLRequest' in request.GET:  # logout started by the IdP
+    # logout started by the IdP
+    elif sanitize_get(request, 'SAMLRequest') is not None:
         log.debug('Receiving a logout request from the IdP')
         subject_id = _get_name_id(request.session)
         if subject_id is None:
