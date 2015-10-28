@@ -333,23 +333,22 @@ def sanitize_input(untrusted_text, strip_characters=False,
 
         return percent_encoded_text
 
+    # If the untrusted_text is not percent encoded we only have to:
+    # 1. Encode it to UTF-8 since bleach assumes this encoding
+    # 2. Clean it to remove dangerous characters.
+
+    if not isinstance(untrusted_text, unicode):
+        text_in_utf8 = untrusted_text.encode("UTF-8")
     else:
-        # If the untrusted_text is not percent encoded we only have to:
-        # 1. Encode it to UTF-8 since bleach assumes this encoding
-        # 2. Clean it to remove dangerous characters.
+        text_in_utf8 = untrusted_text
 
-        if not isinstance(untrusted_text, unicode):
-            text_in_utf8 = untrusted_text.encode("UTF-8")
-        else:
-            text_in_utf8 = untrusted_text
+    cleaned_text = _safe_clean(text_in_utf8, strip_characters)
 
-        cleaned_text = _safe_clean(text_in_utf8, strip_characters)
+    if text_in_utf8 != cleaned_text:
+        logger.warn('Some potential harmful characters were '
+                    'removed from untrusted user input.')
 
-        if text_in_utf8 != cleaned_text:
-            logger.warn('Some potential harmful characters were '
-                        'removed from untrusted user input.')
-
-        return cleaned_text
+    return cleaned_text
 
 
 def _safe_clean(untrusted_text, strip_characters=False):
