@@ -26,8 +26,13 @@ from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
-from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
-    convert_to_localtime, normalize_to_e_164
+from eduiddashboard.utils import (generate_password,
+                                  get_unique_hash,
+                                  validate_email_format,
+                                  normalize_email,
+                                  convert_to_localtime,
+                                  normalize_to_e_164,
+                                  sanitize_post_key)
 
 import logging
 log = logging.getLogger(__name__)
@@ -176,7 +181,7 @@ def start_password_change(context, request):
     settings = request.registry.settings
 
     # check csrf
-    csrf = request.POST.get('csrf')
+    csrf = sanitize_post_key(request, 'csrf')
     if csrf != request.session.get_csrf_token():
         return HTTPBadRequest()
 

@@ -8,7 +8,9 @@ from eduid_userdb.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
-from eduiddashboard.utils import normalize_to_e_164
+from eduiddashboard.utils import (normalize_to_e_164,
+                                  sanitize_input,
+                                  sanitize_post_key)
 from eduiddashboard.idproofinglog import TeleAdressProofing, TeleAdressProofingRelation
 from eduiddashboard import log
 
@@ -95,6 +97,21 @@ class PermissionsValidator(object):
                 )
 
 
+class MaliciousInputValidator(object):
+
+    def __call__(self, node, value):
+        """
+        Check the input for potentially harmful content
+        """
+        request = node.bindings.get('request')
+        localizer = get_localizer(request)
+
+        if value != sanitize_input(value, strip_characters=True):
+            err = _("Some of the characters you entered are "
+                    "not allowed, please try again.")
+            raise colander.Invalid(node, localizer.translate(err))
+
+
 class EmailUniqueValidator(object):
 
     def __call__(self, node, value):
@@ -105,7 +122,7 @@ class EmailUniqueValidator(object):
         user_emails.append(user.get_mail())
         localizer = get_localizer(request)
 
-        if 'add' in request.POST:
+        if sanitize_post_key(request, 'add') is not None:
             if value in user_emails:
                 err = _("You already have this email address")
                 raise colander.Invalid(node, localizer.translate(err))
@@ -136,7 +153,7 @@ class MobilePhoneUniqueValidator(object):
         user_mobiles = [m['mobile'] for m in user.get_mobiles()]
         mobile = {'mobile': normalize_to_e_164(request, value)}
 
-        if 'add' in request.POST:
+        if sanitize_post_key(request, 'add') is not None:
             if mobile['mobile'] in user_mobiles:
                 err = _("This mobile phone was already registered")
                 raise colander.Invalid(node, get_localizer(request).translate(err))

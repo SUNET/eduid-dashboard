@@ -12,7 +12,10 @@ from pyramid_deform import FormView
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.utils import get_short_hash
+from eduiddashboard.utils import (get_short_hash,
+                                  sanitize_get,
+                                  sanitize_post_key,
+                                  sanitize_post_multidict)
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
@@ -138,7 +141,7 @@ class BaseActionsView(object):
                         request).translate(self.special_verify_messages[msgid])
 
     def __call__(self):
-        action = self.request.POST['action']
+        action = sanitize_post_multidict(self.request, 'action')
         action_method = getattr(self, '%s_action' % action)
         post_data = self.request.POST
         try:
@@ -305,9 +308,9 @@ class BaseWizard(object):
 
     def get_datakey(self):
         if self.request.POST:
-            return self.request.POST.get(self.model, None)
+            return sanitize_post_key(self.request, self.model, None)
         elif self.request.GET:
-            return self.request.GET.get(self.model, None)
+            return sanitize_get(self.request, self.model, None)
         return None
 
     def get_object(self):
@@ -358,8 +361,8 @@ class BaseWizard(object):
         return HTTPMethodNotAllowed()
 
     def post(self):
-        if self.request.POST['action'] == 'next_step':
-            step = self.request.POST['step']
+        if sanitize_post_multidict(self.request, 'action') == 'next_step':
+            step = sanitize_post_multidict(self.request, 'step')
             action_method = getattr(self, 'step_%s' % step)
             post_data = self.request.POST
             response = action_method(post_data)
@@ -367,7 +370,7 @@ class BaseWizard(object):
             if response and response['status'] == 'success':
                 self.next_step()
 
-        elif self.request.POST['action'] == 'dismissed':
+        elif sanitize_post_multidict(self.request, 'action') == 'dismissed':
             response = self.dismiss_wizard()
 
         elif callable(getattr(self, self.request.POST['action'], None)):

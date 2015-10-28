@@ -16,6 +16,10 @@ from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
+from eduiddashboard.utils import (sanitize_get,
+                                  sanitize_session_get,
+                                  sanitize_post_key)
+
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
 from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
@@ -80,7 +84,7 @@ def forbidden_view(context, request):
     """
     user = authenticated_userid(request)
     if user:
-        # Return a plain forbbiden page
+        # Return a plain forbidden page
         try:
             reason = context.explanation
         except AttributeError:
@@ -106,7 +110,7 @@ def login_action(request, session_info, user):
     _set_name_id(request.session, session_info['name_id'])
 
     # redirect the user to the view where he came from
-    relay_state = request.POST.get('RelayState', '/')
+    relay_state = sanitize_post_key(request, 'RelayState', '/')
     log.debug('Redirecting to the RelayState: ' + relay_state)
     return HTTPFound(location=relay_state, headers=headers)
 
@@ -116,12 +120,12 @@ def login_view(request):
     login_redirect_url = request.registry.settings.get(
         'saml2.login_redirect_url', '/')
 
-    came_from = request.GET.get('next', login_redirect_url)
+    came_from = sanitize_get(request, 'next', login_redirect_url)
 
     if authenticated_userid(request):
         return HTTPFound(location=came_from)
 
-    selected_idp = request.GET.get('idp', None)
+    selected_idp = sanitize_get(request, 'idp', None)
     if selected_idp is not None:
         request.session['selected_idp'] = selected_idp
 
@@ -153,7 +157,7 @@ def assertion_consumer_service(request):
     ''' '''
     action = get_action(request.session)
 
-    if 'SAMLResponse' not in request.POST:
+    if sanitize_post_key(request, 'SAMLResponse') is None:
         raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
     client = Saml2Client(request.saml2_config,
@@ -258,10 +262,10 @@ def logout_service(request):
     settings = request.registry.settings
 
     logout_redirect_url = settings.get('saml2.logout_redirect_url')
-    next_page = request.session.get('next_page', logout_redirect_url)
-    next_page = request.GET.get('next_page', next_page)
+    next_page = sanitize_session_get(request, 'next_page', logout_redirect_url)
+    next_page = sanitize_get(request, 'next_page', next_page)
 
-    if 'SAMLResponse' in request.GET:  # we started the logout
+    if sanitize_get(request, 'SAMLResponse') is not None: # we started the logout
         log.debug('Receiving a logout response from the IdP')
         response = client.parse_logout_request_response(
             request.GET['SAMLResponse'],
@@ -275,7 +279,8 @@ def logout_service(request):
             log.error('Unknown error during the logout')
             return HTTPBadRequest('Error during logout')
 
-    elif 'SAMLRequest' in request.GET:  # logout started by the IdP
+    # logout started by the IdP
+    elif sanitize_get(request, 'SAMLRequest') is not None:
         log.debug('Receiving a logout request from the IdP')
         subject_id = _get_name_id(request.session)
         if subject_id is None:
