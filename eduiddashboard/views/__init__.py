@@ -373,8 +373,8 @@ class BaseWizard(object):
         elif sanitize_post_multidict(self.request, 'action') == 'dismissed':
             response = self.dismiss_wizard()
 
-        elif callable(getattr(self, self.request.POST['action'], None)):
-            response = getattr(self, self.request.POST['action'])()
+        elif sanitize_post_multidict(self.request, 'action') == 'resendcode':
+            response = self.resendcode()
 
         else:
             message = _('Unexpected error')
