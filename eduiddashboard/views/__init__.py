@@ -150,8 +150,7 @@ class BaseActionsView(object):
         except ValueError:
             index = post_data['identifier']
 
-        # Replaced arbitrary _action method execution with the
-        # if-clause below, which functions as a form of whitelisting.
+        # The if-clause below functions as a form of whitelisting.
         if action == 'verify':
             result = self.verify_action(index, post_data)
         elif action == 'resend_code':
@@ -381,8 +380,7 @@ class BaseWizard(object):
             step = sanitize_post_multidict(self.request, 'step')
             post_data = self.request.POST
 
-            # Replaced arbitrary _step method execution with the
-            # if-clause below, which functions as a form of whitelisting.
+            # The if-clause below functions as a form of whitelisting.
             if step == '0':
                 response = self.step_0(post_data)
             elif step == '1':
