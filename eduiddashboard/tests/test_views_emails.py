@@ -180,13 +180,13 @@ class MailsFormTests(LoggedInRequestTests):
     def test_setprimary_not_existant_email(self):
         self.set_logged()
 
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-
-        with self.assertRaises(IndexError):
-            self.testapp.post(
-                '/profile/emails-actions/',
+        response = self.testapp.post(
+            '/profile/emails-actions/',
                 {'identifier': 10, 'action': 'setprimary'}
-            )
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_setprimary_existant_email(self):
         self.set_logged()
