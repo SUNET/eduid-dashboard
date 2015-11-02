@@ -70,7 +70,11 @@ class EmailsActionsView(BaseActionsView):
     }
 
     def setprimary_action(self, index, post_data):
-        mail = self.user.get_mail_aliases()[index]
+
+        try:
+            mail = self.user.get_mail_aliases()[index]
+        except IndexError:
+            return self.sync_user()
 
         if not mail.get('verified', False):
             message = _('You need to confirm your email address '
