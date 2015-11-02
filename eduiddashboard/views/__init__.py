@@ -2,7 +2,9 @@ import json
 from copy import deepcopy
 from bson import ObjectId
 
-from pyramid.httpexceptions import HTTPOk, HTTPMethodNotAllowed
+from pyramid.httpexceptions import (HTTPOk,
+                                    HTTPMethodNotAllowed,
+                                    HTTPBadRequest)
 from pyramid.i18n import get_localizer
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
@@ -142,13 +144,27 @@ class BaseActionsView(object):
 
     def __call__(self):
         action = sanitize_post_multidict(self.request, 'action')
-        action_method = getattr(self, '%s_action' % action)
         post_data = self.request.POST
         try:
             index = int(post_data['identifier'])
         except ValueError:
             index = post_data['identifier']
-        result = action_method(index, post_data)
+
+        # Replaced arbitrary _action method execution with the
+        # if-clause below, which functions as a form of whitelisting.
+        if action == 'verify':
+            result = self.verify_action(index, post_data)
+        elif action == 'resend_code':
+            result = self.resend_code_action(index, post_data)
+        elif action == 'setprimary':
+            result = self.setprimary_action(index, post_data)
+        elif action == 'remove':
+            result = self.remove_action(index, post_data)
+        elif action == 'verify_mb':
+            result = self.verify_mb_action(index, post_data)
+        else:
+            raise HTTPBadRequest("Unsupported action")
+
         result['action'] = action
         result['identifier'] = index
         return Response(json.dumps(result))
@@ -363,9 +379,16 @@ class BaseWizard(object):
     def post(self):
         if sanitize_post_multidict(self.request, 'action') == 'next_step':
             step = sanitize_post_multidict(self.request, 'step')
-            action_method = getattr(self, 'step_%s' % step)
             post_data = self.request.POST
-            response = action_method(post_data)
+
+            # Replaced arbitrary _step method execution with the
+            # if-clause below, which functions as a form of whitelisting.
+            if step == '0':
+                response = self.step_0(post_data)
+            elif step == '1':
+                response = self.step_1(post_data)
+            else:
+                raise HTTPBadRequest("Unsupported wizard step")
 
             if response and response['status'] == 'success':
                 self.next_step()
