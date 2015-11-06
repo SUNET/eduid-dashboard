@@ -9,6 +9,7 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link href="{{'eduiddashboard:static/css/bootstrap-3.2.0.min.css'|static_url}}" rel="stylesheet" media="screen">
     <link href="{{'eduiddashboard:static/css/dashboard.css'|static_url}}" rel="stylesheet" media="screen">
+    <link href="{{'eduiddashboard:static/css/screen.css'|static_url}}" rel="stylesheet" media="screen">
 
     {% block extracss %}
     {% endblock %}
@@ -20,16 +21,16 @@
     <div id='wrap container'>
       <header id="header" class="header">
         <div class="logo"></div>
-        <nav class="navbar navbar-default" id="eduid-dashboard-navbar">
+        <nav class="navbar navbar-default" id="eduid-navbar">
           <div class="container-fluid">
             <div class="navbar-header">
               <a class="navbar-brand" href="#">
                 <div id="eduid-logo-small" class="logo"></div>
               </a>
-              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-dashboard-menu" aria-expanded="false">
+              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-menu" aria-expanded="false">
               </span>
             </div>
-            <div class="collapse navbar-collapse text-center" id="eduid-dashboard-menu">
+            <div class="collapse navbar-collapse text-center" id="eduid-menu">
               <ul  class="nav navbar-nav">
                       <!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
                 <li>
@@ -80,10 +81,8 @@
 
         <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
         <div id="content-block">
-          <div class='clearfix'></div>
           {% block title %}
           {% endblock %}
-          <div class='clearfix'></div>
           {% block contents %}
 
           {% endblock %}
