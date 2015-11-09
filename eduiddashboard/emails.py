@@ -84,7 +84,7 @@ def send_termination_mail(request, user):
 
     # DEBUG
     if request.registry.settings.get('developer_mode', False):
-        print message.body
+        print(message.body.encode("UTF-8"))
     else:
         mailer.send(message)
     log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))
