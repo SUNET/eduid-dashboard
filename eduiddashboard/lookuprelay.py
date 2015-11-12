@@ -32,7 +32,7 @@ class LookupMobileRelay(object):
             result = result.get(timeout=25)
             return result
         except:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
     def find_mobiles_by_NIN(self, nin):
         try:
@@ -41,7 +41,7 @@ class LookupMobileRelay(object):
             result = result.get(timeout=25)
             return result
         except:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
 
 def get_lookuprelay(request):

@@ -308,14 +308,14 @@ class NinsView(BaseFormView):
         self.buttons = ()
         if self.request.registry.settings.get('enable_mm_verification'):
             self.buttons += (deform.Button(name='add',
-                             title=_('Verify through Mina Meddelanden')),)
+                             title=_('Mina Meddelanden')),)
         else:
             # Add a disabled button to for information purposes when Mina Meddelanden is disabled
             self.buttons += (deform.Button(name='NoMM',
-                                           title=_('Verify through Mina Meddelanden'),
+                                           title=_('Mina Meddelanden'),
                                            css_class='btn btn-primary disabled'),)
         self.buttons += (deform.Button(name='add_by_mobile',
-                                       title=_('Verify by registered phone'),
+                                       title=_('Phone subscription'),
                                        css_class='btn btn-primary'),)
 
     def appstruct(self):

@@ -4,7 +4,7 @@
 
 
 {% block contents %}
-    <h3>{{ _("Dashboard %(mode)s mode", mode=context.workmode) }}</h3>
+    <h3>{{ _("Dashboard %(mode)'s mode", mode=context.workmode) }}</h3>
 
     <div class="loa-big">
     <div>{{ _("Level %(level)s", level=request.session.get("loa", 5)) }}</div>

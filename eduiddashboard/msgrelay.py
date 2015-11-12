@@ -120,12 +120,12 @@ class MsgRelay(object):
         try:
             rtask.wait()
         except:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
             return rtask.get()
         else:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
     def nin_validator(self, reference, nin, code, language, recipient, message_type='mm'):
         """
@@ -200,13 +200,13 @@ class MsgRelay(object):
         try:
             rtask.wait()
         except:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
             result = rtask.get()
             return parse_address_dict(result)
         else:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
     def get_full_postal_address(self, nin):
         """
@@ -232,13 +232,13 @@ class MsgRelay(object):
         try:
             rtask.wait()
         except:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
             result = rtask.get()
             return result
         else:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
     def get_relations_to(self, nin, relative_nin):
         """
@@ -262,13 +262,13 @@ class MsgRelay(object):
         try:
             rtask.wait()
         except:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
             result = rtask.get()
             return result
         else:
-            raise self.TaskFailed('Something goes wrong')
+            raise self.TaskFailed('Something went wrong')
 
     def postal_address_to_transaction_audit_log(self, reference):
         """

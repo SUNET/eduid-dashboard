@@ -27,7 +27,7 @@ def get_status(request, user):
     completed = 0
 
     if not mobiles:
-        pending_actions = _('Add mobile phone number')
+        pending_actions = _('Add')
         pending_actions = get_localizer(request).translate(pending_actions)
     else:
         for n, mobile in enumerate(mobiles):
@@ -169,7 +169,7 @@ class MobilesView(BaseFormView):
     schema = Mobile()
     route = 'mobiles'
 
-    buttons = (deform.Button(name='add', title=_('Add mobile phone number')), )
+    buttons = (deform.Button(name='add', title=_('Add')), )
 
     bootstrap_form_style = 'form-inline'
 
