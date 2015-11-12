@@ -151,7 +151,7 @@ class EmailsView(BaseFormView):
     schema = Email()
     route = 'emails'
 
-    buttons = (deform.Button(name='add', title=_('Add email address')), )
+    buttons = (deform.Button(name='add', title=_('Add')), )
 
     bootstrap_form_style = 'form-inline'
 

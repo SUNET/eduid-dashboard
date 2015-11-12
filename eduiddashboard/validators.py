@@ -232,19 +232,16 @@ class NINUniqueValidator(object):
         # Alternatively the POST may come from the wizard,
         # in which case it will have a "step" param.
         for post_value in request.POST:
-            if post_value.startswith('add') and (value in user_nins or 
+            if post_value.startswith('add') and (value in user_nins or
                                       unverified_user_nins.count() > 0):
-                err = _("This national identity number is already in use")
-                raise colander.Invalid(node,
-                        get_localizer(request).translate(err))
+                err = _('National identity number already added')
+                raise colander.Invalid(node, get_localizer(request).translate(err))
 
             if (post_value == 'step' and
                     request.POST['step'] == '0' and
                     value in user_nins):
-                err = _("You have already confirmed this"
-                        " national identity number")
-                raise colander.Invalid(node,
-                        get_localizer(request).translate(err))
+                err = _('National identity number already confirmed')
+                raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class NINReachableValidator(object):

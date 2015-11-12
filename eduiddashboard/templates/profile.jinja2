@@ -22,7 +22,7 @@
             {% if context.workmode == 'personal' %}
                 <h3>{{ _("Profile") }}</h3>
             {% else %}
-                <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
+                <h3>{{ _("Editing user %(email)s", email=user.get('mail')) }}</h3>
             {% endif %}
 
             {% if pending_actions %}
@@ -46,7 +46,7 @@
           {% endfor %}
             <li id="profile-filled-li">
               <div class='profile-filled profile-filled-large'>
-                <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+                <div class='title'>{{ _("Completion") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
                 <div class="progress progress-striped">
                   <div class="progress-bar profile-filled-progress-bar"></div>
                 </div>
@@ -101,7 +101,7 @@
     </div>
 
     <div class="profile-filled profile-filled-small hidden-md hidden-lg">
-      <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+      <div class='title'>{{ _("Completion") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
       <div class="progress progress-striped">
         <div class="progress-bar profile-filled-progress-bar"></div>
       </div>
@@ -198,7 +198,7 @@
 <script id='communication-error-template' language='text/template'>
   <div class='alert communication-error'>
     <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>{{_('Warning!')}}</strong> {{_('An error has occurred, please try again or contact support if the problem persists.')}}
+    <strong>{{_('Warning!')}}</strong> {{_('An error has occurred, please try again later.')}}
   </div>
 </script>
 
