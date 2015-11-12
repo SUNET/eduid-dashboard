@@ -22,7 +22,7 @@
             {% if context.workmode == 'personal' %}
                 <h3>{{ _("Profile") }}</h3>
             {% else %}
-                <h3>{{ _("Editing %(email)'s user", email=user.get('mail')) }}</h3>
+                <h3>{{ _("Editing user %(email)s", email=user.get('mail')) }}</h3>
             {% endif %}
 
             {% if pending_actions %}

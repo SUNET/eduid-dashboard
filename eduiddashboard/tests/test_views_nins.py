@@ -53,8 +53,7 @@ class NinsFormTests(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/nins/')
         response_form.mustcontain(self.formname)
 
-        self.assertNotIn('johnsmith@example.info', response_form.body)
-        self.assertIn('Verify through Mina Meddelanden', response_form.body)
+        response_form.mustcontain('input type="text" name="norEduPersonNIN"')
 
         form = response_form.forms[self.formname]
         nin = '200010100001'
