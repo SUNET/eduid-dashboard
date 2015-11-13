@@ -74,6 +74,11 @@ SETTINGS = {
     'password_reset_timeout': '120',
     'dashboard_hostname': 'dashboard.example.com',
     'dashboard_baseurl': 'http://dashboard.example.com',
+    'student_link': 'http://eduid.se/privacy.html',
+    'technicians_link': 'http://eduid.se/privacy.html',
+    'staff_link': 'http://eduid.se/privacy.html',
+    'faq_link': 'http://eduid.se/privacy.html',
+    'privacy_link': 'http://eduid.se/privacy.html',
     }
 
 

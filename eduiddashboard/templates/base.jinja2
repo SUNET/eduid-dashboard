@@ -34,16 +34,16 @@
               <ul  class="nav navbar-nav">
                       <!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
                 <li>
-                  <a href="/">{{ _("Student") }}</a>
+                  <a href="{{ request.registry.settings['student_link'] }}">{{ _("Student") }}</a>
                 </li>
                 <li>
-                  <a href="/">{{ _("Tekniker") }}</a>
+                  <a href="{{ request.registry.settings['technicians_link'] }}">{{ _("Technicians") }}</a>
                 </li>
                 <li>
-                  <a href="/">{{ _("Personal") }}</a>
+                  <a href="{{ request.registry.settings['staff_link'] }}">{{ _("Staff") }}</a>
                 </li>
                 <li>
-                  <a href="{{ request.route_path('help') }}">{{ _("Faq") }}</a>
+                  <a href="{{ request.registry.settings['faq_link'] }}">{{ _("Faq") }}</a>
                 </li>
               </ul>
               <div class="buttons nav navbar-nav navbar-right">
