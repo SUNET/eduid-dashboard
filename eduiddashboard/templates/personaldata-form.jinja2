@@ -4,7 +4,7 @@
     <h4>{% trans %}Personal information{% endtrans %}</h4>
     {% trans %}<p>This information is sent to service providers when you log in using eduID in
                   order to personalize those services for you.</p>{% endtrans %}
-     {% trans %}<p>For more information see the <a href="{{ request.registry.settings['faq_link'] }}">FAQ</a>.</p>{% endtrans %}
+    <p>{% trans %}For more information see the{% endtrans %} <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>.</p>
 
     <span class="scriptholder" data-script="auto_displayname"></span>
 
