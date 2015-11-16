@@ -7,7 +7,7 @@ def reauthn_ts_tween_factory(handler, registry):
 
     def clean_reauthn_ts_from_session(request):
         response = handler(request)
-        path = request.get('PATH_INFO', '')
+        path = request.get('SCRIPT_NAME', '') + request.get('PATH_INFO', '')
         acs_path = request.route_path('saml2-acs')
         try:
             chp_path = request.route_path('password-change')
