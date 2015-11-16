@@ -27,7 +27,7 @@ def get_status(request, user):
     completed = 0
 
     if not mobiles:
-        pending_actions = _('Add')
+        pending_actions = _('Add mobile number')
         pending_actions = get_localizer(request).translate(pending_actions)
     else:
         for n, mobile in enumerate(mobiles):
