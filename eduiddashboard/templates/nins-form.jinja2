@@ -3,7 +3,7 @@
 {% block form_generic_description %}
    <h4>{% trans %}National identity number{% endtrans %}</h4>
    {% trans %}<p>Some service providers (e.g. Antagning.se) require a confirmed identity.</p>{% endtrans %}
-   {% trans %}<p>For more information see the FAQ.</p>{% endtrans %}
+   {% trans %}<p>For more information see the <a href="{{ request.registry.settings['faq_link'] }}">FAQ</a>.</p>{% endtrans %}
 {% endblock %}
 
 {% block extra_content %}
