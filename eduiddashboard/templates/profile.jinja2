@@ -8,7 +8,7 @@
     <div class='col-md-3'>
         <div class="profile-head">
 
-             <div class="messages-wrapper hidden-lg hidden-md" id="eduid-header-messages">
+             <div class="messages-wrapper {% if request.session.peek_flash %} messages-wrapper-empty{% endif %} hidden-lg hidden-md" id="eduid-header-messages">
                <div class="messages">
                {% for message in request.session.pop_flash() %}
                  <div class="alert alert-{{ message|get_flash_message_type }}">
@@ -85,7 +85,7 @@
       </div>
     </nav>
 
-     <div class="messages-wrapper visible-lg-inline-block visible-md-inline-block" id="eduid-header-messages">
+     <div class="messages-wrapper{% if request.session.peek_flash %} messages-wrapper-empty{% endif %} col-md-8 col-md-offset-1" id="eduid-header-messages">
        <div class="messages">
        {% for message in request.session.pop_flash() %}
          <div class="alert alert-{{ message|get_flash_message_type }}">
@@ -178,11 +178,11 @@
 {% block extrajs %}
 
 <script src="{{'eduiddashboard:static/js/libs/jquery.maskedinput.min.js'|static_url}}"></script>
-<script src="{{'deform:static/scripts/jquery.form-3.09.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/jquery.form-3.09.js'|static_url}}"></script>
 
-<script src="{{'deform:static/scripts/deform.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/deform.js'|static_url}}"></script>
 
-<script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/deform_bootstrap.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/dashboard-forms-helper-functions.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/dashboard-tabbed-form.js'|static_url}}"></script>
