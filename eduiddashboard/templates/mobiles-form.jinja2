@@ -4,7 +4,7 @@
     <h4>{% trans %}Mobile phone numbers{% endtrans %}</h4>
     {% trans %}<p>You can connect one or more e-mail addresses with your eduID account,
                   and select which one is the primary one.</p>{% endtrans %}
-    {% trans %}<p>For more information see the help section.</p>{% endtrans %}
+    <p>{% trans %}For more information see the{% endtrans %} <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>.</p>
 {% endblock %}
 
 {% block extra_content %}
