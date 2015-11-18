@@ -209,9 +209,9 @@ class NINUniqueValidator(object):
 
     def __call__(self, node, value):
         """
-            Check if the NIN was not already registered and verified by any user
-            Check if the NIN was not already registered by the present user in the
-                verifications process.
+        Validator which makes sure that:
+        1. the NiN has not already been added by the user
+        2. the user does not already have a confirmed NiN.
         """
 
         from eduiddashboard.models import normalize_nin
