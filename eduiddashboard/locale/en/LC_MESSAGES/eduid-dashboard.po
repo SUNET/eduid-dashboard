@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-17 14:25+0100\n"
-"PO-Revision-Date: 2015-11-17 13:26+0000\n"
+"POT-Creation-Date: 2015-11-18 13:54+0100\n"
+"PO-Revision-Date: 2015-11-18 12:57+0000\n"
 "Last-Translator: Gijutsu <ascii@binary.to>\n"
 "Language-Team: English (United States) (http://www.transifex.com/sunet"
 "/eduid-dashboard/language/en_US/)\n"
@@ -245,12 +245,13 @@ msgstr ""
 msgid "National identity number already added"
 msgstr "National identity number already added"
 
-#: eduiddashboard/validators.py:243
-msgid "National identity number already confirmed"
-msgstr "National identity number already confirmed"
+#: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
+#: eduiddashboard/views/nins.py:515
+msgid "You already have a confirmed national identity number"
+msgstr "You already have a confirmed national identity number"
 
-#: eduiddashboard/validators.py:268 eduiddashboard/validators.py:379
-#: eduiddashboard/validators.py:401
+#: eduiddashboard/validators.py:272 eduiddashboard/validators.py:383
+#: eduiddashboard/validators.py:405
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -258,7 +259,7 @@ msgstr ""
 "We are experiencing temporary technical problems with ${service_name}, "
 "please try again later."
 
-#: eduiddashboard/validators.py:274
+#: eduiddashboard/validators.py:278
 msgid ""
 "This national identity number is not registered with \"${service_name}\"."
 " Please register at <a href=\"${service_url}\" "
@@ -268,7 +269,7 @@ msgstr ""
 " Please register at <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:279
+#: eduiddashboard/validators.py:283
 msgid ""
 "Your registration process with \"${service_name}\" is not complete. "
 "Please visit <a href=\"${service_url}\" "
@@ -278,7 +279,7 @@ msgstr ""
 "Please visit <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a> to complete your registration."
 
-#: eduiddashboard/validators.py:284
+#: eduiddashboard/validators.py:288
 msgid ""
 "According to \"${service_name}\" you have opted out to receive messages "
 "from SUNET (eduID). In order to receive a confirmation code from us, you "
@@ -290,11 +291,11 @@ msgstr ""
 "need to accept SUNET (eduID) as a sender at <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:371
+#: eduiddashboard/validators.py:375
 msgid "You have no confirmed mobile phone"
 msgstr "You have no confirmed mobile phone number"
 
-#: eduiddashboard/validators.py:375
+#: eduiddashboard/validators.py:379
 msgid ""
 "The given mobile number was not associated to the given national identity"
 " number"
@@ -302,19 +303,19 @@ msgstr ""
 "The national identity number you provided is not associated with the "
 "confirmed mobile phone number"
 
-#: eduiddashboard/validators.py:386
+#: eduiddashboard/validators.py:390
 msgid "Validate NIN via mobile with succeeded"
 msgstr "National identity number validated via mobile phone number"
 
-#: eduiddashboard/validators.py:427
+#: eduiddashboard/validators.py:431
 msgid "The entered code does not exist"
 msgstr "The entered code does not exist"
 
-#: eduiddashboard/validators.py:442
+#: eduiddashboard/validators.py:446
 msgid "Invalid CSRF token"
 msgstr "Invalid CSRF token"
 
-#: eduiddashboard/validators.py:458
+#: eduiddashboard/validators.py:462
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -613,6 +614,8 @@ msgid ""
 "<p>Some service providers (e.g. Antagning.se) require a confirmed "
 "identity.</p>"
 msgstr ""
+"<p>Some service providers (e.g. Antagning.se) require a confirmed "
+"identity.</p>"
 
 #: eduiddashboard/templates/nins-form.jinja2:19
 msgid "Active"
@@ -1268,15 +1271,15 @@ msgstr ""
 
 #: eduiddashboard/templates/translate-messages.jinja2:1
 msgid "http://www.swamid.se/policy/assurance/al1"
-msgstr ""
+msgstr "Unconfirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:2
 msgid "http://www.swamid.se/policy/assurance/al2"
-msgstr ""
+msgstr "Confirmed"
 
 #: eduiddashboard/templates/translate-messages.jinja2:3
 msgid "http://www.swamid.se/policy/assurance/al3"
-msgstr ""
+msgstr "Verified"
 
 #: eduiddashboard/templates/verification_email.html.jinja2:5
 #, python-format
@@ -1670,10 +1673,6 @@ msgstr "Your national identity number confirmation request can not be found"
 #: eduiddashboard/views/nins.py:500
 msgid "There was an unknown error dealing with your request"
 msgstr "There was an unknown error in dealing with your request"
-
-#: eduiddashboard/views/nins.py:515
-msgid "You already have a verified national identity number"
-msgstr "You already have a verified personal identity number"
 
 #: eduiddashboard/views/nins.py:535
 msgid "Add your national identity number"

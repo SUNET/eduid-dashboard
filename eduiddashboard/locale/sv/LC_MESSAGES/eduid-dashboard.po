@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-17 14:25+0100\n"
-"PO-Revision-Date: 2015-11-17 15:15+0000\n"
+"POT-Creation-Date: 2015-11-18 13:54+0100\n"
+"PO-Revision-Date: 2015-11-18 12:56+0000\n"
 "Last-Translator: Gijutsu <ascii@binary.to>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
@@ -249,12 +249,13 @@ msgstr "Personnumret kunde inte hittas, är inte bekräftat eller inte aktivt"
 msgid "National identity number already added"
 msgstr "Personnummret finns redan i listan"
 
-#: eduiddashboard/validators.py:243
-msgid "National identity number already confirmed"
-msgstr "Det här personnumret är redan bekräftat"
+#: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
+#: eduiddashboard/views/nins.py:515
+msgid "You already have a confirmed national identity number"
+msgstr "Du har redan ett bekräftat personnummer"
 
-#: eduiddashboard/validators.py:268 eduiddashboard/validators.py:379
-#: eduiddashboard/validators.py:401
+#: eduiddashboard/validators.py:272 eduiddashboard/validators.py:383
+#: eduiddashboard/validators.py:405
 msgid ""
 "Sorry, we are experiencing temporary technical problem with "
 "${service_name}, please try again later."
@@ -262,7 +263,7 @@ msgstr ""
 "Vi har för närvarande tekniska problem med ${service_name}, vänligen "
 "försök igen senare."
 
-#: eduiddashboard/validators.py:274
+#: eduiddashboard/validators.py:278
 msgid ""
 "This national identity number is not registered with \"${service_name}\"."
 " Please register at <a href=\"${service_url}\" "
@@ -271,7 +272,7 @@ msgstr ""
 "Personnumret finns inte registrerat hos ${service_name}. Registrera dig "
 "här <a href=\"${service_url}\" target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:279
+#: eduiddashboard/validators.py:283
 msgid ""
 "Your registration process with \"${service_name}\" is not complete. "
 "Please visit <a href=\"${service_url}\" "
@@ -281,7 +282,7 @@ msgstr ""
 "din registrering vänligen besök <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:284
+#: eduiddashboard/validators.py:288
 msgid ""
 "According to \"${service_name}\" you have opted out to receive messages "
 "from SUNET (eduID). In order to receive a confirmation code from us, you "
@@ -293,11 +294,11 @@ msgstr ""
 "blockeringen hos <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 
-#: eduiddashboard/validators.py:371
+#: eduiddashboard/validators.py:375
 msgid "You have no confirmed mobile phone"
 msgstr "Du har inget bekräftat mobiltelefonnummer"
 
-#: eduiddashboard/validators.py:375
+#: eduiddashboard/validators.py:379
 msgid ""
 "The given mobile number was not associated to the given national identity"
 " number"
@@ -305,19 +306,19 @@ msgstr ""
 "Ditt bekräftade mobiltelefonnummer är inte kopplat till det personnummer "
 "du angav"
 
-#: eduiddashboard/validators.py:386
+#: eduiddashboard/validators.py:390
 msgid "Validate NIN via mobile with succeeded"
 msgstr "Personnummer bekräftat via ditt mobiltelefonabonnemang"
 
-#: eduiddashboard/validators.py:427
+#: eduiddashboard/validators.py:431
 msgid "The entered code does not exist"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/validators.py:442
+#: eduiddashboard/validators.py:446
 msgid "Invalid CSRF token"
 msgstr "Ogiltig CSRF kod"
 
-#: eduiddashboard/validators.py:458
+#: eduiddashboard/validators.py:462
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -1655,10 +1656,6 @@ msgstr "Bekräftelseförfrågan för ditt personnummer kan inte hittas"
 #: eduiddashboard/views/nins.py:500
 msgid "There was an unknown error dealing with your request"
 msgstr "Ett okänt fel inträffade vid hanteringen av din förfrågan."
-
-#: eduiddashboard/views/nins.py:515
-msgid "You already have a verified national identity number"
-msgstr "Du har redan ett bekräftat personnummer"
 
 #: eduiddashboard/views/nins.py:535
 msgid "Add your national identity number"
