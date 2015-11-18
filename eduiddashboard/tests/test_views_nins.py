@@ -576,4 +576,4 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                         'norEduPersonNIN': '19700101-0001',
                         'csrf': '12345',
                     }, status=200)
-                    self.assertEqual(resp_step0.json['status'], 'success')
+                    self.assertEqual(resp_step0.json['status'], 'failure')
