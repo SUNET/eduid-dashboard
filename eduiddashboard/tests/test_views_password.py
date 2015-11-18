@@ -190,7 +190,7 @@ class PasswordFormTests(LoggedInRequestTests):
                 response = form.submit('save')
 
             self.assertEqual(response.status, '200 OK')
-            self.assertIn('The password complexity is too weak.',
+            self.assertIn('A stronger password is required',
                           response.body, msg='The entropy for {0} is bigger than required'.format(password))
             self.assertNotIn('Your password has been successfully updated',
                              response.body)
