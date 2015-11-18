@@ -512,7 +512,7 @@ class NinsWizard(BaseWizard):
         verified_nins = user.get_nins()
 
         if len(verified_nins) > 0:
-            message = _("You already have a verified national identity number")
+            message = _("You already have a confirmed national identity number")
             message = get_localizer(self.request).translate(message)
             return {
                 'status': 'error',
