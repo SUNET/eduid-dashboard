@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard 0.4.0b7\n"
+"Project-Id-Version: eduid-dashboard 0.4.0b8\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-17 14:25+0100\n"
+"POT-Creation-Date: 2015-11-18 13:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -233,32 +233,33 @@ msgstr ""
 msgid "National identity number already added"
 msgstr ""
 
-#: eduiddashboard/validators.py:243
-msgid "National identity number already confirmed"
+#: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
+#: eduiddashboard/views/nins.py:515
+msgid "You already have a confirmed national identity number"
 msgstr ""
 
-#: eduiddashboard/validators.py:268 eduiddashboard/validators.py:379
-#: eduiddashboard/validators.py:401
+#: eduiddashboard/validators.py:272 eduiddashboard/validators.py:383
+#: eduiddashboard/validators.py:405
 msgid ""
 "Sorry, we are experiencing temporary technical problem with ${service_name}, "
 "please try again later."
 msgstr ""
 
-#: eduiddashboard/validators.py:274
+#: eduiddashboard/validators.py:278
 msgid ""
 "This national identity number is not registered with \"${service_name}\". "
 "Please register at <a href=\"${service_url}\" "
 "target=\"_blank\">${service_name}</a>."
 msgstr ""
 
-#: eduiddashboard/validators.py:279
+#: eduiddashboard/validators.py:283
 msgid ""
 "Your registration process with \"${service_name}\" is not complete. Please "
 "visit <a href=\"${service_url}\" target=\"_blank\">${service_name}</a> to "
 "complete your registration."
 msgstr ""
 
-#: eduiddashboard/validators.py:284
+#: eduiddashboard/validators.py:288
 msgid ""
 "According to \"${service_name}\" you have opted out to receive messages from "
 "SUNET (eduID). In order to receive a confirmation code from us, you need to "
@@ -266,29 +267,29 @@ msgid ""
 "target=\"_blank\">${service_name}</a>."
 msgstr ""
 
-#: eduiddashboard/validators.py:371
+#: eduiddashboard/validators.py:375
 msgid "You have no confirmed mobile phone"
 msgstr ""
 
-#: eduiddashboard/validators.py:375
+#: eduiddashboard/validators.py:379
 msgid ""
 "The given mobile number was not associated to the given national identity "
 "number"
 msgstr ""
 
-#: eduiddashboard/validators.py:386
+#: eduiddashboard/validators.py:390
 msgid "Validate NIN via mobile with succeeded"
 msgstr ""
 
-#: eduiddashboard/validators.py:427
+#: eduiddashboard/validators.py:431
 msgid "The entered code does not exist"
 msgstr ""
 
-#: eduiddashboard/validators.py:442
+#: eduiddashboard/validators.py:446
 msgid "Invalid CSRF token"
 msgstr ""
 
-#: eduiddashboard/validators.py:458
+#: eduiddashboard/validators.py:462
 msgid ""
 "Valid input formats are:<ul><li>National identity number: "
 "yyyymmddnnnn</li><li>Mobile phone number that begin with + or "
@@ -1400,10 +1401,6 @@ msgstr ""
 
 #: eduiddashboard/views/nins.py:500
 msgid "There was an unknown error dealing with your request"
-msgstr ""
-
-#: eduiddashboard/views/nins.py:515
-msgid "You already have a verified national identity number"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:535

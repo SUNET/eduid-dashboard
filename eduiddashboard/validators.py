@@ -209,9 +209,9 @@ class NINUniqueValidator(object):
 
     def __call__(self, node, value):
         """
-            Check if the NIN was not already registered and verified by any user
-            Check if the NIN was not already registered by the present user in the
-                verifications process.
+        Validator which makes sure that:
+        1. the NiN has not already been added by the user
+        2. the user does not already have a confirmed NiN.
         """
 
         from eduiddashboard.models import normalize_nin
@@ -237,10 +237,14 @@ class NINUniqueValidator(object):
                 err = _('National identity number already added')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
-            if (post_value == 'step' and
-                    request.POST['step'] == '0' and
-                    value in user_nins):
-                err = _('National identity number already confirmed')
+            elif post_value.startswith('add') and len(user_nins) > 0:
+                err = _('You already have a confirmed national identity number')
+                raise colander.Invalid(node, get_localizer(request).translate(err))
+
+            elif post_value == 'step' and \
+                 request.POST['step'] == '0' and \
+                 len(user_nins) > 0:
+                err = _('You already have a confirmed national identity number')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
