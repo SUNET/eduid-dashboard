@@ -9,7 +9,9 @@ import pytz
 
 from eduiddashboard.testing import LoggedInRequestTests
 from eduid_common.authn import vccs
-from eduid_common.authn.vccs import (check_password, add_credentials, provision_credentials)
+from eduid_common.authn.vccs import check_password, add_credentials
+from eduid_common.authn.testing import provision_credentials
+from eduid_common.authn.testing import get_vccs_client as get_vccs
 
 from eduid_userdb import Password
 
@@ -60,7 +62,7 @@ class PasswordFormTests(LoggedInRequestTests):
 
     def setUp(self, settings={}):
         super(PasswordFormTests, self).setUp(settings=settings)
-        vccs_url = self.settings['vccs_url']
+        vccs_url = 'dummy'
         fake_vccs_client = FakeVCCSClient()
         mock_config = {
             'return_value': fake_vccs_client,
@@ -81,11 +83,12 @@ class PasswordFormTests(LoggedInRequestTests):
         self.assertEqual(response.status, '302 Found')
 
     def test_add_credentials(self):
-        vccs_url = self.settings['vccs_url']
-        self.assertTrue(check_password(vccs_url, self.initial_password, self.user))
+        vccs_url = 'dummy'
+        vccs_client = get_vccs(vccs_url)
+        self.assertTrue(check_password(vccs_url, self.initial_password, self.user, vccs=vccs_client))
         new_password = 'new-password'
-        add_credentials(vccs_url, self.initial_password, new_password, self.user)
-        self.assertTrue(check_password(vccs_url, new_password, self.user))
+        add_credentials(vccs_url, self.initial_password, new_password, self.user, vccs=vccs_client)
+        self.assertTrue(check_password(vccs_url, new_password, self.user, vccs=vccs_client))
 
         with patch('eduid_common.authn.vccs', clear=True):
             vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
@@ -94,7 +97,7 @@ class PasswordFormTests(LoggedInRequestTests):
                     'authenticated': False,
                 },
             })
-            self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
+            self.assertFalse(check_password(vccs_url, self.initial_password, self.user, vccs=vccs_client))
 
     def test_valid_current_password(self):
         self.set_logged()
@@ -357,14 +360,15 @@ class ResetPasswordFormTests(LoggedInRequestTests):
 
     def setUp(self, settings={}):
         super(ResetPasswordFormTests, self).setUp(settings=settings, std_user='johnnysmith1@example.org')
-        vccs_url = self.settings['vccs_url']
+        vccs_url = 'dummy'
+        vccs_client = get_vccs(vccs_url)
         fake_vccs_client = FakeVCCSClient()
         mock_config = {
             'return_value': fake_vccs_client,
         }
         self.patcher = patch.object(vccs, 'get_vccs_client', **mock_config)
         self.patcher.start()
-        add_credentials(vccs_url, 'xxx', self.initial_password, self.user)
+        add_credentials(vccs_url, 'xxx', self.initial_password, self.user, vccs=vccs_client)
 
     def test_reset_password(self):
         response_form = self.testapp.get('/profile/reset-password/email/')
