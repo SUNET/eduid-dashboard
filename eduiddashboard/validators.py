@@ -7,7 +7,7 @@ from eduid_userdb.exceptions import UserDoesNotExist, MultipleUsersReturned
 from eduid_userdb.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.vccs import check_password
+from eduid_common.authn.vccs import check_password
 from eduiddashboard.utils import (normalize_to_e_164,
                                   sanitize_input,
                                   sanitize_post_key)

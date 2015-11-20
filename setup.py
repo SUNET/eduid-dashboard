@@ -29,6 +29,7 @@ requires = [
     'vccs_client>=0.4.1',
     'eduid_lookup_mobile>=0.0.4',
     'eduid_userdb>=0.0.2',
+    'eduid-common>=0.1.0',
     'pysaml2==1.2.0beta2',
 
     'pymongo>=2.8,<3',

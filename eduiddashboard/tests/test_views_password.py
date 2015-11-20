@@ -8,8 +8,8 @@ import vccs_client
 import pytz
 
 from eduiddashboard.testing import LoggedInRequestTests
-from eduiddashboard import vccs
-from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
+from eduid_common.authn import vccs
+from eduid_common.authn.vccs import (check_password, add_credentials, provision_credentials)
 
 from eduid_userdb import Password
 
@@ -87,7 +87,7 @@ class PasswordFormTests(LoggedInRequestTests):
         add_credentials(vccs_url, self.initial_password, new_password, self.user)
         self.assertTrue(check_password(vccs_url, new_password, self.user))
 
-        with patch('eduiddashboard.vccs', clear=True):
+        with patch('eduid_common.authn.vccs', clear=True):
             vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
                 'auth_response': {
                     'version': 1,
@@ -130,7 +130,7 @@ class PasswordFormTests(LoggedInRequestTests):
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
-            with patch('eduiddashboard.vccs', clear=True):
+            with patch('eduid_common.authn.vccs', clear=True):
                 vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
                     'auth_response': {
                         'version': 1,
@@ -234,8 +234,8 @@ class TerminateAccountTests(LoggedInRequestTests):
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
         self.assertIn('idp.example.com', form_response.location)
-        with patch('eduiddashboard.vccs.get_vccs_client'):
-            from eduiddashboard.vccs import get_vccs_client
+        with patch('eduid_common.authn.vccs.get_vccs_client'):
+            from eduid_common.authn.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
                 'revoke_creds_response': {
                     'version': 1,
@@ -272,8 +272,8 @@ class TerminateAccountTests(LoggedInRequestTests):
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
         self.assertIn('Please choose a new password for your eduID account', response.text)
         form = response.forms['resetpasswordstep2view-form']
-        with patch('eduiddashboard.vccs.get_vccs_client'):
-            from eduiddashboard.vccs import get_vccs_client
+        with patch('eduid_common.authn.vccs.get_vccs_client'):
+            from eduid_common.authn.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient()
             form_resp = form.submit('reset')
 
@@ -413,8 +413,8 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
         self.assertIn('Please choose a new password for your eduID account', response.text)
         form = response.forms['resetpasswordstep2view-form']
-        with patch('eduiddashboard.vccs.get_vccs_client'):
-            from eduiddashboard.vccs import get_vccs_client
+        with patch('eduid_common.authn.vccs.get_vccs_client'):
+            from eduid_common.authn.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient()
             form_resp = form.submit('reset')
 

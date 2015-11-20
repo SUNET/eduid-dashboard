@@ -20,7 +20,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    NINResetPassword,
                                    ResetPasswordStep2)
-from eduiddashboard.vccs import add_credentials
+from eduid_common.authn.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action

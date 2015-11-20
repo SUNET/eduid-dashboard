@@ -24,7 +24,7 @@ from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
-from eduiddashboard.vccs import revoke_all_credentials
+from eduid_common.authn.vccs import revoke_all_credentials
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
