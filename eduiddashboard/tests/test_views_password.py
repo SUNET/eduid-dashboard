@@ -4,13 +4,12 @@ from copy import deepcopy
 
 from bson import ObjectId
 import simplejson as json
-import vccs_client
 import pytz
 
 from eduiddashboard.testing import LoggedInRequestTests
 from eduid_common.authn import vccs
 from eduid_common.authn.vccs import check_password, add_credentials
-from eduid_common.authn.testing import provision_credentials
+from eduid_common.authn.testing import provision_credentials, FakeVCCSClient
 from eduid_common.authn.testing import get_vccs_client as get_vccs
 
 from eduid_userdb import Password
@@ -19,40 +18,6 @@ from eduid_userdb.testing import MockedUserDB as MUDB
 
 import logging
 log = logging.getLogger(__name__)
-
-
-class FakeVCCSClient(vccs_client.VCCSClient):
-
-    def __init__(self, fake_response=None):
-        self.fake_response = fake_response
-
-    def _execute_request_response(self, _service, _values):
-        if self.fake_response is not None:
-            return json.dumps(self.fake_response)
-
-        fake_response = {}
-        if _service == 'add_creds':
-            fake_response = {
-                'add_creds_response': {
-                    'version': 1,
-                    'success': True,
-                },
-            }
-        elif _service == 'authenticate':
-            fake_response = {
-                'auth_response': {
-                    'version': 1,
-                    'authenticated': True,
-                },
-            }
-        elif _service == 'revoke_creds':
-            fake_response = {
-                'revoke_creds_response': {
-                    'version': 1,
-                    'success': True,
-                },
-            }
-        return json.dumps(fake_response)
 
 
 class PasswordFormTests(LoggedInRequestTests):
