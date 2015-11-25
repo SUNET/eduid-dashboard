@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-20 12:49+0100\n"
+"POT-Creation-Date: 2015-11-25 15:28+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -664,8 +664,10 @@ msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
 msgid ""
-"eduID cannot use Mina meddelanden at this time. Please confirm your "
-"identity using another option."
+"For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
+"from using Mina Meddelanden due to pressure from SWEDBANK. For more "
+"information: <a href='https://www.sunet.se/sunet-mina-"
+"meddelanden/'>Vetenskapsrådet's press release</a>"
 msgstr ""
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:7
@@ -2098,4 +2100,10 @@ msgstr ""
 
 #~ msgid "National identity number already confirmed"
 #~ msgstr "números de identificación personal"
+
+#~ msgid ""
+#~ "eduID cannot use Mina meddelanden at "
+#~ "this time. Please confirm your identity"
+#~ " using another option."
+#~ msgstr ""
 
