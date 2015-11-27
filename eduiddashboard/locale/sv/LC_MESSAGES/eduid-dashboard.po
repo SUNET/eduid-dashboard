@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-27 08:44+0100\n"
-"PO-Revision-Date: 2015-11-27 07:27+0000\n"
+"POT-Creation-Date: 2015-11-27 17:10+0100\n"
+"PO-Revision-Date: 2015-11-27 16:14+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
@@ -663,20 +663,23 @@ msgid "We are verifying that the provided identity number is valid, please wait.
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/reset-password.jinja2:32
 msgid "Mina Meddelanden disabled"
 msgstr "Mina Meddelanden är inaktiverad"
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/reset-password.jinja2:32
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
 "information:"
 msgstr ""
-"För närvarande har skatteverket stängt av Vetenskapsrådet/SUNET/eduID "
+"För närvarande har Skatteverket stängt av Vetenskapsrådet/SUNET/eduID "
 "från användning av ”Mina Meddelanden” efter påtryckning från SWEDBANK. "
 "Mer information:"
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/reset-password.jinja2:32
 msgid "Vetenskapsrådet's press release"
 msgstr "Vetenskapsrådets pressrelease"
 
@@ -1185,28 +1188,34 @@ msgstr "Glömt bort ditt lösenord?"
 
 #: eduiddashboard/templates/reset-password.jinja2:8
 msgid ""
-"<p>Password reset is possible using either your government inbox or "
-"e-mail.</p>"
-msgstr ""
-"<p>Återställning av ditt lösenord är möjligt antingen via \"Min "
-"myndighetspost\" eller via e-post.</p>"
+"Password reset is possible using an email that you have registered on "
+"your account."
+msgstr "Återställning av ditt lösenord är möjligt via e-post."
 
-#: eduiddashboard/templates/reset-password.jinja2:10
+#: eduiddashboard/templates/reset-password.jinja2:11
 msgid ""
-"<p>The recommended method to reset your password is by using your "
-"government inbox. If e-mail is used\n"
-"  to reset your password your eduID account status will be reset to "
-"unconfirmed.</p>"
+"If email is used to reset your password your eduID account status will be"
+" reset to unconfirmed."
 msgstr ""
-"<p>Den rekommenderade metoden för att återställa ditt lösenord är genom "
-"\"Min myndighetspost\". Om återställning av ditt lösenord sker via e-post"
-" återställs även din kontostatus till obekräftad.</p>"
+"Om återställning av ditt lösenord sker via e-post återställs även din "
+"kontostatus till obekräftad."
 
-#: eduiddashboard/templates/reset-password.jinja2:16
+#: eduiddashboard/templates/reset-password.jinja2:12
+msgid ""
+"Unfortunately, we have been locked out from ”Mina Meddelanden”. We are "
+"currently working on other methods for password reset, that will be able "
+"to use without resetting the account status to unconfirmed."
+msgstr ""
+"Tyvärr har Skatteverket stängt av möjligheten att återställa lösenordet "
+"via \"Mina Meddelanden\". Vi arbetar på möjligheten att återställa "
+"lösenordet med andra metoder som innebär att kontot inte blir obekräftat."
+
+#: eduiddashboard/templates/reset-password.jinja2:18
+#: eduiddashboard/templates/reset-password.jinja2:20
 msgid "Reset password by government mailbox service"
 msgstr "Återställ ditt lösenord via \"Min myndighetspost\""
 
-#: eduiddashboard/templates/reset-password.jinja2:22
+#: eduiddashboard/templates/reset-password.jinja2:24
 msgid "Reset password by e-mail"
 msgstr "Återställ ditt lösenord via e-post"
 
