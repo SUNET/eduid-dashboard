@@ -8,3 +8,7 @@ class ViewTests(LoggedInRequestTests):
         res = self.testapp.get('/')
         self.assertEqual(res.status, '302 Found')
         self.assertEqual('http://localhost/profile/', res.location)
+
+    def test_favicon(self):
+        res = self.testapp.get('/favicon.ico')
+        self.assertEqual(res.status, '302 Found')
