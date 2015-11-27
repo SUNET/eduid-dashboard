@@ -74,6 +74,6 @@
 
 {% block extra_jsdata %}
     <span class="dataholder" id="ninsform-data" data-msg_verifying="{{ _("We are verifying that the provided identity number is valid, please wait.") }}"></span>
-    <span class="dataholder" id="disabled_mm" data-title="{{ _("Mina Meddelanden disabled") }}" data-content="{{ _("For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID from using Mina Meddelanden due to pressure from SWEDBANK. For more information: <a href='https://www.sunet.se/sunet-mina-meddelanden/'>Vetenskapsrådet's press release</a>") }}"></span>
+    <span class="dataholder" id="disabled_mm" data-title="{{ _("Mina Meddelanden disabled") }}" data-content="{{ _("For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID from using Mina Meddelanden due to pressure from SWEDBANK. For more information:")}} <a href='https://www.sunet.se/sunet-mina-meddelanden/'>{{ _("Vetenskapsrådet's press release") }}</a>"></span>
     <span class="scriptholder" data-script="nins"></span>
 {% endblock %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-25 15:28+0100\n"
+"POT-Creation-Date: 2015-11-27 08:25+0100\n"
 "PO-Revision-Date: 2015-11-25 14:30+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: English (http://www.transifex.com/sunet/eduid-"
@@ -354,19 +354,19 @@ msgstr ""
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: eduiddashboard/templates/base.jinja2:37
+#: eduiddashboard/templates/base.jinja2:55
 msgid "Student"
 msgstr "Student"
 
-#: eduiddashboard/templates/base.jinja2:40
+#: eduiddashboard/templates/base.jinja2:58
 msgid "Technicians"
 msgstr "Technicians"
 
-#: eduiddashboard/templates/base.jinja2:43
+#: eduiddashboard/templates/base.jinja2:61
 msgid "Staff"
 msgstr "Staff"
 
-#: eduiddashboard/templates/base.jinja2:46
+#: eduiddashboard/templates/base.jinja2:64
 #: eduiddashboard/templates/emails-form.jinja2:7
 #: eduiddashboard/templates/mobiles-form.jinja2:7
 #: eduiddashboard/templates/nins-form.jinja2:6
@@ -374,19 +374,19 @@ msgstr "Staff"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: eduiddashboard/templates/base.jinja2:51
+#: eduiddashboard/templates/base.jinja2:69
 msgid "Logout"
 msgstr "Logout"
 
-#: eduiddashboard/templates/base.jinja2:55
+#: eduiddashboard/templates/base.jinja2:73
 msgid "Sign up"
 msgstr "Sign up"
 
-#: eduiddashboard/templates/base.jinja2:59
+#: eduiddashboard/templates/base.jinja2:77
 msgid "Sign in"
 msgstr "Sign in"
 
-#: eduiddashboard/templates/base.jinja2:82
+#: eduiddashboard/templates/base.jinja2:100
 msgid "This Site depends on Javascript, so please enable it."
 msgstr "This Site depends on Javascript, so please enable it."
 
@@ -661,16 +661,25 @@ msgid "Mina Meddelanden disabled"
 msgstr "Mina Meddelanden disabled"
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#, fuzzy
+#| msgid "" "For the time being Skatteverket has disabled
+#| Vetenskapsrådet/SUNET/eduID " "from using Mina Meddelanden due to pressure
+#| from SWEDBANK. For more " "information: <a
+#| href='https://www.sunet.se/sunet-mina-" "meddelanden/'>Vetenskapsrådet's
+#| press release</a>"
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
-"information: <a href='https://www.sunet.se/sunet-mina-"
-"meddelanden/'>Vetenskapsrådet's press release</a>"
+"information:"
 msgstr ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
 "information: <a href='https://www.sunet.se/sunet-mina-"
 "meddelanden/'>Vetenskapsrådet's press release</a>"
+
+#: eduiddashboard/templates/nins-form.jinja2:77
+msgid "Vetenskapsrådet's press release"
+msgstr ""
 
 #: eduiddashboard/templates/nins-verification-chooser.jinja2:7
 msgid "Choose NIN verification method"
