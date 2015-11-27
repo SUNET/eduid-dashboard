@@ -336,8 +336,8 @@ class PasswordsView(BaseFormView):
              request_method='GET', permission='edit')
 def reset_password(context, request):
     """ Reset password """
-    return {
-    }
+    enable_mm = request.registry.settings.get('enable_mm_verification')
+    return {'enable_mm_verification': enable_mm}
 
 
 @view_config(route_name='reset-password-expired', renderer='templates/reset-password-expired.jinja2',
