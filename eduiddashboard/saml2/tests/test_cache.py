@@ -1,6 +1,6 @@
 import unittest
 
-from eduiddashboard.saml2.cache import (pyramidSessionCacheAdapter,
+from eduid_common.authn.cache import (SessionCacheAdapter,
                                         OutstandingQueriesCache,
                                         IdentityCache, StateCache)
 
@@ -11,7 +11,7 @@ class pyramidSessionCacheAdapterTests(unittest.TestCase):
         fake_session_dict = {
             'user': 'someone@example.com',
         }
-        psca = pyramidSessionCacheAdapter(fake_session_dict, 'saml2')
+        psca = SessionCacheAdapter(fake_session_dict, 'saml2')
 
         self.assertEqual(psca.session, fake_session_dict)
         self.assertEqual(psca.key, psca.key_prefix + 'saml2')
@@ -20,7 +20,7 @@ class pyramidSessionCacheAdapterTests(unittest.TestCase):
         fake_session_dict = {
             'user': 'someone@example.com',
         }
-        psca = pyramidSessionCacheAdapter(fake_session_dict, 'saml2')
+        psca = SessionCacheAdapter(fake_session_dict, 'saml2')
 
         self.assertEqual(psca._get_objects(), {})
 
@@ -28,7 +28,7 @@ class pyramidSessionCacheAdapterTests(unittest.TestCase):
         fake_session_dict = {
             'user': 'someone@example.com',
         }
-        psca = pyramidSessionCacheAdapter(fake_session_dict, 'saml2')
+        psca = SessionCacheAdapter(fake_session_dict, 'saml2')
 
         psca._set_objects({
             'onekey': 'onevalue',
@@ -40,7 +40,7 @@ class pyramidSessionCacheAdapterTests(unittest.TestCase):
         fake_session_dict = {
             'user': 'someone@example.com',
         }
-        psca = pyramidSessionCacheAdapter(fake_session_dict, 'saml2')
+        psca = SessionCacheAdapter(fake_session_dict, 'saml2')
 
         psca.sync()
         self.assertEqual(psca._get_objects(), {})
@@ -59,7 +59,7 @@ class OutstandingQueriesCacheTests(unittest.TestCase):
         }
         oqc = OutstandingQueriesCache(fake_session_dict)
 
-        self.assertIsInstance(oqc._db, pyramidSessionCacheAdapter)
+        self.assertIsInstance(oqc._db, SessionCacheAdapter)
 
     def test_outstanding_queries(self):
 
@@ -91,5 +91,5 @@ class IdentityCacheTests(unittest.TestCase):
     def test_init(self):
         ic = IdentityCache({})
 
-        self.assertIsInstance(ic._db, pyramidSessionCacheAdapter)
+        self.assertIsInstance(ic._db, SessionCacheAdapter)
         self.assertTrue(ic._sync, True)

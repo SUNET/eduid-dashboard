@@ -5,7 +5,8 @@ from pyramid.authentication import (AuthTktAuthenticationPolicy,
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import ConfigurationError
 
-from eduiddashboard.saml2.utils import get_saml2_config_from_request
+from eduiddashboard.saml2.utils import (get_saml2_config_from_request,
+                                        get_saml2_config)
 
 
 def read_setting_from_env(settings, key, default=None):
@@ -57,6 +58,7 @@ def includeme(config):
 
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
+    settings['saml2_config'] = get_saml2_config(settings.get('saml2.settings_module'))
 
     config = configure_auth(config, settings)
     # saml2 views
