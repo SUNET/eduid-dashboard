@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-27 08:44+0100\n"
+"POT-Creation-Date: 2015-11-27 17:10+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -659,10 +659,12 @@ msgid "We are verifying that the provided identity number is valid, please wait.
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/reset-password.jinja2:32
 msgid "Mina Meddelanden disabled"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/reset-password.jinja2:32
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
@@ -670,6 +672,7 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/reset-password.jinja2:32
 msgid "Vetenskapsrådet's press release"
 msgstr ""
 
@@ -1088,23 +1091,29 @@ msgstr "Cambia tu contraseña"
 
 #: eduiddashboard/templates/reset-password.jinja2:8
 msgid ""
-"<p>Password reset is possible using either your government inbox or "
-"e-mail.</p>"
+"Password reset is possible using an email that you have registered on "
+"your account."
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:10
+#: eduiddashboard/templates/reset-password.jinja2:11
 msgid ""
-"<p>The recommended method to reset your password is by using your "
-"government inbox. If e-mail is used\n"
-"  to reset your password your eduID account status will be reset to "
-"unconfirmed.</p>"
+"If email is used to reset your password your eduID account status will be"
+" reset to unconfirmed."
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:16
+#: eduiddashboard/templates/reset-password.jinja2:12
+msgid ""
+"Unfortunately, we have been locked out from ”Mina Meddelanden”. We are "
+"currently working on other methods for password reset, that will be able "
+"to use without resetting the account status to unconfirmed."
+msgstr ""
+
+#: eduiddashboard/templates/reset-password.jinja2:18
+#: eduiddashboard/templates/reset-password.jinja2:20
 msgid "Reset password by government mailbox service"
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:22
+#: eduiddashboard/templates/reset-password.jinja2:24
 #, fuzzy
 msgid "Reset password by e-mail"
 msgstr "Cambia tu contraseña"
@@ -2103,4 +2112,19 @@ msgstr ""
 
 #~ msgid "National identity number already confirmed"
 #~ msgstr "números de identificación personal"
+
+#~ msgid ""
+#~ "<p>Password reset is possible using "
+#~ "either your government inbox or "
+#~ "e-mail.</p>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<p>The recommended method to reset your"
+#~ " password is by using your government"
+#~ " inbox. If e-mail is used\n"
+#~ "  to reset your password your "
+#~ "eduID account status will be reset "
+#~ "to unconfirmed.</p>"
+#~ msgstr ""
 
