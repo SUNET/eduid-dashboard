@@ -11,6 +11,7 @@ from pyramid.settings import asbool
 
 from deform_bootstrap import Form
 
+from eduid_common.authn.saml2 import get_authn_request
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
@@ -25,7 +26,6 @@ from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
-from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 
@@ -311,7 +311,8 @@ def terminate_account(context, request):
     selected_idp = request.session.get('selected_idp')
     relay_state = context.route_url('account-terminated')
     loa = context.get_loa()
-    info = get_authn_request(request, relay_state, selected_idp,
+    info = get_authn_request(request.registry.settings, request.session,
+                             relay_state, selected_idp,
                              required_loa=loa, force_authn=True)
     schedule_action(request.session, 'account-termination-action')
 

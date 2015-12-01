@@ -16,6 +16,7 @@ from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
+from eduid_common.authn.saml2 import get_authn_request, get_authn_response
 from eduiddashboard.utils import (sanitize_get,
                                   sanitize_session_get,
                                   sanitize_post_key)
@@ -139,7 +140,8 @@ def login_view(request):
             'login_url': request.route_url('saml2-login'),
         })
 
-    result = get_authn_request(request, came_from, selected_idp)
+    result = get_authn_request(request.registy.settings, request.session,
+                               came_from, selected_idp)
 
     schedule_action(request.session, 'login-action')
 
@@ -160,36 +162,11 @@ def assertion_consumer_service(request):
     if sanitize_post_key(request, 'SAMLResponse') is None:
         raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
-    client = Saml2Client(request.saml2_config,
-                         identity_cache=IdentityCache(request.session))
 
-    oq_cache = OutstandingQueriesCache(request.session)
-    outstanding_queries = oq_cache.outstanding_queries()
-
-    try:
-        # process the authentication response
-        response = client.parse_authn_request_response(xmlstr, BINDING_HTTP_POST,
-                                                       outstanding_queries)
-    except AssertionError:
-        log.error('SAML response is not verified')
-        raise HTTPBadRequest(
-            """SAML response is not verified. May be caused by the response
-            was not issued at a reasonable time or the SAML status is not ok.
-            Check the IDP datetime setup""")
-
-    if response is None:
-        log.error('SAML response is None')
-        raise HTTPBadRequest(
-            "SAML response has errors. Please check the logs")
-
-    session_id = response.session_id()
-    oq_cache.delete(session_id)
-
-    # authenticate the remote user
-    session_info = response.session_info()
+    session_info = get_authn_response(request.registry.settings,
+                                      request.session, xmlstr)
 
     log.debug('Trying to locate the user authenticated by the IdP')
-    log.debug('Session info:\n{!s}\n\n'.format(pprint.pformat(session_info)))
 
     user = authenticate(request, session_info)
     if user is None:
@@ -330,37 +307,3 @@ def wayf_demo(request):
         'came_from': '/',
         'login_url': request.route_url('saml2-login'),
     }
-
-
-def get_authn_request(request, came_from, selected_idp,
-                      required_loa=None, force_authn=False):
-    # Request the right AuthnContext for workmode
-    # (AL1 for 'personal', AL2 for 'helpdesk' and AL3 for 'admin' by default)
-    if required_loa is None:
-        required_loa = request.registry.settings.get('required_loa', {})
-        workmode = request.registry.settings.get('workmode')
-        required_loa = required_loa.get(workmode, '')
-    log.debug('Requesting AuthnContext {!r}'.format(required_loa))
-    kwargs = {
-        "requested_authn_context": RequestedAuthnContext(
-            authn_context_class_ref=AuthnContextClassRef(
-                text=required_loa
-            )
-        ),
-        "force_authn": str(force_authn).lower(),
-    }
-
-    client = Saml2Client(request.saml2_config)
-    try:
-        (session_id, info) = client.prepare_for_authenticate(
-            entityid=selected_idp, relay_state=came_from,
-            binding=BINDING_HTTP_REDIRECT,
-            **kwargs
-        )
-    except TypeError:
-        log.error('Unable to know which IdP to use')
-        raise
-
-    oq_cache = OutstandingQueriesCache(request.session)
-    oq_cache.set(session_id, came_from)
-    return info
