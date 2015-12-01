@@ -22,7 +22,7 @@ from eduiddashboard.utils import (sanitize_get,
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
-from eduiddashboard.saml2.cache import (IdentityCache, OutstandingQueriesCache,
+from eduid_common.authn.cache import (IdentityCache, OutstandingQueriesCache,
                                         StateCache, )
 from eduiddashboard.saml2.acs_actions import (acs_action,
                                               schedule_action,
