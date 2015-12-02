@@ -283,6 +283,32 @@ class NINResetPassword(CSRFTokenSchema):
     )
 
 
+class MobileResetPassword(CSRFTokenSchema):
+    mobile = colander.SchemaNode(
+        colander.String(),
+        title="",
+        widget=deform.widget.TextInputWidget(
+            error_class='text-danger',
+            css_class='form-control'
+        ),
+        validator=ResetPasswordFormValidator(
+            MobileFormatValidator,
+        )
+    )
+
+
+class MobileResetPasswordStep2(CSRFTokenSchema):
+    mobile_code = colander.SchemaNode(
+        colander.String(),
+        title="Code",
+        widget=deform.widget.TextInputWidget(
+            error_class='text-danger',
+            css_class='form-control'
+        ),
+        validator=MaliciousInputValidator()
+    )
+
+
 class ResetPasswordStep2(CSRFTokenSchema):
     use_custom_password = colander.SchemaNode(
         colander.Boolean(),

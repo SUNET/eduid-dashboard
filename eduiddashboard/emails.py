@@ -126,8 +126,9 @@ def send_reset_password_mail(request, user, reset_password_link):
 
     # DEBUG
     if request.registry.settings.get('developer_mode', False):
-        print message.body
+        log.debug(message.body)
     else:
         mailer.send(message)
     log.debug("Sent reset password mail to user {!r} with address {!s}.".format(user, email))
     request.stats.count('dashboard/email_send_pwreset_mail', 1)
+
