@@ -693,7 +693,6 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        # TODO: If mechanism is mobile, check if user has validated the mobile hash
         user = self.request.userdb.get_user_by_mail(password_reset['email'])
         user.retrieve_modified_ts(self.request.db.profiles)
 
