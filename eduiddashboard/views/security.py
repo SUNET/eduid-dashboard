@@ -50,21 +50,27 @@ def change_password(request, user, old_password, new_password):
     return added
 
 
-def new_reset_password_code(request, user, mechanism='email'):
+def new_reset_password_code(request, user, mechanism='email', next_view='reset-password-step2'):
     hash_code = get_unique_hash()
     date = datetime.now(pytz.utc)
     request.db.reset_passwords.remove({
         'email': user.get_mail()
     })
-    reference = request.db.reset_passwords.insert({
+
+    reset_doc = {
         'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
         'created_at': date,
-    }, safe=True, manipulate=True)
+    }
+
+    if mechanism == 'mobile':
+        reset_doc['mobile_hash_code'] = get_short_hash()
+
+    reference = request.db.reset_passwords.insert(reset_doc, safe=True, manipulate=True)
     log.debug("New reset password code: {!s} via {!s} for user: {!r}.".format(hash_code, mechanism, user))
     reset_password_link = request.route_url(
-        "reset-password-step2",
+        next_view,
         code=hash_code,
     )
     return reference, reset_password_link
