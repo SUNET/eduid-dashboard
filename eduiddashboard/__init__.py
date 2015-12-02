@@ -140,6 +140,10 @@ def profile_urls(config):
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-mina', '/reset-password/mina/',
                      factory=ResetPasswordFactory)
+    config.add_route('reset-password-mobile', '/reset-password/mobile/',
+                     factory=ResetPasswordFactory)
+    config.add_route('reset-password-mobile2', '/reset-password/mobile/{code}/',
+                     factory=ResetPasswordFactory)
     config.add_route('reset-password-step2', '/reset-password/{code}/',
                      factory=ResetPasswordFactory)
     # config.add_route('postaladdress', '/postaladdress/',
