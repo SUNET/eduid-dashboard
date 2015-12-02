@@ -1,5 +1,7 @@
 from bson import ObjectId
 from datetime import datetime
+from eduid_userdb.dashboard import DashboardLegacyUser, DashboardUser
+from eduid_userdb import Password
 
 import vccs_client
 
@@ -23,7 +25,7 @@ def get_vccs_client(vccs_url):
 def check_password(vccs_url, password, user, vccs=None):
     """ Try to validate a user provided password.
 
-    Returns False or a dict with data about the credential that validated.
+    Returns False or a Password instance with data about the credential that validated.
 
     :param vccs_url: URL to VCCS authentication backend
     :param password: plaintext password
@@ -32,31 +34,27 @@ def check_password(vccs_url, password, user, vccs=None):
 
     :type vccs_url: string
     :type password: string
-    :type user: OldUser
+    :type user: DashboardUser or DashboardLegacyUser or User
     :type vccs: None or VCCSClient
-    :rtype: False or dict
+    :rtype: False or Password
     """
-    passwords = user.get_passwords()
-    for password_dict in passwords:
-        password_id = password_dict['id']
+    # upgrade DashboardLegacyUser to DashboardUser
+    if isinstance(user, DashboardLegacyUser):
+        user = DashboardUser(data=user._mongo_doc)
+
+    for cred in user.passwords.to_list():
         if vccs is None:
             vccs = get_vccs_client(vccs_url)
         factor = vccs_client.VCCSPasswordFactor(
             password,
-            credential_id=str(password_id),
-            salt=password_dict['salt'],
-        )
-        # Old credentials were created using the username (user['mail']) of the user
-        # instead of the user['_id']. Try both during a transition period.
-        user_ids = [str(user.get_id()), user.get_mail()]
-        if password_dict.get('user_id_hint') is not None:
-            user_ids.insert(0, password_dict.get('user_id_hint'))
+            credential_id=str(cred.id),
+            salt=cred.salt,
+            )
         try:
-            for user_id in user_ids:
-                if vccs.authenticate(user_id, [factor]):
-                    password_dict['user_id_hint'] = user_id
-                    return password_dict
-        except Exception:
+            if vccs.authenticate(str(user.user_id), [factor]):
+                return cred
+        except Exception as exc:
+            log.warning("VCCS authentication threw exception: {!s}".format(exc))
             pass
     return False
 
@@ -82,63 +80,62 @@ def add_credentials(vccs_url, old_password, new_password, user):
     new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                 credential_id=str(password_id))
 
-    passwords = user.get_passwords()
+    if isinstance(user, DashboardLegacyUser):
+        user = DashboardUser(data=user._mongo_doc)
+
     old_factor = None
     checked_password = None
     # remember if an old password was supplied or not, without keeping it in
     # memory longer than we have to
     old_password_supplied = bool(old_password)
-    if passwords and old_password:
+    if user.passwords.count > 0 and old_password:
         # Find the old credential to revoke
         checked_password = check_password(vccs_url, old_password, user, vccs=vccs)
         del old_password  # don't need it anymore, try to forget it
         if not checked_password:
             return False
         old_factor = vccs_client.VCCSRevokeFactor(
-            str(checked_password['id']),
+            str(checked_password.id),
             'changing password',
             reference='dashboard',
         )
 
-    if not vccs.add_credentials(str(user.get_id()), [new_factor]):
+    if not vccs.add_credentials(str(user.user_id), [new_factor]):
         log.warning("Failed adding password credential {!r} for user {!r}".format(
-            new_factor.credential_id, user.get_id()))
+            new_factor.credential_id, user))
         return False  # something failed
     log.debug("Added password credential {!s} for user {!s}".format(
-        new_factor.credential_id, user.get_id()))
+        new_factor.credential_id, user))
 
     if old_factor:
-        # Use the user_id_hint inserted by check_password() until we know all
-        # credentials use str(user['_id']) as user_id.
-        vccs.revoke_credentials(checked_password['user_id_hint'], [old_factor])
-        passwords = [x for x in passwords if x['id'] != checked_password['id']]
+        vccs.revoke_credentials(str(user.user_id), [old_factor])
+        user.passwords.remove(checked_password.id)
         log.debug("Revoked old credential {!s} (user {!s})".format(
-            old_factor.credential_id, user.get_id()))
+            old_factor.credential_id, user))
 
     if not old_password_supplied:
         # TODO: Revoke all current credentials on password reset for now
         revoked = []
-        for password in passwords:
-            revoked.append(vccs_client.VCCSRevokeFactor(str(password['id']), 'reset password', reference='dashboard'))
-            log.debug("Revoked old credential (password reset) {!s} (user {!s})".format(
-                password['id'], user.get_id()))
+        for password in user.passwords.to_list():
+            revoked.append(vccs_client.VCCSRevokeFactor(str(password.id), 'reset password', reference='dashboard'))
+            log.debug("Revoking old credential (password reset) {!s} (user {!r})".format(
+                password.id, user))
+            user.passwords.remove(password.id)
         if revoked:
             try:
-                vccs.revoke_credentials(str(user.get_id()), revoked)
+                vccs.revoke_credentials(str(user.user_id), revoked)
             except vccs_client.VCCSClientHTTPError:
                 # Password already revoked
                 # TODO: vccs backend should be changed to return something more informative than
                 # TODO: VCCSClientHTTPError when the credential is already revoked or just return success.
+                log.warning("VCCS failed to revoke all passwords for user {!s}".format(user))
                 pass
-        del passwords[:]
 
-    passwords.append({
-        'id': password_id,
-        'salt': new_factor.salt,
-        'source': 'dashboard',
-        'created_ts': datetime.now(),
-    })
-    user.set_passwords(passwords)
+    new_password = Password(credential_id = password_id,
+                            salt = new_factor.salt,
+                            application = 'dashboard',
+                            )
+    user.passwords.add(new_password)
 
     return True
 
@@ -191,8 +188,8 @@ def revoke_all_credentials(vccs_url, user):
             reference='dashboard'
         )
         log.debug("Revoked old credential (account termination)"
-                  " {!s} (user {!s})".format(
-                      credential_id, user.get_id()))
+                  " {!s} (user {!r})".format(
+                      credential_id, user))
         to_revoke.append(factor)
     userid = str(user.get_id())
     vccs.revoke_credentials(userid, to_revoke)

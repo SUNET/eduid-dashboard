@@ -106,7 +106,10 @@ class EmailsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message),
             }
 
-        remove_email = emails[index]['email']
+        try:
+            remove_email = emails[index]['email']
+        except IndexError:
+            return self.sync_user()
 
         # By using pop(index) instead of remove(emails[index]) we avoid
         # evaluating the time zone stored together with the value of the

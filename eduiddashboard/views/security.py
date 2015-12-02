@@ -26,12 +26,14 @@ from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
+from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.utils import (generate_password,
                                   get_unique_hash,
                                   validate_email_format,
                                   normalize_email,
                                   convert_to_localtime,
                                   normalize_to_e_164,
+                                  retrieve_modified_ts,
                                   sanitize_post_key)
 
 import logging
@@ -39,14 +41,25 @@ log = logging.getLogger(__name__)
 
 
 def change_password(request, user, old_password, new_password):
-    """ Change the user password, deleting old credentials """
+    """
+    Change the user password, deleting old credentials
+
+    @param request: Request object
+    @param user: User object
+    @param old_password: Old password, if supplied (i.e. not a password reset)
+    @param new_password: New password
+
+    @type request: Request
+    @type user: User
+    @type old_password: str or unicode or None
+    """
     vccs_url = request.registry.settings.get('vccs_url')
+    log.debug("Changing password user {!s}\nTIMESTAMP 1 {!s}".format(user, user.modified_ts))
     added = add_credentials(vccs_url, old_password, new_password, user)
+    log.debug("Changing password user {!s}\nTIMESTAMP 2 {!s}".format(user, user.modified_ts))
     if added:
-        user.set_terminated(terminate=False)
-        update_doc = {'$set': {'passwords': user.get_passwords(),
-                               'terminated': None}}
-        user.save(request, check_sync=False, update_doc=update_doc)
+        user.terminated = False
+        request.dashboard_userdb.save(user)
     return added
 
 
@@ -118,7 +131,7 @@ def get_authn_info(request):
 
     for credential in user.get_passwords():
         auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential['id'])})
-        log.debug("cred id: {!r} auth entry: {!r}".format(credential['id'], auth_entry))
+        log.debug("get_authn_info {!s}: cred id: {!r} auth entry: {!r}".format(user, credential['id'], auth_entry))
         if auth_entry:
             created_dt = convert_to_localtime(credential['created_ts'])
             success_dt = convert_to_localtime(auth_entry['success_ts'])
@@ -142,12 +155,13 @@ def unverify_user_nins(request, user):
 
     Remove all NINs from the user and set all previous NIN verifications to verified = False.
     """
-    user.set_nins([])
-    user.save(request)
+    for nin in user.nins.to_list():
+        user.nins.remove(nin.key)
+    request.dashboard_userdb.save(user)
     # Do not remove the verification as we no longer allow users to remove a already verified nin
     # even if it gets unverified by a e-mail password reset.
     request.db.verifications.update({
-        "user_oid": user.get_id(),
+        "user_oid": user.user_id,
         "model_name": "norEduPersonNIN",
     }, {
         "$set": {"verified": False}
@@ -166,9 +180,10 @@ def unverify_user_mobiles(request, user):
 
     Set all verified mobile phone number to verified = False.
     """
-    for mobile in user.get_mobiles():
-        mobile['verified'] = False
-    user.save(request)
+    for mobile in user.phone_numbers.to_list():
+        mobile.is_primary = False
+        mobile.is_verified = False
+    request.dashboard_userdb.save(user)
     return True
 
 
@@ -319,8 +334,9 @@ class PasswordsView(BaseFormView):
 
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
-        user = self.request.userdb.get_user_by_oid(user.get_id())
-        user.retrieve_modified_ts(self.request.db.profiles)
+        user = self.request.userdb_new.get_user_by_id(user.get_id())
+        log.debug("Refreshed user {!s} from {!s}".format(user, self.request.userdb_new))
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
 
         self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
@@ -574,15 +590,17 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb.get_user_by_mail(password_reset['email'])
-        user.retrieve_modified_ts(self.request.db.profiles)
+        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
+
+        log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 
         if form_data.get('use_custom_password') == 'true':
-            log.debug("Password change for user {!r} (custom password).".format(user.get_id()))
+            log.debug("Password change for user {!r} (custom password).".format(user))
             new_password = form_data.get('custom_password')
             self.request.stats.count('dashboard/pwreset_custom_password', 1)
         else:
-            log.debug("Password change for user {!r} (suggested password).".format(user.get_id()))
+            log.debug("Password change for user {!r} (suggested password).".format(user))
             new_password = self.get_suggested_password()
             self.request.stats.count('dashboard/pwreset_generated_password', 1)
 
@@ -594,16 +612,16 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if ok:
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
             if password_reset['mechanism'] == 'email':
-                user.retrieve_modified_ts(self.request.db.profiles)
-                if user.get_nins():
-                    nin_count = len(user.get_nins())
+                retrieve_modified_ts(user, self.request.dashboard_userdb)
+                nin_count = len(user.nins.to_list())
+                if nin_count:
                     unverify_user_nins(self.request, user)
                     self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
-                if user.get_mobiles():
+                if len(user.phone_numbers.to_list()):
                     # We need to unverify a users phone numbers to make sure that an attacker can not
                     # verify the account again without control over the users phone number
                     unverify_user_mobiles(self.request, user)
-                update_attributes('eduid_dashboard', str(user['_id']))
+                update_attributes('eduid_dashboard', str(user.user_id))
             url = self.request.route_url('profile-editor')
             reset = True
         else:

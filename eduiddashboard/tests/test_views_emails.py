@@ -113,7 +113,6 @@ class MailsFormTests(LoggedInRequestTests):
         self.userdb.UserClass = DashboardUser
 
         old_user = self.userdb.get_user_by_id(self.user['_id'])
-        assert isinstance(old_user, DashboardUser)
 
         # Make a post that attempts to verify a non-existant mail address,
         # so no change is expected in the database.
@@ -127,13 +126,12 @@ class MailsFormTests(LoggedInRequestTests):
 
         # Check that mail addresses was not updated. Sort of redundant since
         # we checked that we got an out of sync condition above.
-        new_user = self.userdb.get_user_by_id(self.user['_id'])
-        assert isinstance(new_user, DashboardUser)
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
 
         old_addresses = old_user.mail_addresses.to_list_of_dicts()
-        new_addresses = new_user.mail_addresses.to_list_of_dicts()
+        updated_addresses = updated_user.mail_addresses.to_list_of_dicts()
 
-        self.assertEqual(old_addresses, new_addresses)
+        self.assertEqual(old_addresses, updated_addresses)
 
     def test_verify_existant_email(self):
         self.set_logged()
@@ -166,27 +164,46 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_remove_not_existant_email(self):
         self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
-        emails_number = len(userdb['mailAliases'])
+        self.userdb.UserClass = DashboardUser
 
-        with self.assertRaises(IndexError):
-            self.testapp.post(
-                '/profile/emails-actions/',
-                {'identifier': 10, 'action': 'remove'}
-            )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
-        self.assertEqual(emails_number, len(userdb_after['mailAliases']))
-
-    def test_setprimary_not_existant_email(self):
-        self.set_logged()
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
 
         response = self.testapp.post(
-            '/profile/emails-actions/',
-                {'identifier': 10, 'action': 'setprimary'}
+                '/profile/emails-actions/',
+                {'identifier': old_amount_of_addresses, 'action': 'remove'}
         )
 
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
+
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_amount_of_addresses = len(updated_user.mail_addresses.to_list_of_dicts())
+
+        self.assertEqual(old_amount_of_addresses, updated_amount_of_addresses)
+
+    def test_setprimary_not_existant_email(self):
+        self.set_logged()
+        self.userdb.UserClass = DashboardUser
+
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        # FFF from here
+        old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
+        old_primary_mail = old_user.mail_addresses.primary.email
+
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': old_amount_of_addresses, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'out_of_sync')
+
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_primary_mail = updated_user.mail_addresses.primary.email
+
+        self.assertEqual(old_primary_mail, updated_primary_mail)
+        # FFF to here
 
     def test_setprimary_existant_email(self):
         self.set_logged()
@@ -200,6 +217,36 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
         self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
+
+    def test_setprimary_not_verified_mail(self):
+        self.set_logged()
+        self.userdb.UserClass = DashboardUser
+        mail_index = 2
+
+        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_primary_mail = old_user.mail_addresses.primary.email
+        mail_to_test = old_user.mail_addresses.find("johnsmith3@example.com")
+
+        # Make sure that the mail address that we are about
+        # to test if we can set as primary is not verified.
+        self.assertEqual(mail_to_test.is_verified, False)
+
+        # Make sure that the mail address that we are about
+        # to test is not already set as primary.
+        self.assertEqual(mail_to_test.is_primary, False)
+
+        response = self.testapp.post(
+            '/profile/emails-actions/',
+            {'identifier': mail_index, 'action': 'setprimary'}
+        )
+
+        response_json = json.loads(response.body)
+        self.assertEqual(response_json['result'], 'bad')
+
+        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_primary_mail = updated_user.mail_addresses.primary.email
+
+        self.assertEqual(old_primary_mail, updated_primary_mail)
 
     def test_steal_verified_mail(self):
         self.set_logged(email ='johnsmith@example.org')
