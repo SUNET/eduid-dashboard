@@ -70,6 +70,7 @@ class EmailsActionsView(BaseActionsView):
     }
 
     def setprimary_action(self, index, post_data):
+
         try:
             mail = self.user.get_mail_aliases()[index]
         except IndexError:
@@ -153,7 +154,7 @@ class EmailsView(BaseFormView):
     schema = Email()
     route = 'emails'
 
-    buttons = (deform.Button(name='add', title=_('Add email address')), )
+    buttons = (deform.Button(name='add', title=_('Add')), )
 
     bootstrap_form_style = 'form-inline'
 

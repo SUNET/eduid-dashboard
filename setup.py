@@ -21,11 +21,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.4.0b5'
+version = '0.4.0'
 
 requires = [
-    'eduid_am>=0.6.0b0',
-    'eduid_msg>=0.9.0b0',
+    'eduid_am>=0.6.0',
+    'eduid_msg>=0.9.0',
     'vccs_client>=0.4.1',
     'eduid_lookup_mobile>=0.0.4',
     'eduid_userdb>=0.0.2',
@@ -50,6 +50,7 @@ requires = [
     'pytz',
     'stathat-async==0.0.3',
     'markupsafe>=0.23',
+    'bleach>=1.4.2',
 ]
 
 if sys.version_info[0] < 3:

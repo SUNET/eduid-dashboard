@@ -8,7 +8,7 @@
     <div class='col-md-3'>
         <div class="profile-head">
 
-             <div class="messages-wrapper hidden-lg hidden-md" id="eduid-header-messages">
+             <div class="messages-wrapper {% if request.session.peek_flash %} messages-wrapper-empty{% endif %} hidden-lg hidden-md" id="eduid-header-messages">
                <div class="messages">
                {% for message in request.session.pop_flash() %}
                  <div class="alert alert-{{ message|get_flash_message_type }}">
@@ -22,7 +22,7 @@
             {% if context.workmode == 'personal' %}
                 <h3>{{ _("Profile") }}</h3>
             {% else %}
-                <h3>{{ _("Editing %(email)s user", email=user.get('mail')) }}</h3>
+                <h3>{{ _("Editing user %(email)s", email=user.get('mail')) }}</h3>
             {% endif %}
 
             {% if pending_actions %}
@@ -46,17 +46,15 @@
           {% endfor %}
             <li id="profile-filled-li">
               <div class='profile-filled profile-filled-large'>
-                <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+                <div class='title'>{{ _("Completion") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
                 <div class="progress progress-striped">
                   <div class="progress-bar profile-filled-progress-bar"></div>
                 </div>
               </div>
             </li>
-            <li id="profile-menu-help">
-              <div class="help">
-                <a href="{{ request.route_path('help') }}">
-                  {{ _('Help') }}
-                </a>
+            <li id="profile-menu-eppn-li">
+              <div class="profile-menu-eppn">
+                <p class="eppn-text-muted">{{ _("eduID identifier") }}: {{ user.eduPersonPrincipalName }}</p>
               </div>
             </li>
 
@@ -64,7 +62,7 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-default hidden-sm hidden-md hidden-lg" role="navigation">
+    <nav class="navbar navbar-default hidden-md hidden-lg" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#profile-menu-small" aria-expanded="false">
@@ -79,7 +77,7 @@
           <ul class="nav nav-stacked nav-tabs navbar-nav">
               {% for tab in tabs %}
                 <li>
-                    <a href='#{{tab.id}}' class="main-nav-tabs hidden-sm">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' class="main-nav-tabs">{{_(tab.label)}}</a>
                 </li>
               {% endfor %}
           </ul>
@@ -87,7 +85,7 @@
       </div>
     </nav>
 
-     <div class="messages-wrapper visible-lg-inline-block visible-md-inline-block" id="eduid-header-messages">
+     <div class="messages-wrapper{% if request.session.peek_flash %} messages-wrapper-empty{% endif %} col-md-8 col-md-offset-1" id="eduid-header-messages">
        <div class="messages">
        {% for message in request.session.pop_flash() %}
          <div class="alert alert-{{ message|get_flash_message_type }}">
@@ -103,17 +101,14 @@
     </div>
 
     <div class="profile-filled profile-filled-small hidden-md hidden-lg">
-      <div class='title'>{{ _("Profile filled") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
+      <div class='title'>{{ _("Completion") }}: <span class="percentaje">{{ profile_filled }}%</span></div>
       <div class="progress progress-striped">
         <div class="progress-bar profile-filled-progress-bar"></div>
       </div>
-      <div class="help">
-        <a href="{{ request.route_path('help') }}">
-          {{ _('Help') }}
-        </a>
+      <div class="profile-menu-eppn hidden-md hidden-lg">
+          <p class="eppn-text-muted">{{ _("eduID identifier") }}: {{ user.eduPersonPrincipalName }}</p>
       </div>
     </div>
-  </div>
 
   <div id="askDialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="askDialogPrompt" aria-hidden="true">
     <div class="modal-dialog">
@@ -183,27 +178,27 @@
 {% block extrajs %}
 
 <script src="{{'eduiddashboard:static/js/libs/jquery.maskedinput.min.js'|static_url}}"></script>
-<script src="{{'deform:static/scripts/jquery.form-3.09.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/jquery.form-3.09.js'|static_url}}"></script>
 
-<script src="{{'deform:static/scripts/deform.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/deform.js'|static_url}}"></script>
 
-<script src="{{'deform_bootstrap:static/deform_bootstrap.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/deform_bootstrap.js'|static_url}}"></script>
 
-<script src="{{'eduiddashboard:static/js/forms-helper-functions.js'|static_url}}"></script>
-<script src="{{'eduiddashboard:static/js/tabbed-form.js'|static_url}}"></script>
-<script src="{{'eduiddashboard:static/js/proofing.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/dashboard-forms-helper-functions.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/dashboard-tabbed-form.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/dashboard-proofing.js'|static_url}}"></script>
 {% if enable_mm_verification %}
 <script src="{{'eduiddashboard:static/js/libs/bootstrap-wizard.js'|static_url}}"></script>
-<script src="{{'eduiddashboard:static/js/eduid-wizards.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/dashboard-eduid-wizards.js'|static_url}}"></script>
 {% endif %}
-<script src="{{'eduiddashboard:static/js/tablelist-form.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/dashboard-tablelist-form.js'|static_url}}"></script>
 
-<script src="{{'eduiddashboard:static/js/libs/zxcvbn-async.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/zxcvbn.js'|static_url}}"></script>
 
 <script id='communication-error-template' language='text/template'>
   <div class='alert communication-error'>
     <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>{{_('Warning!')}}</strong> {{_('An error has occurred, please try again or contact support if the problem persists.')}}
+    <strong>{{_('Warning!')}}</strong> {{_('An error has occurred, please try again later.')}}
   </div>
 </script>
 
@@ -214,6 +209,6 @@
   </div>
 </script>
 
-<script type="text/javascript" src="{{'eduiddashboard:static/js/profile.js'|static_url}}"></script>
+<script type="text/javascript" src="{{'eduiddashboard:static/js/dashboard-profile.js'|static_url}}"></script>
 
 {% endblock %}

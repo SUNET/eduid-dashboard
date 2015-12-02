@@ -53,8 +53,7 @@ class NinsFormTests(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/nins/')
         response_form.mustcontain(self.formname)
 
-        self.assertNotIn('johnsmith@example.info', response_form.body)
-        self.assertIn('Verify through Mina Meddelanden', response_form.body)
+        response_form.mustcontain('input type="text" name="norEduPersonNIN"')
 
         form = response_form.forms[self.formname]
         nin = '200010100001'
@@ -466,7 +465,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
         '_id': ObjectId('234567890123456789012301'),
         'code': '1234',
         'model_name': 'norEduPersonNIN',
-        'obj_id': '123412341234',
+        'obj_id': '197001010000',
         'user_oid': ObjectId("901234567890123456789012"),
         'timestamp': datetime.utcnow(),
         'verified': False,
@@ -489,7 +488,7 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                 response = self.testapp.post('/profile/nin-wizard/', {
                     'action': 'next_step',
                     'step': 1,
-                    'norEduPersonNIN': '12341234-1234',
+                    'norEduPersonNIN': '19700101-0000',
                     'code': '1234',
                 }, status=200)
                 self.assertEqual(response.json['status'], 'success')
@@ -499,8 +498,82 @@ class NinWizardStep1Tests(LoggedInRequestTests):
         response = self.testapp.post('/profile/nin-wizard/', {
             'action': 'next_step',
             'step': 1,
-            'norEduPersonNIN': '12341234-1234',
+            'norEduPersonNIN': '19700101-0000',
             'code': '1234asdf',
         }, status=200)
         self.assertEqual(response.json['status'], 'failure')
         self.assertIn('code', response.json['data'])
+
+    def test_step0_after_step1_same_nin(self):
+        self.set_logged(email='johnsmith@example.org')
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.object(MsgRelay, 'get_postal_address'):
+            MsgRelay.get_postal_address.return_value = {
+                'Address2': u'StreetName 103',
+                'PostalCode': u'74141',
+                'City': u'STOCKHOLM',
+            }
+            with patch.multiple(MsgRelay,
+                                postal_address_to_transaction_audit_log=return_true,
+                                nin_validator=return_true,
+                                nin_reachable=return_true):
+                from eduiddashboard.validators import CSRFTokenValidator
+                with patch.object(CSRFTokenValidator, '__call__', clear=True):
+
+                    CSRFTokenValidator.__call__.return_value = None
+
+                    resp_step1 = self.testapp.post('/profile/nin-wizard/', {
+                        'action': 'next_step',
+                        'step': 1,
+                        'norEduPersonNIN': '197001010000',
+                        'code': '1234',
+                        'csrf': '12345',
+                    }, status=200)
+                    self.assertEqual(resp_step1.json['status'], 'success')
+
+                    resp_step0 = self.testapp.post('/profile/nin-wizard/', {
+                        'action': 'next_step',
+                        'step': 0,
+                        'norEduPersonNIN': '19700101-0000',
+                        'csrf': '12345',
+                    }, status=200)
+                    self.assertEqual(resp_step0.json['status'], 'failure')
+
+    def test_step0_after_step1_different_nin(self):
+        self.set_logged(email='johnsmith@example.org')
+
+        from eduiddashboard.msgrelay import MsgRelay
+
+        with patch.object(MsgRelay, 'get_postal_address'):
+            MsgRelay.get_postal_address.return_value = {
+                'Address2': u'StreetName 103',
+                'PostalCode': u'74141',
+                'City': u'STOCKHOLM',
+            }
+            with patch.multiple(MsgRelay,
+                                postal_address_to_transaction_audit_log=return_true,
+                                nin_validator=return_true,
+                                nin_reachable=return_true):
+                from eduiddashboard.validators import CSRFTokenValidator
+                with patch.object(CSRFTokenValidator, '__call__', clear=True):
+
+                    CSRFTokenValidator.__call__.return_value = None
+
+                    resp_step1 = self.testapp.post('/profile/nin-wizard/', {
+                        'action': 'next_step',
+                        'step': 1,
+                        'norEduPersonNIN': '19700101-0000',
+                        'code': '1234',
+                        'csrf': '12345',
+                    }, status=200)
+                    self.assertEqual(resp_step1.json['status'], 'success')
+
+                    resp_step0 = self.testapp.post('/profile/nin-wizard/', {
+                        'action': 'next_step',
+                        'step': 0,
+                        'norEduPersonNIN': '19700101-0001',
+                        'csrf': '12345',
+                    }, status=200)
+                    self.assertEqual(resp_step0.json['status'], 'failure')

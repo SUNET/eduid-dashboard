@@ -26,9 +26,15 @@ from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
-from eduiddashboard.utils import generate_password, get_unique_hash, validate_email_format, normalize_email, \
-    convert_to_localtime, normalize_to_e_164, retrieve_modified_ts
 from eduid_userdb.dashboard import DashboardUser
+from eduiddashboard.utils import (generate_password,
+                                  get_unique_hash,
+                                  validate_email_format,
+                                  normalize_email,
+                                  convert_to_localtime,
+                                  normalize_to_e_164,
+                                  retrieve_modified_ts,
+                                  sanitize_post_key)
 
 import logging
 log = logging.getLogger(__name__)
@@ -138,6 +144,49 @@ def get_authn_info(request):
     return authninfo
 
 
+def unverify_user_nins(request, user):
+    """
+    :param request: request object
+    :type request:
+    :param user: user object
+    :type user:
+    :return: True
+    :rtype: boolean
+
+    Remove all NINs from the user and set all previous NIN verifications to verified = False.
+    """
+    for nin in user.nins.to_list():
+        user.nins.remove(nin.key)
+    user.save(request)
+    # Do not remove the verification as we no longer allow users to remove a already verified nin
+    # even if it gets unverified by a e-mail password reset.
+    request.db.verifications.update({
+        "user_oid": user.get_id(),
+        "model_name": "norEduPersonNIN",
+    }, {
+        "$set": {"verified": False}
+    })
+    return True
+
+
+def unverify_user_mobiles(request, user):
+    """
+    :param request: request object
+    :type request:
+    :param user: user object
+    :type user:
+    :return: True
+    :rtype: boolean
+
+    Set all verified mobile phone number to verified = False.
+    """
+    for mobile in user.mobiles.to_list():
+        mobile.is_primary(False)
+        mobile.is_verified(False)
+    user.save(request)
+    return True
+
+
 @view_config(route_name='start-password-change',
              request_method='POST',
              permission='edit')
@@ -147,7 +196,7 @@ def start_password_change(context, request):
     settings = request.registry.settings
 
     # check csrf
-    csrf = request.POST.get('csrf')
+    csrf = sanitize_post_key(request, 'csrf')
     if csrf != request.session.get_csrf_token():
         return HTTPBadRequest()
 
@@ -228,11 +277,16 @@ class PasswordsView(BaseFormView):
 
     def get_template_context(self):
         context = super(PasswordsView, self).get_template_context()
+        # Collect the users mail addresses for use with zxcvbn
+        mail_addresses = []
+        for item in self.request.session['user'].get_mail_aliases():
+            mail_addresses.append(item['email'])
 
         context.update({
             'message': getattr(self, 'message', ''),
             'changed': getattr(self, 'changed', False),
-            'authninfo': get_authn_info(self.request)
+            'authninfo': get_authn_info(self.request),
+            'user_input': json.dumps(mail_addresses)
         })
         return context
 
@@ -298,8 +352,8 @@ class PasswordsView(BaseFormView):
              request_method='GET', permission='edit')
 def reset_password(context, request):
     """ Reset password """
-    return {
-    }
+    enable_mm = request.registry.settings.get('enable_mm_verification')
+    return {'enable_mm_verification': enable_mm}
 
 
 @view_config(route_name='reset-password-expired', renderer='templates/reset-password-expired.jinja2',
@@ -343,9 +397,17 @@ class BaseResetPasswordView(FormView):
         }
 
     def get_template_context(self):
-        return {
+        context = {
             'intro_message': self.intro_message
         }
+        # Collect the users mail addresses for use with zxcvbn
+        user = self.request.session.get('user', None)
+        if user:
+            mail_addresses = []
+            for item in user.get_mail_aliases():
+                mail_addresses.append(item['email'])
+            context['user_input'] = json.dumps(mail_addresses)
+        return context
 
     def failure(self, e):
         context = super(BaseResetPasswordView, self).failure(e)
@@ -480,6 +542,18 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         super(ResetPasswordStep2View, self).__init__(context, request)
         self._password = None
 
+    def get_template_context(self):
+        context = super(ResetPasswordStep2View, self).get_template_context()
+        # Collect the users mail addresses for use with zxcvbn
+        hash_code = self.request.matchdict['code']
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+        user = self.request.userdb.get_user_by_mail(password_reset['email'])
+        mail_addresses = []
+        for item in user.get_mail_aliases():
+            mail_addresses.append(item['email'])
+        context['user_input'] = json.dumps(mail_addresses)
+        return context
+
     def appstruct(self):
         passwords_dict = {
             'suggested_password': self.get_suggested_password()
@@ -538,23 +612,16 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if ok:
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
             if password_reset['mechanism'] == 'email':
-                # TODO: Re-send verification code in advance?
-                reset_nin_count = 0
-                for nin in user.nins.to_list():
-                    user.nins.remove(nin.key)
-                    # Do not remove the verification as we no longer allow users to remove a already verified nin
-                    # even if it gets unverified by a e-mail password reset.
-                    self.request.db.verifications.update({
-                        "user_oid": user.user_id,
-                        "model_name": "norEduPersonNIN",
-                        "obj_id": nin.number,
-                    }, {
-                        "$set": {"verified": False}
-                    })
-                    update_attributes('eduid_dashboard', str(user.user_id))
-                    reset_nin_count += 1
-                self.request.dashboard_userdb.save(user)
-                self.request.stats.count('dashboard/pwreset_downgraded_NINs', reset_nin_count)
+                user.retrieve_modified_ts(self.request.db.profiles)
+                nin_count = len(user.nins.to_list())
+                if nin_count:
+                    unverify_user_nins(self.request, user)
+                    self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
+                if len(user.mobiles.to_list()):
+                    # We need to unverify a users phone numbers to make sure that an attacker can not
+                    # verify the account again without control over the users phone number
+                    unverify_user_mobiles(self.request, user)
+                update_attributes('eduid_dashboard', str(user.user_id))
             url = self.request.route_url('profile-editor')
             reset = True
         else:

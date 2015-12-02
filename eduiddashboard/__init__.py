@@ -11,8 +11,6 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
-from pyramid.interfaces import IStaticURLInfo
-from pyramid.config.views import StaticURLInfo
 
 from eduid_am.celery import celery
 from eduid_userdb import MongoDB, UserDB
@@ -66,15 +64,6 @@ REQUIRED_PROOFING_LINKS = (
 
 
 log = logging.getLogger('eduiddashboard')
-
-class ConfiguredHostStaticURLInfo(StaticURLInfo):
-
-    def generate(self, path, request, **kw):
-        host = request.registry.settings.get('static_assets_host_override', None)
-        kw.update({'_host': host})
-        return super(ConfiguredHostStaticURLInfo, self).generate(path,
-                                                                 request,
-                                                                 **kw)
 
 
 def groups_callback(userid, request):
@@ -304,9 +293,9 @@ def main(global_config, **settings):
     """
     settings = dict(settings)
 
-    settings['debug_mode'] = read_setting_from_env_bool(settings,
-                                                        'debug_mode',
-                                                        default=False)
+    settings['developer_mode'] = read_setting_from_env_bool(settings,
+                                                       'developer_mode',
+                                                       default=False)
 
     # read pyramid_mailer options
     for key, default in (
@@ -482,9 +471,6 @@ def main(global_config, **settings):
 
     config.add_tween('eduiddashboard.middleware.reauthn_ts_tween_factory')
 
-    config.registry.registerUtility(ConfiguredHostStaticURLInfo(),
-                                    IStaticURLInfo)
-
     config.set_request_property(get_locale_name, 'locale', reify=True)
 
     locale_path = read_setting_from_env(settings, 'locale_dirs',
@@ -498,7 +484,7 @@ def main(global_config, **settings):
 
     config.include('eduiddashboard.saml2')
 
-    if settings['debug_mode'] or ('testing' in settings and asbool(settings['testing'])):
+    if settings['developer_mode'] or ('testing' in settings and asbool(settings['testing'])):
         config.include('pyramid_mailer.testing')
     else:
         config.include('pyramid_mailer')
@@ -508,11 +494,10 @@ def main(global_config, **settings):
     add_custom_deform_templates_path()
     add_custom_workmode_templates_path()
 
-    config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_static_view('deform', 'deform:static',
-                           cache_max_age=3600)
-    config.add_static_view('deform_bootstrap', 'deform_bootstrap:static',
-                           cache_max_age=3600)
+    if settings.get('static_url', False):
+        config.add_static_view(settings['static_url'], 'static')
+    else:
+        config.add_static_view('static', 'static', cache_max_age=3600)
 
     # eudid specific configuration
     includeme(config)

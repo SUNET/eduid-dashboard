@@ -1,4 +1,6 @@
+from bleach import clean
 from hashlib import sha256
+from urllib import unquote, quote
 from uuid import uuid4
 import re
 import time
@@ -14,9 +16,10 @@ from eduiddashboard import AVAILABLE_LOA_LEVEL
 
 from eduid_userdb.exceptions import UserDBValueError
 
-from pyramid.httpexceptions import HTTPForbidden
+from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 MAX_LOA_ROL = {
@@ -89,10 +92,10 @@ def filter_tabs(tabs, remove_tabs):
 
 
 def get_available_tabs(context, request):
-
-    from eduiddashboard.views import (emails, personal, postal_address,
+    from eduiddashboard.views import (emails, personal,
                                       mobiles, nins, permissions,
                                       get_dummy_status)
+
     default_tabs = [
         personal.get_tab(request),
         nins.get_tab(request),
@@ -234,3 +237,179 @@ def retrieve_modified_ts(user, dashboard_userdb):
     user.modified_ts = dashboard_user.modified_ts
     logger.debug("Updating {!s} with modified_ts from dashboard user {!s}: {!s}".format(
         user, dashboard_user, dashboard_user.modified_ts))
+
+
+def sanitize_get(request, *args):
+    """
+    Wrapper around request.GET.get() to sanitize untrusted user input.
+    """
+    return _sanitize_common(request, 'GET', *args)
+
+
+def sanitize_session_get(request, *args):
+    """
+    Wrapper around request.session.get() to sanitize untrusted input.
+    """
+    return _sanitize_common(request, 'session', *args)
+
+def sanitize_cookies_get(request, *args):
+    """
+    Wrapper around request.cookie.get() to sanitize untrusted input.
+    """
+    return _sanitize_common(request, 'cookies', *args)
+
+
+def sanitize_post_key(request, *args):
+    """
+    Wrapper around self.request.POST.get() to sanitize untrusted user input.
+    """
+    return _sanitize_common(request, 'POST', *args)
+
+
+def sanitize_post_multidict(request, post_parameter):
+    """
+    Wrapper around self.request.POST['parameter'] to sanitize user input.
+    """
+    try:
+        return _sanitize_common(request, 'POST', post_parameter)
+    except KeyError:
+        logger.warn('An unexpected error occurred: POST parameter {!r} '
+                    'could not be found in the request.'.format(post_parameter))
+
+        # Re-raise the exception to not change the
+        # expected logic of the wrapped function.
+        raise
+
+
+def _sanitize_common(request, function_attribute, *args):
+    """
+    Wrapper around request.GET.get() to sanitize the GET request by using
+    bleach as recommended by OWASP and take care of illegal UTF-8, which
+    is not properly handled in webob as seen in this unfixed bug:
+    https://github.com/Pylons/webob/issues/161.
+
+    :param request: The webob request object
+    :param function_attribute: Function attribute returning the desired information
+    :param args: Parameter name and possibly default value
+
+    :return: Sanitized user input
+    :rtype: str | unicode
+    """
+    try:
+        if hasattr(request, 'content_type'):
+            return sanitize_input(getattr(request, function_attribute).get(*args),
+                                  content_type=request.content_type)
+        else:
+            # The DummyRequest class used for testing has no attribute content_type
+            return sanitize_input(getattr(request, function_attribute).get(*args))
+    except UnicodeDecodeError:
+        logger.warn('A malicious user tried to crash the application '
+                    'by sending non-unicode input in a {!r} request'
+                    .format(function_attribute))
+        raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def sanitize_input(untrusted_text, strip_characters=False,
+                   content_type=None, percent_encoded=False):
+    """
+    Sanitize user input by escaping or removing potentially
+    harmful input using a whitelist-based approach with
+    bleach as recommended by OWASP.
+
+    :param untrusted_text User input to sanitize
+    :param strip_characters Set to True to remove instead of escaping
+                            potentially harmful input.
+
+    :param content_type Set to decide on the use of percent encoding
+                        according to the content type.
+
+    :param percent_encoded Set to True if the input should be treated
+                           as percent encoded if no content type is
+                           already defined.
+
+    :return: Sanitized user input
+
+    :type untrusted_text: str | unicode
+    :rtype: str | unicode
+    """
+    if untrusted_text is None:
+        # If we are given None then there's nothing to clean
+        return None
+
+    # Decide on whether or not to use percent encoding:
+    # 1. Check if the content type has been explicitly set
+    # 2. If set, use percent encoding if requested by the client
+    # 3. If the content type has not been explicitly set,
+    # 3.1 use percent encoding according to the calling
+    #    functions preference or,
+    # 3.2 use the default value as set in the function definition.
+    if content_type is not None:
+
+        if content_type == "application/x-www-form-urlencoded":
+            use_percent_encoding = True
+        else:
+            use_percent_encoding = False
+
+    else:
+        use_percent_encoding = percent_encoded
+
+    if use_percent_encoding:
+        # If the untrusted_text is percent encoded we have to:
+        # 1. Decode it so we can process it.
+        # 2. Encode it to UTF-8 since bleach assumes this encoding
+        # 3. Clean it to remove dangerous characters.
+        # 4. Percent encode it before returning it back.
+
+        decoded_text = unquote(untrusted_text)
+
+        if not isinstance(decoded_text, unicode):
+            decoded_text_in_utf8 = decoded_text.encode("UTF-8")
+        else:
+            decoded_text_in_utf8 = decoded_text
+
+        cleaned_text = _safe_clean(decoded_text_in_utf8, strip_characters)
+        percent_encoded_text = quote(cleaned_text)
+
+        if decoded_text_in_utf8 != cleaned_text:
+            logger.warn('Some potential harmful characters were '
+                        'removed from untrusted user input.')
+
+        return percent_encoded_text
+
+    # If the untrusted_text is not percent encoded we only have to:
+    # 1. Encode it to UTF-8 since bleach assumes this encoding
+    # 2. Clean it to remove dangerous characters.
+
+    if not isinstance(untrusted_text, unicode):
+        text_in_utf8 = untrusted_text.encode("UTF-8")
+    else:
+        text_in_utf8 = untrusted_text
+
+    cleaned_text = _safe_clean(text_in_utf8, strip_characters)
+
+    if text_in_utf8 != cleaned_text:
+        logger.warn('Some potential harmful characters were '
+                    'removed from untrusted user input.')
+
+    return cleaned_text
+
+
+def _safe_clean(untrusted_text, strip_characters=False):
+    """
+    Wrapper for the clean function of bleach to be able
+    to catch when illegal UTF-8 is processed.
+
+    :param untrusted_text: Text to sanitize
+    :param strip_characters: Set to True to remove instead of escaping
+    :return: Sanitized text
+
+    :type untrusted_text: str | unicode
+    :rtype: str | unicode
+    """
+    try:
+        return clean(untrusted_text, strip=strip_characters)
+    except KeyError:
+        logger.warn('A malicious user tried to crash the application by '
+                    'sending illegal UTF-8 in an URI or other untrusted '
+                    'user input.')
+        raise HTTPBadRequest("Non-unicode input, please try again.")

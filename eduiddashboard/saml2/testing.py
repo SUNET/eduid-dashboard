@@ -11,7 +11,7 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
 
-from eduid_userdb.userdb import MongoDB
+from eduid_userdb.db import MongoDB
 from eduid_userdb.dashboard import UserDBWrapper
 from eduiddashboard.testing import MongoTestCase
 from eduiddashboard.saml2 import includeme as saml2_includeme

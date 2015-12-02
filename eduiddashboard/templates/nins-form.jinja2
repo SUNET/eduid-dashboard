@@ -2,8 +2,8 @@
 
 {% block form_generic_description %}
    <h4>{% trans %}National identity number{% endtrans %}</h4>
-   {% trans %}<p>Certain service providers (e.g. Antagning.se) require eduID users to be confirmed to log in. You can
-   confirm your eduID account using the below methods. For more information see the help section.</p>{% endtrans %}
+   {% trans %}<p>Some service providers (e.g. Antagning.se) require a confirmed identity.</p>{% endtrans %}
+   <p>{% trans %}For more information see the{% endtrans %} <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>.</p>
 {% endblock %}
 
 {% block extra_content %}
@@ -11,7 +11,7 @@
   {{ safe_actions_url('nins-actions') }}
 
   <div class="table-responsive">
-    <table class='table table-striped table-thin table-form nins'>
+    <table class='table table-striped table-form nins'>
     {% if active_nin %}
         <tr class='ninrow' data-identifier="0">
             <td class='identifier'>{{ active_nin }}</td>
@@ -19,31 +19,32 @@
             <td class='non-identifier'><span class='nobutton'>{{_("Active")}}</span></td>
             <td class='non-identifier'></td>
         </tr>
-    {% endif %}
-    {% if not_verified_nins %}
-      {% for nin in not_verified_nins %}
-      <tr class='ninrow' data-identifier="{{ loop.index0 }}">
-          <td class='identifier'>{{ nin }}</td>
-          <td class='non-identifier'>
-            {% if enable_mm_verification %}
-            <input type='button' class='btn btn-link' value="{{_('Verify through Mina Meddelanden')}}"
-                 data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
-            {% endif %}
-          </td>
-          <td class='non-identifier'>
-            {% if has_mobile %}
-            <input type='button' class='btn btn-link verify_mb' value="{{_('Verify by registered phone')}}"
-                 data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
-            {% endif %}
-          </td>
-          <!-- Removed functionality temporary
-                      <td>
-                        <input type='button' class='btn btn-link' value="{{_('Remove')}}"
-                             data-index='{{ nin }} {{ loop.index0 }}' name='remove'>
-                      </td>
-                     -->
-      </tr>
-      {% endfor %}
+    {% else %}
+        {% if not_verified_nins %}
+            {% for nin in not_verified_nins %}
+                <tr class='ninrow' data-identifier="{{ loop.index0 }}">
+                    <td class='identifier'>{{ nin }}</td>
+                    <td class='non-identifier'>
+                        {% if enable_mm_verification %}
+                            <input type='button' class='btn btn-link' value="{{_('Confirm using Mina Meddelanden')}}"
+                                   data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
+                        {% endif %}
+                    </td>
+                    <td class='non-identifier'>
+                        {% if has_mobile %}
+                            <input type='button' class='btn btn-link verify_mb' value="{{_('Confirm using phone subscription')}}"
+                                   data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
+                        {% endif %}
+                    </td>
+                    <!-- Removed functionality temporary
+                        <td>
+                            <input type='button' class='btn btn-link' value="{{_('Remove')}}"
+                                data-index='{{ nin }} {{ loop.index0 }}' name='remove'>
+                        </td>
+                    -->
+                </tr>
+            {% endfor %}
+        {% endif %}
     {% endif %}
     </table>
   </div>
@@ -55,6 +56,8 @@
 
 {% block form_generic_form %}
   {% if not active_nin %}
+     {% trans %}<p>Add your Swedish national identity number and initiate the confirmation process using
+                one of the buttons below.</p>{% endtrans %}
     <div class='form-content'>
       {{ form|safe }}
     </div>
@@ -64,13 +67,13 @@
 {% block askdialog_extra_info %}
   {% if enable_mm_verification %}
     {% trans nin_service_url=nin_service_url,nin_service_name=nin_service_name %}
-        You can access your governmental inbox using <a href="{{nin_service_url}}" target="_blank">{{nin_service_name}}</a>
+        Get the confirmation code here: <a href="{{nin_service_url}}" target="_blank">{{nin_service_name}}</a>
     {% endtrans %}
   {% endif %}
 {% endblock %}
 
 {% block extra_jsdata %}
     <span class="dataholder" id="ninsform-data" data-msg_verifying="{{ _("We are verifying that the provided identity number is valid, please wait.") }}"></span>
-    <span class="dataholder" id="disabled_mm" data-title="{{ _("Mina Meddelanden disabled") }}" data-content="{{ _("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin eu convallis augue, eget laoreet erat. Suspendisse ac tortor aliquam velit semper rutrum. Mauris nec lorem velit. Vivamus nec libero non.") }}"></span>
+    <span class="dataholder" id="disabled_mm" data-title="{{ _("Mina Meddelanden disabled") }}" data-content="{{ _("For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID from using Mina Meddelanden due to pressure from SWEDBANK. For more information:")}} <a href='https://www.sunet.se/sunet-mina-meddelanden/'>{{ _("Vetenskapsrådet's press release") }}</a>"></span>
     <span class="scriptholder" data-script="nins"></span>
 {% endblock %}

@@ -47,7 +47,7 @@ def send_verification_mail(request, email, reference=None, code=None):
     )
 
     # DEBUG
-    if request.registry.settings.get('debug_mode', False):
+    if request.registry.settings.get('developer_mode', False):
         print message.body
     else:
         mailer.send(message)
@@ -83,8 +83,8 @@ def send_termination_mail(request, user):
     )
 
     # DEBUG
-    if request.registry.settings.get('debug_mode', False):
-        print message.body
+    if request.registry.settings.get('developer_mode', False):
+        print(message.body.encode("UTF-8"))
     else:
         mailer.send(message)
     log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))
@@ -125,7 +125,7 @@ def send_reset_password_mail(request, user, reset_password_link):
     )
 
     # DEBUG
-    if request.registry.settings.get('debug_mode', False):
+    if request.registry.settings.get('developer_mode', False):
         print message.body
     else:
         mailer.send(message)

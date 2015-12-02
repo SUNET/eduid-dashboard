@@ -6,13 +6,28 @@
     <title>{{ _("Dashboard") }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link href="{{'eduiddashboard:static/css/bootstrap-3.2.0.min.css'|static_url}}" rel="stylesheet" media="screen">
     <link href="{{'eduiddashboard:static/css/dashboard.css'|static_url}}" rel="stylesheet" media="screen">
+    <link href="{{'eduiddashboard:static/css/screen.css'|static_url}}" rel="stylesheet" media="screen">
+    <link rel="icon" href="{{'eduiddashboard:static/favicon.ico'|static_url}}" type="image/x-icon" />
+    <link rel="apple-touch-icon" sizes="57x57" href="{{'eduiddashboard:static/apple-touch-icon-57x57.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{'eduiddashboard:static/apple-touch-icon-60x60.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{'eduiddashboard:static/apple-touch-icon-72x72.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{'eduiddashboard:static/apple-touch-icon-76x76.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{'eduiddashboard:static/apple-touch-icon-114x114.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{'eduiddashboard:static/apple-touch-icon-120x120.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{'eduiddashboard:static/apple-touch-icon-144x144.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{'eduiddashboard:static/apple-touch-icon-152x152.png'|static_url}}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{'eduiddashboard:static/apple-touch-icon-180x180.png'|static_url}}">
+    <link rel="icon" type="image/png" href="{{'eduiddashboard:static/favicon-32x32.png" sizes="32x32'|static_url}}">
+    <link rel="icon" type="image/png" href="{{'eduiddashboard:static/android-chrome-192x192.png" sizes="192x192'|static_url}}">
+    <link rel="icon" type="image/png" href="{{'eduiddashboard:static/favicon-96x96.png" sizes="96x96'|static_url}}">
+    <link rel="icon" type="image/png" href="{{'eduiddashboard:static/favicon-16x16.png" sizes="16x16'|static_url}}">
+    <link rel="manifest" href="{{'eduiddashboard:static/manifest.json'|static_url}}">
+    <link rel="mask-icon" href="{{'eduiddashboard:static/safari-pinned-tab.svg'|static_url}}" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="{{'eduiddashboard:static/mstile-144x144.png'|static_url}}">
+    <meta name="theme-color" content="#ffffff">
 
     {% block extracss %}
     {% endblock %}
@@ -24,29 +39,29 @@
     <div id='wrap container'>
       <header id="header" class="header">
         <div class="logo"></div>
-        <nav class="navbar navbar-default" id="eduid-dashboard-navbar">
+        <nav class="navbar navbar-default" id="eduid-navbar">
           <div class="container-fluid">
             <div class="navbar-header">
               <a class="navbar-brand" href="#">
                 <div id="eduid-logo-small" class="logo"></div>
               </a>
-              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-dashboard-menu" aria-expanded="false">
+              <span class="navbar-toggle collapsed" data-toggle="collapse" data-target="#eduid-menu" aria-expanded="false">
               </span>
             </div>
-            <div class="collapse navbar-collapse text-center" id="eduid-dashboard-menu">
+            <div class="collapse navbar-collapse text-center" id="eduid-menu">
               <ul  class="nav navbar-nav">
                       <!-- Menu reflects the menu on eduid.se (not yet updated) with links and title -->
                 <li>
-                  <a href="/">{{ _("Student") }}</a>
+                  <a href="{{ request.registry.settings['student_link'] }}">{{ _("Student") }}</a>
                 </li>
                 <li>
-                  <a href="/">{{ _("Tekniker") }}</a>
+                  <a href="{{ request.registry.settings['technicians_link'] }}">{{ _("Technicians") }}</a>
                 </li>
                 <li>
-                  <a href="/">{{ _("Personal") }}</a>
+                  <a href="{{ request.registry.settings['staff_link'] }}">{{ _("Staff") }}</a>
                 </li>
                 <li>
-                  <a href="{{ request.route_path('help') }}">{{ _("Faq") }}</a>
+                  <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>
                 </li>
               </ul>
               <div class="buttons nav navbar-nav navbar-right">
@@ -84,10 +99,8 @@
 
         <noscript><div id="no-script"><h3>{{ _("This Site depends on Javascript, so please enable it.") }}</h3></div></noscript>
         <div id="content-block">
-          <div class='clearfix'></div>
           {% block title %}
           {% endblock %}
-          <div class='clearfix'></div>
           {% block contents %}
 
           {% endblock %}
@@ -117,16 +130,16 @@
     {% block extra_jsdata %}
     {% endblock %}
 
-    <script src="{{'deform:static/scripts/jquery-2.0.3.min.js'|static_url}}"></script>
-    <script src="{{'deform:static/scripts/jquery-2.0.3.min.map'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/libs/jquery-2.0.3.min.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/libs/jquery-2.0.3.min.map'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
-    <script src="{{'eduiddashboard:static/js/userstatus.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/dashboard-userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/pwstrength-bootstrap-1.1.1.min.js'|static_url}}"></script>
     <!--[if IE]>
-    <script type="text/javascript" src="{{'eduiddashboard:static/js/base-ie.js'|static_url}}"></script>
+    <script type="text/javascript" src="{{'eduiddashboard:static/js/dashboard-base-ie.js'|static_url}}"></script>
     <![endif]-->
-    <script type="text/javascript" src="{{'eduiddashboard:static/js/base.js'|static_url}}"></script>
-    <script src="{{'eduiddashboard:static/js/mobilemenu.js'|static_url}}"></script>
+    <script type="text/javascript" src="{{'eduiddashboard:static/js/dashboard-base.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/dashboard-mobilemenu.js'|static_url}}"></script>
     {% block extrajs %}
     {% endblock %}
 

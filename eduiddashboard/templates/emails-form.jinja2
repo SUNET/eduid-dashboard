@@ -2,8 +2,9 @@
 
 {% block form_generic_description %}
     <h4>{% trans %}Email addresses{% endtrans %}</h4>
-    {% trans %}<p>Below you can add additional email addresses connected to your eduID account and also change your
-    primary email address. For more information see the help section.</p>{% endtrans %}
+    {% trans %}<p>You can connect one or more e-mail addresses with your eduID account,
+                  and select which one is the primary one.</p>{% endtrans %}
+    <p>{% trans %}For more information see the{% endtrans %} <a href="{{ request.registry.settings['faq_link'] }}">{{ _("FAQ") }}</a>.</p>
 {% endblock %}
 
 {% block extra_content %}
@@ -12,7 +13,7 @@
 
   {% if mails %}
   <div class="table-responsive">
-    <table class='table table-striped table-thin table-form emails'>
+    <table class='table table-striped table-form emails'>
       {% for mail in mails %}
       <tr class='emailrow' data-identifier="{{ loop.index0 }}">
         <td class='identifier'>{{ mail.email }}</td>

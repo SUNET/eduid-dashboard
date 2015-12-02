@@ -71,6 +71,10 @@ def send_verification_code(request, user, nin, reference=None, code=None):
     You need to replace the call to dummy_message with the govt
     message api
     """
+
+    # Always normalize the nin before usage
+    nin = normalize_nin(nin)
+
     if code is None or reference is None:
         reference, code = new_verification_code(request, 'norEduPersonNIN', nin, user, hasher=get_short_hash)
 
@@ -304,14 +308,14 @@ class NinsView(BaseFormView):
         self.buttons = ()
         if self.request.registry.settings.get('enable_mm_verification'):
             self.buttons += (deform.Button(name='add',
-                             title=_('Verify through Mina Meddelanden')),)
+                             title=_('Mina Meddelanden')),)
         else:
             # Add a disabled button to for information purposes when Mina Meddelanden is disabled
             self.buttons += (deform.Button(name='NoMM',
-                                           title=_('Verify through Mina Meddelanden'),
+                                           title=_('Mina Meddelanden'),
                                            css_class='btn btn-primary disabled'),)
         self.buttons += (deform.Button(name='add_by_mobile',
-                                       title=_('Verify by registered phone'),
+                                       title=_('Phone subscription'),
                                        css_class='btn btn-primary'),)
 
     def appstruct(self):
@@ -499,9 +503,25 @@ class NinsWizard(BaseWizard):
                 'text': text,
             }
 
+        # Always normalize the NiN before usage
+        nin = normalize_nin(self.datakey)
+
+        # Fetch the user's verified NiNs so that we can make sure that we
+        # do not try to send a new verification code and add another NiN.
+        user = self.context.user
+        verified_nins = user.get_nins()
+
+        if len(verified_nins) > 0:
+            message = _("You already have a confirmed national identity number")
+            message = get_localizer(self.request).translate(message)
+            return {
+                'status': 'error',
+                'text': message
+            }
+
         send_verification_code(self.request,
                                self.context.user,
-                               self.datakey)
+                               nin)
         text = NINsActionsView.special_verify_messages.get('new_code_sent',
             NINsActionsView.default_verify_messages.get('new_code_sent', ''))
         self.request.stats.count('dashboard/nin_wizard_resend_code', 1)

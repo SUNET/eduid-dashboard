@@ -187,6 +187,7 @@ class MailsFormTests(LoggedInRequestTests):
         self.userdb.UserClass = DashboardUser
 
         old_user = self.userdb.get_user_by_id(self.user['_id'])
+        # FFF from here
         old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
         old_primary_mail = old_user.mail_addresses.primary.email
 
@@ -202,6 +203,7 @@ class MailsFormTests(LoggedInRequestTests):
         updated_primary_mail = updated_user.mail_addresses.primary.email
 
         self.assertEqual(old_primary_mail, updated_primary_mail)
+        # FFF to here
 
     def test_setprimary_existant_email(self):
         self.set_logged()

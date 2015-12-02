@@ -8,7 +8,9 @@ from eduid_userdb.userdb import UserDB
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.vccs import check_password
-from eduiddashboard.utils import normalize_to_e_164
+from eduiddashboard.utils import (normalize_to_e_164,
+                                  sanitize_input,
+                                  sanitize_post_key)
 from eduiddashboard.idproofinglog import TeleAdressProofing, TeleAdressProofingRelation
 from eduiddashboard import log
 
@@ -65,7 +67,16 @@ class PasswordValidator(object):
             # password
             return
 
-        veredict = zxcvbn.password_strength(value)
+        # Get a users e-mail addresses to make sure a user does not use one of those as password
+        user = request.session.get('user', None)
+        if not user:
+            # User is resetting a forgotten password
+            hash_code = request.matchdict['code']
+            password_reset = request.db.reset_passwords.find_one({'hash_code': hash_code})
+            user = request.userdb.get_user_by_mail(password_reset['email'])
+        mail_addresses = [item['email'] for item in user.get_mail_aliases()]
+
+        veredict = zxcvbn.password_strength(value, user_inputs=mail_addresses)
 
         if veredict.get('entropy', 0) < password_min_entropy:
             err = _('The password complexity is too weak.')
@@ -86,6 +97,21 @@ class PermissionsValidator(object):
                 )
 
 
+class MaliciousInputValidator(object):
+
+    def __call__(self, node, value):
+        """
+        Check the input for potentially harmful content
+        """
+        request = node.bindings.get('request')
+        localizer = get_localizer(request)
+
+        if value != sanitize_input(value, strip_characters=True):
+            err = _("Some of the characters you entered are "
+                    "not allowed, please try again.")
+            raise colander.Invalid(node, localizer.translate(err))
+
+
 class EmailUniqueValidator(object):
 
     def __call__(self, node, value):
@@ -96,7 +122,7 @@ class EmailUniqueValidator(object):
         user_emails.append(user.get_mail())
         localizer = get_localizer(request)
 
-        if 'add' in request.POST:
+        if sanitize_post_key(request, 'add') is not None:
             if value in user_emails:
                 err = _("You already have this email address")
                 raise colander.Invalid(node, localizer.translate(err))
@@ -127,7 +153,7 @@ class MobilePhoneUniqueValidator(object):
         user_mobiles = [m['mobile'] for m in user.get_mobiles()]
         mobile = {'mobile': normalize_to_e_164(request, value)}
 
-        if 'add' in request.POST:
+        if sanitize_post_key(request, 'add') is not None:
             if mobile['mobile'] in user_mobiles:
                 err = _("This mobile phone was already registered")
                 raise colander.Invalid(node, get_localizer(request).translate(err))
@@ -183,9 +209,9 @@ class NINUniqueValidator(object):
 
     def __call__(self, node, value):
         """
-            Check if the NIN was not already registered and verified by any user
-            Check if the NIN was not already registered by the present user in the
-                verifications process.
+        Validator which makes sure that:
+        1. the NiN has not already been added by the user
+        2. the user does not already have a confirmed NiN.
         """
 
         from eduiddashboard.models import normalize_nin
@@ -202,13 +228,24 @@ class NINUniqueValidator(object):
             'verified': False
         })
 
-        # Search the request.POST for any post that starts with "add"
+        # Search the request.POST for any post that starts with "add".
+        # Alternatively the POST may come from the wizard,
+        # in which case it will have a "step" param.
         for post_value in request.POST:
-            if post_value.startswith('add'):
-                if unverified_user_nins.count() > 0 or value in user_nins:
-                    err = _("This national identity number is already in use")
-                    raise colander.Invalid(node,
-                            get_localizer(request).translate(err))
+            if post_value.startswith('add') and (value in user_nins or
+                                      unverified_user_nins.count() > 0):
+                err = _('National identity number already added')
+                raise colander.Invalid(node, get_localizer(request).translate(err))
+
+            elif post_value.startswith('add') and len(user_nins) > 0:
+                err = _('You already have a confirmed national identity number')
+                raise colander.Invalid(node, get_localizer(request).translate(err))
+
+            elif post_value == 'step' and \
+                 request.POST['step'] == '0' and \
+                 len(user_nins) > 0:
+                err = _('You already have a confirmed national identity number')
+                raise colander.Invalid(node, get_localizer(request).translate(err))
 
 
 class NINReachableValidator(object):
@@ -225,7 +262,7 @@ class NINReachableValidator(object):
         request = node.bindings.get('request')
         settings = request.registry.settings
 
-        if settings.get('debug_mode', False):
+        if settings.get('developer_mode', False):
             return
         
         msg = None

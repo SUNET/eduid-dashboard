@@ -14,8 +14,10 @@ from eduiddashboard.validators import (EmailUniqueValidator,
                                        NINRegisteredMobileValidator,
                                        MobilePhoneUniqueValidator,
                                        CSRFTokenValidator,
-                                       ResetPasswordFormValidator)
+                                       ResetPasswordFormValidator,
+                                       MaliciousInputValidator)
 from eduiddashboard.widgets import permissions_widget
+from eduiddashboard.utils import sanitize_post_key
 
 
 SEARCHER_ATTTRIBUTE_TYPES = [
@@ -77,7 +79,7 @@ class All_StopOnFirst_Switch(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
 
-        if 'add_by_mobile' in request.POST:
+        if sanitize_post_key(request, 'add_by_mobile') is not None:
             current_validator = self.validator_dict['add_by_mobile']
         else:
             current_validator = self.validator_dict['add']
@@ -92,6 +94,7 @@ class Email(CSRFTokenSchema):
     mail = colander.SchemaNode(colander.String(),
                                preparer=EmailNormalizer(),
                                validator=colander.All(colander.Email(),
+                                                      MaliciousInputValidator(),
                                                       EmailUniqueValidator()),
                                title=_('email'),
                                widget=deform.widget.TextInputWidget(
@@ -131,10 +134,12 @@ class NIN(CSRFTokenSchema):
     validator_switch = All_StopOnFirst_Switch(
         {'add': All_StopOnFirst(
             NINFormatValidator,
+            MaliciousInputValidator(),
             NINUniqueValidator(),
             NINReachableValidator()
         ), 'add_by_mobile': All_StopOnFirst(
             NINFormatValidator,
+            MaliciousInputValidator(),
             NINUniqueValidator(),
             NINRegisteredMobileValidator()
         )})
@@ -169,25 +174,29 @@ def preferred_language_widget(node, kw):
 
 class Person(CSRFTokenSchema):
     givenName = colander.SchemaNode(colander.String(),
+                                    validator=MaliciousInputValidator(),
                                     widget=deform.widget.TextInputWidget(
                                         error_class='text-danger',
                                         css_class='form-control'),
                                     readonly=True,
                                     title=_('Given name'))
     sn = colander.SchemaNode(colander.String(),
-                             widget=deform.widget.TextInputWidget(
+                                    validator=MaliciousInputValidator(),
+                                    widget=deform.widget.TextInputWidget(
                                         error_class='text-danger',
                                         css_class='form-control'),
-                             title=_('Surname'))
+                                    title=_('Surname'))
     displayName = colander.SchemaNode(colander.String(),
-                                      widget=deform.widget.TextInputWidget(
+                                    validator=MaliciousInputValidator(),
+                                    widget=deform.widget.TextInputWidget(
                                         error_class='text-danger',
                                         css_class='form-control'),
-                                      title=_('Display name'))
+                                    title=_('Display name'))
     preferredLanguage = colander.SchemaNode(colander.String(),
-                                            title=_('Preferred language'),
-                                            missing='',
-                                            widget=preferred_language_widget)
+                                    validator=MaliciousInputValidator(),
+                                    title=_('Preferred language'),
+                                    missing='',
+                                    widget=preferred_language_widget)
 
 
 @colander.deferred
@@ -322,35 +331,41 @@ def postal_address_default_country(node, kw):
 
 class PostalAddress(colander.MappingSchema):
     address = colander.SchemaNode(colander.String(),
+                                  validator=MaliciousInputValidator(),
                                   title=_('Address'),
                                   widget=deform.widget.TextInputWidget(
-                                     error_class='text-danger',
-                                     css_class='form-control'),
+                                       error_class='text-danger',
+                                       css_class='form-control'),
                                   )
     locality = colander.SchemaNode(colander.String(),
+                                   validator=MaliciousInputValidator(),
                                    title=_('City'),
                                    widget=deform.widget.TextInputWidget(
-                                     error_class='text-danger',
-                                     css_class='form-control'),
+                                       error_class='text-danger',
+                                       css_class='form-control'),
                                    )
     postalCode = colander.SchemaNode(colander.String(),
-                                     title=_('Postal code'),
-                                     widget=deform.widget.TextInputWidget(
-                                        error_class='text-danger',
-                                        css_class='form-control'),
-                                     validator=colander.Length(min=5, max=6))
+                                   validator=colander.All(
+                                       colander.Length(min=5, max=6),
+                                       MaliciousInputValidator()),
+                                   title=_('Postal code'),
+                                   widget=deform.widget.TextInputWidget(
+                                       error_class='text-danger',
+                                       css_class='form-control'))
     country = colander.SchemaNode(colander.String(),
-                                  title=_('Country'),
-                                  widget=deform.widget.TextInputWidget(
-                                        error_class='text-danger',
-                                        css_class='form-control'),
-                                  default=postal_address_default_country)
+                                   validator=MaliciousInputValidator(),
+                                   title=_('Country'),
+                                   widget=deform.widget.TextInputWidget(
+                                       error_class='text-danger',
+                                       css_class='form-control'),
+                                   default=postal_address_default_country)
 
 
 class Mobile(CSRFTokenSchema):
     mobile = colander.SchemaNode(colander.String(),
                                  validator=colander.All(
                                      MobileFormatValidator,
+                                     MaliciousInputValidator(),
                                      MobilePhoneUniqueValidator()
                                  ),
                                  title=_('mobile'),
@@ -371,6 +386,7 @@ class Permissions(colander.Schema):
 
 class UserSearcher(colander.MappingSchema):
     query = colander.SchemaNode(colander.String(),
+                                validator=MaliciousInputValidator(),
                                 description=_('Search for users'),
                                 title=_('query'),
                                 widget=deform.widget.TextInputWidget(
