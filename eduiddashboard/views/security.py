@@ -157,11 +157,11 @@ def unverify_user_nins(request, user):
     """
     for nin in user.nins.to_list():
         user.nins.remove(nin.key)
-    user.save(request)
+    request.dashboard_userdb.save(user)
     # Do not remove the verification as we no longer allow users to remove a already verified nin
     # even if it gets unverified by a e-mail password reset.
     request.db.verifications.update({
-        "user_oid": user.get_id(),
+        "user_oid": user.user_id,
         "model_name": "norEduPersonNIN",
     }, {
         "$set": {"verified": False}
@@ -180,10 +180,10 @@ def unverify_user_mobiles(request, user):
 
     Set all verified mobile phone number to verified = False.
     """
-    for mobile in user.mobiles.to_list():
-        mobile.is_primary(False)
-        mobile.is_verified(False)
-    user.save(request)
+    for mobile in user.phone_numbers.to_list():
+        mobile.is_primary = False
+        mobile.is_verified = False
+    request.dashboard_userdb.save(user)
     return True
 
 
@@ -612,12 +612,12 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if ok:
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
             if password_reset['mechanism'] == 'email':
-                user.retrieve_modified_ts(self.request.db.profiles)
+                retrieve_modified_ts(user, self.request.dashboard_userdb)
                 nin_count = len(user.nins.to_list())
                 if nin_count:
                     unverify_user_nins(self.request, user)
                     self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
-                if len(user.mobiles.to_list()):
+                if len(user.phone_numbers.to_list()):
                     # We need to unverify a users phone numbers to make sure that an attacker can not
                     # verify the account again without control over the users phone number
                     unverify_user_mobiles(self.request, user)
