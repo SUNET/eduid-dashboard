@@ -34,7 +34,14 @@ class PasswordFormTests(LoggedInRequestTests):
         }
         self.patcher = patch.object(vccs, 'get_vccs_client', **mock_config)
         self.patcher.start()
-        provision_credentials(vccs_url, self.initial_password, self.user)
+        self.test_vccs = get_vccs(vccs_url)
+        user = provision_credentials(vccs_url, self.initial_password, self.user)
+        passwds = user.passwords.to_list_of_dicts()
+        self.user.set_passwords(passwds)
+
+    def tearDown(self):
+        super(PasswordFormTests, self).tearDown()
+        self.test_vccs.credentials = {}
 
     def test_logged_get(self):
         self.set_logged()
@@ -52,7 +59,9 @@ class PasswordFormTests(LoggedInRequestTests):
         vccs_client = get_vccs(vccs_url)
         self.assertTrue(check_password(vccs_url, self.initial_password, self.user, vccs=vccs_client))
         new_password = 'new-password'
-        add_credentials(vccs_url, self.initial_password, new_password, self.user, vccs=vccs_client)
+        user = add_credentials(vccs_url, self.initial_password, new_password, self.user, vccs=vccs_client)
+        passwds = user.passwords.to_list_of_dicts()
+        self.user.set_passwords(passwds)
         self.assertTrue(check_password(vccs_url, new_password, self.user, vccs=vccs_client))
 
         with patch('eduid_common.authn.vccs', clear=True):
