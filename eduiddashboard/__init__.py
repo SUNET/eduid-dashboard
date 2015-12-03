@@ -13,8 +13,8 @@ from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
 
 from eduid_am.celery import celery
-from eduid_userdb.db import MongoDB
-from eduid_userdb.dashboard import UserDBWrapper
+from eduid_userdb import MongoDB, UserDB
+from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
 from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
@@ -140,6 +140,10 @@ def profile_urls(config):
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-mina', '/reset-password/mina/',
                      factory=ResetPasswordFactory)
+    config.add_route('reset-password-mobile', '/reset-password/mobile/',
+                     factory=ResetPasswordFactory)
+    config.add_route('reset-password-mobile2', '/reset-password/mobile/{code}/',
+                     factory=ResetPasswordFactory)
     config.add_route('reset-password-step2', '/reset-password/{code}/',
                      factory=ResetPasswordFactory)
     # config.add_route('postaladdress', '/postaladdress/',
@@ -214,6 +218,15 @@ def includeme(config):
     _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+
+    # same DB using new style users
+    config.registry.settings['userdb_new'] = UserDB(config.registry.settings['mongo_uri'], db_name='eduid_am')
+    config.add_request_method(lambda x: x.registry.settings['userdb_new'], 'userdb_new', reify=True)
+
+    # Set up handle to Dashboards private UserDb (DashboardUserDB)
+    _dashboard_userdb = DashboardUserDB(config.registry.settings['mongo_uri'])
+    config.registry.settings['dashboard_userdb'] = _dashboard_userdb
+    config.add_request_method(lambda x: x.registry.settings['dashboard_userdb'], 'dashboard_userdb', reify=True)
 
     msgrelay = MsgRelay(config.registry.settings)
     config.registry.settings['msgrelay'] = msgrelay

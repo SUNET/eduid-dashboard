@@ -116,16 +116,14 @@ class MobilesActionsView(BaseActionsView):
     def setprimary_action(self, index, post_data):
         mobiles = self.user.get_mobiles()
 
-        if index > len(mobiles):
-            message = _("That mobile phone number doesn't exists")
-            return {
-                'result': 'bad',
-                'message': get_localizer(self.request).translate(message),
-            }
+        try:
+            mobile = self.user.get_mobiles()[index]
+        except IndexError:
+            return self.sync_user()
 
-        if index > len(mobiles):
-            message = _("You need to verify that mobile phone number "
-                        "before be able to set as primary")
+        if not mobile.get('verified', False):
+            message = _('You need to confirm your mobile number '
+                        'before it can become primary')
             return {
                 'result': 'bad',
                 'message': get_localizer(self.request).translate(message),
@@ -135,7 +133,6 @@ class MobilesActionsView(BaseActionsView):
         for mobile in mobiles:
             mobile['primary'] = False
 
-        assert(mobiles[index]['verified'])  # double check
         mobiles[index]['primary'] = True
 
         self.user.set_mobiles(mobiles)
@@ -143,7 +140,6 @@ class MobilesActionsView(BaseActionsView):
             self.user.save(self.request)
         except UserOutOfSync:
             return self.sync_user()
-
 
         self.request.stats.count('dashboard/mobile_number_set_primary', 1)
         message = _('Mobile phone number was successfully made primary')

@@ -18,20 +18,23 @@ from eduid_am.tasks import update_attributes
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
-                                   NINResetPassword,
-                                   ResetPasswordStep2)
+                                   NINResetPassword, MobileResetPassword,
+                                   MobileResetPasswordStep2, ResetPasswordStep2)
 from eduid_common.authn.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
+from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.utils import (generate_password,
                                   get_unique_hash,
+                                  get_short_hash,
                                   validate_email_format,
                                   normalize_email,
                                   convert_to_localtime,
                                   normalize_to_e_164,
+                                  retrieve_modified_ts,
                                   sanitize_post_key)
 
 import logging
@@ -39,32 +42,49 @@ log = logging.getLogger(__name__)
 
 
 def change_password(request, user, old_password, new_password):
-    """ Change the user password, deleting old credentials """
+    """
+    Change the user password, deleting old credentials
+
+    @param request: Request object
+    @param user: User object
+    @param old_password: Old password, if supplied (i.e. not a password reset)
+    @param new_password: New password
+
+    @type request: Request
+    @type user: User
+    @type old_password: str or unicode or None
+    """
     vccs_url = request.registry.settings.get('vccs_url')
+    log.debug("Changing password user {!s}\nTIMESTAMP 1 {!s}".format(user, user.modified_ts))
     added = add_credentials(vccs_url, old_password, new_password, user)
+    log.debug("Changing password user {!s}\nTIMESTAMP 2 {!s}".format(user, user.modified_ts))
     if added:
-        user.set_terminated(terminate=False)
-        update_doc = {'$set': {'passwords': user.get_passwords(),
-                               'terminated': None}}
-        user.save(request, check_sync=False, update_doc=update_doc)
+        user.terminated = False
+        request.dashboard_userdb.save(user)
     return added
 
 
-def new_reset_password_code(request, user, mechanism='email'):
+def new_reset_password_code(request, user, mechanism='email', next_view='reset-password-step2'):
     hash_code = get_unique_hash()
     date = datetime.now(pytz.utc)
     request.db.reset_passwords.remove({
         'email': user.get_mail()
     })
-    reference = request.db.reset_passwords.insert({
+
+    reset_doc = {
         'email': user.get_mail(),
         'hash_code': hash_code,
         'mechanism': mechanism,
         'created_at': date,
-    }, safe=True, manipulate=True)
+    }
+
+    if mechanism == 'mobile':
+        reset_doc['mobile_hash_code'] = get_short_hash()
+
+    reference = request.db.reset_passwords.insert(reset_doc, safe=True, manipulate=True)
     log.debug("New reset password code: {!s} via {!s} for user: {!r}.".format(hash_code, mechanism, user))
     reset_password_link = request.route_url(
-        "reset-password-step2",
+        next_view,
         code=hash_code,
     )
     return reference, reset_password_link
@@ -118,7 +138,7 @@ def get_authn_info(request):
 
     for credential in user.get_passwords():
         auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential['id'])})
-        log.debug("cred id: {!r} auth entry: {!r}".format(credential['id'], auth_entry))
+        log.debug("get_authn_info {!s}: cred id: {!r} auth entry: {!r}".format(user, credential['id'], auth_entry))
         if auth_entry:
             created_dt = convert_to_localtime(credential['created_ts'])
             success_dt = convert_to_localtime(auth_entry['success_ts'])
@@ -142,12 +162,13 @@ def unverify_user_nins(request, user):
 
     Remove all NINs from the user and set all previous NIN verifications to verified = False.
     """
-    user.set_nins([])
-    user.save(request)
+    for nin in user.nins.to_list():
+        user.nins.remove(nin.key)
+    request.dashboard_userdb.save(user)
     # Do not remove the verification as we no longer allow users to remove a already verified nin
     # even if it gets unverified by a e-mail password reset.
     request.db.verifications.update({
-        "user_oid": user.get_id(),
+        "user_oid": user.user_id,
         "model_name": "norEduPersonNIN",
     }, {
         "$set": {"verified": False}
@@ -166,9 +187,10 @@ def unverify_user_mobiles(request, user):
 
     Set all verified mobile phone number to verified = False.
     """
-    for mobile in user.get_mobiles():
-        mobile['verified'] = False
-    user.save(request)
+    for mobile in user.phone_numbers.to_list():
+        mobile.is_primary = False
+        mobile.is_verified = False
+    request.dashboard_userdb.save(user)
     return True
 
 
@@ -319,8 +341,9 @@ class PasswordsView(BaseFormView):
 
         # Load user from database to ensure we are working on an up-to-date set of credentials.
         # XXX this refresh is a bit redundant with the same thing being done in OldPasswordValidator.
-        user = self.request.userdb.get_user_by_oid(user.get_id())
-        user.retrieve_modified_ts(self.request.db.profiles)
+        user = self.request.userdb_new.get_user_by_id(user.get_id())
+        log.debug("Refreshed user {!s} from {!s}".format(user, self.request.userdb_new))
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
 
         self.changed = change_password(self.request, user, old_password, new_password)
         if self.changed:
@@ -507,6 +530,114 @@ class ResetPasswordNINView(BaseResetPasswordView):
     cancel_failure = cancel_success
 
 
+@view_config(route_name='reset-password-mobile', permission='edit',
+             renderer='templates/reset-password-form.jinja2')
+class ResetPasswordMobileView(BaseResetPasswordView):
+    """
+    Reset user password.
+    """
+    schema = MobileResetPassword()
+    route = 'reset-password-email'
+    buttons = (
+        Button('reset', title=_('Reset password'), css_class='btn-danger'),
+        Button('cancel', _('Cancel')),
+    )
+    intro_message = _("Please enter a phone number associated with your eduID account, "
+                      "and we'll send you an sms with a code and an e-mail with a link to "
+                      "continue your password reset.")
+
+    def reset_success(self, passwordform):
+        passwords_data = self.schema.serialize(passwordform)
+        mobile_number = normalize_to_e_164(self.request, passwords_data['mobile'])
+
+        try:
+            user = self._search_user(mobile_number)
+            log.info("Reset password via mobile initiated for user {!r}".format(user))
+            log.debug("Mobile number: {!r}".format(mobile_number))
+        except self.request.userdb.exceptions.UserDoesNotExist:
+            log.info("User with mobile number {!r} does not exist".format(mobile_number))
+            user = None
+
+        if user is not None:
+            if mobile_number not in [item['mobile'] for item in user.get_mobiles() if item.get('verified', False)]:
+                log.info("User {!r} does not have entered mobile number set to verified".format(user))
+                log.debug("Mobile number: {!r}".format(mobile_number))
+            else:
+                reference, reset_password_link = new_reset_password_code(self.request, user, 'mobile',
+                                                                         'reset-password-mobile2')
+                send_reset_password_mail(self.request, user, reset_password_link)
+                password_reset = self.request.db.reset_passwords.find_one({'_id': reference})
+                user_language = user.get_preferred_language()
+                self.request.msgrelay.mobile_validator(str(reference), mobile_number,
+                                                       password_reset['mobile_hash_code'], user_language)
+                log.info("Mail and SMS sent to user {!r}".format(user))
+
+            self.request.session['_reset_type'] = _('email')  # This is used to tell the user where to look for the next step
+            return HTTPFound(location=self.request.route_url('reset-password-sent'))
+
+    def cancel_success(self, passwordform):
+        return HTTPFound(location=self.request.route_url('saml2-login'))
+    cancel_failure = cancel_success
+
+
+@view_config(route_name='reset-password-mobile2', permission='edit',
+             renderer='templates/reset-password-form.jinja2')
+class ResetPasswordMobileView2(BaseResetPasswordView):
+    """
+    Form to finish user password reset.
+    """
+
+    schema = MobileResetPasswordStep2()
+    route = 'reset-password-mobile2'
+    buttons = (
+        Button('reset', title=_('Change password'), css_class='btn-success'),
+        Button('cancel', _('Cancel')),
+    )
+    intro_message = _("Please enter the code you received by SMS to continue")
+
+    def __init__(self, context, request):
+        super(ResetPasswordMobileView2, self).__init__(context, request)
+        self._password = None
+
+    def get_template_context(self):
+        context = super(ResetPasswordMobileView2, self).get_template_context()
+        return context
+
+    def __call__(self):
+        hash_code = self.request.matchdict['code']
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+
+        if password_reset is None:
+            return HTTPFound(self.request.route_path('reset-password-expired'))
+
+        date = datetime.now(pytz.utc)
+        reset_timeout = int(self.request.registry.settings['password_reset_timeout'])
+        reset_date = password_reset['created_at'] + timedelta(minutes=reset_timeout)
+        if reset_date < date:
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
+            return HTTPFound(self.request.route_path('reset-password-expired'))
+
+        return super(ResetPasswordMobileView2, self).__call__()
+
+    def reset_success(self, passwordform):
+        form_data = self.schema.serialize(passwordform)
+        hash_code = self.request.matchdict['code']
+        password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
+        if password_reset.get('mobile_hash_code') == form_data['mobile_code']:
+            self.request.db.reset_passwords.update(password_reset, {'$set': {'mobile_hash_code_verified': True}})
+            user = self.request.userdb.get_user_by_mail(password_reset['email'])
+            log.debug('Mobile password reset code verified for user {!r}'.format(user))
+            return HTTPFound(self.request.route_path('reset-password-step2', code=hash_code))
+        log.debug('Mobile password reset code verification failed for password reset document {!r}'.format(
+            password_reset['_id']))
+        return HTTPFound(self.request.route_path('reset-password-expired'))
+
+    def cancel_success(self, passwordform):
+        return HTTPFound(location=self.request.route_url('saml2-login'))
+
+    cancel_failure = cancel_success
+
+
 @view_config(route_name='reset-password-step2', permission='edit',
              renderer='templates/reset-password-form2.jinja2')
 class ResetPasswordStep2View(BaseResetPasswordView):
@@ -560,6 +691,10 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             self.request.stats.count('dashboard/pwreset_code_expired', 1)
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
+        if password_reset['mechanism'] == 'mobile':
+            if not password_reset.get('mobile_hash_code_verified', False):
+                return HTTPFound(self.request.route_path('reset-password-expired'))
+
         return super(ResetPasswordStep2View, self).__call__()
 
     def get_suggested_password(self):
@@ -574,15 +709,17 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb.get_user_by_mail(password_reset['email'])
-        user.retrieve_modified_ts(self.request.db.profiles)
+        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
+
+        log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 
         if form_data.get('use_custom_password') == 'true':
-            log.debug("Password change for user {!r} (custom password).".format(user.get_id()))
+            log.debug("Password change for user {!r} (custom password).".format(user))
             new_password = form_data.get('custom_password')
             self.request.stats.count('dashboard/pwreset_custom_password', 1)
         else:
-            log.debug("Password change for user {!r} (suggested password).".format(user.get_id()))
+            log.debug("Password change for user {!r} (suggested password).".format(user))
             new_password = self.get_suggested_password()
             self.request.stats.count('dashboard/pwreset_generated_password', 1)
 
@@ -594,16 +731,16 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if ok:
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
             if password_reset['mechanism'] == 'email':
-                user.retrieve_modified_ts(self.request.db.profiles)
-                if user.get_nins():
-                    nin_count = len(user.get_nins())
+                retrieve_modified_ts(user, self.request.dashboard_userdb)
+                nin_count = len(user.nins.to_list())
+                if nin_count:
                     unverify_user_nins(self.request, user)
                     self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
-                if user.get_mobiles():
+                if len(user.phone_numbers.to_list()):
                     # We need to unverify a users phone numbers to make sure that an attacker can not
                     # verify the account again without control over the users phone number
                     unverify_user_mobiles(self.request, user)
-                update_attributes('eduid_dashboard', str(user['_id']))
+                update_attributes('eduid_dashboard', str(user.user_id))
             url = self.request.route_url('profile-editor')
             reset = True
         else:

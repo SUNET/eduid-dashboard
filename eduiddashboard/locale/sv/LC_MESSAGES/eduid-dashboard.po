@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-27 17:10+0100\n"
-"PO-Revision-Date: 2015-11-27 16:14+0000\n"
+"POT-Creation-Date: 2015-12-02 16:03+0100\n"
+"PO-Revision-Date: 2015-12-02 15:13+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
@@ -38,7 +38,7 @@ msgid "Reset your {site_name} password"
 msgstr "Återställning av ditt {site_name} lösenord"
 
 #: eduiddashboard/models.py:24 eduiddashboard/models.py:99
-#: eduiddashboard/views/security.py:459
+#: eduiddashboard/views/security.py:482 eduiddashboard/views/security.py:575
 msgid "email"
 msgstr "e-post"
 
@@ -96,11 +96,11 @@ msgstr "Språk"
 msgid "Current password"
 msgstr "Nuvarande lösenord"
 
-#: eduiddashboard/models.py:221 eduiddashboard/models.py:290
+#: eduiddashboard/models.py:221 eduiddashboard/models.py:316
 msgid "Use my own password"
 msgstr "Välj lösenord själv"
 
-#: eduiddashboard/models.py:226 eduiddashboard/models.py:295
+#: eduiddashboard/models.py:226 eduiddashboard/models.py:321
 msgid "Suggested password"
 msgstr "Rekommenderat lösenord"
 
@@ -112,82 +112,82 @@ msgstr "Valt lösenord"
 msgid "Repeat the password"
 msgstr "Repetera valt lösenord"
 
-#: eduiddashboard/models.py:309
+#: eduiddashboard/models.py:335
 msgid "New Password"
 msgstr "Nytt lösenord"
 
-#: eduiddashboard/models.py:316
+#: eduiddashboard/models.py:342
 msgid "Confirm New Password"
 msgstr "Bekräfta nytt lösenord"
 
-#: eduiddashboard/models.py:322
+#: eduiddashboard/models.py:348
 msgid "Passwords doesn't match"
 msgstr "Lösenorden är olika"
 
-#: eduiddashboard/models.py:335
+#: eduiddashboard/models.py:361
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr "Adress"
 
-#: eduiddashboard/models.py:342
+#: eduiddashboard/models.py:368
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr "Stad"
 
-#: eduiddashboard/models.py:351
+#: eduiddashboard/models.py:377
 msgid "Postal code"
 msgstr "Postkod"
 
-#: eduiddashboard/models.py:357
+#: eduiddashboard/models.py:383
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr "Land"
 
-#: eduiddashboard/models.py:371
+#: eduiddashboard/models.py:397
 msgid "mobile"
 msgstr "mobiltelefon"
 
-#: eduiddashboard/models.py:373
+#: eduiddashboard/models.py:399
 msgid "Mobile phone number"
 msgstr "Mobiltelefonnummer"
 
-#: eduiddashboard/models.py:390 eduiddashboard/templates/home.jinja2:17
+#: eduiddashboard/models.py:416 eduiddashboard/templates/home.jinja2:17
 msgid "Search for users"
 msgstr "Sök efter användare"
 
-#: eduiddashboard/models.py:391
+#: eduiddashboard/models.py:417
 msgid "query"
 msgstr "sökfras"
 
-#: eduiddashboard/permissions.py:85
+#: eduiddashboard/permissions.py:100
 msgid "You do not have sufficient permissions to access this user"
 msgstr "Du har inte tillräckliga rättigheter för att komma åt denna användare"
 
-#: eduiddashboard/permissions.py:117
+#: eduiddashboard/permissions.py:132
 msgid "You do not have sufficient AL to access to this workmode"
 msgstr "Du har inte tillräckligt hög AL-nivå för att komma åt detta arbetsläge"
 
-#: eduiddashboard/permissions.py:282
+#: eduiddashboard/permissions.py:298
 msgid "Not logged in"
 msgstr "EJ inloggad"
 
-#: eduiddashboard/permissions.py:291
+#: eduiddashboard/permissions.py:307
 msgid "You must be logged in with {user_AL} to manage your credentials"
 msgstr ""
 "Du måste vara inloggad med behörighet {user_AL} för att kunna ändra dina "
 "säkerhetsinställningar"
 
-#: eduiddashboard/utils.py:59
+#: eduiddashboard/utils.py:62
 msgid "Login token expired, please await confirmation e-mail to log in."
 msgstr ""
 "Automatinloggningen har gått ut. Var vänlig invänta bekräftelsebrevet "
 "till din e-post för att logga in."
 
-#: eduiddashboard/utils.py:63 eduiddashboard/utils.py:71
+#: eduiddashboard/utils.py:66 eduiddashboard/utils.py:74
 msgid "Login token invalid"
 msgstr "Ogiltig automatinloggning"
 
-#: eduiddashboard/utils.py:104 eduiddashboard/templates/passwords-form.jinja2:4
+#: eduiddashboard/utils.py:107 eduiddashboard/templates/passwords-form.jinja2:4
 msgid "Security"
 msgstr "Säkerhet"
 
@@ -663,12 +663,12 @@ msgid "We are verifying that the provided identity number is valid, please wait.
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
 #: eduiddashboard/templates/nins-form.jinja2:77
-#: eduiddashboard/templates/reset-password.jinja2:32
+#: eduiddashboard/templates/reset-password.jinja2:37
 msgid "Mina Meddelanden disabled"
 msgstr "Mina Meddelanden är inaktiverad"
 
 #: eduiddashboard/templates/nins-form.jinja2:77
-#: eduiddashboard/templates/reset-password.jinja2:32
+#: eduiddashboard/templates/reset-password.jinja2:37
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
@@ -679,7 +679,7 @@ msgstr ""
 "Mer information:"
 
 #: eduiddashboard/templates/nins-form.jinja2:77
-#: eduiddashboard/templates/reset-password.jinja2:32
+#: eduiddashboard/templates/reset-password.jinja2:37
 msgid "Vetenskapsrådet's press release"
 msgstr "Vetenskapsrådets pressrelease"
 
@@ -833,7 +833,8 @@ msgstr "Användes senast"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:84
-#: eduiddashboard/views/security.py:236 eduiddashboard/views/security.py:520
+#: eduiddashboard/views/security.py:258 eduiddashboard/views/security.py:593
+#: eduiddashboard/views/security.py:651
 msgid "Change password"
 msgstr "Byt lösenord"
 
@@ -875,8 +876,9 @@ msgstr "Bekräfta borttagandet av eduID-kontot"
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:105
-#: eduiddashboard/views/security.py:438 eduiddashboard/views/security.py:477
-#: eduiddashboard/views/security.py:521
+#: eduiddashboard/views/security.py:461 eduiddashboard/views/security.py:500
+#: eduiddashboard/views/security.py:543 eduiddashboard/views/security.py:594
+#: eduiddashboard/views/security.py:652
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1188,34 +1190,36 @@ msgstr "Glömt bort ditt lösenord?"
 
 #: eduiddashboard/templates/reset-password.jinja2:8
 msgid ""
-"Password reset is possible using an email that you have registered on "
-"your account."
-msgstr "Återställning av ditt lösenord är möjligt via e-post."
+"Password reset is possible using an email or mobile phone number that you"
+" have registered on your account."
+msgstr "Återställning av ditt lösenord är möjligt via e-post eller mobilnummer."
 
 #: eduiddashboard/templates/reset-password.jinja2:11
 msgid ""
-"If email is used to reset your password your eduID account status will be"
-" reset to unconfirmed."
+"If only email is used to reset your password your eduID account status "
+"will be reset to unconfirmed."
 msgstr ""
 "Om återställning av ditt lösenord sker via e-post återställs även din "
 "kontostatus till obekräftad."
 
-#: eduiddashboard/templates/reset-password.jinja2:12
+#: eduiddashboard/templates/reset-password.jinja2:14
 msgid ""
-"Unfortunately, we have been locked out from ”Mina Meddelanden”. We are "
-"currently working on other methods for password reset, that will be able "
-"to use without resetting the account status to unconfirmed."
+"Unfortunately, we have been locked out from the government mailbox "
+"service."
 msgstr ""
 "Tyvärr har Skatteverket stängt av möjligheten att återställa lösenordet "
-"via \"Mina Meddelanden\". Vi arbetar på möjligheten att återställa "
-"lösenordet med andra metoder som innebär att kontot inte blir obekräftat."
+"via \"Min Myndighetspost\"."
 
-#: eduiddashboard/templates/reset-password.jinja2:18
 #: eduiddashboard/templates/reset-password.jinja2:20
+#: eduiddashboard/templates/reset-password.jinja2:22
 msgid "Reset password by government mailbox service"
 msgstr "Återställ ditt lösenord via \"Min myndighetspost\""
 
-#: eduiddashboard/templates/reset-password.jinja2:24
+#: eduiddashboard/templates/reset-password.jinja2:26
+msgid "Reset password by mobile phone number"
+msgstr "Återställ ditt lösenord via mobiltelefonnummer"
+
+#: eduiddashboard/templates/reset-password.jinja2:29
 msgid "Reset password by e-mail"
 msgstr "Återställ ditt lösenord via e-post"
 
@@ -1435,7 +1439,7 @@ msgid "Confirm identity number"
 msgstr "Bekräfta identitet"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:124 eduiddashboard/views/nins.py:155
+#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:155
 msgid "Confirmation code"
 msgstr "Bekräftelsekod"
 
@@ -1451,23 +1455,23 @@ msgstr "Ditt personnummer är nu bekräftat."
 msgid "Invalid identity number"
 msgstr "Ogiltigt personnummer"
 
-#: eduiddashboard/views/__init__.py:121
+#: eduiddashboard/views/__init__.py:129
 msgid "The data has been verified"
 msgstr "Informationen har bekräftats"
 
-#: eduiddashboard/views/__init__.py:122
+#: eduiddashboard/views/__init__.py:130
 msgid "Confirmation code is invalid"
 msgstr "Ogiltig bekräftelsekod"
 
-#: eduiddashboard/views/__init__.py:123
+#: eduiddashboard/views/__init__.py:131
 msgid "Check your email for further instructions"
 msgstr "Se e-post för vidare instruktioner"
 
-#: eduiddashboard/views/__init__.py:125
+#: eduiddashboard/views/__init__.py:133
 msgid "A new confirmation code has been sent to you"
 msgstr "En ny bekräftelsekod har skickats till dig"
 
-#: eduiddashboard/views/__init__.py:126
+#: eduiddashboard/views/__init__.py:134
 msgid ""
 "The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
@@ -1475,18 +1479,18 @@ msgstr ""
 "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en"
 " ny."
 
-#: eduiddashboard/views/__init__.py:128 eduiddashboard/views/nins.py:419
+#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:419
 #: eduiddashboard/views/verifications.py:36
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
 "Ditt användardata har ändrats i ett annat fönster eller flik. Vänligen "
 "ladda om sidan och försök igen."
 
-#: eduiddashboard/views/__init__.py:360
+#: eduiddashboard/views/__init__.py:368
 msgid "The wizard was dismissed"
 msgstr "Guiden har avbrutits"
 
-#: eduiddashboard/views/__init__.py:401
+#: eduiddashboard/views/__init__.py:409
 msgid "Unexpected error"
 msgstr "Ett oväntat fel inträffade"
 
@@ -1530,20 +1534,20 @@ msgstr "Din primära e-postadress har ändrats"
 msgid "Error: You only have one email address and it  can not be removed"
 msgstr "Fel: Minst en e-postadress krävs, denna kan ej tas bort"
 
-#: eduiddashboard/views/emails.py:129
+#: eduiddashboard/views/emails.py:132
 msgid "Email address was successfully removed"
 msgstr "E-postadress borttagen"
 
-#: eduiddashboard/views/emails.py:154 eduiddashboard/views/mobiles.py:172
+#: eduiddashboard/views/emails.py:157 eduiddashboard/views/mobiles.py:168
 msgid "Add"
 msgstr "Lägg till"
 
-#: eduiddashboard/views/emails.py:192 eduiddashboard/views/mobiles.py:203
+#: eduiddashboard/views/emails.py:195 eduiddashboard/views/mobiles.py:199
 #: eduiddashboard/views/personal.py:75
 msgid "Changes saved"
 msgstr "Ändringarna har sparats"
 
-#: eduiddashboard/views/emails.py:197
+#: eduiddashboard/views/emails.py:200
 msgid ""
 "A confirmation email has been sent to your email address. Please enter "
 "your confirmation code <a href=\"#\" class=\"verifycode\" data-"
@@ -1589,21 +1593,15 @@ msgstr "En ny bekräftelsekod har skickats till ditt mobiltelefonnummer"
 msgid "Mobile phone number was successfully removed"
 msgstr "Mobiltelefonnumret har tagits bort "
 
-#: eduiddashboard/views/mobiles.py:120
-msgid "That mobile phone number doesn't exists"
-msgstr "Mobiltelefonnumret kunde inte hittas"
+#: eduiddashboard/views/mobiles.py:125
+msgid "You need to confirm your mobile number before it can become primary"
+msgstr "Du måste bekräfta ditt mobilnummer innan det går att ange som primärt"
 
-#: eduiddashboard/views/mobiles.py:127
-msgid ""
-"You need to verify that mobile phone number before be able to set as "
-"primary"
-msgstr "Du behöver verifiera ditt mobilnummer innan det går att ange som primärt"
-
-#: eduiddashboard/views/mobiles.py:149
+#: eduiddashboard/views/mobiles.py:145
 msgid "Mobile phone number was successfully made primary"
 msgstr "Ditt primära mobiltelefonnumret har ändrats"
 
-#: eduiddashboard/views/mobiles.py:205
+#: eduiddashboard/views/mobiles.py:201
 msgid ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
@@ -1690,27 +1688,27 @@ msgstr "Ändringarna har sparats."
 msgid "Save"
 msgstr "Spara"
 
-#: eduiddashboard/views/security.py:102
+#: eduiddashboard/views/security.py:122
 msgid "Invalid request: only GET and POST accepted."
 msgstr "Ogiltig förfrågan: endast GET och POST tillåtna."
 
-#: eduiddashboard/views/security.py:125
+#: eduiddashboard/views/security.py:145
 msgid "Password"
 msgstr "Lösenord"
 
-#: eduiddashboard/views/security.py:289
+#: eduiddashboard/views/security.py:311
 msgid "No authentication info"
 msgstr "Ingen autentiseringsinformation"
 
-#: eduiddashboard/views/security.py:294
+#: eduiddashboard/views/security.py:316
 msgid "Stale authentication info. Please try again."
 msgstr "Autentiseringsinformationen är för gammal. Försök igen."
 
-#: eduiddashboard/views/security.py:327
+#: eduiddashboard/views/security.py:350
 msgid "Your password has been successfully updated"
 msgstr "Ditt lösenord har uppdaterats"
 
-#: eduiddashboard/views/security.py:329
+#: eduiddashboard/views/security.py:352
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
@@ -1718,7 +1716,7 @@ msgstr ""
 "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen "
 "eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/views/security.py:369
+#: eduiddashboard/views/security.py:392
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
@@ -1727,15 +1725,30 @@ msgstr ""
 "Ange e-postadress, personnummer eller mobiltelefonnummer associerat med "
 "ditt eduID-konto så skickar vi en länk för att återställa ditt lösenord."
 
-#: eduiddashboard/views/security.py:437 eduiddashboard/views/security.py:476
+#: eduiddashboard/views/security.py:460 eduiddashboard/views/security.py:499
+#: eduiddashboard/views/security.py:542
 msgid "Reset password"
 msgstr "Återställ lösenord"
 
-#: eduiddashboard/views/security.py:502
+#: eduiddashboard/views/security.py:525
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:523
+#: eduiddashboard/views/security.py:545
+msgid ""
+"Please enter a phone number associated with your eduID account, and we'll"
+" send you an sms with a code and an e-mail with a link to continue your "
+"password reset."
+msgstr ""
+"Ange ett mobiltelefonnummer associerat med ditt eduID-konto så skickar vi"
+" ett sms med en kod samt ett e-postmeddelande med en länk till sidan för "
+"att fortsätta återställningen av ditt lösenord."
+
+#: eduiddashboard/views/security.py:596
+msgid "Please enter the code you received by SMS to continue"
+msgstr "Ange koden du fick via SMS för att fortsätta"
+
+#: eduiddashboard/views/security.py:654
 msgid "Please choose a new password for your eduID account."
 msgstr "Välj ett nytt lösenord för ditt eduID-konto."
 
