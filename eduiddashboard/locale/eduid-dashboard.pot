@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.4.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-02 16:03+0100\n"
+"POT-Creation-Date: 2015-12-03 14:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,7 +234,7 @@ msgid "National identity number already added"
 msgstr ""
 
 #: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
-#: eduiddashboard/views/nins.py:515
+#: eduiddashboard/views/nins.py:514
 msgid "You already have a confirmed national identity number"
 msgstr ""
 
@@ -605,19 +605,19 @@ msgid "We are verifying that the provided identity number is valid, please wait.
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
-#: eduiddashboard/templates/reset-password.jinja2:37
+#: eduiddashboard/templates/reset-password.jinja2:33
 msgid "Mina Meddelanden disabled"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
-#: eduiddashboard/templates/reset-password.jinja2:37
+#: eduiddashboard/templates/reset-password.jinja2:33
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID from"
 " using Mina Meddelanden due to pressure from SWEDBANK. For more information:"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:77
-#: eduiddashboard/templates/reset-password.jinja2:37
+#: eduiddashboard/templates/reset-password.jinja2:33
 msgid "Vetenskapsrådet's press release"
 msgstr ""
 
@@ -1020,30 +1020,26 @@ msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:8
 msgid ""
-"Password reset is possible using an email or mobile phone number that you "
-"have registered on your account."
+"Password reset is possible using an email combined with SMS to your mobile "
+"device. If your mobile number is not already registered in eduID, email can "
+"be used to reset your password but your eduID account status will be reset to"
+" unconfirmed."
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:11
-msgid ""
-"If only email is used to reset your password your eduID account status will "
-"be reset to unconfirmed."
-msgstr ""
-
-#: eduiddashboard/templates/reset-password.jinja2:14
+#: eduiddashboard/templates/reset-password.jinja2:10
 msgid "Unfortunately, we have been locked out from the government mailbox service."
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:20
-#: eduiddashboard/templates/reset-password.jinja2:22
+#: eduiddashboard/templates/reset-password.jinja2:16
+#: eduiddashboard/templates/reset-password.jinja2:18
 msgid "Reset password by government mailbox service"
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:26
+#: eduiddashboard/templates/reset-password.jinja2:22
 msgid "Reset password by mobile phone number"
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:29
+#: eduiddashboard/templates/reset-password.jinja2:25
 msgid "Reset password by e-mail"
 msgstr ""
 
@@ -1204,7 +1200,7 @@ msgid "Confirm identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:155
+#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:154
 msgid "Confirmation code"
 msgstr ""
 
@@ -1242,7 +1238,7 @@ msgid ""
 "code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:419
+#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:418
 #: eduiddashboard/views/verifications.py:36
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
@@ -1263,7 +1259,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:153
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:152
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -1369,53 +1365,53 @@ msgstr ""
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:152
+#: eduiddashboard/views/nins.py:151
 msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:154
+#: eduiddashboard/views/nins.py:153
 msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:156
+#: eduiddashboard/views/nins.py:155
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:257
+#: eduiddashboard/views/nins.py:256
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:274
+#: eduiddashboard/views/nins.py:273
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:311 eduiddashboard/views/nins.py:315
+#: eduiddashboard/views/nins.py:310 eduiddashboard/views/nins.py:314
 msgid "Mina Meddelanden"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:318
+#: eduiddashboard/views/nins.py:317
 msgid "Phone subscription"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:422
+#: eduiddashboard/views/nins.py:421
 msgid "Your national identity number has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:434
+#: eduiddashboard/views/nins.py:433
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:481
+#: eduiddashboard/views/nins.py:480
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:500
+#: eduiddashboard/views/nins.py:499
 msgid "There was an unknown error dealing with your request"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:535
+#: eduiddashboard/views/nins.py:534
 msgid "Add your national identity number"
 msgstr ""
 
