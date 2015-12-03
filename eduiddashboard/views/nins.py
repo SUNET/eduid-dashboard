@@ -124,12 +124,11 @@ def get_not_verified_nins_list(request, user):
             # old style, list of strings (understood to be verified)
             user_already_verified = users_nins
     for this in verifications:
-        if this['verified']:
-            if this['obj_id'] in user_not_verified:
-                # Found to be verified after all, filter out from user_not_verified
-                user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
+        if this['verified'] and this['obj_id'] in user_not_verified:    # XXX: This will never happen with DashboardLegacyUser
+            # Found to be verified after all, filter out from user_not_verified
+            user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
         else:
-            if this['obj_id'] not in user_already_verified:
+            if this['obj_id'] not in user_already_verified:             # XXX: This will always happen with DashboardLegacyUser
                 res.append(this['obj_id'])
     res += user_not_verified
     # As we no longer remove verification documents make the list items unique
