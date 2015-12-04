@@ -55,7 +55,7 @@
 {% endblock %}
 
 {% block form_generic_form %}
-  {% if not active_nin %}
+  {% if not active_nin and not not_verified_nins %}
      {% trans %}<p>Add your Swedish national identity number and initiate the confirmation process using
                 one of the buttons below.</p>{% endtrans %}
     <div class='form-content'>
