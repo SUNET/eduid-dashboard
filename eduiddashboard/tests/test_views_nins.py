@@ -71,7 +71,6 @@ class NinsFormTests(LoggedInRequestTests):
 
                 self.assertEqual(response.status, '200 OK')
                 self.assertIn(nin, response.body)
-                self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_not_valid_nin(self):
         self.set_logged(email=self.no_nin_user_email)
@@ -116,8 +115,6 @@ class NinsFormTests(LoggedInRequestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn(nin, response.body)
-            self.assertIn('alert-danger', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):
         self.set_logged(email=self.no_nin_user_email)
