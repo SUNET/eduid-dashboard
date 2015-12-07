@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-03 14:20+0100\n"
+"POT-Creation-Date: 2015-12-07 14:16+0100\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -486,7 +486,7 @@ msgstr "Reenviar el email de verificación"
 #: eduiddashboard/templates/emails-form.jinja2:35
 #: eduiddashboard/templates/emails-form.jinja2:38
 #: eduiddashboard/templates/mobiles-form.jinja2:34
-#: eduiddashboard/templates/nins-form.jinja2:41
+#: eduiddashboard/templates/nins-form.jinja2:43
 #, fuzzy
 msgid "Remove"
 msgstr "eliminar"
@@ -634,18 +634,24 @@ msgstr ""
 msgid "Confirm using phone subscription"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:53
+#: eduiddashboard/templates/nins-form.jinja2:38
+#, fuzzy
+#| msgid "Add a mobile phone number using the button below."
+msgid "Add a mobile phone number to continue"
+msgstr "número de teléfono móvil"
+
+#: eduiddashboard/templates/nins-form.jinja2:55
 msgid "Your identity is already confirmed. No further action is required here."
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:59
+#: eduiddashboard/templates/nins-form.jinja2:61
 msgid ""
 "<p>Add your Swedish national identity number and initiate the "
 "confirmation process using\n"
 "                one of the buttons below.</p>"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:69
+#: eduiddashboard/templates/nins-form.jinja2:71
 #, python-format
 msgid ""
 "\n"
@@ -654,16 +660,16 @@ msgid ""
 "    "
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:76
+#: eduiddashboard/templates/nins-form.jinja2:78
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/nins-form.jinja2:79
 #: eduiddashboard/templates/reset-password.jinja2:33
 msgid "Mina Meddelanden disabled"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/nins-form.jinja2:79
 #: eduiddashboard/templates/reset-password.jinja2:33
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
@@ -671,7 +677,7 @@ msgid ""
 "information:"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:77
+#: eduiddashboard/templates/nins-form.jinja2:79
 #: eduiddashboard/templates/reset-password.jinja2:33
 msgid "Vetenskapsrådet's press release"
 msgstr ""
@@ -2122,16 +2128,4 @@ msgstr ""
 
 #~ msgid "That mobile phone number doesn't exists"
 #~ msgstr "No se puede encontrar este email"
-
-#~ msgid ""
-#~ "Password reset is possible using an "
-#~ "email or mobile phone number that "
-#~ "you have registered on your account."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If only email is used to reset "
-#~ "your password your eduID account status"
-#~ " will be reset to unconfirmed."
-#~ msgstr ""
 
