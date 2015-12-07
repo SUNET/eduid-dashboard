@@ -34,6 +34,8 @@
                         {% if has_mobile %}
                             <input type='button' class='btn btn-link verify_mb' value="{{_('Confirm using phone subscription')}}"
                                    data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
+                        {% else %}
+                            Add a mobile phone number to continue
                         {% endif %}
                     </td>
                     <!-- Removed functionality temporary
@@ -55,7 +57,7 @@
 {% endblock %}
 
 {% block form_generic_form %}
-  {% if not active_nin %}
+  {% if not active_nin and not not_verified_nins %}
      {% trans %}<p>Add your Swedish national identity number and initiate the confirmation process using
                 one of the buttons below.</p>{% endtrans %}
     <div class='form-content'>

@@ -74,9 +74,9 @@ def verify_nin(request, user, new_nin, reference=None):
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
-    old_user_docs = request.db.profiles.find({
+    old_user_docs = request.userdb.get_users_by_filter({
         'norEduPersonNIN': new_nin
-    })
+    }, raise_on_missing=False)
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = OldUser(old_user_doc)
@@ -113,9 +113,9 @@ def verify_mobile(request, user, new_mobile):
     log.info('Trying to verify mobile number for user {!r}.'.format(user))
     log.debug('Mobile number: {!s}.'.format(new_mobile))
     # Start by removing mobile number from any other user
-    old_user_docs = request.db.profiles.find({
+    old_user_docs = request.userdb.get_users_by_filter({
         'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}
-    })
+    }, raise_on_missing=False)
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = OldUser(old_user_doc)
@@ -142,9 +142,9 @@ def verify_mail(request, user, new_mail):
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
     # Start by removing mail address from any other user
-    old_user_docs = request.db.profiles.find({
+    old_user_docs = request.userdb.get_users_by_filter({
         'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}
-    })
+    }, raise_on_missing=False)
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = OldUser(old_user_doc)
