@@ -59,8 +59,10 @@ def change_password(request, user, old_password, new_password):
     added = add_credentials(vccs_url, old_password, new_password, user)
     log.debug("Changing password user {!s}\nTIMESTAMP 2 {!s}".format(user, user.modified_ts))
     if added:
+        retrieve_modified_ts(user, request.dashboard_userdb)
         user.terminated = False
         request.dashboard_userdb.save(user)
+        update_attributes('eduid_dashboard', str(user.user_id))
     return added
 
 
@@ -71,6 +73,7 @@ def new_reset_password_code(request, user, mechanism='email', next_view='reset-p
         'email': user.get_mail()
     })
 
+    # XXX: Use eppn instead of email
     reset_doc = {
         'email': user.get_mail(),
         'hash_code': hash_code,
@@ -710,7 +713,6 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
         user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
-        retrieve_modified_ts(user, self.request.dashboard_userdb)
 
         log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 
@@ -723,24 +725,26 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             new_password = self.get_suggested_password()
             self.request.stats.count('dashboard/pwreset_generated_password', 1)
 
-        new_password = new_password.replace(' ', '')
+        # Make user AL1 if password was reset by e-mail only
+        if password_reset['mechanism'] == 'email':
+            retrieve_modified_ts(user, self.request.dashboard_userdb)
+            nin_count = len(user.nins.to_list())
+            if nin_count:
+                unverify_user_nins(self.request, user)
+                self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
+            if len(user.phone_numbers.to_list()):
+                # We need to unverify a users phone numbers to make sure that an attacker can not
+                # verify the account again without control over the users phone number
+                unverify_user_mobiles(self.request, user)
+            update_attributes('eduid_dashboard', str(user.user_id))
 
-        self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
+        # Save new password
+        new_password = new_password.replace(' ', '')
         ok = change_password(self.request, user, '', new_password)
 
         if ok:
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
-            if password_reset['mechanism'] == 'email':
-                retrieve_modified_ts(user, self.request.dashboard_userdb)
-                nin_count = len(user.nins.to_list())
-                if nin_count:
-                    unverify_user_nins(self.request, user)
-                    self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
-                if len(user.phone_numbers.to_list()):
-                    # We need to unverify a users phone numbers to make sure that an attacker can not
-                    # verify the account again without control over the users phone number
-                    unverify_user_mobiles(self.request, user)
-                update_attributes('eduid_dashboard', str(user.user_id))
             url = self.request.route_url('profile-editor')
             reset = True
         else:
