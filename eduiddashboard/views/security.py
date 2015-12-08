@@ -62,7 +62,7 @@ def change_password(request, user, old_password, new_password):
         retrieve_modified_ts(user, request.dashboard_userdb)
         user.terminated = False
         request.dashboard_userdb.save(user)
-        update_attributes('eduid_dashboard', str(user.user_id))
+        update_attributes.delay('eduid_dashboard', str(user.user_id))
     return added
 
 
@@ -736,7 +736,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                 # We need to unverify a users phone numbers to make sure that an attacker can not
                 # verify the account again without control over the users phone number
                 unverify_user_mobiles(self.request, user)
-            update_attributes('eduid_dashboard', str(user.user_id))
+            update_attributes.delay('eduid_dashboard', str(user.user_id))
 
         # Save new password
         new_password = new_password.replace(' ', '')
