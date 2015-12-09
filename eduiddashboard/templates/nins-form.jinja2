@@ -60,10 +60,11 @@
   {% if not active_nin and not not_verified_nins %}
      {% trans %}<p>Add your Swedish national identity number and initiate the confirmation process using
                 one of the buttons below.</p>{% endtrans %}
-    <div class='form-content'>
+  {% endif %}
+    <!-- Hiding a form does not make in unusable. we should really have different forms for adding and validating NINs -->
+    <div class='form-content {% if active_nin or not_verified_nins %} hidden{% endif %}'>
       {{ form|safe }}
     </div>
-  {% endif %}
 {% endblock %}
 
 {% block askdialog_extra_info %}
