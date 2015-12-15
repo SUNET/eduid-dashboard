@@ -728,15 +728,21 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         # Make user AL1 if password was reset by e-mail only
         if password_reset['mechanism'] == 'email':
             retrieve_modified_ts(user, self.request.dashboard_userdb)
+            sync_user = False
             nin_count = len(user.nins.to_list())
             if nin_count:
                 unverify_user_nins(self.request, user)
+                sync_user = True
                 self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
             if len(user.phone_numbers.to_list()):
                 # We need to unverify a users phone numbers to make sure that an attacker can not
                 # verify the account again without control over the users phone number
                 unverify_user_mobiles(self.request, user)
-            update_attributes.delay('eduid_dashboard', str(user.user_id))
+                sync_user = True
+            if sync_user:
+                # Do not perform a sync if no changes where made, there is a corner case
+                # where the user has not been created yet
+                update_attributes.delay('eduid_dashboard', str(user.user_id))
 
         # Save new password
         new_password = new_password.replace(' ', '')
