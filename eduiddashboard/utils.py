@@ -222,7 +222,7 @@ def retrieve_modified_ts(user, dashboard_userdb):
         user.modified_ts = None
         return
 
-    dashboard_user = dashboard_userdb.get_user_by_id(userid)
+    dashboard_user = dashboard_userdb.get_user_by_id(userid, raise_on_missing=False)
     if dashboard_user is None:
         logger.debug("User {!s} not found in {!s}, setting modified_ts to None".format(user, dashboard_userdb))
         user.modified_ts = None
