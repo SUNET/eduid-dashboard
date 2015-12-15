@@ -1,6 +1,7 @@
 # NINS form
 
 import deform
+import requests
 from datetime import datetime
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
@@ -229,6 +230,47 @@ class NINsActionsView(BaseActionsView):
             'message': msg,
             }
 
+    def verify_lp_action(self, data, post_data):
+        '''
+        verify by physical mail
+        '''
+        nin, index = data.split()
+        index = int(index)
+        nins = get_not_verified_nins_list(self.request, self.user)
+
+        if len(nins) > index:
+            new_nin = nins[index]
+            if new_nin != nin:
+                return self.sync_user()
+        else:
+            return self.sync_user()
+
+        settings = self.request.registry.settings
+        letter_url = settings.get('letter_service_url')
+        state_url = '{0}{1}?nin={2}'.format(letter_url, 'get-state', nin)
+
+        response = requests.get(state_url)
+        if response.status_code == 200:
+            state = response.json()
+            if 'sent' in state:
+                msg = _('A letter has already been sent to this address')
+            else:
+                msg = _('If this address is correct, '
+                        'click on the "send" button')
+            return {
+                'result': 'success',
+                'message': get_localizer(self.request).translate(msg),
+                'address': state['address'],
+                'sent': state['sent']
+            }
+        else:
+            message = _('Problem with the letter service. '
+                        'Please try again later.')
+            return {
+                'result': 'error',
+                'message': get_localizer(self.request).translate(message)
+            }
+
     def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """
         raise HTTPNotImplemented  # Temporary remove the functionality
@@ -315,6 +357,9 @@ class NinsView(BaseFormView):
                                            css_class='btn btn-primary disabled'),)
         self.buttons += (deform.Button(name='add_by_mobile',
                                        title=_('Phone subscription'),
+                                       css_class='btn btn-primary'),)
+        self.buttons += (deform.Button(name='add_by_letter',
+                                       title=_('Add by physical letter'),
                                        css_class='btn btn-primary'),)
 
     def appstruct(self):
@@ -440,6 +485,12 @@ class NinsView(BaseFormView):
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
         self.add_success_other(ninform)
+
+    def add_by_letter_success(self, ninform):
+        """
+        This method is bounded to the "add_by_letter"-button by it's name
+        """
+        pass
 
 
 @view_config(route_name='wizard-nins', permission='edit', renderer='json')
