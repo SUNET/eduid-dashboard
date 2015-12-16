@@ -263,7 +263,7 @@ class NINsActionsView(BaseActionsView):
                 msg = _('A letter has already been sent to this address. '
                         'It will expire on {}'.format(
                             state['letter_expires']))
-                address = state['address']
+                address = state['official_address']
                 sent = state['sent']
                 result = 'success'
             else:
@@ -272,7 +272,7 @@ class NINsActionsView(BaseActionsView):
                 ga_response = requests.post(get_address_url, data=data)
                 if ga_response.status_code == 200:
                     state = ga_response.json()
-                    address = state['address']
+                    address = state['official_address']
                     sent = False
                     result = 'success'
                     msg = _('If this address is correct, click on the "send" '
