@@ -171,6 +171,10 @@ class BaseActionsView(object):
             result = self.verify_mb_action(index, post_data)
         elif action == 'verify_lp':
             result = self.verify_lp_action(index, post_data)
+        elif action == 'send_letter':
+            result = self.send_letter_action(index, post_data)
+        elif action == 'finish_letter':
+            result = self.finish_letter_action(index, post_data)
         else:
             raise HTTPBadRequest("Unsupported action")
 

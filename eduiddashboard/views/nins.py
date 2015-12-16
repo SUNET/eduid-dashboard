@@ -347,6 +347,69 @@ class NINsActionsView(BaseActionsView):
             'message': message,
         }
 
+    def send_letter_action(self, data, post_data):
+        nin, index = data.split()
+        index = int(index)
+
+        settings = self.request.registry.settings
+        letter_url = settings.get('letter_service_url')
+        send_letter_url = urlparse.urljoin(letter_url, 'send-letter')
+
+        data = {'eppn': self.user.get_eppn(), 'accepted_address': True}
+        response = requests.post(send_letter_url, data=data)
+        result = 'error'
+        msg = _('There was a problem with the letter service. '
+                    'Please try again later.')
+        if response.status_code == 200:
+            result = 'success'
+            msg = _('A letter with a verification code has been sent to your '
+                    'address. Please return to this form once you receive it.')
+        return {
+            'result': result,
+            'message': get_localizer(self.request).translate(msg),
+        }
+
+    def finish_letter_action(self, data, post_data):
+        nin, index = data.split()
+        index = int(index)
+
+        settings = self.request.registry.settings
+        letter_url = settings.get('letter_service_url')
+        verify_letter_url = urlparse.urljoin(letter_url, 'verify-code')
+
+        code = post_data['verification_code']
+
+        data = {'eppn': self.user.get_eppn(),
+                'verification_code': code,
+                'nin': nin}
+        response = requests.post(verify_letter_url, data=data)
+        result = 'error'
+        msg = _('There was a problem with the letter service. '
+                    'Please try again later.')
+        if response.status_code == 200:
+            rdata = response.json()
+            if rdata['verified']:
+                self.user.add_verified_nin(nin)
+                try:
+                    self.user.save(self.request)
+                    logger.info("Verified NIN by physical letter saved "
+                                "for user {!r}.".format(self.user))
+                except UserOutOfSync:
+                    log.info("Verified NIN by physical letter NOT saved "
+                            "for user {!r}. User out of sync.".format(self.user))
+                    return self.sync_user()
+                else:
+                    result = 'success'
+                    msg = _('You have successfully verified your identity')
+            else:
+                result = 'error'
+                msg = _('Your verification code seems to be wrong, '
+                        'please try again.')
+        return {
+            'result': result,
+            'message': get_localizer(self.request).translate(msg),
+        }
+
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')

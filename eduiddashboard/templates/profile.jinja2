@@ -167,7 +167,8 @@
         <p id="proofingAddressSent"></p>
         <p>{{ _('If you have already received the letter, please enter the enclosed code in the form below and click "Send"') }}</p>
         <p>
-        <input class="xlarge" id="letter-code" name="letter-code" type="text" />
+        <span class="danger hide" id="proofingLetterRequired">{{ _('required') }}</span></br>
+        <input class="xlarge" id="proofingLetterCode" name="letterCode" type="text" />
         </p>
       </div>
       <div class="modal-footer">
