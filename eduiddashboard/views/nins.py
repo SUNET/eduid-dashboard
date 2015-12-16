@@ -268,7 +268,7 @@ class NINsActionsView(BaseActionsView):
                 result = 'success'
             else:
                 get_address_url = urlparse.urljoin(letter_url, 'get-address')
-                data = {'eppn': self.user.eppn, 'nin': nin}
+                data = {'eppn': self.user.get_eppn(), 'nin': nin}
                 ga_response = requests.post(get_address_url, data=data)
                 if ga_response.status_code == 200:
                     state = ga_response.json()
