@@ -340,6 +340,7 @@ def main(global_config, **settings):
         'signup_base_url',
         'vccs_url',
         'mobile_service_name',
+        'letter_service_url',
         )
     if settings['enable_mm_verification']:
         required_settings += (
