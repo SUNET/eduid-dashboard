@@ -249,27 +249,50 @@ class NINsActionsView(BaseActionsView):
         letter_url = settings.get('letter_service_url')
         state_url = '{0}{1}?nin={2}'.format(letter_url, 'get-state', nin)
 
-        response = requests.get(state_url)
-        if response.status_code == 200:
-            state = response.json()
-            if 'sent' in state:
-                msg = _('A letter has already been sent to this address')
+        address, sent, result = '', False, 'error'
+        msg = _('There was a problem with the letter service. '
+                    'Please try again later.')
+
+        gs_response = requests.get(state_url)
+        if gs_response.status_code == 200:
+            state = gs_response.json()
+
+            if 'sent' in state and state['sent']:
+                msg = _('A letter has already been sent to this address. '
+                        'It will expire on {}'.format(
+                            state['letter_expires']))
+                address = state['address']
+                sent = state['sent']
+                result = 'success'
             else:
-                msg = _('If this address is correct, '
-                        'click on the "send" button')
-            return {
-                'result': 'success',
-                'message': get_localizer(self.request).translate(msg),
-                'address': state['address'],
-                'sent': state['sent']
-            }
+                get_address_url = '{0}{1}?nin={2}'.format(letter_url,
+                                                          'get-address',
+                                                          nin)
+                ga_response = requests.get(get_address_url)
+                if ga_response.status_code == 200:
+                    state = ga_response.json()
+                    address = state['address']
+                    sent = False
+                    result = 'success'
+                    msg = _('If this address is correct, click on the "send" '
+                            'button, and a letter with a verification code will '
+                            'be sent to you.')
+                else:
+                    logger.info('Error getting address from the letter '
+                                'service. Status code {!r}, msg "{}"'.format(
+                                    ga_response.status_code,
+                                    ga_response.text))
         else:
-            message = _('Problem with the letter service. '
-                        'Please try again later.')
-            return {
-                'result': 'error',
-                'message': get_localizer(self.request).translate(message)
-            }
+            logger.info('Error getting status from the letter '
+                        'service. Status code {!r}, msg "{}"'.format(
+                            gs_response.status_code,
+                            gs_response.text))
+        return {
+            'result': result,
+            'message': get_localizer(self.request).translate(msg),
+            'address': address,
+            'sent': sent
+        }
 
     def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """

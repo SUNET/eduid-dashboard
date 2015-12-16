@@ -144,6 +144,7 @@
         <h4 class="modal-title">{{ _('Send code by physical mail') }}</h4>
       </div>
       <div class="modal-body">
+        <p id="sendProofingLetterText"></p>
         <p id="proofingAddress"></p>
       </div>
       <div class="modal-footer">
@@ -162,13 +163,16 @@
         <h4 class="modal-title">{{ _('Enter code sent by physical mail') }}</h4>
       </div>
       <div class="modal-body">
+        <p id="proofingLetterSentText"><p>
+        <p id="proofingAddressSent"></p>
+        <p>{{ _('If you have already received the letter, please enter the enclosed code in the form below and click "Send"') }}</p>
         <p>
         <input class="xlarge" id="letter-code" name="letter-code" type="text" />
         </p>
       </div>
       <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
-        <button id="doSendProofingLetterCode" type="button" class="btn btn-primary">{{ _('Send') }}</button>
+        <button id="doSendProofingCode" type="button" class="btn btn-primary">{{ _('Send') }}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
