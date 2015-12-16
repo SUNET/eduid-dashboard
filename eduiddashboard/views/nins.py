@@ -1,6 +1,7 @@
 # NINS form
 
 import deform
+import urlparse
 import requests
 from datetime import datetime
 from pyramid.view import view_config
@@ -247,7 +248,8 @@ class NINsActionsView(BaseActionsView):
 
         settings = self.request.registry.settings
         letter_url = settings.get('letter_service_url')
-        state_url = '{0}{1}?nin={2}'.format(letter_url, 'get-state', nin)
+        state_url = '{0}?nin={1}'.format(
+                urlparse.urljoin(letter_url, 'get-state'), nin)
 
         address, sent, result = '', False, 'error'
         msg = _('There was a problem with the letter service. '
@@ -265,10 +267,9 @@ class NINsActionsView(BaseActionsView):
                 sent = state['sent']
                 result = 'success'
             else:
-                get_address_url = '{0}{1}?nin={2}'.format(letter_url,
-                                                          'get-address',
-                                                          nin)
-                ga_response = requests.get(get_address_url)
+                get_address_url = urlparse.urljoin(letter_url, 'get-address')
+                data = {'eppn': self.user.eppn, 'nin': nin}
+                ga_response = requests.post(get_address_url, data=data)
                 if ga_response.status_code == 200:
                     state = ga_response.json()
                     address = state['address']
