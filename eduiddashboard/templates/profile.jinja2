@@ -145,7 +145,6 @@
       </div>
       <div class="modal-body">
         <p id="sendProofingLetterText"></p>
-        <p id="proofingAddress"></p>
       </div>
       <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
@@ -164,11 +163,12 @@
       </div>
       <div class="modal-body">
         <p id="proofingLetterSentText"><p>
-        <p id="proofingAddressSent"></p>
         <p>{{ _('If you have already received the letter, please enter the enclosed code in the form below and click "Send"') }}</p>
         <p>
-        <span class="danger hide" id="proofingLetterRequired">{{ _('required') }}</span></br>
-        <input class="xlarge" id="proofingLetterCode" name="letterCode" type="text" />
+        <div class="form-group has-feedback control">
+          <label class="control-label hide" for="proofingLetterCode" id="proofingLetterCodeLabel">{{ _('required') }}</label>
+          <input class="xlarge form-control" id="proofingLetterCode" name="letterCode" type="text" />
+        </div>
         </p>
       </div>
       <div class="modal-footer">
