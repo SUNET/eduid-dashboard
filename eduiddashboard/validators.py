@@ -399,7 +399,7 @@ def validate_nin_by_mobile(request, user, nin):
                                                        registered_postal_address)
 
         log.info('Logging of mobile proofing data for user {!r}.'.format(user))
-        if not request.idproofinglog.log_verified_by_mobile(proofing_data):
+        if not request.idproofinglog.log_verification(proofing_data):
             log.error('Logging of mobile proofing data for user {!r} failed.'.format(user))
             valid_mobile = None
             msg = _('Sorry, we are experiencing temporary technical '
