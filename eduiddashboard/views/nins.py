@@ -386,6 +386,7 @@ class NINsActionsView(BaseActionsView):
         if response.status_code == 200:
             rdata = response.json()
             if rdata['verified']:
+                self.user.set_letter_proofing_data(rdata)
                 code_data = get_verification_code(self.request,
                         'norEduPersonNIN', obj_id=nin, user=self.user)
                 try:
