@@ -404,8 +404,8 @@ class NINsActionsView(BaseActionsView):
                         logger.info("Verified NIN by physical letter saved "
                                     "for user {!r}.".format(self.user))
                     except UserOutOfSync:
-                        log.info("Verified NIN by physical letter NOT saved "
-                                 "for user {!r}. User out of sync.".format(self.user))
+                        log.error("Verified NIN by physical letter NOT saved "
+                                  "for user {!r}. User out of sync.".format(self.user))
                         return self.sync_user()
                     else:
                         result = 'success'
@@ -415,7 +415,6 @@ class NINsActionsView(BaseActionsView):
                     msg = _('Sorry, we are experiencing temporary technical '
                             'problems, please try again later.')
             else:
-                result = 'error'
                 msg = _('Your verification code seems to be wrong, '
                         'please try again.')
         return {
