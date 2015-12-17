@@ -21,6 +21,7 @@ from eduiddashboard.verifications import (verify_nin, verify_code,
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduiddashboard.idproofinglog import LetterProofing
 
 import logging
 logger = logging.getLogger(__name__)
@@ -154,7 +155,7 @@ def letter_status(request, user, nin):
 
     sent, result = False, 'error'
     msg = _('There was a problem with the letter service. '
-                'Please try again later.')
+            'Please try again later.')
     if response.status_code == 200:
         state = response.json()
 
@@ -163,18 +164,18 @@ def letter_status(request, user, nin):
             result = 'success'
             expires = datetime.utcfromtimestamp(state['letter_expires'])
             expires = expires.strftime('%Y-%m-%d')
-            msg = _('A letter has already been sent to your address. '
-                    'It will expire on {}'.format(expires))
+            msg = _('A letter has already been sent to your official postal address. '
+                    'The code enclosed will expire on {!s}. '
+                    'After that date you can restart the process if the letter was lost.'.format(expires))
         else:
             sent = False
             result = 'success'
-            msg = _('Click on the "send" button, and a letter with a '
-                    'verification code will be sent to your address.')
+            msg = _('When you click on the "Send" button a letter with a '
+                    'verification code will be sent to your official postal address.')
+            logger.info("Letter sent for user {!r}.".format(user))
     else:
-        logger.info('Error getting status from the letter '
-                    'service. Status code {!r}, msg "{}"'.format(
-                        response.status_code,
-                        response.text))
+        logger.error('Error getting status from the letter service. Status code {!r}, msg "{}"'.format(
+            response.status_code, response.text))
     return {
         'result': result,
         'message': get_localizer(request).translate(msg),
@@ -192,15 +193,15 @@ def send_letter(request, user, nin):
     response = requests.post(send_letter_url, data=data)
     result = 'error'
     msg = _('There was a problem with the letter service. '
-                'Please try again later.')
+            'Please try again later.')
     if response.status_code == 200:
         expires = response.json()['letter_expires']
         expires = datetime.utcfromtimestamp(expires)
         expires = expires.strftime('%Y-%m-%d')
         result = 'success'
         msg = _('A letter with a verification code has been sent to your '
-                'address. Please return to this form once you receive it.'
-                ' The code will be valid until {}'.format(expires))
+                'official postal address. Please return to this page once you receive it.'
+                ' The code will be valid until {!s}.'.format(expires))
     return {
         'result': result,
         'message': get_localizer(request).translate(msg),
@@ -381,25 +382,38 @@ class NINsActionsView(BaseActionsView):
         response = requests.post(verify_letter_url, data=data)
         result = 'error'
         msg = _('There was a problem with the letter service. '
-                    'Please try again later.')
+                'Please try again later.')
         if response.status_code == 200:
-            rdata = response.json()
-            if rdata['verified']:
+            rdata = response.json().get('data', {})
+            if rdata.get('verified', False) and nin == rdata.get('number', None):
+                # Save data from successful verification call for later addition to user proofing collection
+                rdata['created_ts'] = datetime.utcfromtimestamp(rdata['created_ts'])
+                rdata['verified_ts'] = datetime.utcfromtimestamp(rdata['verified_ts'])
                 self.user.set_letter_proofing_data(rdata)
-                code_data = get_verification_code(self.request,
-                        'norEduPersonNIN', obj_id=nin, user=self.user)
-                try:
-                    verify_code(self.request, 'norEduPersonNIN',
-                            code_data['code'])
-                    logger.info("Verified NIN by physical letter saved "
-                                "for user {!r}.".format(self.user))
-                except UserOutOfSync:
-                    log.info("Verified NIN by physical letter NOT saved "
-                        "for user {!r}. User out of sync.".format(self.user))
-                    return self.sync_user()
+                # Look up users official address at the time of verification per Kantara requirements
+                user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
+                proofing_data = LetterProofing(self.user, rdata['number'], rdata['official_address'],
+                                               rdata['transaction_id'], user_postal_address)
+                # Log verification event and fail if that goes wrong
+                if self.request.idproofinglog.log_verification(proofing_data):
+                    code_data = get_verification_code(self.request,
+                                                      'norEduPersonNIN', obj_id=nin, user=self.user)
+                    try:
+                        verify_code(self.request, 'norEduPersonNIN',
+                                    code_data['code'])
+                        logger.info("Verified NIN by physical letter saved "
+                                    "for user {!r}.".format(self.user))
+                    except UserOutOfSync:
+                        log.info("Verified NIN by physical letter NOT saved "
+                                 "for user {!r}. User out of sync.".format(self.user))
+                        return self.sync_user()
+                    else:
+                        result = 'success'
+                        msg = _('You have successfully verified your identity')
                 else:
-                    result = 'success'
-                    msg = _('You have successfully verified your identity')
+                    log.error('Logging of letter proofing data for user {!r} failed.'.format(self.user))
+                    msg = _('Sorry, we are experiencing temporary technical '
+                            'problems, please try again later.')
             else:
                 result = 'error'
                 msg = _('Your verification code seems to be wrong, '
