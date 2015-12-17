@@ -16,11 +16,11 @@ from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduiddashboard.verifications import verify_nin
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-
+from eduiddashboard.verifications import (verify_nin, verify_code,
+                                          get_verification_code)
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 
 import logging
 logger = logging.getLogger(__name__)
@@ -161,9 +161,11 @@ def letter_status(request, user, nin):
         if 'letter_sent' in state:
             sent = True
             result = 'success'
+            expires = datetime.strptime(state['letter_expires'], 
+                                        '%Y-%m-%d %H:%M:%S.%f')
+            expires = expires.strftime('%Y-%m-%d')
             msg = _('A letter has already been sent to your address. '
-                    'It will expire on {}'.format(
-                        state['letter_expires']))
+                    'It will expire on {}'.format(expires))
         else:
             sent = False
             result = 'success'
@@ -194,10 +196,12 @@ def send_letter(request, user, nin):
                 'Please try again later.')
     if response.status_code == 200:
         expires = response.json()['letter_expires']
+        expires = datetime.strptime(expires, '%Y-%m-%d %H:%M:%S.%f')
+        expires = expires.strftime('%Y-%m-%d')
         result = 'success'
         msg = _('A letter with a verification code has been sent to your '
                 'address. Please return to this form once you receive it.'
-                ' The code will be valid until {!r}'.format(expires))
+                ' The code will be valid until {}'.format(expires))
     return {
         'result': result,
         'message': get_localizer(request).translate(msg),
@@ -581,6 +585,8 @@ class NinsView(BaseFormView):
                 new_verification_code(self.request, 'norEduPersonNIN',
                                       nin, self.user)
             msg = result2['message']
+        else:
+            msg = result['message']
         self.request.session.flash(msg, queue='forms')
 
 
