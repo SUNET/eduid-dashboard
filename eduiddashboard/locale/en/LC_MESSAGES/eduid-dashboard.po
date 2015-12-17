@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-07 14:16+0100\n"
+"POT-Creation-Date: 2015-12-17 12:37+0100\n"
 "PO-Revision-Date: 2015-12-07 13:16+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: English (United States) (http://www.transifex.com/sunet"
@@ -34,8 +34,8 @@ msgstr "{site_name} account termination"
 msgid "Reset your {site_name} password"
 msgstr "Reset your {site_name} password"
 
-#: eduiddashboard/models.py:24 eduiddashboard/models.py:99
-#: eduiddashboard/views/security.py:482 eduiddashboard/views/security.py:575
+#: eduiddashboard/models.py:24 eduiddashboard/models.py:101
+#: eduiddashboard/views/security.py:485 eduiddashboard/views/security.py:578
 msgid "email"
 msgstr "email"
 
@@ -47,15 +47,15 @@ msgstr "mobile phone number"
 msgid "national identity number"
 msgstr "national identity number"
 
-#: eduiddashboard/models.py:101
+#: eduiddashboard/models.py:103
 msgid "Email address"
 msgstr "Email address"
 
-#: eduiddashboard/models.py:108
+#: eduiddashboard/models.py:110
 msgid "The Swedish national identity number should be entered as yyyymmddnnnn"
 msgstr "The Swedish national identity number should be entered as yyyymmddnnnn"
 
-#: eduiddashboard/models.py:113
+#: eduiddashboard/models.py:115
 msgid ""
 "Invalid telephone number. It must be a valid Swedish number, or written "
 "using international notation, starting with \"+\" and followed by 10-20 "
@@ -65,95 +65,95 @@ msgstr ""
 "using international notation, starting with \"+\" and followed by 10-20 "
 "digits."
 
-#: eduiddashboard/models.py:160
+#: eduiddashboard/models.py:166
 msgid "Swedish national identity number"
 msgstr "Swedish national identity number"
 
-#: eduiddashboard/models.py:162
+#: eduiddashboard/models.py:168
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:14
 msgid "yyyymmddnnnn"
 msgstr "yyyymmddnnnn"
 
-#: eduiddashboard/models.py:182
+#: eduiddashboard/models.py:188
 msgid "Given name"
 msgstr "Given name"
 
-#: eduiddashboard/models.py:188 eduiddashboard/templates/home.jinja2:29
+#: eduiddashboard/models.py:194 eduiddashboard/templates/home.jinja2:29
 msgid "Surname"
 msgstr "Surname"
 
-#: eduiddashboard/models.py:194
+#: eduiddashboard/models.py:200
 msgid "Display name"
 msgstr "Display name"
 
-#: eduiddashboard/models.py:197
+#: eduiddashboard/models.py:203
 msgid "Preferred language"
 msgstr "Preferred language"
 
-#: eduiddashboard/models.py:212
+#: eduiddashboard/models.py:218
 msgid "Current password"
 msgstr "Current password"
 
-#: eduiddashboard/models.py:221 eduiddashboard/models.py:316
+#: eduiddashboard/models.py:227 eduiddashboard/models.py:322
 msgid "Use my own password"
 msgstr "Use my own password"
 
-#: eduiddashboard/models.py:226 eduiddashboard/models.py:321
+#: eduiddashboard/models.py:232 eduiddashboard/models.py:327
 msgid "Suggested password"
 msgstr "Suggested password"
 
-#: eduiddashboard/models.py:235
+#: eduiddashboard/models.py:241
 msgid "Custom password"
 msgstr "Custom password"
 
-#: eduiddashboard/models.py:245
+#: eduiddashboard/models.py:251
 msgid "Repeat the password"
 msgstr "Repeat password"
 
-#: eduiddashboard/models.py:335
+#: eduiddashboard/models.py:341
 msgid "New Password"
 msgstr "New Password"
 
-#: eduiddashboard/models.py:342
+#: eduiddashboard/models.py:348
 msgid "Confirm New Password"
 msgstr "Confirm New Password"
 
-#: eduiddashboard/models.py:348
+#: eduiddashboard/models.py:354
 msgid "Passwords doesn't match"
 msgstr "Passwords do not match"
 
-#: eduiddashboard/models.py:361
+#: eduiddashboard/models.py:367
 #: eduiddashboard/templates/postaladdress-form.jinja2:22
 msgid "Address"
 msgstr "Address"
 
-#: eduiddashboard/models.py:368
+#: eduiddashboard/models.py:374
 #: eduiddashboard/templates/postaladdress-form.jinja2:29
 msgid "City"
 msgstr "City"
 
-#: eduiddashboard/models.py:377
+#: eduiddashboard/models.py:383
 msgid "Postal code"
 msgstr "Postal code"
 
-#: eduiddashboard/models.py:383
+#: eduiddashboard/models.py:389
 #: eduiddashboard/templates/postaladdress-form.jinja2:43
 msgid "Country"
 msgstr "Country"
 
-#: eduiddashboard/models.py:397
+#: eduiddashboard/models.py:403
 msgid "mobile"
 msgstr "mobile"
 
-#: eduiddashboard/models.py:399
+#: eduiddashboard/models.py:405
 msgid "Mobile phone number"
 msgstr "Mobile phone number"
 
-#: eduiddashboard/models.py:416 eduiddashboard/templates/home.jinja2:17
+#: eduiddashboard/models.py:422 eduiddashboard/templates/home.jinja2:17
 msgid "Search for users"
 msgstr "Search for users"
 
-#: eduiddashboard/models.py:417
+#: eduiddashboard/models.py:423
 msgid "query"
 msgstr "query"
 
@@ -246,7 +246,7 @@ msgid "National identity number already added"
 msgstr "National identity number already added"
 
 #: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
-#: eduiddashboard/views/nins.py:514
+#: eduiddashboard/views/nins.py:662
 msgid "You already have a confirmed national identity number"
 msgstr "You already have a confirmed national identity number"
 
@@ -482,7 +482,7 @@ msgstr "Pending confirmation"
 #: eduiddashboard/templates/emails-form.jinja2:35
 #: eduiddashboard/templates/emails-form.jinja2:38
 #: eduiddashboard/templates/mobiles-form.jinja2:34
-#: eduiddashboard/templates/nins-form.jinja2:43
+#: eduiddashboard/templates/nins-form.jinja2:51
 msgid "Remove"
 msgstr "Remove"
 
@@ -633,18 +633,22 @@ msgstr ""
 msgid "Add a mobile phone number to continue"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:55
+#: eduiddashboard/templates/nins-form.jinja2:45
+msgid "Confirm using physical mail"
+msgstr ""
+
+#: eduiddashboard/templates/nins-form.jinja2:63
 msgid "Your identity is already confirmed. No further action is required here."
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:61
+#: eduiddashboard/templates/nins-form.jinja2:69
 msgid ""
 "<p>Add your Swedish national identity number and initiate the "
 "confirmation process using\n"
 "                one of the buttons below.</p>"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:71
+#: eduiddashboard/templates/nins-form.jinja2:80
 #, python-format
 msgid ""
 "\n"
@@ -653,25 +657,22 @@ msgid ""
 "    "
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:78
+#: eduiddashboard/templates/nins-form.jinja2:87
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:79
-#: eduiddashboard/templates/reset-password.jinja2:33
+#: eduiddashboard/templates/nins-form.jinja2:88
 msgid "Mina Meddelanden disabled"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:79
-#: eduiddashboard/templates/reset-password.jinja2:33
+#: eduiddashboard/templates/nins-form.jinja2:88
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
 "information:"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:79
-#: eduiddashboard/templates/reset-password.jinja2:33
+#: eduiddashboard/templates/nins-form.jinja2:88
 msgid "Vetenskapsrådet's press release"
 msgstr ""
 
@@ -836,8 +837,8 @@ msgstr "Last used"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:84
-#: eduiddashboard/views/security.py:258 eduiddashboard/views/security.py:593
-#: eduiddashboard/views/security.py:651
+#: eduiddashboard/views/security.py:261 eduiddashboard/views/security.py:596
+#: eduiddashboard/views/security.py:654
 msgid "Change password"
 msgstr "Change password"
 
@@ -880,9 +881,9 @@ msgstr "Confirm deletion of eduID account"
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:105
-#: eduiddashboard/views/security.py:461 eduiddashboard/views/security.py:500
-#: eduiddashboard/views/security.py:543 eduiddashboard/views/security.py:594
-#: eduiddashboard/views/security.py:652
+#: eduiddashboard/views/security.py:464 eduiddashboard/views/security.py:503
+#: eduiddashboard/views/security.py:546 eduiddashboard/views/security.py:597
+#: eduiddashboard/views/security.py:655
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -996,19 +997,47 @@ msgstr "Resend confirmation code"
 msgid "Finish"
 msgstr "Finish"
 
-#: eduiddashboard/templates/profile.jinja2:201
+#: eduiddashboard/templates/profile.jinja2:144
+msgid "Send code by physical mail"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:150
+#: eduiddashboard/templates/profile.jinja2:175
+msgid "Close"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:151
+#: eduiddashboard/templates/profile.jinja2:176
+msgid "Send"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:162
+msgid "Enter code sent by physical mail"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:166
+msgid ""
+"If you have already received the letter, please enter the enclosed code "
+"in the form below and click \"Send\""
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:169
+msgid "required"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:244
 msgid "Warning!"
 msgstr "Warning!"
 
-#: eduiddashboard/templates/profile.jinja2:201
+#: eduiddashboard/templates/profile.jinja2:244
 msgid "An error has occurred, please try again later."
 msgstr "An error has occurred, please try again later."
 
-#: eduiddashboard/templates/profile.jinja2:208
+#: eduiddashboard/templates/profile.jinja2:251
 msgid "Error!"
 msgstr "Error!"
 
-#: eduiddashboard/templates/profile.jinja2:208
+#: eduiddashboard/templates/profile.jinja2:251
 msgid "Permission denied"
 msgstr "Permission denied"
 
@@ -1216,15 +1245,14 @@ msgid ""
 msgstr ""
 
 #: eduiddashboard/templates/reset-password.jinja2:16
-#: eduiddashboard/templates/reset-password.jinja2:18
 msgid "Reset password by government mailbox service"
 msgstr "Reset password using \"Min myndighetspost\""
 
-#: eduiddashboard/templates/reset-password.jinja2:22
+#: eduiddashboard/templates/reset-password.jinja2:20
 msgid "Reset password by mobile phone number"
 msgstr ""
 
-#: eduiddashboard/templates/reset-password.jinja2:25
+#: eduiddashboard/templates/reset-password.jinja2:23
 msgid "Reset password by e-mail"
 msgstr "Reset password by email"
 
@@ -1452,7 +1480,7 @@ msgid "Confirm identity number"
 msgstr "Confirm identity number"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:154
+#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:218
 msgid "Confirmation code"
 msgstr "Confirmation code"
 
@@ -1492,16 +1520,16 @@ msgstr ""
 "The confirmation code has expired. Please click on \"Resend confirmation "
 "code\" to get a new one"
 
-#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:418
+#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:549
 #: eduiddashboard/views/verifications.py:36
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr "Your user profile is out of sync. Please reload the page and try again."
 
-#: eduiddashboard/views/__init__.py:368
+#: eduiddashboard/views/__init__.py:374
 msgid "The wizard was dismissed"
 msgstr "The wizard was dismissed"
 
-#: eduiddashboard/views/__init__.py:409
+#: eduiddashboard/views/__init__.py:415
 msgid "Unexpected error"
 msgstr "Unexpected error"
 
@@ -1513,7 +1541,7 @@ msgstr "An email address is pending confirmation"
 msgid "Email address has been confirmed"
 msgstr "Email address has been confirmed"
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:152
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:216
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr "The confirmation code is invalid, please try again or request a new code"
 
@@ -1618,51 +1646,79 @@ msgstr ""
 "A confirmation code has been sent to your mobile phone. Please click on "
 "the \"Pending confirmation\" link below and enter your confirmation code."
 
-#: eduiddashboard/views/nins.py:48
+#: eduiddashboard/views/nins.py:50
 msgid "Add national identity number"
 msgstr "Add national identity number"
 
-#: eduiddashboard/views/nins.py:50
+#: eduiddashboard/views/nins.py:52
 msgid "Validation required for national identity number"
 msgstr "Verification required for national identity number"
 
-#: eduiddashboard/views/nins.py:88
+#: eduiddashboard/views/nins.py:90
 msgid "Confirm Identity"
 msgstr "Confirm Identity"
 
-#: eduiddashboard/views/nins.py:151
+#: eduiddashboard/views/nins.py:156 eduiddashboard/views/nins.py:194
+#: eduiddashboard/views/nins.py:383
+#, fuzzy
+#| msgid "" "Sorry, we are experiencing temporary technical problem with "
+#| "${service_name}, please try again later."
+msgid "There was a problem with the letter service. Please try again later."
+msgstr ""
+"We are experiencing temporary technical problems with ${service_name}, "
+"please try again later."
+
+#: eduiddashboard/views/nins.py:171
+msgid ""
+"Click on the \"send\" button, and a letter with a verification code will "
+"be sent to your address."
+msgstr ""
+
+#: eduiddashboard/views/nins.py:215
 msgid "National identity number verified"
 msgstr "Personal identity number verified"
 
-#: eduiddashboard/views/nins.py:153
+#: eduiddashboard/views/nins.py:217
 msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
 msgstr "A confirmation code has been sent to \"Mina meddelanden\"."
 
-#: eduiddashboard/views/nins.py:155
+#: eduiddashboard/views/nins.py:219
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr "A new confirmation code has been sent to \"Mina meddelanden\""
 
-#: eduiddashboard/views/nins.py:256
+#: eduiddashboard/views/nins.py:320
 msgid "National identity number has been removed"
 msgstr "National identity number has been removed"
 
-#: eduiddashboard/views/nins.py:273
+#: eduiddashboard/views/nins.py:337
 msgid "No pending national identity numbers found."
 msgstr "No pending national identity numbers found."
 
-#: eduiddashboard/views/nins.py:310 eduiddashboard/views/nins.py:314
+#: eduiddashboard/views/nins.py:402
+msgid "You have successfully verified your identity"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:405
+msgid "Your verification code seems to be wrong, please try again."
+msgstr ""
+
+#: eduiddashboard/views/nins.py:438 eduiddashboard/views/nins.py:442
 msgid "Mina Meddelanden"
 msgstr "Mina Meddelanden"
 
-#: eduiddashboard/views/nins.py:317
+#: eduiddashboard/views/nins.py:445
 msgid "Phone subscription"
 msgstr "Phone subscription"
 
-#: eduiddashboard/views/nins.py:421
+#: eduiddashboard/views/nins.py:448
+msgid "Physical letter"
+msgstr ""
+
+#: eduiddashboard/views/nins.py:552
 msgid "Your national identity number has been confirmed"
 msgstr "Your national identity number has been confirmed"
 
-#: eduiddashboard/views/nins.py:433
+#: eduiddashboard/views/nins.py:564
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."
@@ -1671,15 +1727,15 @@ msgstr ""
 " on the \"Pending confirmation\" link below to enter your confirmation "
 "code."
 
-#: eduiddashboard/views/nins.py:480
+#: eduiddashboard/views/nins.py:628
 msgid "Your national identity number confirmation request can not be found"
 msgstr "Your national identity number confirmation request can not be found"
 
-#: eduiddashboard/views/nins.py:499
+#: eduiddashboard/views/nins.py:647
 msgid "There was an unknown error dealing with your request"
 msgstr "There was an unknown error in dealing with your request"
 
-#: eduiddashboard/views/nins.py:534
+#: eduiddashboard/views/nins.py:682
 msgid "Add your national identity number"
 msgstr "Add your personal identity number"
 
@@ -1697,27 +1753,27 @@ msgstr "Changes saved."
 msgid "Save"
 msgstr "Save"
 
-#: eduiddashboard/views/security.py:122
+#: eduiddashboard/views/security.py:125
 msgid "Invalid request: only GET and POST accepted."
 msgstr "Invalid request: only GET and POST accepted."
 
-#: eduiddashboard/views/security.py:145
+#: eduiddashboard/views/security.py:148
 msgid "Password"
 msgstr "Password"
 
-#: eduiddashboard/views/security.py:311
+#: eduiddashboard/views/security.py:314
 msgid "No authentication info"
 msgstr "No authentication info"
 
-#: eduiddashboard/views/security.py:316
+#: eduiddashboard/views/security.py:319
 msgid "Stale authentication info. Please try again."
 msgstr "Expired authentication info. Please try again."
 
-#: eduiddashboard/views/security.py:350
+#: eduiddashboard/views/security.py:353
 msgid "Your password has been successfully updated"
 msgstr "Your password has been successfully updated"
 
-#: eduiddashboard/views/security.py:352
+#: eduiddashboard/views/security.py:355
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
@@ -1725,7 +1781,7 @@ msgstr ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 
-#: eduiddashboard/views/security.py:392
+#: eduiddashboard/views/security.py:395
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
@@ -1735,27 +1791,27 @@ msgstr ""
 "associated with your eduID account, and we'll send you a link to reset "
 "your password."
 
-#: eduiddashboard/views/security.py:460 eduiddashboard/views/security.py:499
-#: eduiddashboard/views/security.py:542
+#: eduiddashboard/views/security.py:463 eduiddashboard/views/security.py:502
+#: eduiddashboard/views/security.py:545
 msgid "Reset password"
 msgstr "Reset password"
 
-#: eduiddashboard/views/security.py:525
+#: eduiddashboard/views/security.py:528
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:545
+#: eduiddashboard/views/security.py:548
 msgid ""
 "Please enter a phone number associated with your eduID account, and we'll"
 " send you an sms with a code and an e-mail with a link to continue your "
 "password reset."
 msgstr ""
 
-#: eduiddashboard/views/security.py:596
+#: eduiddashboard/views/security.py:599
 msgid "Please enter the code you received by SMS to continue"
 msgstr ""
 
-#: eduiddashboard/views/security.py:654
+#: eduiddashboard/views/security.py:657
 msgid "Please choose a new password for your eduID account."
 msgstr "Please choose a new password for your eduID account."
 

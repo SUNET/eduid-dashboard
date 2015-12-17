@@ -38,6 +38,14 @@
                             {% trans %}Add a mobile phone number to continue{% endtrans %}
                         {% endif %}
                     </td>
+                    <td class='non-identifier'>
+                        <input type='button'
+                               id="letter-proofing"
+                               class='btn btn-link verify_lp'
+                               value="{{_('Confirm using physical mail')}}"
+                               data-index='{{ nin }} {{ loop.index0 }}'
+                               name='verify_lp'>
+                    </td>
                     <!-- Removed functionality temporary
                         <td>
                             <input type='button' class='btn btn-link' value="{{_('Remove')}}"

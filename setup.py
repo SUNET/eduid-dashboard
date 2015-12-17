@@ -51,6 +51,7 @@ requires = [
     'stathat-async==0.0.3',
     'markupsafe>=0.23',
     'bleach>=1.4.2',
+    'requests>=2.8.1',
 ]
 
 if sys.version_info[0] < 3:
