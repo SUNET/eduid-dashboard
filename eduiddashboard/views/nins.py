@@ -382,14 +382,16 @@ class NINsActionsView(BaseActionsView):
         if response.status_code == 200:
             rdata = response.json()
             if rdata['verified']:
-                self.user.add_verified_nin(nin)
+                code_data = get_verification_code(self.request,
+                        'norEduPersonNIN', obj_id=nin, user=self.user)
                 try:
-                    self.user.save(self.request)
+                    verify_code(self.request, 'norEduPersonNIN',
+                            code_data['code'])
                     logger.info("Verified NIN by physical letter saved "
                                 "for user {!r}.".format(self.user))
                 except UserOutOfSync:
                     log.info("Verified NIN by physical letter NOT saved "
-                            "for user {!r}. User out of sync.".format(self.user))
+                        "for user {!r}. User out of sync.".format(self.user))
                     return self.sync_user()
                 else:
                     result = 'success'
