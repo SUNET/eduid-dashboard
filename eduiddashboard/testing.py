@@ -66,6 +66,7 @@ SETTINGS = {
     'nin_service_name': 'Mina meddelanden',
     'nin_service_url': 'http://minameddelanden.se/',
     'mobile_service_name': 'TeleAdress',
+    'letter_service_url': 'http://letter-proofing.example.com/',
     'available_languages': '''
             en = English
             sv = Svenska
