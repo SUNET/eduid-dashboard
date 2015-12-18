@@ -387,9 +387,11 @@ class NINsActionsView(BaseActionsView):
             rdata = response.json().get('data', {})
             if rdata.get('verified', False) and nin == rdata.get('number', None):
                 # Save data from successful verification call for later addition to user proofing collection
-                self.user.set_letter_proofing_data(rdata)
                 rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
                 rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
+                letter_proofings = self.user.get_letter_proofing_data()
+                letter_proofings.append(rdata)
+                self.user.set_letter_proofing_data(letter_proofings)
                 # Look up users official address at the time of verification per Kantara requirements
                 user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
                 proofing_data = LetterProofing(self.user, rdata['number'], rdata['official_address'],
