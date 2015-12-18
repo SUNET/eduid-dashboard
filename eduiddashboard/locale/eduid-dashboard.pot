@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.4.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-17 12:37+0100\n"
+"POT-Creation-Date: 2015-12-18 15:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,7 +234,7 @@ msgid "National identity number already added"
 msgstr ""
 
 #: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
-#: eduiddashboard/views/nins.py:662
+#: eduiddashboard/views/nins.py:677
 msgid "You already have a confirmed national identity number"
 msgstr ""
 
@@ -585,7 +585,7 @@ msgid "Add a mobile phone number to continue"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:45
-msgid "Confirm using physical mail"
+msgid "Confirm using letter"
 msgstr ""
 
 #: eduiddashboard/templates/nins-form.jinja2:63
@@ -782,9 +782,10 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:105
-#: eduiddashboard/views/security.py:464 eduiddashboard/views/security.py:503
-#: eduiddashboard/views/security.py:546 eduiddashboard/views/security.py:597
-#: eduiddashboard/views/security.py:655
+#: eduiddashboard/templates/profile.jinja2:150
+#: eduiddashboard/templates/profile.jinja2:175 eduiddashboard/views/security.py:464
+#: eduiddashboard/views/security.py:503 eduiddashboard/views/security.py:546
+#: eduiddashboard/views/security.py:597 eduiddashboard/views/security.py:655
 msgid "Cancel"
 msgstr ""
 
@@ -885,31 +886,29 @@ msgid "Finish"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:144
-msgid "Send code by physical mail"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:150
-#: eduiddashboard/templates/profile.jinja2:175
-msgid "Close"
+msgid "Send code to your official postal address"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:151
-#: eduiddashboard/templates/profile.jinja2:176
 msgid "Send"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:162
-msgid "Enter code sent by physical mail"
+msgid "Enter code received by letter"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:166
 msgid ""
-"If you have already received the letter, please enter the enclosed code in "
-"the form below and click \"Send\""
+"If you have received the letter, please enter the enclosed code below and "
+"click \"Ok\""
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:169
 msgid "required"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:176
+msgid "Ok"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:244
@@ -1232,7 +1231,7 @@ msgid "Confirm identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:218
+#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:219
 msgid "Confirmation code"
 msgstr ""
 
@@ -1270,7 +1269,7 @@ msgid ""
 "code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:549
+#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:564
 #: eduiddashboard/views/verifications.py:36
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
@@ -1291,7 +1290,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:216
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:217
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -1385,88 +1384,94 @@ msgid ""
 "\"Pending confirmation\" link below and enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:50
+#: eduiddashboard/views/nins.py:51
 msgid "Add national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:52
+#: eduiddashboard/views/nins.py:53
 msgid "Validation required for national identity number"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:90
+#: eduiddashboard/views/nins.py:91
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:156 eduiddashboard/views/nins.py:194
-#: eduiddashboard/views/nins.py:383
+#: eduiddashboard/views/nins.py:157 eduiddashboard/views/nins.py:195
+#: eduiddashboard/views/nins.py:384
 msgid "There was a problem with the letter service. Please try again later."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:171
+#: eduiddashboard/views/nins.py:173
 msgid ""
-"Click on the \"send\" button, and a letter with a verification code will be "
-"sent to your address."
+"When you click on the \"Send\" button a letter with a verification code will "
+"be sent to your official postal address."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:215
+#: eduiddashboard/views/nins.py:216
 msgid "National identity number verified"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:217
+#: eduiddashboard/views/nins.py:218
 msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:219
+#: eduiddashboard/views/nins.py:220
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:320
+#: eduiddashboard/views/nins.py:321
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:337
+#: eduiddashboard/views/nins.py:338
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:402
+#: eduiddashboard/views/nins.py:414
 msgid "You have successfully verified your identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:405
+#: eduiddashboard/views/nins.py:417
+msgid ""
+"Sorry, we are experiencing temporary technical problems, please try again "
+"later."
+msgstr ""
+
+#: eduiddashboard/views/nins.py:420
 msgid "Your verification code seems to be wrong, please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:438 eduiddashboard/views/nins.py:442
+#: eduiddashboard/views/nins.py:453 eduiddashboard/views/nins.py:457
 msgid "Mina Meddelanden"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:445
+#: eduiddashboard/views/nins.py:460
 msgid "Phone subscription"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:448
+#: eduiddashboard/views/nins.py:463
 msgid "Physical letter"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:552
+#: eduiddashboard/views/nins.py:567
 msgid "Your national identity number has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:564
+#: eduiddashboard/views/nins.py:579
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:628
+#: eduiddashboard/views/nins.py:643
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:647
+#: eduiddashboard/views/nins.py:662
 msgid "There was an unknown error dealing with your request"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:682
+#: eduiddashboard/views/nins.py:697
 msgid "Add your national identity number"
 msgstr ""
 

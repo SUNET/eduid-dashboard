@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-17 12:37+0100\n"
-"PO-Revision-Date: 2015-12-07 13:18+0000\n"
+"POT-Creation-Date: 2015-12-18 15:11+0100\n"
+"PO-Revision-Date: 2015-12-18 14:25+0000\n"
 "Last-Translator: lundberg.johan <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
@@ -250,7 +250,7 @@ msgid "National identity number already added"
 msgstr "Personnummret finns redan i listan"
 
 #: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
-#: eduiddashboard/views/nins.py:662
+#: eduiddashboard/views/nins.py:677
 msgid "You already have a confirmed national identity number"
 msgstr "Du har redan ett bekräftat personnummer"
 
@@ -638,8 +638,8 @@ msgid "Add a mobile phone number to continue"
 msgstr "Lägg till ett mobiltelefonnummer för att fortsätta"
 
 #: eduiddashboard/templates/nins-form.jinja2:45
-msgid "Confirm using physical mail"
-msgstr ""
+msgid "Confirm using letter"
+msgstr "Bekräfta med brev"
 
 #: eduiddashboard/templates/nins-form.jinja2:63
 msgid "Your identity is already confirmed. No further action is required here."
@@ -881,6 +881,8 @@ msgstr "Bekräfta borttagandet av eduID-kontot"
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:105
+#: eduiddashboard/templates/profile.jinja2:150
+#: eduiddashboard/templates/profile.jinja2:175
 #: eduiddashboard/views/security.py:464 eduiddashboard/views/security.py:503
 #: eduiddashboard/views/security.py:546 eduiddashboard/views/security.py:597
 #: eduiddashboard/views/security.py:655
@@ -997,32 +999,30 @@ msgid "Finish"
 msgstr "Klar"
 
 #: eduiddashboard/templates/profile.jinja2:144
-msgid "Send code by physical mail"
-msgstr ""
-
-#: eduiddashboard/templates/profile.jinja2:150
-#: eduiddashboard/templates/profile.jinja2:175
-msgid "Close"
-msgstr ""
+msgid "Send code to your official postal address"
+msgstr "Skicka kod till din folkbokföringsadress"
 
 #: eduiddashboard/templates/profile.jinja2:151
-#: eduiddashboard/templates/profile.jinja2:176
 msgid "Send"
-msgstr ""
+msgstr "Skicka"
 
 #: eduiddashboard/templates/profile.jinja2:162
-msgid "Enter code sent by physical mail"
-msgstr ""
+msgid "Enter code received by letter"
+msgstr "Ange koden du fick i brevet"
 
 #: eduiddashboard/templates/profile.jinja2:166
 msgid ""
-"If you have already received the letter, please enter the enclosed code "
-"in the form below and click \"Send\""
-msgstr ""
+"If you have received the letter, please enter the enclosed code below and"
+" click \"Ok\""
+msgstr "Om du har fått ett brev, skriv koden i rutan nedan och klicka på \"Ok\""
 
 #: eduiddashboard/templates/profile.jinja2:169
 msgid "required"
-msgstr ""
+msgstr "nödvändig"
+
+#: eduiddashboard/templates/profile.jinja2:176
+msgid "Ok"
+msgstr "Ok"
 
 #: eduiddashboard/templates/profile.jinja2:244
 msgid "Warning!"
@@ -1469,7 +1469,7 @@ msgid "Confirm identity number"
 msgstr "Bekräfta identitet"
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:218
+#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:219
 msgid "Confirmation code"
 msgstr "Bekräftelsekod"
 
@@ -1509,7 +1509,7 @@ msgstr ""
 "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en"
 " ny."
 
-#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:549
+#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:564
 #: eduiddashboard/views/verifications.py:36
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
@@ -1532,7 +1532,7 @@ msgstr "En e-postadress behöver bekräftas"
 msgid "Email address has been confirmed"
 msgstr "E-postadressen är bekräftad"
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:216
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:217
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 "Ogiltig bekräftelsekod, vänligen prova igen eller begär en ny "
@@ -1639,79 +1639,84 @@ msgstr ""
 "En bekräftelsekod har skickats till ditt mobiltelefonnummer. Vänligen "
 "ange din bekräftelsekod genom att klicka på \"Bekräfta\" här nedan."
 
-#: eduiddashboard/views/nins.py:50
+#: eduiddashboard/views/nins.py:51
 msgid "Add national identity number"
 msgstr "Lägg till personnummer"
 
-#: eduiddashboard/views/nins.py:52
+#: eduiddashboard/views/nins.py:53
 msgid "Validation required for national identity number"
 msgstr "Bekräfta personnummer"
 
-#: eduiddashboard/views/nins.py:90
+#: eduiddashboard/views/nins.py:91
 msgid "Confirm Identity"
 msgstr "Bekräfta identitet"
 
-#: eduiddashboard/views/nins.py:156 eduiddashboard/views/nins.py:194
-#: eduiddashboard/views/nins.py:383
-#, fuzzy
-#| msgid "" "Sorry, we are experiencing temporary technical problem with "
-#| "${service_name}, please try again later."
+#: eduiddashboard/views/nins.py:157 eduiddashboard/views/nins.py:195
+#: eduiddashboard/views/nins.py:384
 msgid "There was a problem with the letter service. Please try again later."
 msgstr ""
-"Vi har för närvarande tekniska problem med ${service_name}, vänligen "
-"försök igen senare."
+"Vi har för närvarande tekniska problem med brevtjänsten. Vänligen försök "
+"senare."
 
-#: eduiddashboard/views/nins.py:171
+#: eduiddashboard/views/nins.py:173
 msgid ""
-"Click on the \"send\" button, and a letter with a verification code will "
-"be sent to your address."
+"When you click on the \"Send\" button a letter with a verification code "
+"will be sent to your official postal address."
 msgstr ""
+"Om du klickar på \"Sänd\"-knappen kommer en kod att skickas till din "
+"folkbokföringsadress."
 
-#: eduiddashboard/views/nins.py:215
+#: eduiddashboard/views/nins.py:216
 msgid "National identity number verified"
 msgstr "Personnumret är bekräftat "
 
-#: eduiddashboard/views/nins.py:217
+#: eduiddashboard/views/nins.py:218
 msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
 msgstr "En bekräftelsekod har skickats till din \"Mina meddelanden\"-brevlåda."
 
-#: eduiddashboard/views/nins.py:219
+#: eduiddashboard/views/nins.py:220
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr "En ny bekräftelsekod har skickats till din \"Mina meddelanden\"-brevlåda."
 
-#: eduiddashboard/views/nins.py:320
+#: eduiddashboard/views/nins.py:321
 msgid "National identity number has been removed"
 msgstr "Personnumret har tagits bort"
 
-#: eduiddashboard/views/nins.py:337
+#: eduiddashboard/views/nins.py:338
 msgid "No pending national identity numbers found."
 msgstr "Det finns inga personnummer som behöver bekräftas."
 
-#: eduiddashboard/views/nins.py:402
+#: eduiddashboard/views/nins.py:414
 msgid "You have successfully verified your identity"
-msgstr ""
+msgstr "Din identitet är nu bekräftad"
 
-#: eduiddashboard/views/nins.py:405
+#: eduiddashboard/views/nins.py:417
+msgid ""
+"Sorry, we are experiencing temporary technical problems, please try again"
+" later."
+msgstr "Vi har för närvarande tekniska problem, vänligen försök igen senare."
+
+#: eduiddashboard/views/nins.py:420
 msgid "Your verification code seems to be wrong, please try again."
-msgstr ""
+msgstr "Den bekräftelsekod du angett stämmer inte, vänligen försök igen."
 
-#: eduiddashboard/views/nins.py:438 eduiddashboard/views/nins.py:442
+#: eduiddashboard/views/nins.py:453 eduiddashboard/views/nins.py:457
 msgid "Mina Meddelanden"
 msgstr "Mina Meddelanden"
 
-#: eduiddashboard/views/nins.py:445
+#: eduiddashboard/views/nins.py:460
 msgid "Phone subscription"
 msgstr "Telefonabonnemang"
 
-#: eduiddashboard/views/nins.py:448
+#: eduiddashboard/views/nins.py:463
 msgid "Physical letter"
-msgstr ""
+msgstr "Brev"
 
-#: eduiddashboard/views/nins.py:552
+#: eduiddashboard/views/nins.py:567
 msgid "Your national identity number has been confirmed"
 msgstr "Ditt personnummer är bekräftat"
 
-#: eduiddashboard/views/nins.py:564
+#: eduiddashboard/views/nins.py:579
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."
@@ -1720,15 +1725,15 @@ msgstr ""
 "myndighetspost\". Vänligen ange din bekräftelsekod genom att klicka på "
 "\"Bekräfta\" här nedan."
 
-#: eduiddashboard/views/nins.py:628
+#: eduiddashboard/views/nins.py:643
 msgid "Your national identity number confirmation request can not be found"
 msgstr "Bekräftelseförfrågan för ditt personnummer kan inte hittas"
 
-#: eduiddashboard/views/nins.py:647
+#: eduiddashboard/views/nins.py:662
 msgid "There was an unknown error dealing with your request"
 msgstr "Ett okänt fel inträffade vid hanteringen av din förfrågan."
 
-#: eduiddashboard/views/nins.py:682
+#: eduiddashboard/views/nins.py:697
 msgid "Add your national identity number"
 msgstr "Lägg till ditt personnummer"
 
