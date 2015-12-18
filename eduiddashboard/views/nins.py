@@ -165,8 +165,9 @@ def letter_status(request, user, nin):
             expires = datetime.utcfromtimestamp(int(state['letter_expires']))
             expires = expires.strftime('%Y-%m-%d')
             msg = _('A letter has already been sent to your official postal address. '
-                    'The code enclosed will expire on {!s}. '
-                    'After that date you can restart the process if the letter was lost.'.format(expires))
+                    'The code enclosed will expire on ${expires}. '
+                    'After that date you can restart the process if the letter was lost.',
+                    mapping={'expires': expires})
         else:
             sent = False
             result = 'success'
@@ -201,7 +202,8 @@ def send_letter(request, user, nin):
         result = 'success'
         msg = _('A letter with a verification code has been sent to your '
                 'official postal address. Please return to this page once you receive it.'
-                ' The code will be valid until {!s}.'.format(expires))
+                ' The code will be valid until ${expires}.',
+                mapping={'expires': expires})
     return {
         'result': result,
         'message': get_localizer(request).translate(msg),

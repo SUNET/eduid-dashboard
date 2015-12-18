@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.4.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-18 15:11+0100\n"
+"POT-Creation-Date: 2015-12-18 16:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,7 +234,7 @@ msgid "National identity number already added"
 msgstr ""
 
 #: eduiddashboard/validators.py:241 eduiddashboard/validators.py:247
-#: eduiddashboard/views/nins.py:677
+#: eduiddashboard/views/nins.py:679
 msgid "You already have a confirmed national identity number"
 msgstr ""
 
@@ -1231,7 +1231,7 @@ msgid "Confirm identity number"
 msgstr ""
 
 #: eduiddashboard/templates/wizards/wizard-norEduPersonNIN.jinja2:25
-#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:219
+#: eduiddashboard/views/__init__.py:132 eduiddashboard/views/nins.py:221
 msgid "Confirmation code"
 msgstr ""
 
@@ -1269,7 +1269,7 @@ msgid ""
 "code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:564
+#: eduiddashboard/views/__init__.py:136 eduiddashboard/views/nins.py:566
 #: eduiddashboard/views/verifications.py:36
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
@@ -1290,7 +1290,7 @@ msgstr ""
 msgid "Email address has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:217
+#: eduiddashboard/views/emails.py:66 eduiddashboard/views/nins.py:219
 msgid "The confirmation code is invalid, please try again or request a new code"
 msgstr ""
 
@@ -1396,82 +1396,96 @@ msgstr ""
 msgid "Confirm Identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:157 eduiddashboard/views/nins.py:195
-#: eduiddashboard/views/nins.py:384
+#: eduiddashboard/views/nins.py:157 eduiddashboard/views/nins.py:196
+#: eduiddashboard/views/nins.py:386
 msgid "There was a problem with the letter service. Please try again later."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:173
+#: eduiddashboard/views/nins.py:167
+msgid ""
+"A letter has already been sent to your official postal address. The code "
+"enclosed will expire on ${expires}. After that date you can restart the "
+"process if the letter was lost."
+msgstr ""
+
+#: eduiddashboard/views/nins.py:174
 msgid ""
 "When you click on the \"Send\" button a letter with a verification code will "
 "be sent to your official postal address."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:216
-msgid "National identity number verified"
+#: eduiddashboard/views/nins.py:203
+msgid ""
+"A letter with a verification code has been sent to your official postal "
+"address. Please return to this page once you receive it. The code will be "
+"valid until ${expires}."
 msgstr ""
 
 #: eduiddashboard/views/nins.py:218
-msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
+msgid "National identity number verified"
 msgstr ""
 
 #: eduiddashboard/views/nins.py:220
+msgid "A confirmation code has been sent to your \"Mina meddelanden\" mailbox."
+msgstr ""
+
+#: eduiddashboard/views/nins.py:222
 msgid "A new confirmation code has been sent to your \"Mina meddelanden\" mailbox"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:321
+#: eduiddashboard/views/nins.py:323
 msgid "National identity number has been removed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:338
+#: eduiddashboard/views/nins.py:340
 msgid "No pending national identity numbers found."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:414
+#: eduiddashboard/views/nins.py:416
 msgid "You have successfully verified your identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:417
+#: eduiddashboard/views/nins.py:419
 msgid ""
 "Sorry, we are experiencing temporary technical problems, please try again "
 "later."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:420
+#: eduiddashboard/views/nins.py:422
 msgid "Your verification code seems to be wrong, please try again."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:453 eduiddashboard/views/nins.py:457
+#: eduiddashboard/views/nins.py:455 eduiddashboard/views/nins.py:459
 msgid "Mina Meddelanden"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:460
+#: eduiddashboard/views/nins.py:462
 msgid "Phone subscription"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:463
+#: eduiddashboard/views/nins.py:465
 msgid "Physical letter"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:567
+#: eduiddashboard/views/nins.py:569
 msgid "Your national identity number has been confirmed"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:579
+#: eduiddashboard/views/nins.py:581
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click on "
 "\"Pending confirmation\" link below to enter your confirmation code."
 msgstr ""
 
-#: eduiddashboard/views/nins.py:643
+#: eduiddashboard/views/nins.py:645
 msgid "Your national identity number confirmation request can not be found"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:662
+#: eduiddashboard/views/nins.py:664
 msgid "There was an unknown error dealing with your request"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:697
+#: eduiddashboard/views/nins.py:699
 msgid "Add your national identity number"
 msgstr ""
 
