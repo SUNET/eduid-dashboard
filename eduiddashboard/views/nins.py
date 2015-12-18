@@ -162,7 +162,7 @@ def letter_status(request, user, nin):
         if 'letter_sent' in state:
             sent = True
             result = 'success'
-            expires = datetime.utcfromtimestamp(state['letter_expires'])
+            expires = datetime.utcfromtimestamp(int(state['letter_expires']))
             expires = expires.strftime('%Y-%m-%d')
             msg = _('A letter has already been sent to your official postal address. '
                     'The code enclosed will expire on {!s}. '
@@ -196,7 +196,7 @@ def send_letter(request, user, nin):
             'Please try again later.')
     if response.status_code == 200:
         expires = response.json()['letter_expires']
-        expires = datetime.utcfromtimestamp(expires)
+        expires = datetime.utcfromtimestamp(int(expires))
         expires = expires.strftime('%Y-%m-%d')
         result = 'success'
         msg = _('A letter with a verification code has been sent to your '
