@@ -194,15 +194,8 @@ def disabled_admin_urls(config):
 def includeme(config):
     # DB setup
     settings = config.registry.settings
-    mongo_replicaset = settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo',
-                              replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'])
-        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
+    mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
 
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
@@ -353,11 +346,6 @@ def main(global_config, **settings):
         if settings[item] is None:
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
-
-    mongo_replicaset = read_setting_from_env(settings, 'mongo_replicaset',
-                                             None)
-    if mongo_replicaset is not None:
-        settings['mongo_replicaset'] = mongo_replicaset
 
     # configure Celery broker
     broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
