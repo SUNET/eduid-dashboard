@@ -5,8 +5,9 @@ from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
+from eduiddashboard.utils import sync_user_changes_to_userdb
+from eduiddashboard.session import get_session_user
 
-from eduid_am.tasks import update_attributes
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
 
 import logging
@@ -37,13 +38,8 @@ class RootFactory(object):
         :type user: DasboardLegacyUser or DashboardUser
         :return:
         """
-        if isinstance(user, OldUser):
-            update_attributes.delay('eduid_dashboard', str(user.get_id()))
-            return
-        elif isinstance(user, DashboardUser):
-            update_attributes.delay('eduid_dashboard', str(user.user_id))
-        else:
-            raise ValueError('Can only propagate changes for DashboardLegacyUser or DashboardUser')
+        logger.debug('Root factory propagate_user_changes')
+        return sync_user_changes_to_userdb(user)
 
 
 def is_logged(request):
@@ -191,11 +187,13 @@ class BaseFactory(object):
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
+        # XXX what is this context user???
         eppn = self.user.get('eduPersonPrincipalName')
         self.user = self.request.userdb.get_user_by_eppn(eppn)
         self.user.retrieve_modified_ts(self.request.db.profiles)
 
     def update_session_user(self):
+        raise NotImplementedError('update_session_user is UN-implemented')
         user = self.request.session.get('user', OldUser({}))
         eppn = user.get('eduPersonPrincipalName')
         user = self.request.userdb.get_user(eppn)
@@ -207,24 +205,13 @@ class BaseFactory(object):
             self.request.session['edit-user'] = user
 
     def propagate_user_changes(self, newuser):
-        if self.workmode == 'personal':
-            # Only update session if user is the same as currently in session
-            user = self.request.session.get('user')
-            newuser = OldUser(newuser)
-            if user.get_id() == newuser.get_id():
-                self.request.session['user'] = newuser
-        else:
-            user_session = self.request.session['user'].get(self.main_attribute)
-            if user_session == newuser[self.main_attribute]:
-                newuser = OldUser(newuser)
-                self.request.session['edit-user'] = newuser
-
-        update_attributes.delay('eduid_dashboard', str(newuser['_id']))
+        logger.debug('Base factory propagate_user_changes')
+        return sync_user_changes_to_userdb(newuser)
 
     def get_groups(self, userid=None, request=None):
-        user = self.request.session.get('user', None)
+        user = get_session_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
         if not user:
-            logger.debug("No user found in request.session (userid {!r})".format(userid))
+            logger.debug("No user found in session (userid {!r})".format(userid))
             user = OldUser({})
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})

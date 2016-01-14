@@ -1,14 +1,11 @@
 import json
 from bson import ObjectId
-import re
 
 from mock import patch
 
 from eduid_userdb.dashboard import UserDBWrapper as UserDB
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
-
-from eduid_userdb.dashboard import DashboardUser
 
 
 class MailsFormTests(LoggedInRequestTests):
@@ -110,9 +107,8 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_verify_not_existant_email(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
 
         # Make a post that attempts to verify a non-existant mail address,
         # so no change is expected in the database.
@@ -164,9 +160,8 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_remove_not_existant_email(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
 
         response = self.testapp.post(
@@ -184,9 +179,8 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_setprimary_not_existant_email(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         # FFF from here
         old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
         old_primary_mail = old_user.mail_addresses.primary.email
@@ -220,10 +214,9 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_setprimary_not_verified_mail(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
         mail_index = 2
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         old_primary_mail = old_user.mail_addresses.primary.email
         mail_to_test = old_user.mail_addresses.find("johnsmith3@example.com")
 
