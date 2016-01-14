@@ -195,9 +195,10 @@ def token_login(context, request):
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
         user = request.userdb.get_user_by_eppn(eppn)
-        request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
+        # these seem to be unused -- ft@ 2016-01-14
+        #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
+        #request.session['loa'] = 1
         store_session_user(request, user)
-        request.session['loa'] = 1
         remember_headers = remember(request, user.get('email'))
         request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
