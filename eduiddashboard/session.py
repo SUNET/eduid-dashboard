@@ -35,6 +35,8 @@ def get_session_user(request, legacy_user=False, raise_on_not_logged_in=True):
     if _EDIT_USER in request.session:
         user = request.session[_EDIT_USER]
     else:
+        if not raise_on_not_logged_in and _USER not in request.session:
+            return None
         user = request.session[_USER]
     return user
 

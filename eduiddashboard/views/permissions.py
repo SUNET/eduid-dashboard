@@ -7,7 +7,7 @@ from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Permissions
-
+from eduiddashboard.session import get_session_user
 from eduiddashboard.views import BaseFormView, get_dummy_status
 
 
@@ -37,7 +37,10 @@ class PermissionsView(BaseFormView):
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
         ma = self.context.main_attribute
-        if self.context.user.get(ma) == self.request.session.get('user', OldUser({})).get(ma):
+        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = True)
+        if not user:
+            user = OldUser({})
+        if self.context.user.get(ma) == user.get(ma):
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False

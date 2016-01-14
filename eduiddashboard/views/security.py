@@ -314,8 +314,7 @@ class PasswordsView(BaseFormView):
                 msg = _('Stale authentication info. Please try again.')
                 self.request.session.flash('error|' + msg)
                 raise HTTPFound(self.context.route_url('profile-editor'))
-        user = self.request.session.get('edit-user',
-                self.request.session.get('user'))
+        user = get_session_user(self.request, legacy_user = True)
         log.debug('Removing Authn ts for user {!r} before'
                 ' changing the password'.format(user.get_id()))
         del self.request.session['re-authn-ts']
@@ -406,7 +405,7 @@ class BaseResetPasswordView(FormView):
             'intro_message': self.intro_message
         }
         # Collect the users mail addresses for use with zxcvbn
-        user = self.request.session.get('user', None)
+        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = True)
         if user:
             mail_addresses = []
             for item in user.get_mail_aliases():
