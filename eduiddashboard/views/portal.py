@@ -275,7 +275,7 @@ def account_termination_action(request, session_info, user):
     :type user: eduid_userdb.dashboard.DashboardLegacyUser
     """
     settings = request.registry.settings
-    logged_user = get_logged_in_user(request)
+    logged_user = get_logged_in_user(request, legacy_user = True)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")

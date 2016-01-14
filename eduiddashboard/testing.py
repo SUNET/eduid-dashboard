@@ -243,6 +243,7 @@ class LoggedInRequestTests(MongoTestCase):
         request = DummyRequest()
         request.context = DummyResource()
         request.userdb = self.userdb
+        request.userdb_new = self.userdb_new
         request.db = self.db
         request.registry.settings = self.settings
         return request
