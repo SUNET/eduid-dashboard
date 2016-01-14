@@ -21,9 +21,10 @@ from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUserDB, DashboardUser
 from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
-from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
 from eduiddashboard.session import store_session_user
+from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
+
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -120,7 +121,7 @@ INITIAL_VERIFICATIONS = [{
 }]
 
 
-def loa(index):                                                                                                                                             
+def loa(index):
     return AVAILABLE_LOA_LEVEL[index-1]
 
 

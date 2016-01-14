@@ -14,8 +14,6 @@ from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 
 from eduiddashboard.compat import text_type
 
-from eduiddashboard import AVAILABLE_LOA_LEVEL
-
 from eduid_userdb.exceptions import UserDBValueError
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
 from eduid_userdb import User
@@ -24,11 +22,6 @@ from eduid_am.tasks import update_attributes_keep_result
 
 logger = logging.getLogger(__name__)
 
-MAX_LOA_ROL = {
-    'user': AVAILABLE_LOA_LEVEL[0],
-    'helpdesk': AVAILABLE_LOA_LEVEL[1],
-    'admin': AVAILABLE_LOA_LEVEL[2],
-}
 
 # http://www.regular-expressions.info/email.html
 RFC2822_email = re.compile("(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
@@ -147,16 +140,6 @@ def get_pending_actions(user, tabs):
                 ))
 
     return tuples
-
-
-def get_max_available_loa(groups):
-    if not groups:
-        return MAX_LOA_ROL['user']
-    loas = [v for (k, v) in MAX_LOA_ROL.iteritems() if k in groups]
-    if len(loas) > 0:
-        return max(loas)
-    else:
-        return MAX_LOA_ROL['user']
 
 
 def get_unique_hash():

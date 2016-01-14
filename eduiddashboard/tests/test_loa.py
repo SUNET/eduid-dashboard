@@ -1,4 +1,6 @@
-from eduiddashboard.testing import LoggedInRequestTests, loa
+from eduiddashboard.testing import LoggedInRequestTests
+from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
+from eduiddashboard.testing import loa
 
 
 class LoaTestsAdminMode(LoggedInRequestTests):

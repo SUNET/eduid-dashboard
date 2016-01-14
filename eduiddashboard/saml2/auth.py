@@ -19,7 +19,7 @@
 
 from pyramid.security import remember, forget
 
-from eduiddashboard import AVAILABLE_LOA_LEVEL
+from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.utils import get_saml_attribute
 from eduiddashboard.session import store_session_user, get_logged_in_user
 from eduiddashboard import log
@@ -58,7 +58,7 @@ def get_loa(available_loa, session_info):
     :return: The AL level
 
     :type available_loa: [string()]
-    :type session_info: dict
+    :type session_info: dict | None
     :rtype: string | None
     """
     if not available_loa:

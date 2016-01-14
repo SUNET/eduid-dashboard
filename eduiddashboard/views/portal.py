@@ -14,10 +14,10 @@ from deform_bootstrap import Form
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
-                                  get_max_available_loa,
                                   get_available_tabs,
                                   sanitize_get,
                                   sanitize_post_key)
+from eduiddashboard.loa import get_max_available_loa
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
