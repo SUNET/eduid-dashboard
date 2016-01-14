@@ -21,7 +21,7 @@ from pyramid.security import remember, forget
 
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.utils import get_saml_attribute
-
+from eduiddashboard.session import store_session_user, get_logged_in_user
 from eduiddashboard import log
 
 
@@ -129,7 +129,7 @@ def login(request, session_info, user):
     """
     log.info("User {!r} logging in (eduPersonPrincipalName: {!r})".format(user['_id'], user['eduPersonPrincipalName']))
     request.session['eduPersonPrincipalName'] = user['eduPersonPrincipalName']
-    request.session['user'] = user
+    store_session_user(request, user)
     request.session['eduPersonAssurance'] = get_loa(
         request.registry.settings.get('available_loa'),
         session_info
@@ -145,11 +145,11 @@ def logout(request):
     :param request:
     :return:
     """
-    if 'user' in request.session:
-        user = request.session['user']
-        log.info("User {!r} logging out".format(user['_id']))
-
     if request.session is not None:
+        user = get_logged_in_user(request, raise_on_not_logged_in = False, legacy_user = True)
+        if user:
+            log.info("User {!r} logging out".format(user.get_id()))
         request.session.delete()
+
     headers = forget(request)
     return headers

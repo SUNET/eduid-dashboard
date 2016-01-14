@@ -23,6 +23,7 @@ from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
+from eduiddashboard.session import store_session_user
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -257,13 +258,15 @@ class LoggedInRequestTests(MongoTestCase):
         # user only exists in eduid-userdb, so need to clear modified-ts to be able
         # to save it to eduid-dashboard.profiles
         user_obj.set_modified_ts(None)
-        session_data = {
+        dummy = DummyRequest()
+        dummy.session = {
             'user': user_obj,
             'eduPersonAssurance': loa(3),
             'eduPersonIdentityProofing': loa(3),
         }
-        session_data.update(extra_session_data)
-        request = self.add_to_session(session_data)
+        store_session_user(dummy, user_obj)
+        dummy.session.update(extra_session_data)
+        request = self.add_to_session(dummy.session)
         return request
 
     def set_user_cookie(self, user_id):

@@ -267,8 +267,9 @@ def includeme(config):
                          '/verificate/{model}/{code}/',
                          factory=ForbiddenFactory)
     config.add_route('help', '/help/', factory=HelpFactory)
-    config.add_route('session-reload', '/session-reload/',
-                     factory=PersonFactory)
+    # Seems unused -- ft@ 2016-01-14
+    #config.add_route('session-reload', '/session-reload/',
+    #                 factory=PersonFactory)
 
     config.add_route('set_language', '/set_language/')
     config.add_route('error500test', '/error500test/')

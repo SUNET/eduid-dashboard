@@ -24,8 +24,9 @@ from eduiddashboard.utils import (get_short_hash,
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
-
 from eduiddashboard import log
+from eduiddashboard.session import store_session_user
+
 
 def get_dummy_status(request, user):
     return None
@@ -40,9 +41,9 @@ def sync_user(request, context, old_user):
         user.retrieve_modified_ts(request.db.profiles)
 
     if context.workmode == 'personal':
-        request.session['user'] = user
+        store_session_user(request, user)
     else:
-        request.session['edit-user'] = user
+        store_session_user(request, user, edit_user = True)
     return user
 
 

@@ -28,6 +28,7 @@ from eduiddashboard.vccs import revoke_all_credentials
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
+from eduiddashboard.session import store_session_user, get_logged_in_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -146,13 +147,14 @@ def home(context, request):
     }
 
 
-@view_config(route_name='session-reload',
-             request_method='GET', permission='edit')
-def session_reload(context, request):
-    eppn = request.session.get('user').get('eduPersonPrincipalName')
-    user = request.userdb.get_user_by_eppn(eppn)
-    request.session['user'] = user
-    raise HTTPFound(request.route_path('home'))
+# Seems unused -- ft@ 2016-01-14
+#@view_config(route_name='session-reload',
+#             request_method='GET', permission='edit')
+#def session_reload(context, request):
+#    eppn = request.session.get('user').get('eduPersonPrincipalName')
+#    user = request.userdb.get_user_by_eppn(eppn)
+#    request.session['user'] = user
+#    raise HTTPFound(request.route_path('home'))
 
 
 @view_config(route_name='help')
@@ -193,8 +195,8 @@ def token_login(context, request):
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
         user = request.userdb.get_user_by_eppn(eppn)
-        request.session['mail'] = user.get('email'),
-        request.session['user'] = user
+        request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
+        store_session_user(request, user)
         request.session['loa'] = 1
         remember_headers = remember(request, user.get('email'))
         request.stats.count('dashboard/token_login_success', 1)
@@ -261,16 +263,18 @@ def account_terminated(context, request):
 
 @acs_action('account-termination-action')
 def account_termination_action(request, session_info, user):
-    '''
+    """
     The account termination action,
     removes all credentials for the terminated account
     from the VCCS service,
     flags the account as terminated,
     sends an email to the address in the terminated account,
     and logs out the session.
-    '''
+
+    :type user: eduid_userdb.dashboard.DashboardLegacyUser
+    """
     settings = request.registry.settings
-    logged_user = request.session['user']
+    logged_user = get_logged_in_user(request)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")

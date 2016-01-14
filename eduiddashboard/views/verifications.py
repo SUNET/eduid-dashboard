@@ -8,7 +8,7 @@ from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.views import sync_user
 from eduiddashboard.verifications import verify_code, get_verification_code
 from eduiddashboard.i18n import TranslationString as _
-
+from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
 @view_config(route_name='verifications', permission='edit')
@@ -28,11 +28,6 @@ def verifications(context, request):
     try:
         obj_id = verify_code(request, model_name, code)
     except UserOutOfSync:
-        if 'edit-user' in request.session:
-            user = request.session['edit-user']
-        else:
-            user = request.session['user']
-        sync_user(request, context, user)
         msg = _('Your user profile is out of sync. Please '
                 'reload the page and try again.')
         msg = get_localizer(request).translate(msg)

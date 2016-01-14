@@ -1,6 +1,5 @@
 from datetime import datetime
 from mock import patch
-from copy import deepcopy
 
 from bson import ObjectId
 import simplejson as json
@@ -10,6 +9,7 @@ import pytz
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
+from eduiddashboard.session import store_session_user
 
 from eduid_userdb import Password
 
@@ -106,8 +106,8 @@ class PasswordFormTests(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
-        self.add_to_session({'re-authn-ts': datetime.utcnow(),
-                             'user': self.user})
+        self.set_logged(email = self.user.get_mail(),
+                        extra_session_data = {'re-authn-ts': datetime.utcnow()})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
 
@@ -125,8 +125,8 @@ class PasswordFormTests(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
-        self.add_to_session({'re-authn-ts': datetime.utcnow(),
-                             'user': self.user})
+        self.set_logged(email = self.user.get_mail(),
+                        extra_session_data = {'re-authn-ts': datetime.utcnow()})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
@@ -150,8 +150,8 @@ class PasswordFormTests(LoggedInRequestTests):
         form['old_password'].value = self.initial_password
         form['custom_password'].value = '0l8m vta8 j9lr'
         form['repeated_password'].value = form['custom_password'].value
-        self.add_to_session({'re-authn-ts': datetime.utcnow(),
-                             'user': self.user})
+        self.set_logged(email = self.user.get_mail(),
+                        extra_session_data = {'re-authn-ts': datetime.utcnow()})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
@@ -182,8 +182,8 @@ class PasswordFormTests(LoggedInRequestTests):
         ]:
             form['custom_password'].value = password
             form['repeated_password'].value = form['custom_password'].value
-            self.add_to_session({'re-authn-ts': datetime.utcnow(),
-                                 'user': self.user})
+            self.set_logged(email = self.user.get_mail(),
+                            extra_session_data = {'re-authn-ts': datetime.utcnow()})
             from eduiddashboard.validators import CSRFTokenValidator
             with patch.object(CSRFTokenValidator, '__call__', clear=True):
                 CSRFTokenValidator.__call__.return_value = None
@@ -251,7 +251,7 @@ class TerminateAccountTests(LoggedInRequestTests):
                 with patch('eduiddashboard.views.portal.logout_view'):
                     from eduiddashboard.views.portal import logout_view
                     logout_view.return_value = None
-                    request.session['user'] = self.user
+                    store_session_user(request, self.user)
                     request.POST['RelayState'] = '/profile/account-terminated/'
                     request.context.propagate_user_changes = lambda x: None
                     from eduiddashboard.views.portal import account_termination_action

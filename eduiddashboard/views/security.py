@@ -26,7 +26,7 @@ from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
-from eduid_userdb.dashboard import DashboardUser
+from eduiddashboard.session import get_session_user, get_logged_in_user
 from eduiddashboard.utils import (generate_password,
                                   get_unique_hash,
                                   get_short_hash,
@@ -132,10 +132,7 @@ def get_authn_info(request):
     :param request: the request object
     :return: a list of dicts [{'type': string, 'created_ts': timestamp, 'success_ts': timestamp }]
     """
-    if 'edit-user' in request.session:
-        user = request.session['edit-user']
-    else:
-        user = request.session['user']
+    user = get_session_user(request, legacy_user = True)
 
     authninfo = []
 
@@ -203,8 +200,6 @@ def unverify_user_mobiles(request, user):
 def start_password_change(context, request):
     '''
     '''
-    settings = request.registry.settings
-
     # check csrf
     csrf = sanitize_post_key(request, 'csrf')
     if csrf != request.session.get_csrf_token():
@@ -222,8 +217,7 @@ def start_password_change(context, request):
 
 @acs_action('change-password-action')
 def change_password_action(request, session_info, user):
-    settings = request.registry.settings
-    logged_user = request.session['user']
+    logged_user = get_logged_in_user(request)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
@@ -289,7 +283,8 @@ class PasswordsView(BaseFormView):
         context = super(PasswordsView, self).get_template_context()
         # Collect the users mail addresses for use with zxcvbn
         mail_addresses = []
-        for item in self.request.session['user'].get_mail_aliases():
+        user = get_session_user(self.request, legacy_user = True)
+        for item in user.get_mail_aliases():
             mail_addresses.append(item['email'])
 
         context.update({
