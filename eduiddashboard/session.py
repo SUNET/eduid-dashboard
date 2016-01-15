@@ -32,6 +32,31 @@ def store_session_user(request, user, edit_user=False):
     log.debug('Stored user {!r} eppn in session (edit-user: {!s})'.format(user, edit_user))
 
 
+def has_edit_user(request):
+    """
+    Check if there is an 'edit-user' in the session.
+
+    Used when initializing helpdesk/admin mode - if there is no 'edit-user' in the session
+    some request parameters are parsed and an edit-user is stored.
+
+    :param request: Pyramid request object
+    :return: True if an edit-user has been stored in the session
+    :rtype: bool
+    """
+    return _EDIT_USER_EPPN in request.session
+
+
+def has_logged_in_user(request):
+    """
+    Check if there is a logged in user in the session.
+
+    :param request: Pyramid request object
+    :return: True if a logged in user has been stored in the session
+    :rtype: bool
+    """
+    return _USER_EPPN in request.session
+
+
 def get_session_user(request, legacy_user, raise_on_not_logged_in=True):
     """
     Get the session user. This is the user being worked on, in helpdesk mode

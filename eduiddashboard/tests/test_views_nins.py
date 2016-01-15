@@ -530,6 +530,8 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                     }, status=200)
                     self.assertEqual(resp_step1.json['status'], 'success')
 
+                    self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
+
                     resp_step0 = self.testapp.post('/profile/nin-wizard/', {
                         'action': 'next_step',
                         'step': 0,
@@ -566,6 +568,8 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                         'csrf': '12345',
                     }, status=200)
                     self.assertEqual(resp_step1.json['status'], 'success')
+
+                    self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
 
                     resp_step0 = self.testapp.post('/profile/nin-wizard/', {
                         'action': 'next_step',

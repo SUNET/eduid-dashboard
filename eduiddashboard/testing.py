@@ -24,7 +24,7 @@ from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard.msgrelay import MsgRelay
 from eduiddashboard.session import store_session_user
 from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
-
+from eduiddashboard.utils import sync_user_changes_to_userdb
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -196,6 +196,7 @@ class LoggedInRequestTests(MongoTestCase):
         self.assertIsNotNone(_userdoc, "Could not load the standard test user {!r} from the database {!s}".format(
             std_user, self.userdb))
         self.user = OldUser(data=_userdoc)
+        self.logged_in_user = None
 
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
@@ -247,6 +248,16 @@ class LoggedInRequestTests(MongoTestCase):
         request.userdb_new = self.userdb_new
         request.db = self.db
         request.registry.settings = self.settings
+
+        def propagate_user_changes(user):
+            """
+            Make sure there is a request.context.propagate_user_changes in testing too.
+            """
+            logger.debug('FREDRIK: Testing dummy_request.context propagate_user_changes')
+            return sync_user_changes_to_userdb(user)
+
+        request.context.propagate_user_changes = propagate_user_changes
+
         return request
 
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
@@ -262,11 +273,12 @@ class LoggedInRequestTests(MongoTestCase):
         user_obj.set_modified_ts(None)
         dummy = DummyRequest()
         dummy.session = {
-            'user': user_obj,
             'eduPersonAssurance': loa(3),
             'eduPersonIdentityProofing': loa(3),
         }
         store_session_user(dummy, user_obj)
+        # XXX ought to set self.user = user_obj
+        self.logged_in_user = self.userdb_new.get_user_by_id(user_obj.get_id())
         dummy.session.update(extra_session_data)
         request = self.add_to_session(dummy.session)
         return request
@@ -280,6 +292,8 @@ class LoggedInRequestTests(MongoTestCase):
         return request
 
     def add_to_session(self, data):
+        # Log warning since we're moving away from direct request.session access
+        logger.warning('Add to session called with data: {!r}'.format(data))
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
         request = self.dummy_request()
@@ -305,8 +319,27 @@ class LoggedInRequestTests(MongoTestCase):
         values = [x for x in values if x not in ignore_not_found]
         self.assertEqual(values, [], "Failed checking one or more checkboxes: {!r}".format(values))
 
-
     def values_are_checked(self, fields, values):
         checked = [f.value for f in fields if f.value is not None]
 
         self.assertEqual(values, checked)
+
+    def sync_user_from_dashboard_to_userdb(self, user_id, old_format = True):
+        """
+        When there is no eduid-dashboard-amp Attribute Manager plugin loaded to
+        sync users from dashboard to userdb, this crude function can do it.
+
+        :param user_id: User id
+        :param old_format: Write in old format to userdb
+
+        :type user_id: ObjectId
+        :type old_format: bool
+        :return:
+        """
+        user = self.dashboard_db.get_user_by_id(user_id)
+        logger.debug('Syncing user {!s} from dashboard to userdb'.format(user))
+        test_doc = {'_id': user_id}
+        user_doc = user.to_dict(old_userdb_format=old_format)
+        # Fixups to turn the DashboardUser into a User
+        del user_doc['terminated']
+        self.userdb_new._coll.update(test_doc, user_doc, upsert=False)

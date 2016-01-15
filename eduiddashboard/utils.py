@@ -418,7 +418,7 @@ def sync_user_changes_to_userdb(user):
         raise ValueError('Can only propagate changes for DashboardLegacyUser, DashboardUser or User')
 
     # XXX this code is shared with signup, move somewhere common? Into eduid_am perhaps?
-    logger.debug("Asking for sync of {!r} by Attribute Manager".format(user_id))
+    logger.debug("Asking Attribute Manager to sync user {!s}".format(user))
     try:
         rtask = update_attributes_keep_result.delay('eduid_dashboard', user_id)
         result = rtask.get(timeout=3)

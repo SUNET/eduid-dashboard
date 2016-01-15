@@ -6,7 +6,9 @@ from pyramid.security import (Allow, Deny, Authenticated, Everyone,
 from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import sync_user_changes_to_userdb
-from eduiddashboard.session import get_session_user
+from eduiddashboard.session import (get_session_user, get_logged_in_user,
+                                    has_logged_in_user, has_edit_user,
+                                    store_session_user)
 
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
 
@@ -46,9 +48,7 @@ def is_logged(request):
     user = authenticated_userid(request)
     if user is None:
         return False
-    if request.session.get('user', None) is None:
-        return False
-    return True
+    return has_logged_in_user(request)
 
 
 class BaseFactory(object):
@@ -68,11 +68,11 @@ class BaseFactory(object):
         ],
     }
 
-    user = None
+    #user = None
 
     def __init__(self, request):
         try:
-            user = request.session.get('user')
+            user = get_logged_in_user(request, legacy_user = True, raise_on_not_logged_in = False)
         except OSError:
             # If any of the beaker session files is removed, then
             # a OSError is raised, so we want to relogin the user
@@ -87,17 +87,15 @@ class BaseFactory(object):
         self.request = request
         settings = self.request.registry.settings
         self.workmode = settings.get('workmode')
-        self.user = self.get_user()
         self.main_attribute = self.request.registry.settings.get(
             'saml2.user_main_attribute', 'mail')
+        self._cached_user = None
 
         if not self.authorize():
             logger.debug('Un-authorized access attempt to user {!r}'.format(self.user))
             raise HTTPForbidden(_('You do not have sufficient permissions to access this user'))
 
         self.__acl__ = self.acls[self.workmode]
-        #logger.debug("Using ACL {!r} for work-mode {!r}".format(self.acls[self.workmode], self.workmode))
-        return None
 
     def authorize(self):
         """You must overwrite this method is you want to get another
@@ -130,6 +128,20 @@ class BaseFactory(object):
 
         return True
 
+    @property
+    def user(self):
+        """
+        Get the 'current user', as returned by get_user().
+
+        This user object is cached typically in what is known as the 'context'
+        around the dashboard. The context is ephemeral to each processed request.
+        :return: The current user
+        :rtype: DashboardLegacyUser
+        """
+        if self._cached_user is None:
+            self._cached_user = self.get_user()
+        return self._cached_user
+
     def get_user(self):
         """
         Get the current user.
@@ -140,31 +152,28 @@ class BaseFactory(object):
         '/users/{userid}/'.
 
         :return: User object
-        :rtype: OldUser()
+        :rtype: DashboardLegacyUser
         """
-        # Cache user until the request is completed
-        if self.user is not None:
-            return self.user
-
         if self.workmode == 'personal':
-            user = self.request.session.get('user', OldUser({}))
+            user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+            if not user:
+                user = OldUser({})
         elif self.workmode == 'admin' or self.workmode == 'helpdesk':
-            user = self.request.session.get('edit-user', None)
-            if user is None:
+            if not has_edit_user(self.request):
+                user = None
                 userid = self.request.matchdict.get('userid', '')
+                logger.debug('get_user() looking for user matching {!r}'.format(userid))
                 if EMAIL_RE.match(userid):
                     user = self.request.userdb.get_user_by_mail(userid)
                 elif OID_RE.match(userid):
                     user = self.request.userdb.get_user_by_oid(userid)
                 if not user:
                     raise HTTPNotFound()
-                self.request.session['edit-user'] = user
+                logger.debug('get_user() storing user {!r}'.format(user))
+                store_session_user(self.request, user, edit_user = True)
+            user = get_session_user(self.request, legacy_user = True)
         else:
             raise NotImplementedError("Unknown workmode: {!s}".format(self.workmode))
-
-        # Get the modified_ts from the user document in the dashboards private user
-        # database, since that is where we will be writing any updates
-        user.retrieve_modified_ts(self.request.db.profiles)
 
         return user
 
@@ -188,30 +197,20 @@ class BaseFactory(object):
 
     def update_context_user(self):
         # XXX what is this context user???
+        logger.notice('UPDATE CONTEXT USER CALLED')
+        raise NotImplementedError('update_context_user UN-implemented')
         eppn = self.user.get('eduPersonPrincipalName')
         self.user = self.request.userdb.get_user_by_eppn(eppn)
         self.user.retrieve_modified_ts(self.request.db.profiles)
-
-    def update_session_user(self):
-        raise NotImplementedError('update_session_user is UN-implemented')
-        user = self.request.session.get('user', OldUser({}))
-        eppn = user.get('eduPersonPrincipalName')
-        user = self.request.userdb.get_user(eppn)
-        self.user = user
-        self.user.retrieve_modified_ts(self.request.db.profiles)
-        if self.workmode == 'personal':
-            self.request.session['user'] = user
-        else:
-            self.request.session['edit-user'] = user
 
     def propagate_user_changes(self, newuser):
         logger.debug('Base factory propagate_user_changes')
         return sync_user_changes_to_userdb(newuser)
 
     def get_groups(self, userid=None, request=None):
-        user = get_session_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+        user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
         if not user:
-            logger.debug("No user found in session (userid {!r})".format(userid))
+            logger.debug("No logged in user found in session (userid {!r})".format(userid))
             user = OldUser({})
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
@@ -231,8 +230,11 @@ class BaseFactory(object):
     def get_max_loa(self):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)
         if max_loa is None:
-            max_loa = self.request.userdb.get_identity_proofing(
-                self.request.session.get('user', OldUser({})))
+            user = self.get_user()
+            if not user:
+                user = OldUser({})
+
+            max_loa = self.request.userdb.get_identity_proofing(user)
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
@@ -248,7 +250,7 @@ class BaseFactory(object):
             return 1
 
     def session_user_display(self):
-        user = self.request.session.get('user', OldUser({}))
+        user = self.get_user()
         display_name = user.get_display_name()
         if display_name:
             return display_name
@@ -262,7 +264,7 @@ class BaseFactory(object):
 
     def get_preferred_language(self):
         """ Return always a """
-        lang = self.user.get_preferred_language()
+        lang = self.get_user().get_preferred_language()
         if lang is not None:
             return lang
         available_languages = self.request.registry.settings.get('available_languages', {}).keys()
@@ -281,7 +283,7 @@ class ForbiddenFactory(RootFactory):
 class BaseCredentialsFactory(BaseFactory):
 
     def authorize(self):
-        if self.request.session.get('user') is None:
+        if not has_logged_in_user(self.request):
             raise HTTPForbidden(_('Not logged in'))
         is_authorized = super(BaseCredentialsFactory, self).authorize()
 
@@ -300,8 +302,10 @@ class BaseCredentialsFactory(BaseFactory):
 class HomeFactory(BaseFactory):
 
     def get_user(self):
-        return self.request.session.get('user', OldUser({}))
-
+        user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+        if not user:
+            user = OldUser({})
+        return user
 
 class HelpFactory(BaseFactory):
     pass
