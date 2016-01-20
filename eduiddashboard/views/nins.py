@@ -173,7 +173,7 @@ def letter_status(request, user, nin):
             result = 'success'
             msg = _('When you click on the "Send" button a letter with a '
                     'verification code will be sent to your official postal address.')
-            logger.info("Letter sent for user {!r}.".format(user))
+            logger.info("Asking user {!r} if they want to send a letter.".format(user))
     else:
         logger.error('Error getting status from the letter service. Status code {!r}, msg "{}"'.format(
             response.status_code, response.text))
@@ -196,6 +196,7 @@ def send_letter(request, user, nin):
     msg = _('There was a problem with the letter service. '
             'Please try again later.')
     if response.status_code == 200:
+        logger.info("Letter sent to user {!r}.".format(user))  # This log line moved here from letter_status function
         expires = response.json()['letter_expires']
         expires = datetime.utcfromtimestamp(int(expires))
         expires = expires.strftime('%Y-%m-%d')
@@ -350,7 +351,7 @@ class NINsActionsView(BaseActionsView):
 
     def verify_lp_action(self, data, post_data):
         '''
-        verify by physical mail
+        verify by letter
         '''
         nin, index = data.split()
         index = int(index)
@@ -400,11 +401,13 @@ class NINsActionsView(BaseActionsView):
                                                rdata['transaction_id'], user_postal_address)
                 # Log verification event and fail if that goes wrong
                 if self.request.idproofinglog.log_verification(proofing_data):
+                    # TODO: How do we know we which verification object we will get back?
                     code_data = get_verification_code(self.request,
                                                       'norEduPersonNIN', obj_id=nin, user=self.user)
                     try:
-                        verify_code(self.request, 'norEduPersonNIN',
-                                    code_data['code'])
+                        # This is a hack to reuse the existing proofing functionality, the users code is
+                        # verified by the micro service
+                        verify_code(self.request, 'norEduPersonNIN', code_data['code'])
                         logger.info("Verified NIN by physical letter saved "
                                     "for user {!r}.".format(self.user))
                     except UserOutOfSync:
