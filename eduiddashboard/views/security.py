@@ -14,7 +14,7 @@ from pyramid.i18n import get_localizer
 from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
-from eduid_am.tasks import update_attributes
+from eduiddashboard.utils import sync_user_changes_to_userdb
 
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
@@ -26,7 +26,7 @@ from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
-from eduid_userdb.dashboard import DashboardUser
+from eduiddashboard.session import get_session_user, get_logged_in_user
 from eduiddashboard.utils import (generate_password,
                                   get_unique_hash,
                                   get_short_hash,
@@ -62,7 +62,8 @@ def change_password(request, user, old_password, new_password):
         retrieve_modified_ts(user, request.dashboard_userdb)
         user.terminated = False
         request.dashboard_userdb.save(user)
-        update_attributes.delay('eduid_dashboard', str(user.user_id))
+        # XXX save() might have requested a sync already?
+        sync_user_changes_to_userdb(user)
     return added
 
 
@@ -132,10 +133,7 @@ def get_authn_info(request):
     :param request: the request object
     :return: a list of dicts [{'type': string, 'created_ts': timestamp, 'success_ts': timestamp }]
     """
-    if 'edit-user' in request.session:
-        user = request.session['edit-user']
-    else:
-        user = request.session['user']
+    user = get_session_user(request, legacy_user = True)
 
     authninfo = []
 
@@ -203,8 +201,6 @@ def unverify_user_mobiles(request, user):
 def start_password_change(context, request):
     '''
     '''
-    settings = request.registry.settings
-
     # check csrf
     csrf = sanitize_post_key(request, 'csrf')
     if csrf != request.session.get_csrf_token():
@@ -222,8 +218,7 @@ def start_password_change(context, request):
 
 @acs_action('change-password-action')
 def change_password_action(request, session_info, user):
-    settings = request.registry.settings
-    logged_user = request.session['user']
+    logged_user = get_logged_in_user(request)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
@@ -289,7 +284,8 @@ class PasswordsView(BaseFormView):
         context = super(PasswordsView, self).get_template_context()
         # Collect the users mail addresses for use with zxcvbn
         mail_addresses = []
-        for item in self.request.session['user'].get_mail_aliases():
+        user = get_session_user(self.request, legacy_user = True)
+        for item in user.get_mail_aliases():
             mail_addresses.append(item['email'])
 
         context.update({
@@ -319,8 +315,7 @@ class PasswordsView(BaseFormView):
                 msg = _('Stale authentication info. Please try again.')
                 self.request.session.flash('error|' + msg)
                 raise HTTPFound(self.context.route_url('profile-editor'))
-        user = self.request.session.get('edit-user',
-                self.request.session.get('user'))
+        user = get_session_user(self.request, legacy_user = True)
         log.debug('Removing Authn ts for user {!r} before'
                 ' changing the password'.format(user.get_id()))
         del self.request.session['re-authn-ts']
@@ -411,7 +406,7 @@ class BaseResetPasswordView(FormView):
             'intro_message': self.intro_message
         }
         # Collect the users mail addresses for use with zxcvbn
-        user = self.request.session.get('user', None)
+        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = True)
         if user:
             mail_addresses = []
             for item in user.get_mail_aliases():
@@ -742,7 +737,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             if sync_user:
                 # Do not perform a sync if no changes where made, there is a corner case
                 # where the user has not been created yet
-                update_attributes.delay('eduid_dashboard', str(user.user_id))
+                sync_user_changes_to_userdb(user)
 
         # Save new password
         new_password = new_password.replace(' ', '')

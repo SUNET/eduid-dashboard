@@ -1,4 +1,5 @@
-from eduiddashboard.testing import LoggedInRequestTests, loa
+from eduiddashboard.testing import LoggedInRequestTests
+from eduiddashboard.testing import loa
 
 
 class LoaTestsAdminMode(LoggedInRequestTests):

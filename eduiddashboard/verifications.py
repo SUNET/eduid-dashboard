@@ -3,12 +3,12 @@ from datetime import datetime, timedelta
 from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
-from pyramid.httpexceptions import HTTPFound
 
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
+from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
 
@@ -197,12 +197,7 @@ def verify_code(request, model_name, code):
     if not obj_id:
         return None
 
-    if 'edit-user' in request.session:
-        # non personal mode
-        user = request.session['edit-user']
-    elif 'user' in request.session:
-        # personal mode
-        user = request.session['user']
+    user = get_session_user(request, legacy_user=True)
 
     assert_error_msg = 'Requesting users ID does not match verifications user ID'
     assert user.get_id() == this_verification['user_oid'], assert_error_msg

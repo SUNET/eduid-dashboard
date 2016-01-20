@@ -5,7 +5,7 @@ from pyramid.security import remember
 from pyramid.authentication import SessionAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from eduiddashboard import log
+from eduiddashboard.session import store_session_user
 
 
 def setup_auth(config):
@@ -45,7 +45,7 @@ def login(request, username):
 
     main_attribute = request.registry.settings.get('saml2.user_main_attribute')
     request.session[main_attribute] = user.get(main_attribute)
-    request.session['user'] = user
+    store_session_user(request, user)
     request.session['eduPersonAssurance'] = al_level
     headers = remember(request, user.get(main_attribute))
     return request, headers

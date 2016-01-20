@@ -2,7 +2,7 @@ from eduiddashboard.saml2.testing import Saml2RequestTests
 
 from eduiddashboard.saml2.auth import get_loa, authenticate, login
 
-from eduiddashboard import AVAILABLE_LOA_LEVEL
+from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
 
 
 class AuthTests(Saml2RequestTests):

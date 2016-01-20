@@ -24,8 +24,9 @@ from eduiddashboard.utils import (get_short_hash,
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
-
 from eduiddashboard import log
+from eduiddashboard.session import store_session_user
+
 
 def get_dummy_status(request, user):
     return None
@@ -40,9 +41,9 @@ def sync_user(request, context, old_user):
         user.retrieve_modified_ts(request.db.profiles)
 
     if context.workmode == 'personal':
-        request.session['user'] = user
+        store_session_user(request, user)
     else:
-        request.session['edit-user'] = user
+        store_session_user(request, user, edit_user = True)
     return user
 
 
@@ -198,8 +199,10 @@ class BaseActionsView(object):
         # resend the code for corresponds to the same entry we get from
         # data[index].
         try:
-            data_to_verify = self.user.get(self.data_attribute, [])[index]
+            _data = self.user.get(self.data_attribute, [])
+            data_to_verify = _data[index]
         except IndexError:
+            log.warning('Index error in verify_action, user {!s}'.format(self.user))
             message = self.verify_messages['out_of_sync']
             return {
                 'result': 'out_of_sync',
@@ -266,6 +269,7 @@ class BaseActionsView(object):
         try:
             data_to_resend = data[index]
         except IndexError:
+            log.warning('Index error in resend_code_action, user {!s}'.format(self.user))
             message = self.verify_messages['out_of_sync']
             return {
                 'result': 'out_of_sync',
@@ -288,6 +292,7 @@ class BaseActionsView(object):
         raise NotImplementedError()
 
     def sync_user(self):
+        log.warning('User {!s} could not be saved (views/__init__.py)'.format(self.user))
         self.user = sync_user(self.request, self.context, self.user)
         message = self.verify_messages['out_of_sync']
         return {
@@ -422,7 +427,7 @@ class BaseWizard(object):
 
     def get_template_context(self):
         return {
-            'user': self.user.get_doc(),
+            # seems to not be used in the wizard jinja files -- ft@ 2016-01-15 'user': self.user.get_doc(),
             'step': self.obj['step'],
             'path': self.request.route_path(self.route),
             'model': self.model,

@@ -20,11 +20,12 @@ from eduiddashboard.widgets import permissions_widget
 from eduiddashboard.utils import sanitize_post_key
 
 
-SEARCHER_ATTTRIBUTE_TYPES = [
-    (u'mail', _('email')),
-    (u'mobile', _('phone mobile number')),
-    (u'norEduPersonNIN', _('national identity number')),
-]
+# seems unused -- ft@ 2016-01-14
+#SEARCHER_ATTTRIBUTE_TYPES = [
+#   (u'mail', _('email')),
+#   (u'mobile', _('phone mobile number')),
+#   (u'norEduPersonNIN', _('national identity number')),
+#
 
 
 @colander.deferred
