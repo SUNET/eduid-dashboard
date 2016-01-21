@@ -117,7 +117,7 @@ class Session(collections.MutableMapping):
         self.request.add_response_callback(rm_cookie_callback)
 
     def changed(self):
-        pass
+        self._session.commit()
 
     def flash(self, msg, queue='', allow_duplicate=True):
         if not queue:
