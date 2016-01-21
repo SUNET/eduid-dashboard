@@ -5,28 +5,23 @@ from uuid import uuid4
 import re
 import time
 import pytz
+import logging
 from pwgen import pwgen
 from datetime import datetime
 
 from pyramid.i18n import TranslationString as _
+from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 
 from eduiddashboard.compat import text_type
 
-from eduiddashboard import AVAILABLE_LOA_LEVEL
-
 from eduid_userdb.exceptions import UserDBValueError
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
+from eduid_userdb import User
+from eduid_am.tasks import update_attributes_keep_result
 
-from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
-
-import logging
 
 logger = logging.getLogger(__name__)
 
-MAX_LOA_ROL = {
-    'user': AVAILABLE_LOA_LEVEL[0],
-    'helpdesk': AVAILABLE_LOA_LEVEL[1],
-    'admin': AVAILABLE_LOA_LEVEL[2],
-}
 
 # http://www.regular-expressions.info/email.html
 RFC2822_email = re.compile("(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/="
@@ -147,16 +142,6 @@ def get_pending_actions(user, tabs):
     return tuples
 
 
-def get_max_available_loa(groups):
-    if not groups:
-        return MAX_LOA_ROL['user']
-    loas = [v for (k, v) in MAX_LOA_ROL.iteritems() if k in groups]
-    if len(loas) > 0:
-        return max(loas)
-    else:
-        return MAX_LOA_ROL['user']
-
-
 def get_unique_hash():
     return text_type(uuid4())
 
@@ -222,7 +207,7 @@ def retrieve_modified_ts(user, dashboard_userdb):
         user.modified_ts = None
         return
 
-    dashboard_user = dashboard_userdb.get_user_by_id(userid)
+    dashboard_user = dashboard_userdb.get_user_by_id(userid, raise_on_missing=False)
     if dashboard_user is None:
         logger.debug("User {!s} not found in {!s}, setting modified_ts to None".format(user, dashboard_userdb))
         user.modified_ts = None
@@ -413,3 +398,37 @@ def _safe_clean(untrusted_text, strip_characters=False):
                     'sending illegal UTF-8 in an URI or other untrusted '
                     'user input.')
         raise HTTPBadRequest("Non-unicode input, please try again.")
+
+
+def sync_user_changes_to_userdb(user):
+    """
+    Use Celery to ask eduid-am worker to propagate changes from our
+    private DashboardUserDB into the central UserDB.
+
+    :param user: User object
+
+    :type user: DasboardLegacyUser or DashboardUser
+    :return:
+    """
+    if isinstance(user, OldUser):
+        user_id = str(user.get_id())
+    elif isinstance(user, DashboardUser) or isinstance(user, User):
+        user_id = str(user.user_id)
+    else:
+        raise ValueError('Can only propagate changes for DashboardLegacyUser, DashboardUser or User')
+
+    # XXX this code is shared with signup, move somewhere common? Into eduid_am perhaps?
+    logger.debug("Asking Attribute Manager to sync user {!s}".format(user))
+    try:
+        rtask = update_attributes_keep_result.delay('eduid_dashboard', user_id)
+        result = rtask.get(timeout=3)
+        logger.debug("Attribute Manager sync result: {!r}".format(result))
+    except:
+        logger.exception("Failed Attribute Manager sync request. trying again")
+        try:
+            rtask = update_attributes_keep_result.delay('eduid_dashboard', user_id)
+            result = rtask.get(timeout=7)
+            logger.debug("Attribute Manager sync result: {!r}".format(result))
+        except:
+            logger.exception("Failed Attribute Manager sync request retry")
+            raise

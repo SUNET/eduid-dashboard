@@ -1,14 +1,14 @@
 import json
+import pprint
 from bson import ObjectId
-import re
 
 from mock import patch
 
 from eduid_userdb.dashboard import UserDBWrapper as UserDB
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 
-from eduid_userdb.dashboard import DashboardUser
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MailsFormTests(LoggedInRequestTests):
@@ -110,9 +110,8 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_verify_not_existant_email(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
 
         # Make a post that attempts to verify a non-existant mail address,
         # so no change is expected in the database.
@@ -164,9 +163,8 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_remove_not_existant_email(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
 
         response = self.testapp.post(
@@ -184,9 +182,8 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_setprimary_not_existant_email(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         # FFF from here
         old_amount_of_addresses = len(old_user.mail_addresses.to_list_of_dicts())
         old_primary_mail = old_user.mail_addresses.primary.email
@@ -220,10 +217,9 @@ class MailsFormTests(LoggedInRequestTests):
 
     def test_setprimary_not_verified_mail(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
         mail_index = 2
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         old_primary_mail = old_user.mail_addresses.primary.email
         mail_to_test = old_user.mail_addresses.find("johnsmith3@example.com")
 
@@ -249,33 +245,48 @@ class MailsFormTests(LoggedInRequestTests):
         self.assertEqual(old_primary_mail, updated_primary_mail)
 
     def test_steal_verified_mail(self):
+        mail_to_steal = 'johnsmith2@example.com'
+
         self.set_logged(email ='johnsmith@example.org')
 
+        orig_user = self.userdb_new.get_user_by_mail(mail_to_steal)
+
         response_form = self.testapp.get('/profile/emails/')
-
         form = response_form.forms[self.formname]
+        form['mail'].value = mail_to_steal
 
-        mail = 'johnsmith2@example.com'
-        form['mail'].value = mail
+        logger.debug(('-=-' * 30) + "\n\n")
+        foo_user = self.userdb_new.get_user_by_id(self.logged_in_user.user_id)
+        logger.debug('Stealing user BEFORE submitting form:\n{!s}\n\n\n'.format(pprint.pformat(foo_user.to_dict())))
 
         with patch.object(UserDB, 'exists_by_field', clear=True):
 
             UserDB.exists_by_field.return_value = True
-                
+
             response = form.submit('add')
             self.assertEqual(response.status, '200 OK')
 
-        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = OldUser(old_user)
+        # After adding the e-mail address to the user we're logged in as, make sure it is synced to
+        # userdb even if there is no eduid-dashboard-amp around to do it
+        self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
 
-        self.assertIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
+        logger.debug(('-=-' * 30) + "\n\n")
+        foo_user = self.userdb_new.get_user_by_id(self.logged_in_user.user_id)
+        logger.debug('Stealing user AFTER submitting form:\n{!s}\n\n\n'.format(pprint.pformat(foo_user.to_dict())))
 
+        # Make sure that merely claiming the mail_to_steal did not result in a changed ownership
+        owner_now = self.userdb_new.get_user_by_mail(mail_to_steal)
+        self.assertEqual(orig_user.user_id, owner_now.user_id)
+        self.assertEqual(owner_now.user_id, ObjectId('012345678901234567890123'))
+
+        # Find the verification code
         email_doc = self.db.verifications.find_one({
             'model_name': 'mailAliases',
             'user_oid': ObjectId('901234567890123456789012'),
-            'obj_id': mail
+            'obj_id': mail_to_steal
         })
 
+        # Post the verification code to prove ownership of mail_to_steal
         response = self.testapp.post(
             '/profile/emails-actions/',
             {'identifier': 3, 'action': 'verify', 'code': email_doc['code']}
@@ -284,15 +295,14 @@ class MailsFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
 
-        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = OldUser(old_user)
-
-        self.assertNotIn(mail, [ma['email'] for ma in old_user.get_mail_aliases()])
+        # Verify the e-mail address `mail' is NO LONGER owned by the orig_user (after a sync of both users to the userdb)
+        self.sync_user_from_dashboard_to_userdb(orig_user.user_id)
+        self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
+        owner_now = self.userdb_new.get_user_by_mail(mail_to_steal)
+        self.assertNotEqual(orig_user.user_id, owner_now.user_id)
 
     def test_steal_verified_mail_from_ourself(self):
         self.set_logged(email='johnsmith@example.org')
-        user = self.db.profiles.find_one({'_id': ObjectId('901234567890123456789012')})
-        user = OldUser(user)
         mail = 'myuniqemail@example.info'
 
         response_form = self.testapp.get('/profile/emails/')
@@ -319,9 +329,11 @@ class MailsFormTests(LoggedInRequestTests):
             # to verify that the user owns the address.
             email_doc = self.db.verifications.find_one({
                 'model_name': 'mailAliases',
-                'user_oid': ObjectId(user.get_id()),
+                'user_oid': ObjectId(self.logged_in_user.user_id),
                 'obj_id': mail
             })
+
+            self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
 
             response = self.testapp.post(
                 '/profile/emails-actions/',

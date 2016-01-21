@@ -18,10 +18,10 @@ else:
 
 
 here = os.path.abspath(os.path.dirname(__file__))
-README = open(os.path.join(here, 'README.txt')).read()
+README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.4.0'
+version = '0.4.1'
 
 requires = [
     'eduid_am>=0.6.0',
@@ -52,6 +52,7 @@ requires = [
     'stathat-async==0.0.3',
     'markupsafe>=0.23',
     'bleach>=1.4.2',
+    'requests>=2.8.1',
 ]
 
 if sys.version_info[0] < 3:

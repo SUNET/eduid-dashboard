@@ -11,6 +11,7 @@ from eduiddashboard.vccs import check_password
 from eduiddashboard.utils import (normalize_to_e_164,
                                   sanitize_input,
                                   sanitize_post_key)
+from eduiddashboard.session import get_session_user
 from eduiddashboard.idproofinglog import TeleAdressProofing, TeleAdressProofingRelation
 from eduiddashboard import log
 
@@ -27,15 +28,7 @@ class OldPasswordValidator(object):
         old_password = value
         old_password = old_password.replace(" ", "")
 
-        if 'edit-user' in request.session:
-            userid = request.session['edit-user'].get_id()
-        else:
-            userid = request.session['user'].get_id()
-        # Load user from database to ensure we are working on an up-to-date set of credentials.
-        user = request.userdb.get_user_by_oid(userid)
-        # XXX if we saved user['passwords'] to node.bindings.request['user']['passwords'] here,
-        # we could possibly avoid doing the same refresh again when changing passwords
-        # (in PasswordsView.save_success()).
+        user = get_session_user(request, legacy_user = False)
 
         vccs_url = request.registry.settings.get('vccs_url')
         password = check_password(vccs_url, old_password, user)
@@ -68,7 +61,7 @@ class PasswordValidator(object):
             return
 
         # Get a users e-mail addresses to make sure a user does not use one of those as password
-        user = request.session.get('user', None)
+        user = get_session_user(request, raise_on_not_logged_in = False, legacy_user = True)
         if not user:
             # User is resetting a forgotten password
             hash_code = request.matchdict['code']
@@ -399,7 +392,7 @@ def validate_nin_by_mobile(request, user, nin):
                                                        registered_postal_address)
 
         log.info('Logging of mobile proofing data for user {!r}.'.format(user))
-        if not request.idproofinglog.log_verified_by_mobile(proofing_data):
+        if not request.idproofinglog.log_verification(proofing_data):
             log.error('Logging of mobile proofing data for user {!r} failed.'.format(user))
             valid_mobile = None
             msg = _('Sorry, we are experiencing temporary technical '

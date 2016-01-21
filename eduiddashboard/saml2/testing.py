@@ -40,12 +40,7 @@ class ObjectFactory(object):
 
 
 def get_db(settings):
-    mongo_replicaset = settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    mongodb = MongoDB(db_uri=settings['mongo_uri'])
     logger.warning("Using a raw MongoDB instance: {!r} (mongo_uri: {!r})".format(mongodb, settings['mongo_uri']))
     return mongodb.get_database()
 

@@ -26,8 +26,10 @@ from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUserDB, DashboardUser
 from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
-from eduiddashboard import AVAILABLE_LOA_LEVEL
 from eduiddashboard.msgrelay import MsgRelay
+from eduiddashboard.session import store_session_user
+from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
+from eduiddashboard.utils import sync_user_changes_to_userdb
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -77,6 +79,7 @@ SETTINGS = {
     'nin_service_name': 'Mina meddelanden',
     'nin_service_url': 'http://minameddelanden.se/',
     'mobile_service_name': 'TeleAdress',
+    'letter_service_url': 'http://letter-proofing.example.com/',
     'available_languages': '''
             en = English
             sv = Svenska
@@ -129,7 +132,7 @@ INITIAL_VERIFICATIONS = [{
 }]
 
 
-def loa(index):                                                                                                                                             
+def loa(index):
     return AVAILABLE_LOA_LEVEL[index-1]
 
 
@@ -209,6 +212,7 @@ class LoggedInRequestTests(MongoTestCase):
         self.assertIsNotNone(_userdoc, "Could not load the standard test user {!r} from the database {!s}".format(
             std_user, self.userdb))
         self.user = OldUser(data=_userdoc)
+        self.logged_in_user = None
 
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
@@ -257,8 +261,19 @@ class LoggedInRequestTests(MongoTestCase):
         request = DummyRequest()
         request.context = DummyResource()
         request.userdb = self.userdb
+        request.userdb_new = self.userdb_new
         request.db = self.db
         request.registry.settings = self.settings
+
+        def propagate_user_changes(user):
+            """
+            Make sure there is a request.context.propagate_user_changes in testing too.
+            """
+            logger.debug('FREDRIK: Testing dummy_request.context propagate_user_changes')
+            return sync_user_changes_to_userdb(user)
+
+        request.context.propagate_user_changes = propagate_user_changes
+
         return request
 
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
@@ -272,13 +287,16 @@ class LoggedInRequestTests(MongoTestCase):
         # user only exists in eduid-userdb, so need to clear modified-ts to be able
         # to save it to eduid-dashboard.profiles
         user_obj.set_modified_ts(None)
-        session_data = {
-            'user': user_obj,
+        dummy = DummyRequest()
+        dummy.session = {
             'eduPersonAssurance': loa(3),
             'eduPersonIdentityProofing': loa(3),
         }
-        session_data.update(extra_session_data)
-        request = self.add_to_session(session_data)
+        store_session_user(dummy, user_obj)
+        # XXX ought to set self.user = user_obj
+        self.logged_in_user = self.userdb_new.get_user_by_id(user_obj.get_id())
+        dummy.session.update(extra_session_data)
+        request = self.add_to_session(dummy.session)
         return request
 
     def set_user_cookie(self, user_id):
@@ -290,6 +308,8 @@ class LoggedInRequestTests(MongoTestCase):
         return request
 
     def add_to_session(self, data):
+        # Log warning since we're moving away from direct request.session access
+        logger.warning('Add to session called with data: {!r}'.format(data))
         queryUtility = self.testapp.app.registry.queryUtility
         session_factory = queryUtility(ISessionFactory)
         request = self.dummy_request()
@@ -315,11 +335,30 @@ class LoggedInRequestTests(MongoTestCase):
         values = [x for x in values if x not in ignore_not_found]
         self.assertEqual(values, [], "Failed checking one or more checkboxes: {!r}".format(values))
 
-
     def values_are_checked(self, fields, values):
         checked = [f.value for f in fields if f.value is not None]
 
         self.assertEqual(values, checked)
+
+    def sync_user_from_dashboard_to_userdb(self, user_id, old_format = True):
+        """
+        When there is no eduid-dashboard-amp Attribute Manager plugin loaded to
+        sync users from dashboard to userdb, this crude function can do it.
+
+        :param user_id: User id
+        :param old_format: Write in old format to userdb
+
+        :type user_id: ObjectId
+        :type old_format: bool
+        :return:
+        """
+        user = self.dashboard_db.get_user_by_id(user_id)
+        logger.debug('Syncing user {!s} from dashboard to userdb'.format(user))
+        test_doc = {'_id': user_id}
+        user_doc = user.to_dict(old_userdb_format=old_format)
+        # Fixups to turn the DashboardUser into a User
+        del user_doc['terminated']
+        self.userdb_new._coll.update(test_doc, user_doc, upsert=False)
 
 
 class RedisTemporaryInstance(object):

@@ -14,7 +14,7 @@ from pyramid.i18n import get_localizer
 from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
-from eduid_am.tasks import update_attributes
+from eduiddashboard.utils import sync_user_changes_to_userdb
 
 from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
@@ -26,7 +26,7 @@ from eduiddashboard.views import BaseFormView
 from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.saml2.utils import get_location
-from eduid_userdb.dashboard import DashboardUser
+from eduiddashboard.session import get_session_user, get_logged_in_user
 from eduiddashboard.utils import (generate_password,
                                   get_unique_hash,
                                   get_short_hash,
@@ -59,8 +59,11 @@ def change_password(request, user, old_password, new_password):
     added = add_credentials(vccs_url, old_password, new_password, user)
     log.debug("Changing password user {!s}\nTIMESTAMP 2 {!s}".format(user, user.modified_ts))
     if added:
+        retrieve_modified_ts(user, request.dashboard_userdb)
         user.terminated = False
         request.dashboard_userdb.save(user)
+        # XXX save() might have requested a sync already?
+        sync_user_changes_to_userdb(user)
     return added
 
 
@@ -71,6 +74,7 @@ def new_reset_password_code(request, user, mechanism='email', next_view='reset-p
         'email': user.get_mail()
     })
 
+    # XXX: Use eppn instead of email
     reset_doc = {
         'email': user.get_mail(),
         'hash_code': hash_code,
@@ -129,10 +133,7 @@ def get_authn_info(request):
     :param request: the request object
     :return: a list of dicts [{'type': string, 'created_ts': timestamp, 'success_ts': timestamp }]
     """
-    if 'edit-user' in request.session:
-        user = request.session['edit-user']
-    else:
-        user = request.session['user']
+    user = get_session_user(request, legacy_user = True)
 
     authninfo = []
 
@@ -200,8 +201,6 @@ def unverify_user_mobiles(request, user):
 def start_password_change(context, request):
     '''
     '''
-    settings = request.registry.settings
-
     # check csrf
     csrf = sanitize_post_key(request, 'csrf')
     if csrf != request.session.get_csrf_token():
@@ -220,8 +219,7 @@ def start_password_change(context, request):
 
 @acs_action('change-password-action')
 def change_password_action(request, session_info, user):
-    settings = request.registry.settings
-    logged_user = request.session['user']
+    logged_user = get_logged_in_user(request)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
@@ -287,7 +285,8 @@ class PasswordsView(BaseFormView):
         context = super(PasswordsView, self).get_template_context()
         # Collect the users mail addresses for use with zxcvbn
         mail_addresses = []
-        for item in self.request.session['user'].get_mail_aliases():
+        user = get_session_user(self.request, legacy_user = True)
+        for item in user.get_mail_aliases():
             mail_addresses.append(item['email'])
 
         context.update({
@@ -317,8 +316,7 @@ class PasswordsView(BaseFormView):
                 msg = _('Stale authentication info. Please try again.')
                 self.request.session.flash('error|' + msg)
                 raise HTTPFound(self.context.route_url('profile-editor'))
-        user = self.request.session.get('edit-user',
-                self.request.session.get('user'))
+        user = get_session_user(self.request, legacy_user = True)
         log.debug('Removing Authn ts for user {!r} before'
                 ' changing the password'.format(user.get_id()))
         del self.request.session['re-authn-ts']
@@ -409,7 +407,7 @@ class BaseResetPasswordView(FormView):
             'intro_message': self.intro_message
         }
         # Collect the users mail addresses for use with zxcvbn
-        user = self.request.session.get('user', None)
+        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = True)
         if user:
             mail_addresses = []
             for item in user.get_mail_aliases():
@@ -711,7 +709,6 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
         user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
-        retrieve_modified_ts(user, self.request.dashboard_userdb)
 
         log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 
@@ -724,24 +721,32 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             new_password = self.get_suggested_password()
             self.request.stats.count('dashboard/pwreset_generated_password', 1)
 
-        new_password = new_password.replace(' ', '')
+        # Make user AL1 if password was reset by e-mail only
+        if password_reset['mechanism'] == 'email':
+            retrieve_modified_ts(user, self.request.dashboard_userdb)
+            sync_user = False
+            nin_count = len(user.nins.to_list())
+            if nin_count:
+                unverify_user_nins(self.request, user)
+                sync_user = True
+                self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
+            if len(user.phone_numbers.to_list()):
+                # We need to unverify a users phone numbers to make sure that an attacker can not
+                # verify the account again without control over the users phone number
+                unverify_user_mobiles(self.request, user)
+                sync_user = True
+            if sync_user:
+                # Do not perform a sync if no changes where made, there is a corner case
+                # where the user has not been created yet
+                sync_user_changes_to_userdb(user)
 
-        self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
+        # Save new password
+        new_password = new_password.replace(' ', '')
         ok = change_password(self.request, user, '', new_password)
 
         if ok:
+            self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
             self.request.stats.count('dashboard/pwreset_changed_password', 1)
-            if password_reset['mechanism'] == 'email':
-                retrieve_modified_ts(user, self.request.dashboard_userdb)
-                nin_count = len(user.nins.to_list())
-                if nin_count:
-                    unverify_user_nins(self.request, user)
-                    self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
-                if len(user.phone_numbers.to_list()):
-                    # We need to unverify a users phone numbers to make sure that an attacker can not
-                    # verify the account again without control over the users phone number
-                    unverify_user_mobiles(self.request, user)
-                update_attributes('eduid_dashboard', str(user.user_id))
             url = self.request.route_url('profile-editor')
             reset = True
         else:

@@ -20,11 +20,12 @@ from eduiddashboard.widgets import permissions_widget
 from eduiddashboard.utils import sanitize_post_key
 
 
-SEARCHER_ATTTRIBUTE_TYPES = [
-    (u'mail', _('email')),
-    (u'mobile', _('phone mobile number')),
-    (u'norEduPersonNIN', _('national identity number')),
-]
+# seems unused -- ft@ 2016-01-14
+#SEARCHER_ATTTRIBUTE_TYPES = [
+#   (u'mail', _('email')),
+#   (u'mobile', _('phone mobile number')),
+#   (u'norEduPersonNIN', _('national identity number')),
+#
 
 
 @colander.deferred
@@ -81,6 +82,8 @@ class All_StopOnFirst_Switch(object):
 
         if sanitize_post_key(request, 'add_by_mobile') is not None:
             current_validator = self.validator_dict['add_by_mobile']
+        elif sanitize_post_key(request, 'add_by_letter') is not None:
+            current_validator = self.validator_dict['add_by_letter']
         else:
             current_validator = self.validator_dict['add']
         for validator in current_validator.validators:
@@ -142,6 +145,10 @@ class NIN(CSRFTokenSchema):
             MaliciousInputValidator(),
             NINUniqueValidator(),
             NINRegisteredMobileValidator()
+        ), 'add_by_letter': All_StopOnFirst(
+            NINFormatValidator,
+            MaliciousInputValidator(),
+            NINUniqueValidator()
         )})
 
     """
