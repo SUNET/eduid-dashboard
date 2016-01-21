@@ -26,7 +26,7 @@ class SessionFactory(object):
     def __call__(self, request):
         self.request = request
         settings = request.registry.settings
-        session_name = settings.get('session.key', 'session')
+        session_name = settings.get('session.key', 'sessid')
         secret = settings.get('session.secret')
         cookies = request.cookies
         token = cookies.get(session_name, None)
@@ -101,7 +101,20 @@ class Session(collections.MutableMapping):
         return self._new
 
     def invalidate(self):
-        pass
+        self._session.clear()
+        name = self.request.registry.settings.get('session.key')
+        domain = self.request.registry.settings.get('session.cookie_domain')
+        path = self.request.registry.settings.get('session.cookie_path')
+        def rm_cookie_callback(request, response):
+            response.set_cookie(
+                    name=name,
+                    value=None,
+                    domain=domain,
+                    path=path,
+                    max_age=0
+                    )
+            return True
+        self.request.add_response_callback(rm_cookie_callback)
 
     def changed(self):
         pass
