@@ -51,7 +51,11 @@ SETTINGS = {
     #'session.webtest_varname': 'session',
     'session.key': 'sessid',
     'session.secret': '123341234',
-    'session.domain': 'localhost',
+    'session.cookie_domain': 'localhost',
+    'session.cookie_path': '/',
+    'session.cookie_max_age': '3600',
+    'session.cookie_httponly': True,
+    'session.cookie_secure': False,
     'testing': True,
     'jinja2.directories': [
         'eduiddashboard:saml2/templates',

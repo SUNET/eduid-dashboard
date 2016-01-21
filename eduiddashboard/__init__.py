@@ -415,23 +415,32 @@ def main(global_config, **settings):
     )
 
     try:
-        settings['session.expire'] = int(settings.get('session.expire', 3600))
+        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 3600))
     except ValueError:
-        raise ConfigurationError('session.expire should be a valid integer')
+        raise ConfigurationError('session.cookie_max_age should be a valid integer')
 
     try:
         settings['session.timeout'] = int(settings.get(
             'session.timeout',
-            settings['session.expire'])
+            settings['session.cookie_max_age'])
         )
     except ValueError:
-        raise ConfigurationError('session.expire should be a valid integer')
+        raise ConfigurationError('session.timeout should be a valid integer')
 
-    settings['session.domain'] = read_setting_from_env(settings, 'session.domain',
+    settings['session.cookie_domain'] = read_setting_from_env(settings, 'session.cookie_domain',
                                                     'dashboard.docker')
 
+    settings['session.cookie_path'] = read_setting_from_env(settings, 'session.cookie_path',
+                                                    '/')
+
+    settings['session.cookie_httponly'] = read_setting_from_env(settings, 'session.cookie_httponly',
+                                                    'true')
+
+    settings['session.cookie_secure'] = read_setting_from_env(settings, 'session.cookie_secure',
+                                                    'false')
+
     settings['session.key'] = read_setting_from_env(settings, 'session.key',
-                                                    'session')
+                                                    'sessid')
 
     settings['session.secret'] = read_setting_from_env(settings,
                                                      'session.secret')

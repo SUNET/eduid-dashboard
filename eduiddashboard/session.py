@@ -34,15 +34,21 @@ class SessionFactory(object):
             base_session['flash_messages'] = {'default': []}
             base_session.commit()
             token = base_session.token
-            domain = settings.get('session.domain')
+            domain = settings.get('session.cookie_domain')
+            path = settings.get('session.cookie_path')
+            secure = settings.get('session.cookie_secure')
+            httponly = settings.get('session.cookie_httponly')
+            max_age = settings.get('session.cookie_max_age')
             new = True
             def set_cookie_callback(request, response):
                 response.set_cookie(
                         name=session_name,
                         value=token,
                         domain=domain,
-                        #secure=True,
-                        #httponly=True
+                        path=path,
+                        secure=secure,
+                        httponly=httponly,
+                        max_age=max_age
                         )
                 self.request = None
                 return True
