@@ -339,7 +339,7 @@ class RedisTemporaryInstance(object):
         return cls._instance
 
     def __init__(self):
-        self._port = 6379 #random.randint(40000, 50000)
+        self._port = random.randint(40000, 50000)
         self._process = subprocess.Popen(['redis-server',
                                           '--port', str(self._port),
                                           '--daemonize', 'no',
