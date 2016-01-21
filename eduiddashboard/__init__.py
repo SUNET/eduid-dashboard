@@ -25,6 +25,7 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         NinsFactory, ForbiddenFactory,
                                         HelpFactory, AdminFactory, is_logged)
 
+from eduiddashboard.session import SessionFactory
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
 from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
@@ -426,12 +427,26 @@ def main(global_config, **settings):
     except ValueError:
         raise ConfigurationError('session.expire should be a valid integer')
 
+    settings['session.domain'] = read_setting_from_env(settings, 'session.domain',
+                                                    'dashboard.docker')
+
     settings['session.key'] = read_setting_from_env(settings, 'session.key',
                                                     'session')
 
+    settings['session.secret'] = read_setting_from_env(settings,
+                                                     'session.secret')
+
+    settings['redis_host'] = read_setting_from_env(settings, 'redis_host',
+                                                    'redis.docker')
+
+    settings['redis_port'] = int(read_setting_from_env(settings, 'redis_port',
+                                                    6379))
+
+    settings['redis_db'] = int(read_setting_from_env(settings, 'redis_db', 0))
+
     settings['groups_callback'] = read_setting_from_env(settings,
-                                                        'groups_callback',
-                                                        groups_callback)
+                                                    'groups_callback',
+                                                    groups_callback)
 
     settings['available_languages'] = available_languages
 
@@ -481,7 +496,9 @@ def main(global_config, **settings):
                                         'eduiddashboard:locale')
     config.add_translation_dirs(locale_path)
 
-    config.include('pyramid_beaker')
+    #config.include('pyramid_beaker')
+    factory = SessionFactory(settings)
+    config.set_session_factory(factory)
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
     config.include('pyramid_deform')

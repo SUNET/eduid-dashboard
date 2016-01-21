@@ -11,7 +11,7 @@ from pyramid.settings import asbool
 
 from deform_bootstrap import Form
 
-from eduid_common.authn.saml2 import get_authn_request
+from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,

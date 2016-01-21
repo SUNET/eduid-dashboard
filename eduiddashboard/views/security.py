@@ -16,7 +16,7 @@ from pyramid.renderers import render_to_response
 
 from eduid_am.tasks import update_attributes
 
-from eduid_common.authn.saml2 import get_authn_request
+from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    NINResetPassword, MobileResetPassword,

@@ -16,7 +16,7 @@ from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
-from eduid_common.authn.saml2 import get_authn_request, get_authn_response
+from eduid_common.authn.eduid_saml2 import get_authn_request, get_authn_response
 from eduiddashboard.utils import (sanitize_get,
                                   sanitize_session_get,
                                   sanitize_post_key)
@@ -140,7 +140,7 @@ def login_view(request):
             'login_url': request.route_url('saml2-login'),
         })
 
-    result = get_authn_request(request.registy.settings, request.session,
+    result = get_authn_request(request.registry.settings, request.session,
                                came_from, selected_idp)
 
     schedule_action(request.session, 'login-action')
