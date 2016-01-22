@@ -218,7 +218,7 @@ def start_password_change(context, request):
 
 @acs_action('change-password-action')
 def change_password_action(request, session_info, user):
-    logged_user = get_logged_in_user(request)
+    logged_user = get_logged_in_user(request, legacy_user = True)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
