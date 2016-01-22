@@ -1,7 +1,7 @@
 
 import os, binascii
-from time import time
 import collections
+from time import time
 from zope.interface import implementer
 from pyramid.interfaces import ISessionFactory, ISession
 from eduid_common.session.session import SessionManager
@@ -12,6 +12,16 @@ logger = logging.getLogger(__name__)
 
 _EDIT_USER_EPPN = 'edit-user_eppn'
 _USER_EPPN = 'user_eppn'
+
+
+def manage_accessed(wrapped):
+    """ Decorator which causes a cookie to be set when a session method
+    is called."""
+    def accessed(session, *arg, **kw):
+        session.set_cookie()
+        return wrapped(session, *arg, **kw)
+    accessed.__doc__ = wrapped.__doc__
+    return accessed
 
 
 @implementer(ISessionFactory)
@@ -32,32 +42,14 @@ class SessionFactory(object):
         token = cookies.get(session_name, None)
         if token is not None:
             base_session = self.manager.get_session(token=token, secret=secret)
-            new = False
+            session = Session(request, base_session)
         else:
             base_session = self.manager.get_session(data={}, secret=secret)
             base_session['flash_messages'] = {'default': []}
             base_session.commit()
-            token = base_session.token
-            domain = settings.get('session.cookie_domain')
-            path = settings.get('session.cookie_path')
-            secure = settings.get('session.cookie_secure')
-            httponly = settings.get('session.cookie_httponly')
-            max_age = settings.get('session.cookie_max_age')
-            new = True
-            def set_cookie_callback(request, response):
-                response.set_cookie(
-                        name=session_name,
-                        value=token,
-                        domain=domain,
-                        path=path,
-                        secure=secure,
-                        httponly=httponly,
-                        max_age=max_age
-                        )
-                self.request = None
-                return True
-            self.request.add_response_callback(set_cookie_callback)
-        return Session(request, base_session, new)
+            session = Session(request, base_session, new=True)
+            session.set_cookie()
+        return session
 
 
 @implementer(ISession)
@@ -65,32 +57,51 @@ class Session(collections.MutableMapping):
 
     _dirty = False
 
-    def __init__(self, request, base_session, new):
+    def __init__(self, request, base_session, new=False):
         self.request = request
         self._session = base_session
         self._created = time()
         self._new = new
-        self._changed = False
+        self._cookie_reset = False
 
+    @manage_accessed
     def __getitem__(self, key, default=None):
         return self._session.__getitem__(key, default=None)
 
+    @manage_accessed
     def __setitem__(self, key, value):
         self._session[key] = value
         self._session.commit()
 
+    @manage_accessed
     def __delitem__(self, key):
         del self._session[key]
         self._session.commit()
 
+    @manage_accessed
     def __iter__(self):
         return self._session.__iter__()
 
+    @manage_accessed
     def __len__(self):
         return len(self._session)
 
+    @manage_accessed
     def __contains__(self, key):
         return self._session.__contains__(key)
+
+    get = manage_accessed(collections.MutableMapping.get)
+    items = manage_accessed(collections.MutableMapping.items)
+    values = manage_accessed(collections.MutableMapping.values)
+    keys = manage_accessed(collections.MutableMapping.keys)
+    iteritems = manage_accessed(collections.MutableMapping.iteritems)
+    itervalues = manage_accessed(collections.MutableMapping.itervalues)
+    iterkeys = manage_accessed(collections.MutableMapping.iterkeys)
+    clear = manage_accessed(collections.MutableMapping.clear)
+    update = manage_accessed(collections.MutableMapping.update)
+    setdefault = manage_accessed(collections.MutableMapping.setdefault)
+    pop = manage_accessed(collections.MutableMapping.pop)
+    popitem = manage_accessed(collections.MutableMapping.popitem)
 
     @property
     def created(self):
@@ -119,6 +130,7 @@ class Session(collections.MutableMapping):
     def changed(self):
         self._session.commit()
 
+    @manage_accessed
     def flash(self, msg, queue='', allow_duplicate=True):
         if not queue:
             queue = 'default'
@@ -130,6 +142,7 @@ class Session(collections.MutableMapping):
         self._session['flash_messages'][queue].append(msg)
         self._session.commit()
 
+    @manage_accessed
     def pop_flash(self, queue=''):
         if not queue:
             queue = 'default'
@@ -139,17 +152,20 @@ class Session(collections.MutableMapping):
             return msgs
         return []
 
+    @manage_accessed
     def peek_flash(self, queue=''):
         if not queue:
             queue = 'default'
         return self._session['flash_messages'].get(queue, [])
 
+    @manage_accessed
     def new_csrf_token(self):
         token = binascii.hexlify(os.urandom(20))
         self['_csrft_'] = token
         self._session.commit()
         return token
 
+    @manage_accessed
     def get_csrf_token(self):
         token = self.get('_csrft_', None)
         if token is None:
@@ -159,6 +175,30 @@ class Session(collections.MutableMapping):
     def persist(self):
         self._session.commit()
 
+    def set_cookie(self):
+        if self._cookie_reset:
+            return
+        token = self._session.token
+        settings = self.request.registry.settings
+        session_name = settings.get('session.key', 'sessid')
+        domain = settings.get('session.cookie_domain')
+        path = settings.get('session.cookie_path')
+        secure = settings.get('session.cookie_secure')
+        httponly = settings.get('session.cookie_httponly')
+        max_age = settings.get('session.cookie_max_age')
+        def set_cookie_callback(request, response):
+            response.set_cookie(
+                    name=session_name,
+                    value=token,
+                    domain=domain,
+                    path=path,
+                    secure=secure,
+                    httponly=httponly,
+                    max_age=max_age
+                    )
+            return True
+        self.request.add_response_callback(set_cookie_callback)
+        self._cookie_reset = True
 
 
 def store_session_user(request, user, edit_user=False):
