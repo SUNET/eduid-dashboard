@@ -1,4 +1,5 @@
 
+import pickle
 import os, binascii
 import collections
 from time import time
@@ -15,8 +16,10 @@ _USER_EPPN = 'user_eppn'
 
 
 def manage_accessed(wrapped):
-    """ Decorator which causes a cookie to be set when a session method
-    is called."""
+    '''
+    Decorator which causes a cookie to be set when a session method
+    is called.
+    '''
     def accessed(session, *arg, **kw):
         session.set_cookie()
         return wrapped(session, *arg, **kw)
@@ -26,25 +29,47 @@ def manage_accessed(wrapped):
 
 @implementer(ISessionFactory)
 class SessionFactory(object):
+    '''
+    Session factory implementing the pyramid.interfaces.ISessionFactory
+    interface.
+    It uses the SessionManager defined in eduid_common.session.session
+    to create sessions backed by redis.
+    '''
 
     def __init__(self, settings):
+        '''
+        SessionFactory constructor.
+
+        :param settings: the pyramid settings
+        :type settings: dict
+        '''
         redis_host = settings['redis_host']
         redis_port = settings['redis_port']
         redis_db = settings['redis_db']
-        self.manager = SessionManager(redis_host, redis_port, redis_db)
+        secret = settings.get('session.secret')
+        self.manager = SessionManager(redis_host, redis_port, redis_db,
+                serializer=pickle, secret=secret)
 
     def __call__(self, request):
+        '''
+        Create a session object for the given request.
+
+        :param request: the request
+        :type request: pyramid.request.Request
+
+        :return: the session
+        :rtype: Session
+        '''
         self.request = request
         settings = request.registry.settings
         session_name = settings.get('session.key', 'sessid')
-        secret = settings.get('session.secret')
         cookies = request.cookies
         token = cookies.get(session_name, None)
         if token is not None:
-            base_session = self.manager.get_session(token=token, secret=secret)
+            base_session = self.manager.get_session(token=token)
             session = Session(request, base_session)
         else:
-            base_session = self.manager.get_session(data={}, secret=secret)
+            base_session = self.manager.get_session(data={})
             base_session['flash_messages'] = {'default': []}
             base_session.commit()
             session = Session(request, base_session, new=True)
@@ -54,10 +79,21 @@ class SessionFactory(object):
 
 @implementer(ISession)
 class Session(collections.MutableMapping):
-
-    _dirty = False
+    '''
+    Session implementing the pyramid.interfaces.ISession interface.
+    It uses the Session defined in eduid_common.session.session
+    to store the session data in redis.
+    '''
 
     def __init__(self, request, base_session, new=False):
+        '''
+        :param request: the request
+        :type request: pyramid.request.Request
+        :param base_session: The underlying session object
+        :type base_session: eduid_common.session.session.Session
+        :param new: whether the session is new or not.
+        :type new: bool
+        '''
         self.request = request
         self._session = base_session
         self._created = time()
