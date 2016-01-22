@@ -1,3 +1,5 @@
+import inspect
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -93,12 +95,12 @@ def get_logged_in_user(request, legacy_user, raise_on_not_logged_in=True):
     :rtype: eduid_userdb.User | eduid_userdb.dashboard.DashboardLegacyUser
     """
     if not raise_on_not_logged_in and _USER_EPPN not in request.session:
-        log.debug('No logged in user found in session, returning None')
+        log.debug('No logged in user found in session, returning None to {!s}'.format(caller_name()))
         return None
     user = _get_user_by_eppn(request, request.session[_USER_EPPN],
                              legacy_user = legacy_user,
                              )
-    log.debug('Returning the logged in user {!r} as session user'.format(user))
+    log.debug('Returning the logged in user {!r} as session user to {!s}'.format(user, caller_name()))
     return user
 
 
@@ -122,3 +124,53 @@ def _get_user_by_eppn(request, eppn, legacy_user):
         user.retrieve_modified_ts(request.db.profiles)
         return user
     return request.userdb_new.get_user_by_eppn(eppn)
+
+
+
+#
+# The function below is intended to aid debugging when we first roll out this
+# non-caching of session users. It should probably be removed later, together
+# with the rather verbose logging for session user lookups.
+#
+# -- ft@ 2016-01-15
+
+# From https://gist.github.com/techtonik/2151727
+# Public Domain, i.e. feel free to copy/paste
+# Considered a hack in Python 2
+
+def caller_name(skip=1):
+    """Get a name of a caller in the format module.class.method
+
+       `skip` specifies how many levels of stack to skip while getting caller
+       name. skip=1 means "who calls me", skip=2 "who calls my caller" etc.
+
+       An empty string is returned if skipped levels exceed stack height
+    """
+    stack = inspect.stack()
+    start = 0 + skip
+    if len(stack) < start + 1:
+      return ''
+    name = []
+    for i in range(start, len(stack)):
+        parentframe = stack[i][0]
+        module = inspect.getmodule(parentframe)
+        # `modname` can be None when frame is executed directly in console
+        # TODO(techtonik): consider using __main__
+        if not module:
+            break
+        if str(module.__name__).upper() == 'EDUIDDASHBOARD.SESSION':
+            # We're after the caller of this module, ignore everything *in* this module
+            continue
+        name.append(module.__name__.upper())
+        break
+    # detect classname
+    if 'self' in parentframe.f_locals:
+        # I don't know any way to detect call from the object method
+        # XXX: there seems to be no way to detect static method call - it will
+        #      be just a function call
+        name.append(parentframe.f_locals['self'].__class__.__name__)
+    codename = parentframe.f_code.co_name
+    if codename != '<module>':  # top level usually
+        name.append( codename ) # function or a method
+    del parentframe
+    return ".".join(name)

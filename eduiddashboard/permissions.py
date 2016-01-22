@@ -84,6 +84,7 @@ class BaseFactory(object):
             home = request.route_path('home')
             url += '?next={0}'.format(home)
             raise HTTPFound(location=url, headers=headers)
+        self._logged_in_user = user
         self.request = request
         settings = self.request.registry.settings
         self.workmode = settings.get('workmode')
@@ -155,7 +156,8 @@ class BaseFactory(object):
         :rtype: DashboardLegacyUser
         """
         if self.workmode == 'personal':
-            user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+            #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+            user = self._logged_in_user
             if not user:
                 user = OldUser({})
         elif self.workmode == 'admin' or self.workmode == 'helpdesk':
@@ -208,7 +210,8 @@ class BaseFactory(object):
         return sync_user_changes_to_userdb(newuser)
 
     def get_groups(self, userid=None, request=None):
-        user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+        #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
+        user = self._logged_in_user
         if not user:
             logger.debug("No logged in user found in session (userid {!r})".format(userid))
             user = OldUser({})
@@ -302,9 +305,11 @@ class BaseCredentialsFactory(BaseFactory):
 class HomeFactory(BaseFactory):
 
     def get_user(self):
+        # XXX what's the purpose here? Override BaseFactory.get_user() to never get edit-user?
         user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
         if not user:
             user = OldUser({})
+        logger.debug('HomeFactory get_user returning {!s}'.format(user))
         return user
 
 class HelpFactory(BaseFactory):
