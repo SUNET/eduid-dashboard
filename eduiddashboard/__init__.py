@@ -418,10 +418,10 @@ def main(global_config, **settings):
     settings['session.cookie_path'] = read_setting_from_env(settings, 'session.cookie_path',
                                                     '/')
 
-    settings['session.cookie_httponly'] = read_setting_from_env(settings, 'session.cookie_httponly',
+    settings['session.cookie_httponly'] = read_setting_from_env_bool(settings, 'session.cookie_httponly',
                                                     'true')
 
-    settings['session.cookie_secure'] = read_setting_from_env(settings, 'session.cookie_secure',
+    settings['session.cookie_secure'] = read_setting_from_env_bool(settings, 'session.cookie_secure',
                                                     'false')
 
     settings['session.key'] = read_setting_from_env(settings, 'session.key',
