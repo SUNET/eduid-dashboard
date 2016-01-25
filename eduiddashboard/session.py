@@ -237,6 +237,9 @@ class Session(collections.MutableMapping):
         self.request.add_response_callback(set_cookie_callback)
         self._cookie_reset = True
 
+    def delete(self):
+        self.invalidate()
+
 
 def store_session_user(request, user, edit_user=False):
     """
