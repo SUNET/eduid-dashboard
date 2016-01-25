@@ -490,9 +490,9 @@ def main(global_config, **settings):
                                         'eduiddashboard:locale')
     config.add_translation_dirs(locale_path)
 
-    #config.include('pyramid_beaker')
     factory = SessionFactory(settings)
     config.set_session_factory(factory)
+
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
     config.include('pyramid_deform')
