@@ -48,7 +48,7 @@ def send_verification_mail(request, email, reference=None, code=None):
 
     # DEBUG
     if request.registry.settings.get('developer_mode', False):
-        print message.body
+        log.debug(message.body)
     else:
         mailer.send(message)
     log.debug("Sent verification mail to user {!r} with address {!s}.".format(request.context.user, email))
@@ -84,7 +84,7 @@ def send_termination_mail(request, user):
 
     # DEBUG
     if request.registry.settings.get('developer_mode', False):
-        print(message.body.encode("UTF-8"))
+        log.debug(message.body)
     else:
         mailer.send(message)
     log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))

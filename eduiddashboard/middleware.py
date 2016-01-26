@@ -1,5 +1,7 @@
-
 import logging
+
+from eduiddashboard.session import get_session_user
+
 log = logging.getLogger(__name__)
 
 
@@ -23,8 +25,7 @@ def reauthn_ts_tween_factory(handler, registry):
             acs_url != referer and
             chp_url != referer and
             request.session.get('re-authn-ts', False)):
-            user = request.session.get('edit-user',
-                    request.session.get('user'))
+            user = get_session_user(request, legacy_user = True)
             log.debug('Removing stale Authn ts for user {} '.format(user.get_id()))
             del request.session['re-authn-ts']
 

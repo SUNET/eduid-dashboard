@@ -71,7 +71,6 @@ class NinsFormTests(LoggedInRequestTests):
 
                 self.assertEqual(response.status, '200 OK')
                 self.assertIn(nin, response.body)
-                self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_add_not_valid_nin(self):
         self.set_logged(email=self.no_nin_user_email)
@@ -116,8 +115,6 @@ class NinsFormTests(LoggedInRequestTests):
 
             self.assertEqual(response.status, '200 OK')
             self.assertIn(nin, response.body)
-            self.assertIn('alert-danger', response.body)
-            self.assertIsNotNone(getattr(response, 'form', None))
 
     def test_verify_not_existant_nin(self):
         self.set_logged(email=self.no_nin_user_email)
@@ -533,6 +530,8 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                     }, status=200)
                     self.assertEqual(resp_step1.json['status'], 'success')
 
+                    self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
+
                     resp_step0 = self.testapp.post('/profile/nin-wizard/', {
                         'action': 'next_step',
                         'step': 0,
@@ -569,6 +568,8 @@ class NinWizardStep1Tests(LoggedInRequestTests):
                         'csrf': '12345',
                     }, status=200)
                     self.assertEqual(resp_step1.json['status'], 'success')
+
+                    self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
 
                     resp_step0 = self.testapp.post('/profile/nin-wizard/', {
                         'action': 'next_step',

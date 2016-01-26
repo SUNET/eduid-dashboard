@@ -1,6 +1,8 @@
 # NINS form
 
 import deform
+import urlparse
+import requests
 from datetime import datetime
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
@@ -14,11 +16,12 @@ from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduiddashboard.verifications import verify_nin
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-
+from eduiddashboard.verifications import (verify_nin, verify_code,
+                                          get_verification_code)
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduiddashboard.idproofinglog import LetterProofing
 
 import logging
 logger = logging.getLogger(__name__)
@@ -124,12 +127,11 @@ def get_not_verified_nins_list(request, user):
             # old style, list of strings (understood to be verified)
             user_already_verified = users_nins
     for this in verifications:
-        if this['verified']:
-            if this['obj_id'] in user_not_verified:
-                # Found to be verified after all, filter out from user_not_verified
-                user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
+        if this['verified'] and this['obj_id'] in user_not_verified:    # XXX: This will never happen with DashboardLegacyUser
+            # Found to be verified after all, filter out from user_not_verified
+            user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
         else:
-            if this['obj_id'] not in user_already_verified:
+            if this['obj_id'] not in user_already_verified:             # XXX: This will always happen with DashboardLegacyUser
                 res.append(this['obj_id'])
     res += user_not_verified
     # As we no longer remove verification documents make the list items unique
@@ -142,6 +144,71 @@ def get_active_nin(self):
         return active_nins[-1]
     else:
         return None
+
+
+def letter_status(request, user, nin):
+    settings = request.registry.settings
+    letter_url = settings.get('letter_service_url')
+    state_url = urlparse.urljoin(letter_url, 'get-state')
+    data = {'eppn': user.get_eppn()}
+    response = requests.post(state_url, data=data)
+
+    sent, result = False, 'error'
+    msg = _('There was a problem with the letter service. '
+            'Please try again later.')
+    if response.status_code == 200:
+        state = response.json()
+
+        if 'letter_sent' in state:
+            sent = True
+            result = 'success'
+            expires = datetime.utcfromtimestamp(int(state['letter_expires']))
+            expires = expires.strftime('%Y-%m-%d')
+            msg = _('A letter has already been sent to your official postal address. '
+                    'The code enclosed will expire on ${expires}. '
+                    'After that date you can restart the process if the letter was lost.',
+                    mapping={'expires': expires})
+        else:
+            sent = False
+            result = 'success'
+            msg = _('When you click on the "Send" button a letter with a '
+                    'verification code will be sent to your official postal address.')
+            logger.info("Asking user {!r} if they want to send a letter.".format(user))
+    else:
+        logger.error('Error getting status from the letter service. Status code {!r}, msg "{}"'.format(
+            response.status_code, response.text))
+    return {
+        'result': result,
+        'message': get_localizer(request).translate(msg),
+        'sent': sent
+    }
+
+
+def send_letter(request, user, nin):
+
+    settings = request.registry.settings
+    letter_url = settings.get('letter_service_url')
+    send_letter_url = urlparse.urljoin(letter_url, 'send-letter')
+
+    data = {'eppn': user.get_eppn(), 'nin': nin}
+    response = requests.post(send_letter_url, data=data)
+    result = 'error'
+    msg = _('There was a problem with the letter service. '
+            'Please try again later.')
+    if response.status_code == 200:
+        logger.info("Letter sent to user {!r}.".format(user))  # This log line moved here from letter_status function
+        expires = response.json()['letter_expires']
+        expires = datetime.utcfromtimestamp(int(expires))
+        expires = expires.strftime('%Y-%m-%d')
+        result = 'success'
+        msg = _('A letter with a verification code has been sent to your '
+                'official postal address. Please return to this page once you receive it.'
+                ' The code will be valid until ${expires}.',
+                mapping={'expires': expires})
+    return {
+        'result': result,
+        'message': get_localizer(request).translate(msg),
+    }
 
 
 @view_config(route_name='nins-actions', permission='edit')
@@ -282,6 +349,86 @@ class NINsActionsView(BaseActionsView):
             'message': message,
         }
 
+    def verify_lp_action(self, data, post_data):
+        '''
+        verify by letter
+        '''
+        nin, index = data.split()
+        index = int(index)
+        nins = get_not_verified_nins_list(self.request, self.user)
+
+        if len(nins) > index:
+            new_nin = nins[index]
+            if new_nin != nin:
+                return self.sync_user()
+        else:
+            return self.sync_user()
+
+        return letter_status(self.request, self.user, nin)
+
+    def send_letter_action(self, data, post_data):
+        nin, index = data.split()
+        return send_letter(self.request, self.user, nin)
+
+    def finish_letter_action(self, data, post_data):
+        nin, index = data.split()
+        index = int(index)
+
+        settings = self.request.registry.settings
+        letter_url = settings.get('letter_service_url')
+        verify_letter_url = urlparse.urljoin(letter_url, 'verify-code')
+
+        code = post_data['verification_code']
+
+        data = {'eppn': self.user.get_eppn(),
+                'verification_code': code}
+        response = requests.post(verify_letter_url, data=data)
+        result = 'error'
+        msg = _('There was a problem with the letter service. '
+                'Please try again later.')
+        if response.status_code == 200:
+            rdata = response.json().get('data', {})
+            if rdata.get('verified', False) and nin == rdata.get('number', None):
+                # Save data from successful verification call for later addition to user proofing collection
+                rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
+                rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
+                letter_proofings = self.user.get_letter_proofing_data()
+                letter_proofings.append(rdata)
+                self.user.set_letter_proofing_data(letter_proofings)
+                # Look up users official address at the time of verification per Kantara requirements
+                user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
+                proofing_data = LetterProofing(self.user, rdata['number'], rdata['official_address'],
+                                               rdata['transaction_id'], user_postal_address)
+                # Log verification event and fail if that goes wrong
+                if self.request.idproofinglog.log_verification(proofing_data):
+                    # TODO: How do we know we which verification object we will get back?
+                    code_data = get_verification_code(self.request,
+                                                      'norEduPersonNIN', obj_id=nin, user=self.user)
+                    try:
+                        # This is a hack to reuse the existing proofing functionality, the users code is
+                        # verified by the micro service
+                        verify_code(self.request, 'norEduPersonNIN', code_data['code'])
+                        logger.info("Verified NIN by physical letter saved "
+                                    "for user {!r}.".format(self.user))
+                    except UserOutOfSync:
+                        log.error("Verified NIN by physical letter NOT saved "
+                                  "for user {!r}. User out of sync.".format(self.user))
+                        return self.sync_user()
+                    else:
+                        result = 'success'
+                        msg = _('You have successfully verified your identity')
+                else:
+                    log.error('Logging of letter proofing data for user {!r} failed.'.format(self.user))
+                    msg = _('Sorry, we are experiencing temporary technical '
+                            'problems, please try again later.')
+            else:
+                msg = _('Your verification code seems to be wrong, '
+                        'please try again.')
+        return {
+            'result': result,
+            'message': get_localizer(self.request).translate(msg),
+        }
+
 
 @view_config(route_name='nins', permission='edit',
              renderer='templates/nins-form.jinja2')
@@ -316,6 +463,9 @@ class NinsView(BaseFormView):
                                            css_class='btn btn-primary disabled'),)
         self.buttons += (deform.Button(name='add_by_mobile',
                                        title=_('Phone subscription'),
+                                       css_class='btn btn-primary'),)
+        self.buttons += (deform.Button(name='add_by_letter',
+                                       title=_('Physical letter'),
                                        css_class='btn btn-primary'),)
 
     def appstruct(self):
@@ -441,6 +591,23 @@ class NinsView(BaseFormView):
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
         self.add_success_other(ninform)
+
+    def add_by_letter_success(self, ninform):
+        """
+        This method is bound to the "add_by_letter"-button by it's name
+        """
+        form = self.schema.serialize(ninform)
+        nin = normalize_nin(form['norEduPersonNIN'])
+        result = letter_status(self.request, self.user, nin)
+        if result['result'] == 'success':
+            result2 = send_letter(self.request, self.user, nin)
+            if result2['result'] == 'success':
+                new_verification_code(self.request, 'norEduPersonNIN',
+                                      nin, self.user)
+            msg = result2['message']
+        else:
+            msg = result['message']
+        self.request.session.flash(msg, queue='forms')
 
 
 @view_config(route_name='wizard-nins', permission='edit', renderer='json')

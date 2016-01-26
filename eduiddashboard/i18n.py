@@ -1,4 +1,5 @@
 from pyramid.i18n import TranslationStringFactory
+from eduiddashboard.session import get_session_user
 
 translation_domain = 'eduid-dashboard'
 TranslationString = TranslationStringFactory(translation_domain)
@@ -16,7 +17,7 @@ def locale_negotiator(request):
     if cookie_lang and cookie_lang in available_languages:
         return cookie_lang
 
-    user = request.session.get('user')
+    user = get_session_user(request, legacy_user = True, raise_on_not_logged_in = False)
     if user:
         preferredLanguage = user.get_preferred_language()
         if preferredLanguage:

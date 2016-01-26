@@ -1,4 +1,4 @@
-include *.txt *.ini *.cfg *.rst
+include *.txt *.ini *.cfg *.rst *.md
 recursive-include eduiddashboard *.jinja2 *.xml *.txt *.pt
 recursive-include eduiddashboard *.ico *.png *.css *.gif *.jpg *.html
 recursive-include eduiddashboard *.pot *.po *.mo *.svg

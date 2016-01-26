@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-__author__ = 'lundberg'
 
-
-from eduiddashboard.idproofinglog import IDProofingLog, TeleAdressProofing, TeleAdressProofingRelation
+from eduiddashboard.idproofinglog import IDProofingLog, IDProofingData, TeleAdressProofing, TeleAdressProofingRelation,\
+    LetterProofing
 from eduiddashboard.testing import LoggedInRequestTests
 from copy import deepcopy
+
+__author__ = 'lundberg'
 
 
 class TestIDProofingLog(LoggedInRequestTests):
@@ -12,6 +13,19 @@ class TestIDProofingLog(LoggedInRequestTests):
     def setUp(self):
         super(TestIDProofingLog, self).setUp()
         self.collection = self.conn['eduid_dashboard']['id_proofing_log']
+
+    def test_id_proofing_data(self):
+        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+
+        proofing_data = IDProofingData(user)
+
+        idlog = IDProofingLog(self.settings)
+        idlog.log_verification(proofing_data)
+        result = self.collection.find({})
+        self.assertEquals(result.count(), 1)
+        hit = result.next()
+        self.assertEquals(hit['eppn'], user.get_eppn())
+        self.assertIsNotNone(hit['created'])
 
     def test_teleadress_proofing(self):
         user = self.userdb.get_user_by_mail('johnsmith@example.org')
@@ -25,7 +39,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         self.assertDictContainsSubset(data, proofing_data.to_dict())
 
         idlog = IDProofingLog(self.settings)
-        idlog.log_verified_by_mobile(proofing_data)
+        idlog.log_verification(proofing_data)
         result = self.collection.find({})
         self.assertEquals(result.count(), 1)
         hit = result.next()
@@ -48,7 +62,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         self.assertDictContainsSubset(data, proofing_data.to_dict())
 
         idlog = IDProofingLog(self.settings)
-        idlog.log_verified_by_mobile(proofing_data)
+        idlog.log_verification(proofing_data)
         result = self.collection.find()
         self.assertEquals(result.count(), 1)
         hit = result.next()
@@ -82,3 +96,24 @@ class TestIDProofingLog(LoggedInRequestTests):
         # Make sure the required keys are instantiated as the original keys
         required_keys2 = TeleAdressProofing(user, **data_match)._required_keys
         self.assertEqual(required_keys1, required_keys2)
+
+    def test_letter_proofing_relation(self):
+        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+        data = {
+            'nin': 'some_nin',
+            'letter_sent_to': {'name': {'some': 'data'}, 'address': {'some': 'data'}},
+            'transaction_id': 'some transaction id',
+            'user_postal_address': {'response_data': {'some': 'data'}},
+        }
+        proofing_data = LetterProofing(user, **data)
+        self.assertDictContainsSubset(data, proofing_data.to_dict())
+
+        idlog = IDProofingLog(self.settings)
+        idlog.log_verification(proofing_data)
+        result = self.collection.find()
+        self.assertEquals(result.count(), 1)
+        hit = result.next()
+        self.assertEquals(hit['eppn'], user.get_eppn())
+        self.assertIsNotNone(hit['letter_sent_to'])
+        self.assertIsNotNone(hit['transaction_id'])
+        self.assertEquals(hit['proofing_method'], 'eduid-idproofing-letter')

@@ -107,9 +107,14 @@ class MsgRelay(object):
 
         logger.debug('SENT mobile validator message code: {0} phone number: {1} with reference {2}'.format(
                      code, targetphone, reference))
-        self._send_message.delay('sms', reference, content, targetphone,
-                                 TEMPLATES_RELATION.get('phone-validator'),
-                                 lang)
+        res = self._send_message.delay('sms', reference, content, targetphone,
+                                       TEMPLATES_RELATION.get('phone-validator'),
+                                       lang)
+        logger.debug('Extra debug: Send message result: {!r}, parameters:\n{!r}'.format(
+            res, ['sms', reference, content, targetphone,
+                  TEMPLATES_RELATION.get('phone-validator'),
+                  lang]
+        ))
 
     def nin_reachable(self, nin):
 

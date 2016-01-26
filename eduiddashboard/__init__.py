@@ -16,6 +16,7 @@ from eduid_am.celery import celery
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
 from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
+
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -25,10 +26,12 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         NinsFactory, ForbiddenFactory,
                                         HelpFactory, AdminFactory, is_logged)
 
+from eduiddashboard.session import SessionFactory
 from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
 from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
 from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
 from eduiddashboard.stats import get_stats_instance
+import eduiddashboard.loa
 
 
 AVAILABLE_WORK_MODES = ('personal', 'helpdesk', 'admin')
@@ -45,13 +48,6 @@ REQUIRED_LOA_PER_WORKMODE = {
     'helpdesk': 'http://www.swamid.se/policy/assurance/al2',
     'admin': 'http://www.swamid.se/policy/assurance/al3',
 }
-
-AVAILABLE_LOA_LEVEL = [
-    'http://www.swamid.se/policy/assurance/al1',
-    'http://www.swamid.se/policy/assurance/al2',
-    'http://www.swamid.se/policy/assurance/al3',
-]
-
 
 AVAILABLE_PERMISSIONS = (
     'urn:mace:eduid.se:role:ra',
@@ -194,15 +190,8 @@ def disabled_admin_urls(config):
 def includeme(config):
     # DB setup
     settings = config.registry.settings
-    mongo_replicaset = settings.get('mongo_replicaset', None)
-    if mongo_replicaset is not None:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'],
-                          replicaSet=mongo_replicaset)
-        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo',
-                              replicaSet=mongo_replicaset)
-    else:
-        mongodb = MongoDB(db_uri=settings['mongo_uri'])
-        authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
+    mongodb = MongoDB(db_uri=settings['mongo_uri'])
+    authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
 
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
@@ -267,8 +256,9 @@ def includeme(config):
                          '/verificate/{model}/{code}/',
                          factory=ForbiddenFactory)
     config.add_route('help', '/help/', factory=HelpFactory)
-    config.add_route('session-reload', '/session-reload/',
-                     factory=PersonFactory)
+    # Seems unused -- ft@ 2016-01-14
+    #config.add_route('session-reload', '/session-reload/',
+    #                 factory=PersonFactory)
 
     config.add_route('set_language', '/set_language/')
     config.add_route('error500test', '/error500test/')
@@ -340,6 +330,7 @@ def main(global_config, **settings):
         'signup_base_url',
         'vccs_url',
         'mobile_service_name',
+        'letter_service_url',
         )
     if settings['enable_mm_verification']:
         required_settings += (
@@ -352,11 +343,6 @@ def main(global_config, **settings):
         if settings[item] is None:
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
-
-    mongo_replicaset = read_setting_from_env(settings, 'mongo_replicaset',
-                                             None)
-    if mongo_replicaset is not None:
-        settings['mongo_replicaset'] = mongo_replicaset
 
     # configure Celery broker
     broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
@@ -400,38 +386,61 @@ def main(global_config, **settings):
     settings['required_loa'] = read_mapping(
         settings,
         'required_loa',
-        available_keys=AVAILABLE_LOA_LEVEL,
+        available_keys=eduiddashboard.loa.AVAILABLE_LOA_LEVEL,
         default=REQUIRED_LOA_PER_WORKMODE,
     )
 
     settings['available_loa'] = read_list(
         settings,
         'available_loa',
-        default=AVAILABLE_LOA_LEVEL)
+        default=eduiddashboard.loa.AVAILABLE_LOA_LEVEL)
 
     settings['enable_postal_address_retrieve'] = read_setting_from_env_bool(
         settings, 'enable_postal_address_retrieve', True
     )
 
     try:
-        settings['session.expire'] = int(settings.get('session.expire', 3600))
+        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 3600))
     except ValueError:
-        raise ConfigurationError('session.expire should be a valid integer')
+        raise ConfigurationError('session.cookie_max_age should be a valid integer')
 
     try:
         settings['session.timeout'] = int(settings.get(
             'session.timeout',
-            settings['session.expire'])
+            settings['session.cookie_max_age'])
         )
     except ValueError:
-        raise ConfigurationError('session.expire should be a valid integer')
+        raise ConfigurationError('session.timeout should be a valid integer')
+
+    settings['session.cookie_domain'] = read_setting_from_env(settings, 'session.cookie_domain',
+                                                    'dashboard.docker')
+
+    settings['session.cookie_path'] = read_setting_from_env(settings, 'session.cookie_path',
+                                                    '/')
+
+    settings['session.cookie_httponly'] = read_setting_from_env_bool(settings, 'session.cookie_httponly',
+                                                    'true')
+
+    settings['session.cookie_secure'] = read_setting_from_env_bool(settings, 'session.cookie_secure',
+                                                    'false')
 
     settings['session.key'] = read_setting_from_env(settings, 'session.key',
-                                                    'session')
+                                                    'sessid')
+
+    settings['session.secret'] = read_setting_from_env(settings,
+                                                     'session.secret')
+
+    settings['redis_host'] = read_setting_from_env(settings, 'redis_host',
+                                                    'redis.docker')
+
+    settings['redis_port'] = int(read_setting_from_env(settings, 'redis_port',
+                                                    6379))
+
+    settings['redis_db'] = int(read_setting_from_env(settings, 'redis_db', 0))
 
     settings['groups_callback'] = read_setting_from_env(settings,
-                                                        'groups_callback',
-                                                        groups_callback)
+                                                    'groups_callback',
+                                                    groups_callback)
 
     settings['available_languages'] = available_languages
 
@@ -481,7 +490,9 @@ def main(global_config, **settings):
                                         'eduiddashboard:locale')
     config.add_translation_dirs(locale_path)
 
-    config.include('pyramid_beaker')
+    factory = SessionFactory(settings)
+    config.set_session_factory(factory)
+
     config.include('pyramid_jinja2')
     config.include('deform_bootstrap')
     config.include('pyramid_deform')

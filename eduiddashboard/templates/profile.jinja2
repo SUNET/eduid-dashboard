@@ -136,6 +136,49 @@
     </div>
   </div>
 
+  <div id="sendProofingLetter" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ _('Send code to your official postal address') }}</h4>
+      </div>
+      <div class="modal-body">
+        <p id="sendProofingLetterText"></p>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Cancel') }}</button>
+        <button id="doSendProofingLetter" type="button" class="btn btn-primary">{{ _('Send') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+  <div id="proofingLetterSent" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ _('Enter code received by letter') }}</h4>
+      </div>
+      <div class="modal-body">
+        <p id="proofingLetterSentText"><p>
+        <p>{{ _('If you have received the letter, please enter the enclosed code below and click "Ok"') }}</p>
+        <p>
+        <div class="form-group has-feedback control">
+          <label class="control-label hide" for="proofingLetterCode" id="proofingLetterCodeLabel">{{ _('required') }}</label>
+          <input class="xlarge form-control" id="proofingLetterCode" name="letterCode" type="text" />
+        </div>
+        </p>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Cancel') }}</button>
+        <button id="doSendProofingCode" type="button" class="btn btn-primary">{{ _('Ok') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
   {% if enable_mm_verification %}
     {% if open_wizard %}
     <div class="openwizard hide"></div>

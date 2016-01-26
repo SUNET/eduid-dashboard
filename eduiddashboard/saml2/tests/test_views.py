@@ -6,11 +6,13 @@ from saml2.mdstore import UnknownPrincipal
 from pyramid.interfaces import ISessionFactory
 from pyramid.testing import DummyRequest
 
-from eduiddashboard.saml2.cache import OutstandingQueriesCache
+from eduid_common.authn.cache import OutstandingQueriesCache
 from eduiddashboard.saml2.testing import Saml2RequestTests
-from eduiddashboard.saml2.tests.responses import (auth_response,
-                                                  logout_response,
-                                                  logout_request)
+from eduid_common.authn.tests.responses import (auth_response,
+                                                logout_response,
+                                                logout_request)
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Saml2ViewsTests(Saml2RequestTests):
@@ -50,17 +52,15 @@ class Saml2ViewsTests(Saml2RequestTests):
         request = self.dummy_request()
         session = session_factory(request)
         session.persist()
-        # ensure that session id is a NCName valid
-        session._sess.id = "a" + session._sess.id
 
         oq_cache = OutstandingQueriesCache(session)
-        oq_cache.set(session._sess.id, came_from)
+        oq_cache.set(session._session.token, came_from)
 
         session.persist()
 
-        self.testapp.set_cookie('beaker.session.id', session._sess.id)
+        self.testapp.set_cookie(self.settings['session.key'], session._session.token)
 
-        return session._sess.id
+        return session._session.token
 
     def test_assertion_consumer_service(self):
         came_from = '/afterlogin/'

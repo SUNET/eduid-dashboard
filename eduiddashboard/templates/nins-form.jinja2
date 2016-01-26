@@ -34,7 +34,17 @@
                         {% if has_mobile %}
                             <input type='button' class='btn btn-link verify_mb' value="{{_('Confirm using phone subscription')}}"
                                    data-index='{{ nin }} {{ loop.index0 }}' name='verify_mb'>
+                        {% else %}
+                            {% trans %}Add a mobile phone number to continue{% endtrans %}
                         {% endif %}
+                    </td>
+                    <td class='non-identifier'>
+                        <input type='button'
+                               id="letter-proofing"
+                               class='btn btn-link verify_lp'
+                               value="{{_('Confirm using letter')}}"
+                               data-index='{{ nin }} {{ loop.index0 }}'
+                               name='verify_lp'>
                     </td>
                     <!-- Removed functionality temporary
                         <td>
@@ -55,13 +65,14 @@
 {% endblock %}
 
 {% block form_generic_form %}
-  {% if not active_nin %}
+  {% if not active_nin and not not_verified_nins %}
      {% trans %}<p>Add your Swedish national identity number and initiate the confirmation process using
                 one of the buttons below.</p>{% endtrans %}
-    <div class='form-content'>
+  {% endif %}
+    <!-- Hiding a form does not make in unusable. we should really have different forms for adding and validating NINs -->
+    <div class='form-content {% if active_nin or not_verified_nins %} hidden{% endif %}'>
       {{ form|safe }}
     </div>
-  {% endif %}
 {% endblock %}
 
 {% block askdialog_extra_info %}

@@ -11,13 +11,14 @@ from pyramid.settings import asbool
 
 from deform_bootstrap import Form
 
+from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
-                                  get_max_available_loa,
                                   get_available_tabs,
                                   sanitize_get,
                                   sanitize_post_key)
+from eduiddashboard.loa import get_max_available_loa
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.nins import nins_open_wizard
@@ -28,6 +29,7 @@ from eduid_common.authn.vccs import revoke_all_credentials
 from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
+from eduiddashboard.session import store_session_user, get_logged_in_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -40,7 +42,7 @@ def profile_editor(context, request):
         Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
 
-    context.user.retrieve_modified_ts(request.db.profiles)
+    #context.user.retrieve_modified_ts(request.db.profiles)
 
     view_context = {}
 
@@ -146,13 +148,14 @@ def home(context, request):
     }
 
 
-@view_config(route_name='session-reload',
-             request_method='GET', permission='edit')
-def session_reload(context, request):
-    eppn = request.session.get('user').get('eduPersonPrincipalName')
-    user = request.userdb.get_user_by_eppn(eppn)
-    request.session['user'] = user
-    raise HTTPFound(request.route_path('home'))
+# Seems unused -- ft@ 2016-01-14
+#@view_config(route_name='session-reload',
+#             request_method='GET', permission='edit')
+#def session_reload(context, request):
+#    eppn = request.session.get('user').get('eduPersonPrincipalName')
+#    user = request.userdb.get_user_by_eppn(eppn)
+#    request.session['user'] = user
+#    raise HTTPFound(request.route_path('home'))
 
 
 @view_config(route_name='help')
@@ -193,9 +196,10 @@ def token_login(context, request):
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
         user = request.userdb.get_user_by_eppn(eppn)
-        request.session['mail'] = user.get('email'),
-        request.session['user'] = user
-        request.session['loa'] = 1
+        # these seem to be unused -- ft@ 2016-01-14
+        #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
+        #request.session['loa'] = 1
+        store_session_user(request, user)
         remember_headers = remember(request, user.get('email'))
         request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
@@ -261,16 +265,18 @@ def account_terminated(context, request):
 
 @acs_action('account-termination-action')
 def account_termination_action(request, session_info, user):
-    '''
+    """
     The account termination action,
     removes all credentials for the terminated account
     from the VCCS service,
     flags the account as terminated,
     sends an email to the address in the terminated account,
     and logs out the session.
-    '''
+
+    :type user: eduid_userdb.dashboard.DashboardLegacyUser
+    """
     settings = request.registry.settings
-    logged_user = request.session['user']
+    logged_user = get_logged_in_user(request, legacy_user = True)
 
     if logged_user.get_id() != user.get_id():
         raise HTTPUnauthorized("Wrong user")
@@ -315,7 +321,8 @@ def terminate_account(context, request):
     selected_idp = request.session.get('selected_idp')
     relay_state = context.route_url('account-terminated')
     loa = context.get_loa()
-    info = get_authn_request(request, relay_state, selected_idp,
+    info = get_authn_request(request.registry.settings, request.session,
+                             relay_state, selected_idp,
                              required_loa=loa, force_authn=True)
     schedule_action(request.session, 'account-termination-action')
 

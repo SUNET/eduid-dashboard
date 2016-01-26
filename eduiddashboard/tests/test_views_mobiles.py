@@ -133,9 +133,8 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_verify_not_existing_mobile(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         old_phones = old_user.phone_numbers.to_list_of_dicts()
         amount_of_phone_numbers = len(old_phones)
 
@@ -180,9 +179,8 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_setprimary_nonexistent_mobile(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
 
         old_phones = old_user.phone_numbers.to_list_of_dicts()
         amount_of_phone_numbers = len(old_phones)
@@ -202,10 +200,9 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_set_primary_not_verified_mobile(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
         index = 1
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         old_primary_phone = old_user.phone_numbers.primary.number
         phone_to_test = old_user.phone_numbers.find('+34 6096096096')
 
@@ -232,10 +229,9 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_setprimary_verified_mobile(self):
         self.set_logged()
-        self.userdb.UserClass = DashboardUser
         index = 2
 
-        old_user = self.userdb.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
         phone_to_test = old_user.phone_numbers.find('+34607507507')
 
         # Make sure that the phone number that we are
