@@ -56,9 +56,9 @@ SETTINGS = {
     'session.cookie_domain': 'localhost',
     'session.cookie_path': '/',
     'session.cookie_max_age': '3600',
-    'session.cookie_httponly': True,
-    'session.cookie_secure': False,
-    'testing': True,
+    'session.cookie_httponly': 'true',
+    'session.cookie_secure': 'false',
+    'testing': 'true',
     'jinja2.directories': [
         'eduiddashboard:saml2/templates',
         'eduiddashboard:/templates'
