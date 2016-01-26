@@ -110,8 +110,8 @@ class Saml2RequestTests(MongoTestCase):
             'session.cookie_domain': 'localhost',
             'session.cookie_path': '/',
             'session.cookie_max_age': '3600',
-            'session.cookie_httponly': True,
-            'session.cookie_secure': False,
+            'session.cookie_httponly': 'true',
+            'session.cookie_secure': 'false',
         }
         self.settings.update(settings)
 
