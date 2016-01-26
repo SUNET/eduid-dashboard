@@ -71,13 +71,7 @@ class BaseFactory(object):
     #user = None
 
     def __init__(self, request):
-        try:
-            user = get_logged_in_user(request, legacy_user = True, raise_on_not_logged_in = False)
-        except OSError:
-            # If any of the beaker session files is removed, then
-            # a OSError is raised, so we want to relogin the user
-            user = None
-
+        user = get_logged_in_user(request, legacy_user = True, raise_on_not_logged_in = False)
         if user is None:
             headers = forget(request)
             url = request.route_path('saml2-login')

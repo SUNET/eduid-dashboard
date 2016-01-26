@@ -10,10 +10,12 @@ from pyramid.security import (remember, Allow, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 from pyramid.testing import DummyRequest, DummyResource
 from pyramid import testing
+import redis
 
 from eduid_userdb.db import MongoDB
 from eduid_userdb.dashboard import UserDBWrapper
-from eduiddashboard.testing import MongoTestCase
+from eduiddashboard.session import SessionFactory
+from eduiddashboard.testing import MongoTestCase, RedisTemporaryInstance
 from eduiddashboard.saml2 import includeme as saml2_includeme
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -56,7 +58,9 @@ def saml2_main(global_config, **settings):
     config = Configurator(settings=settings,
                           root_factory=RootFactory)
 
-    config.include('pyramid_beaker')
+    factory = SessionFactory(settings)
+    config.set_session_factory(factory)
+
     config.include('pyramid_jinja2')
     _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
@@ -101,6 +105,13 @@ class Saml2RequestTests(MongoTestCase):
                 route_url = pyramid_jinja2.filters:route_url_filter
                 static_url = pyramid_jinja2.filters:static_url_filter
             """,
+            'session.key': 'sessid',
+            'session.secret': '123341234',
+            'session.cookie_domain': 'localhost',
+            'session.cookie_path': '/',
+            'session.cookie_max_age': '3600',
+            'session.cookie_httponly': True,
+            'session.cookie_secure': False,
         }
         self.settings.update(settings)
 
@@ -108,6 +119,13 @@ class Saml2RequestTests(MongoTestCase):
             self.settings['groups_callback'] = dummy_groups_callback
 
         self.settings['mongo_uri'] = self.mongodb_uri('')
+
+        self.redis_instance = RedisTemporaryInstance.get_instance()
+        self.settings['redis_host'] = 'localhost'
+        self.settings['redis_port'] = self.redis_instance._port
+        self.settings['redis_db'] = '0'
+        self.redis_conn = redis.Redis(host='localhost',
+                port=self.redis_instance._port, db=0)
 
         app = saml2_main({}, **self.settings)
         self.testapp = TestApp(app)
@@ -120,6 +138,8 @@ class Saml2RequestTests(MongoTestCase):
 
     def tearDown(self):
         super(Saml2RequestTests, self).tearDown()
+        for k in self.redis_conn.keys():
+            self.redis_conn.delete(k)
         self.testapp.reset()
 
     def set_user_cookie(self, user_id):
@@ -145,7 +165,7 @@ class Saml2RequestTests(MongoTestCase):
         request = self.dummy_request()
         session = session_factory(request)
         session.persist()
-        self.testapp.set_cookie('beaker.session.id', session._sess.id)
+        self.testapp.set_cookie(self.settings['session.key'], session._session.token)
         self.pol = self.config.testing_securitypolicy(
             'user', ('editors', ),
             permissive=False, remember_result=True)

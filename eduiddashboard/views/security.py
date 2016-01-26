@@ -16,6 +16,7 @@ from pyramid.renderers import render_to_response
 
 from eduiddashboard.utils import sync_user_changes_to_userdb
 
+from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    NINResetPassword, MobileResetPassword,
@@ -24,7 +25,6 @@ from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.emails import send_reset_password_mail
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
-from eduiddashboard.saml2.views import get_authn_request
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.session import get_session_user, get_logged_in_user
 from eduiddashboard.utils import (generate_password,
@@ -209,7 +209,8 @@ def start_password_change(context, request):
     selected_idp = request.session.get('selected_idp')
     relay_state = context.route_url('profile-editor')
     loa = context.get_loa()
-    info = get_authn_request(request, relay_state, selected_idp,
+    info = get_authn_request(request.registry.settings, request.session,
+                             relay_state, selected_idp,
                              required_loa=loa, force_authn=True)
     schedule_action(request.session, 'change-password-action')
 
