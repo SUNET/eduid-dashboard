@@ -378,7 +378,10 @@ class NINsActionsView(BaseActionsView):
 
         data = {'eppn': self.user.get_eppn(),
                 'verification_code': code}
+        logger.info("Posting letter verification code for user {!r}.".format(self.user))
         response = requests.post(verify_letter_url, data=data)
+        logger.info("Received response from idproofing-letter after posting verification code "
+                    "for user {!r}.".format(self.user))
         result = 'error'
         msg = _('There was a problem with the letter service. '
                 'Please try again later.')
@@ -392,11 +395,15 @@ class NINsActionsView(BaseActionsView):
                 letter_proofings.append(rdata)
                 self.user.set_letter_proofing_data(letter_proofings)
                 # Look up users official address at the time of verification per Kantara requirements
+                logger.info("Looking up address via Navet for user {!r}.".format(self.user))
                 user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
+                logger.info("Finished looking up address via Navet for user {!r}.".format(self.user))
                 proofing_data = LetterProofing(self.user, rdata['number'], rdata['official_address'],
                                                rdata['transaction_id'], user_postal_address)
                 # Log verification event and fail if that goes wrong
+                logger.info("Logging proofing data for user {!r}.".format(self.user))
                 if self.request.idproofinglog.log_verification(proofing_data):
+                    logger.info("Finished logging proofing data for user {!r}.".format(self.user))
                     # TODO: How do we know we which verification object we will get back?
                     code_data = get_verification_code(self.request,
                                                       'norEduPersonNIN', obj_id=nin, user=self.user)
@@ -418,8 +425,11 @@ class NINsActionsView(BaseActionsView):
                     msg = _('Sorry, we are experiencing temporary technical '
                             'problems, please try again later.')
             else:
+                log.error('User {!r} supplied wrong letter verification code or nin did not match.'.format(self.user))
                 msg = _('Your verification code seems to be wrong, '
                         'please try again.')
+        logger.info("Received status code {!s} from idproofing-letter after posting verification code "
+                    "for user {!r}.".format(response.status_code, self.user))
         return {
             'result': result,
             'message': get_localizer(self.request).translate(msg),
