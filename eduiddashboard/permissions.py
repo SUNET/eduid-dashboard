@@ -173,6 +173,42 @@ class BaseFactory(object):
 
         return user
 
+    def get_new_user(self):
+        """
+        Get the current user.
+
+        In 'personal' mode, this is the logged in user. In 'admin' mode, it is the
+        'edit-user' user from the session, or the user indicated by the matchdict
+        'userid'. Matchdict is a part of the URL extracted by Pyramid with routes like
+        '/users/{userid}/'.
+
+        :return: User object
+        :rtype: DashboardLegacyUser
+        """
+        if self.workmode == 'personal':
+            user = get_logged_in_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+            self._logged_in_user = user
+            if not user:
+                user = DashboardUser({})
+        elif self.workmode == 'admin' or self.workmode == 'helpdesk':
+            if not has_edit_user(self.request):
+                user = None
+                userid = self.request.matchdict.get('userid', '')
+                logger.debug('get_user() looking for user matching {!r}'.format(userid))
+                if EMAIL_RE.match(userid):
+                    user = self.request.userdb_new.get_user_by_mail(userid)
+                elif OID_RE.match(userid):
+                    user = self.request.userdb_new.get_user_by_oid(userid)
+                if not user:
+                    raise HTTPNotFound()
+                logger.debug('get_user() storing user {!r}'.format(user))
+                store_session_user(self.request, user, edit_user = True)
+            user = get_session_user(self.request, legacy_user = False)
+        else:
+            raise NotImplementedError("Unknown workmode: {!s}".format(self.workmode))
+
+        return user
+
     def route_url(self, route, **kw):
         if self.workmode == 'personal':
             return self.request.route_url(route, **kw)
@@ -261,7 +297,7 @@ class BaseFactory(object):
 
     def get_preferred_language(self):
         """ Return always a """
-        lang = self.get_user().get_preferred_language()
+        lang = self.get_user().language
         if lang is not None:
             return lang
         available_languages = self.request.registry.settings.get('available_languages', {}).keys()
@@ -328,7 +364,9 @@ class MobilesFactory(BaseFactory):
 
 
 class NinsFactory(BaseFactory):
-    pass
+
+    def get_user(self):
+        return self.get_new_user()
 
 
 class ResetPasswordFactory(RootFactory):

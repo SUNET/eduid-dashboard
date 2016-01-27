@@ -212,12 +212,12 @@ class NINUniqueValidator(object):
 
         request = node.bindings.get('request')
         user = request.context.user
-        user_nins = user.get_nins()
+        user_nins = user.nins
 
         unverified_user_nins = request.db.verifications.find({
             'obj_id': value,
             'model_name': 'norEduPersonNIN',
-            'user_oid': user.get_id(),
+            'user_oid': user.user_id,
             'verified': False
         })
 
@@ -225,18 +225,18 @@ class NINUniqueValidator(object):
         # Alternatively the POST may come from the wizard,
         # in which case it will have a "step" param.
         for post_value in request.POST:
-            if post_value.startswith('add') and (value in user_nins or
+            if post_value.startswith('add') and (user_nins.find(value) or
                                       unverified_user_nins.count() > 0):
                 err = _('National identity number already added')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
-            elif post_value.startswith('add') and len(user_nins) > 0:
+            elif post_value.startswith('add') and user_nins.count > 0:
                 err = _('You already have a confirmed national identity number')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
             elif post_value == 'step' and \
                  request.POST['step'] == '0' and \
-                 len(user_nins) > 0:
+                 user_nins.count > 0:
                 err = _('You already have a confirmed national identity number')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 

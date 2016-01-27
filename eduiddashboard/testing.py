@@ -278,15 +278,14 @@ class LoggedInRequestTests(MongoTestCase):
 
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(email)
-        user_obj = self.userdb.get_user_by_mail(email, raise_on_missing=True)
+        user_obj = self.dashboard_db.get_user_by_mail(email, raise_on_missing=True)
         if not user_obj:
             logging.error("User {!s} not found in database {!r}. Users:".format(email, self.userdb))
-            for this in self.userdb._get_all_userdocs():
-                this_user = OldUser(this)
-                logging.debug("  User: {!s}".format(this_user))
+            for this in self.dashboard_db._get_all_userdocs():
+                logging.debug("  User: {!s}".format(this))
         # user only exists in eduid-userdb, so need to clear modified-ts to be able
         # to save it to eduid-dashboard.profiles
-        user_obj.set_modified_ts(None)
+        user_obj.modified_ts = None
         dummy = DummyRequest()
         dummy.session = {
             'eduPersonAssurance': loa(3),
@@ -294,7 +293,7 @@ class LoggedInRequestTests(MongoTestCase):
         }
         store_session_user(dummy, user_obj)
         # XXX ought to set self.user = user_obj
-        self.logged_in_user = self.userdb_new.get_user_by_id(user_obj.get_id())
+        self.logged_in_user = self.dashboard_db.get_user_by_id(user_obj.user_id)
         dummy.session.update(extra_session_data)
         request = self.add_to_session(dummy.session)
         return request

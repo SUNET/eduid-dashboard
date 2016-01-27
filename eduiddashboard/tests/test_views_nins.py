@@ -4,6 +4,7 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 
+from eduid_userdb.nin import Nin
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
@@ -32,9 +33,11 @@ class NinsFormTests(LoggedInRequestTests):
         super(NinsFormTests, self).setUp()
         # these tests want the self.user user to not have a NIN
         self.no_nin_user_email = 'johnsmith@example.org'
-        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
-        user.set_nins([])
-        self.userdb.save(user)
+        user = self.dashboard_db.get_user_by_mail(self.no_nin_user_email)
+        if user.nins is not None:
+            for nin in user.nins.to_list():
+                user.nins.remove(nin.key)
+            self.userdb.save(user)
 
     def test_logged_get(self):
         self.set_logged(email=self.no_nin_user_email)
@@ -129,19 +132,19 @@ class NinsFormTests(LoggedInRequestTests):
     def test_verify_existant_nin(self):
         # Add a non-verified NIN to the user with no NINs
         email = self.no_nin_user_email
-        user = self.userdb.get_user_by_mail(email)
-        user.set_nins([{'number': '123456789050',
+        user = self.dashboard_db.get_user_by_mail(email)
+        user.nins.add(Nin(data={'number': '123456789050',
                         'verified': False,
                         'primary': True,
-                       }])
-        self.userdb.save(user)
+                       }))
+        self.dashboard_db.save(user)
         # Set up a pending verfication
         verification_data = {
             '_id': ObjectId(),
             'code': '123124',
             'model_name': 'norEduPersonNIN',
             'obj_id': '123456789050',
-            'user_oid': user.get_id(),
+            'user_oid': user.user_id,
             'timestamp': datetime.utcnow(),
             'verified': False,
         }
@@ -160,9 +163,9 @@ class NinsFormTests(LoggedInRequestTests):
         ''' '''
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
+        user = self.dashboard_db.get_user_by_mail(email)
 
-        self.assertEqual(len(user.get_nins()), 0)
+        self.assertEqual(user.nins.count, 0)
 
         # First we add a nin...
         nin = '200010100001'

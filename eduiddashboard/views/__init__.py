@@ -33,7 +33,7 @@ def get_dummy_status(request, user):
 
 
 def sync_user(request, context, old_user):
-    user = request.userdb.get_user_by_id(old_user.get_id())
+    user = request.userdb.get_user_by_id(old_user.user_id)
 
     if isinstance(user, DashboardUser):
         retrieve_modified_ts(user, request.dashboard_userdb)
@@ -327,9 +327,13 @@ class BaseWizard(object):
         self.request = request
         self.context = context
         self.user = context.user
+        try:
+            userid = self.user.get_id()
+        except AttributeError:
+            userid = self.user.user_id
 
         self.object_filter = {
-            'userid': self.user.get_id(),
+            'userid': userid,
             'model': self.model
         }
         self.collection = request.db[self.collection_name]
@@ -383,7 +387,11 @@ class BaseWizard(object):
         }
 
     def is_open_wizard(self):
-        return (not self.context.user.get(self.model) and
+        attr = self.model
+        if attr == 'norEduPersonNIN':
+            attr = 'nins'
+        objs = getattr(self.context.user, attr).to_list()
+        return (not objs and
                 not (self.obj['dismissed'] or self.obj['finished']))
 
     def __call__(self):

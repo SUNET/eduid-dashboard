@@ -4,6 +4,7 @@ from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
 
+from eduid_userdb.nin import Nin
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
@@ -28,7 +29,7 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
     if code is not None:
         filters['code'] = code
     if user is not None:
-        filters['user_oid'] = user.get_id()
+        filters['user_oid'] = user.user_id
     log.debug("Verification code lookup filters : {!r}".format(filters))
     result = request.db.verifications.find_one(filters)
     if result:
@@ -46,7 +47,7 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
     obj = {
         "model_name": model_name,
         "obj_id": obj_id,
-        "user_oid": user.get_id(),
+        "user_oid": user.user_id,
         "code": code,
         "verified": False,
         "timestamp": datetime.now(utc),
@@ -70,33 +71,25 @@ def get_not_verified_objects(request, model_name, user):
 
 
 def verify_nin(request, user, new_nin, reference=None):
-    user = OldUser(user)
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
-    old_user_docs = request.userdb.get_users_by_filter({
-        'norEduPersonNIN': new_nin
-    }, raise_on_missing=False)
+    old_user = request.dashboard_userdb._get_user_by_attr(
+        'norEduPersonNIN', new_nin, raise_on_missing=False)
     steal_count = 0
-    for old_user_doc in old_user_docs:
-        old_user = OldUser(old_user_doc)
-        if old_user and old_user.get_id() != user.get_id():
+    if old_user is not None:
+        if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
-            log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.get_nins()))
-            nins = [nin for nin in old_user.get_nins() if nin != new_nin]
-            old_user.set_nins(nins)
-            log.debug('Old user NINs AFTER: {!r}.'.format(old_user.get_nins()))
-            log.debug('Old user addresses BEFORE: {!r}.'.format(old_user.get_addresses()))
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
-            log.debug('Old user addresses AFTER: {!r}.'.format(old_user.get_addresses()))
-            old_user.retrieve_modified_ts(request.db.profiles)
-            old_user.save(request)
+            log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
+            old_user.nins.remove(new_nin)
+            log.debug('Old user NINs AFTER: {!r}.'.format(old_user.nins.to_list()))
+            request.dashboard_userdb.save(old_user)
             log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified nin to the requesting user
-    user.add_verified_nin(new_nin)
-    user.retrieve_address(request, new_nin)
+    new_nin_obj = Nin(number=new_nin, application='dashboard',
+            verified=True, primary=True)
+    user.nins.add(new_nin_obj)
     # Connect the verification to the transaction audit log
     if reference is not None:
         request.msgrelay.postal_address_to_transaction_audit_log(reference)
@@ -197,10 +190,10 @@ def verify_code(request, model_name, code):
     if not obj_id:
         return None
 
-    user = get_session_user(request, legacy_user=True)
+    user = get_session_user(request, legacy_user=False)
 
     assert_error_msg = 'Requesting users ID does not match verifications user ID'
-    assert user.get_id() == this_verification['user_oid'], assert_error_msg
+    assert user.user_id == this_verification['user_oid'], assert_error_msg
 
     if model_name == 'norEduPersonNIN':
         user, msg = verify_nin(request, user, obj_id, reference)
@@ -212,7 +205,7 @@ def verify_code(request, model_name, code):
         raise NotImplementedError('Unknown validation model_name')
 
     try:
-        user.save(request)
+        request.dashboard_userdb.save(user)
         log.info("Verified {!s} saved for user {!r}.".format(model_name, user))
         verified = {
             'verified': True,

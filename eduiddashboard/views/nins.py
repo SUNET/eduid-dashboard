@@ -108,30 +108,26 @@ def get_not_verified_nins_list(request, user):
     :return: List of NINs pending confirmation
     :rtype: [string]
     """
-    users_nins = user.get_nins()
+    users_nins = user.nins.to_list()
     res = []
     user_already_verified = []
     user_not_verified = []
     verifications = request.db.verifications.find({
         'model_name': 'norEduPersonNIN',
-        'user_oid': user.get_id(),
+        'user_oid': user.user_id,
     }, sort=[('timestamp', 1)])
     if users_nins:
-        if isinstance(users_nins[0], dict):
-            for this in users_nins:
-                if this['verified']:
-                    user_already_verified.append(this['number'])
-                else:
-                    user_not_verified.append(this['number'])
-        else:
-            # old style, list of strings (understood to be verified)
-            user_already_verified = users_nins
+        for this in users_nins:
+            if this['verified']:
+                user_already_verified.append(this['number'])
+            else:
+                user_not_verified.append(this['number'])
     for this in verifications:
-        if this['verified'] and this['obj_id'] in user_not_verified:    # XXX: This will never happen with DashboardLegacyUser
+        if this['verified'] and this['obj_id'] in user_not_verified:
             # Found to be verified after all, filter out from user_not_verified
             user_not_verified = [x for x in user_not_verified if not x == this['obj_id']]
         else:
-            if this['obj_id'] not in user_already_verified:             # XXX: This will always happen with DashboardLegacyUser
+            if this['obj_id'] not in user_already_verified:
                 res.append(this['obj_id'])
     res += user_not_verified
     # As we no longer remove verification documents make the list items unique
@@ -139,7 +135,7 @@ def get_not_verified_nins_list(request, user):
 
 
 def get_active_nin(self):
-    active_nins = self.user.get_nins()
+    active_nins = self.user.nins.to_list()
     if active_nins:
         return active_nins[-1]
     else:
@@ -278,12 +274,12 @@ class NINsActionsView(BaseActionsView):
         result = validation['success'] and 'success' or 'error'
         if result == 'success':
             verify_nin(self.request, self.user, nin)
+            model_name = 'norEduPersonNIN'
             try:
-                self.user.save(self.request)
-                model_name = 'norEduPersonNIN'
+                self.request.dashboard_userdb.save(self.user)
                 logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
                 # Save the state in the verifications collection
-                save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
+                save_as_verified(self.request, 'norEduPersonNIN', self.user.user_id, nin)
             except UserOutOfSync:
                 logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
                 raise
@@ -486,7 +482,7 @@ class NinsView(BaseFormView):
         enable_mm = settings.get('enable_mm_verification')
 
         context.update({
-            'nins': self.user.get_nins(),
+            'nins': self.user.nins,
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
             'active_nin': self.get_active_nin(),
