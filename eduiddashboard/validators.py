@@ -222,8 +222,6 @@ class NINUniqueValidator(object):
         })
 
         # Search the request.POST for any post that starts with "add".
-        # Alternatively the POST may come from the wizard,
-        # in which case it will have a "step" param.
         for post_value in request.POST:
             if post_value.startswith('add') and (value in user_nins or
                                       unverified_user_nins.count() > 0):
@@ -231,12 +229,6 @@ class NINUniqueValidator(object):
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
             elif post_value.startswith('add') and len(user_nins) > 0:
-                err = _('You already have a confirmed national identity number')
-                raise colander.Invalid(node, get_localizer(request).translate(err))
-
-            elif post_value == 'step' and \
-                 request.POST['step'] == '0' and \
-                 len(user_nins) > 0:
                 err = _('You already have a confirmed national identity number')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
