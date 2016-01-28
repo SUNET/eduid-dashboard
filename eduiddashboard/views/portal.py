@@ -56,10 +56,15 @@ def profile_editor(context, request):
 
     enable_mm = request.registry.settings.get('enable_mm_verification')
 
+    if context.main_attribute == 'mail':
+        userid = context.user.mail_addresses.primary.key
+    else:
+        userid =  context.user.eppn
+
     view_context = {
         'tabs': tabs,
-        'userid': context.user.get(context.main_attribute),
-        'user': context.user.get_doc(),
+        'userid': userid,
+        'user': context.user.to_dict(),
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,

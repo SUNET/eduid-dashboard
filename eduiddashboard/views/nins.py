@@ -41,13 +41,13 @@ def get_status(request, user):
     pending_action_type = ''
     verification_needed = -1
 
-    all_nins = user.get_nins()
-    if all_nins:
+    all_nins = user.nins
+    if all_nins.count:
         completed_fields = 1
 
     unverified_nins = get_not_verified_nins_list(request, user)
 
-    if not all_nins and not unverified_nins:
+    if not all_nins.count and not unverified_nins:
         pending_actions = _('Add national identity number')
     if unverified_nins and request.registry.settings.get('enable_mm_verification'):
         pending_actions = _('Validation required for national identity number')

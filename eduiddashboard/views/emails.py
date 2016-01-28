@@ -25,8 +25,8 @@ def get_status(request, user):
     pending_action_type = ''
     verification_needed = -1
     completed = 0
-    for n, email in enumerate(user.get_mail_aliases()):
-        if email['verified']:
+    for n, email in enumerate(user.mail_addresses.to_list()):
+        if email.is_verified:
             completed = 1
         elif pending_actions is None:
             pending_actions = _('An email address is pending confirmation')

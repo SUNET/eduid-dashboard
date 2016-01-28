@@ -16,15 +16,15 @@ def get_status(request, user):
 
     return msg and icon
     """
-    schema = Person()
+    schema = ('given_name', 'surname', 'display_name', 'language')
     completed_fields = 0
 
-    for field in schema.children:
-        if field.name != 'csrf' and user.get(field.name, None) is not None:
+    for field in schema:
+        if getattr(user, field, None) is not None:
             completed_fields += 1
 
     status = {
-        'completed': (completed_fields, len(schema.children) - 1)
+        'completed': (completed_fields, len(schema) - 1)
     }
     return status
 
