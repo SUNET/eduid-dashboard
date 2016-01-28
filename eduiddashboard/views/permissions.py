@@ -50,7 +50,7 @@ class PermissionsView(BaseFormView):
         # Insert the new user object
         self.user.entitlements.append(new_entitlements)
         try:
-            self.request.userdb_new.save(self.user)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             self.sync_user()
         else:

@@ -4,8 +4,11 @@ from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
 
-from eduid_userdb.nin import Nin
+from eduid_userdb.nin import Nin, NinList
+from eduid_userdb.mail import MailAddress, MailAddressList
+from eduid_userdb.element import DuplicateElementViolation
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
@@ -74,13 +77,23 @@ def verify_nin(request, user, new_nin, reference=None):
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
-    old_user = request.dashboard_userdb._get_user_by_attr(
-        'norEduPersonNIN', new_nin, raise_on_missing=False)
+    old_user_docs = request.dashboard_userdb._coll.find(
+            {'nins': {'$elemMatch': {'nin': new_nin, 'verified': True}}})
     steal_count = 0
-    if old_user is not None:
+    for old_user_doc in old_user_docs:
+        old_user = DashboardUser(data=old_user_doc)
         if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
             log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
+            old_user.nins.remove(new_nin)
+            if old_user.nins.primary.key == new_nin:
+                old_nins = old_user.nins.to_list()
+                for nin in old_nins:
+                    if nin.key != new_nin:
+                        old_user.nins.primary = nin.key
+                        break
+                else:
+                    old_user._nins = NinList([])
             old_user.nins.remove(new_nin)
             log.debug('Old user NINs AFTER: {!r}.'.format(old_user.nins.to_list()))
             request.dashboard_userdb.save(old_user)
@@ -89,7 +102,10 @@ def verify_nin(request, user, new_nin, reference=None):
     # Add the verified nin to the requesting user
     new_nin_obj = Nin(number=new_nin, application='dashboard',
             verified=True, primary=True)
-    user.nins.add(new_nin_obj)
+    try:
+        user.nins.add(new_nin_obj)
+    except DuplicateElementViolation:
+        user.nins.find(new_nin).is_verified = True
     # Connect the verification to the transaction audit log
     if reference is not None:
         request.msgrelay.postal_address_to_transaction_audit_log(reference)
@@ -131,35 +147,42 @@ def verify_mobile(request, user, new_mobile):
 
 
 def verify_mail(request, user, new_mail):
-    user = OldUser(user)
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
     # Start by removing mail address from any other user
-    old_user_docs = request.userdb.get_users_by_filter({
-        'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}
-    }, raise_on_missing=False)
+    old_user_docs = request.dashboard_userdb._coll.find(
+            {'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}})
     steal_count = 0
     for old_user_doc in old_user_docs:
-        old_user = OldUser(old_user_doc)
-        if old_user and old_user.get_id() != user.get_id():
+        old_user = DashboardUser(data=old_user_doc)
+        if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
-            log.debug('Old user mail BEFORE: {!s}.'.format(old_user.get_mail()))
-            log.debug('Old user mail aliases BEFORE: {!r}.'.format(old_user.get_mail_aliases()))
-            if old_user.get_mail() == new_mail:
-                old_user.set_mail('')
-            mails = [m for m in old_user.get_mail_aliases() if m['email'] != new_mail]
-            old_user.set_mail_aliases(mails)
-            log.debug('Old user mail AFTER: {!s}.'.format(old_user.get_mail()))
-            log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.get_mail_aliases()))
-            old_user.retrieve_modified_ts(request.db.profiles)
-            old_user.save(request)
+            log.debug('Old user mail BEFORE: {!s}.'.format(old_user.mail_addresses.primary.key))
+            log.debug('Old user mail aliases BEFORE: {!r}.'.format(old_user.mail_addresses.to_list()))
+            if old_user.mail_addresses.primary.key == new_mail:
+                old_addresses = old_user.mail_addresses.to_list()
+                for address in old_addresses:
+                    if address.key != new_mail:
+                        old_user.mail_addresses.primary = address.key
+                        break
+                else:
+                    old_user._mail_addresses = MailAddressList([])
+            old_user.mail_addresses.remove(new_mail)
+            log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
+            log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
+            request.dashboard_userdb.save(old_user)
             steal_count += 1
     # Add the verified mail address to the requesting user
-    user.add_verified_email(new_mail)
+    new_email = MailAddress(email=new_mail, application='dashboard',
+            verified=True, primary=False)
+    try:
+        user.mail_addresses.add(new_email)
+    except DuplicateElementViolation:
+        user.mail_addresses.find(new_mail).is_verified = True
     log.info('Mail address verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mail_stolen', steal_count)
     request.stats.count('dashboard/verify_mail_completed', 1)
-    return user, _('Email {obj} verified')
+    return user, _('Email {obj} verified'.format(obj=new_mail))
 
 
 def verify_code(request, model_name, code):

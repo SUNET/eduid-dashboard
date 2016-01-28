@@ -7,6 +7,8 @@ from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.element import PrimaryElementViolation
+from eduid_userdb.mail import MailAddress
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
@@ -72,11 +74,11 @@ class EmailsActionsView(BaseActionsView):
     def setprimary_action(self, index, post_data):
 
         try:
-            mail = self.user.get_mail_aliases()[index]
+            mail = self.user.mail_addresses.to_list()[index]
         except IndexError:
             return self.sync_user()
 
-        if not mail.get('verified', False):
+        if not mail.is_verified:
             message = _('You need to confirm your email address '
                         'before it can become primary')
             return {
@@ -84,9 +86,9 @@ class EmailsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message),
             }
 
-        self.user.set_mail(mail['email'])
+        self.user.mail_addresses.primary = mail.email
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -97,7 +99,7 @@ class EmailsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message)}
 
     def remove_action(self, index, post_data):
-        emails = self.user.get_mail_aliases()
+        emails = self.user.mail_addresses.to_list()
         if len(emails) == 1:
             message = _('Error: You only have one email address and it  '
                         'can not be removed')
@@ -107,24 +109,19 @@ class EmailsActionsView(BaseActionsView):
             }
 
         try:
-            remove_email = emails[index]['email']
+            remove_email = emails[index].email
         except IndexError:
             return self.sync_user()
 
-        # By using pop(index) instead of remove(emails[index]) we avoid
-        # evaluating the time zone stored together with the value of the
-        # key 'added_timestamp' that leads to "TypeError: can't compare
-        # offset-naive and offset-aware datetimes".
-        emails.pop(index)
-
-        self.user.set_mail_aliases(emails)
-        primary_email = self.user.get_mail()
-
-        if not primary_email or primary_email == remove_email:
-            self.user.set_mail(emails[0]['email'])
+        try:
+            self.user.mail_addresses.remove(remove_email)
+        except PrimaryElementViolation:
+            new_index = 0 if index != 0 else 1
+            self.user.mail_addresses.primary = emails[new_index].email
+            self.user.mail_addresses.remove(remove_email)
 
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -164,8 +161,8 @@ class EmailsView(BaseFormView):
     def get_template_context(self):
         context = super(EmailsView, self).get_template_context()
         context.update({
-            'mails': self.user.get_mail_aliases(),
-            'primary_email': self.user.get_mail(),
+            'mails': self.user.mail_addresses.to_list(),
+            'primary_email': self.user.mail_addresses.primary.key,
         })
 
         return context
@@ -173,21 +170,13 @@ class EmailsView(BaseFormView):
     def add_success(self, emailform):
         newemail = self.schema.serialize(emailform)
 
-        # We need to add the new email to the emails list
+        new_email = MailAddress(email=newemail['mail'],
+                application='dashboard',
+                verified=False, primary=False)
 
-        emails = self.user.get_mail_aliases()
-
-        mailsubdoc = {
-            'email': newemail['mail'],
-            'verified': False,
-            'added_timestamp': datetime.utcnow()
-        }
-
-        emails.append(mailsubdoc)
-
-        self.user.set_mail_aliases(emails)
+        self.user.mail_addresses.add(new_email)
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             self.sync_user()
 
@@ -200,5 +189,5 @@ class EmailsView(BaseFormView):
             second_msg = _('A confirmation email has been sent to your email '
                     'address. Please enter your confirmation code '
                     '<a href="#" class="verifycode" '
-                    'data-identifier="${id}">here</a>.', mapping={'id': len(emails)})
+                    'data-identifier="${id}">here</a>.', mapping={'id': self.user.mail_addresses.count})
             self.request.session.flash(get_localizer(self.request).translate(second_msg), queue='forms')

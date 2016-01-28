@@ -199,7 +199,7 @@ class BaseActionsView(object):
         # resend the code for corresponds to the same entry we get from
         # data[index].
         try:
-            _data = self.user.get(self.data_attribute, [])
+            _data = self.user.to_dict().get(self.data_attribute, [])
             data_to_verify = _data[index]
         except IndexError:
             log.warning('Index error in verify_action, user {!s}'.format(self.user))

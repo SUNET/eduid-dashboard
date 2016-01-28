@@ -409,7 +409,9 @@ class VerificationsFactory(BaseFactory):
 
 
 class StatusFactory(BaseFactory):
-    pass
+
+    def get_user(self):
+        return self.get_new_user()
 
 
 class ProofingFactory(BaseFactory):
