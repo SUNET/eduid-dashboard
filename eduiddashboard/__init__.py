@@ -168,12 +168,6 @@ def profile_urls(config):
     config.add_route('password-change', '/password-change/',
                      factory=SecurityFactory)
 
-    # wizard routes
-    config.add_route('wizard-nins', '/nin-wizard/',
-                     factory=NinsFactory)
-
-    config.add_route('nins-wizard-chooser', '/nins-wizard-chooser/',
-                     factory=NinsFactory)
     config.add_route('nins-verification-chooser',
                      '/nins-verification-chooser/',
                      factory=NinsFactory)
