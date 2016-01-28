@@ -84,7 +84,7 @@ class BaseFormView(FormView):
             self.form_options['bootstrap_form_style'] = bootstrap_form_style
 
     def appstruct(self):
-        return self.schema.serialize(self.user)
+        return self.schema.serialize(self.user.to_dict())
 
     def get_template_context(self):
         return {

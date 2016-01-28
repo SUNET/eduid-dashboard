@@ -118,10 +118,10 @@ def get_not_verified_nins_list(request, user):
     }, sort=[('timestamp', 1)])
     if users_nins:
         for this in users_nins:
-            if this['verified']:
-                user_already_verified.append(this['number'])
+            if this.is_verified:
+                user_already_verified.append(this.key)
             else:
-                user_not_verified.append(this['number'])
+                user_not_verified.append(this.key)
     for this in verifications:
         if this['verified'] and this['obj_id'] in user_not_verified:
             # Found to be verified after all, filter out from user_not_verified

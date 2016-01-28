@@ -4,6 +4,7 @@ from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Permissions
@@ -37,10 +38,8 @@ class PermissionsView(BaseFormView):
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
         ma = self.context.main_attribute
-        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = True)
-        if not user:
-            user = OldUser({})
-        if self.context.user.get(ma) == user.get(ma):
+        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = False)
+        if self.context.user.to_dict().get(ma) == user.to_dict().get(ma):
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False
@@ -49,9 +48,9 @@ class PermissionsView(BaseFormView):
     def save_success(self, new_entitlements):
 
         # Insert the new user object
-        self.user.get_doc().update(new_entitlements)
+        self.user.entitlements.append(new_entitlements)
         try:
-            self.user.save(self.request)
+            self.request.userdb_new.save(self.user)
         except UserOutOfSync:
             self.sync_user()
         else:
