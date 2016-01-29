@@ -6,6 +6,7 @@ from datetime import datetime
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
+from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
@@ -82,7 +83,7 @@ def send_verification_code(request, user, mobile_number, reference=None, code=No
 
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
-    data_attribute = 'mobile'
+    data_attribute = 'phone'
     special_verify_messages = {
         'success': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
@@ -92,17 +93,15 @@ class MobilesActionsView(BaseActionsView):
     }
 
     def get_verification_data_id(self, data_to_verify):
-        return data_to_verify['mobile']
+        return data_to_verify['number']
 
     def remove_action(self, index, post_data):
-        mobiles = self.user.get_mobiles()
+        mobiles = self.user.phone_numbers.to_list()
         mobile_to_remove = mobiles[index]
-        mobiles.remove(mobile_to_remove)
-
-        self.user.set_mobiles(mobiles)
+        self.user.phone_numbers.remove(mobile_to_remove.number)
 
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -114,14 +113,14 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def setprimary_action(self, index, post_data):
-        mobiles = self.user.get_mobiles()
+        mobiles = self.user.phone_numbers.to_list()
 
         try:
-            mobile = self.user.get_mobiles()[index]
+            mobile = mobiles[index]
         except IndexError:
             return self.sync_user()
 
-        if not mobile.get('verified', False):
+        if not mobile.is_verified:
             message = _('You need to confirm your mobile number '
                         'before it can become primary')
             return {
@@ -129,15 +128,9 @@ class MobilesActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message),
             }
 
-        # set all to False, and then set the new primary to True using the index
-        for mobile in mobiles:
-            mobile['primary'] = False
-
-        mobiles[index]['primary'] = True
-
-        self.user.set_mobiles(mobiles)
+        self.user.phone_numbers.primary = mobile.number
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -175,21 +168,21 @@ class MobilesView(BaseFormView):
     def get_template_context(self):
         context = super(MobilesView, self).get_template_context()
         context.update({
-            'mobiles': self.user.get_mobiles(),
+            'mobiles': self.user.phone_numbers.to_list(),
         })
         return context
 
     def add_success(self, mobileform):
         mobile_number = self.schema.serialize(mobileform)['mobile']
         mobile_number = normalize_to_e_164(self.request, mobile_number)
-        mobile = {'mobile':  mobile_number,
-                  'verified': False,
-                  'primary': False,
-                  'added_timestamp': datetime.utcnow()
-                  }
-        self.user.add_mobile(mobile)
+        mobile = PhoneNumber(data={'number':  mobile_number,
+                                   'verified': False,
+                                   'primary': False,
+                                   'created_ts': datetime.utcnow()
+                                   })
+        self.user.phone_numbers.add(mobile)
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             self.sync_user()
 

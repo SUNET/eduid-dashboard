@@ -6,6 +6,7 @@ from pyramid.i18n import get_localizer
 
 from eduid_userdb.nin import Nin, NinList
 from eduid_userdb.mail import MailAddress, MailAddressList
+from eduid_userdb.phone import PhoneNumber, PhoneNumberList
 from eduid_userdb.element import DuplicateElementViolation
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUser
@@ -85,7 +86,6 @@ def verify_nin(request, user, new_nin, reference=None):
         if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
             log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
-            old_user.nins.remove(new_nin)
             if old_user.nins.primary.key == new_nin:
                 old_nins = old_user.nins.to_list()
                 for nin in old_nins:
@@ -101,7 +101,7 @@ def verify_nin(request, user, new_nin, reference=None):
             steal_count += 1
     # Add the verified nin to the requesting user
     new_nin_obj = Nin(number=new_nin, application='dashboard',
-            verified=True, primary=True)
+            verified=True, primary=False)
     try:
         user.nins.add(new_nin_obj)
     except DuplicateElementViolation:
@@ -118,28 +118,38 @@ def verify_nin(request, user, new_nin, reference=None):
 
 
 def verify_mobile(request, user, new_mobile):
-    user = OldUser(user)
     log.info('Trying to verify mobile number for user {!r}.'.format(user))
     log.debug('Mobile number: {!s}.'.format(new_mobile))
     # Start by removing mobile number from any other user
-    old_user_docs = request.userdb.get_users_by_filter({
-        'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}
-    }, raise_on_missing=False)
+    old_user_docs = request.dashboard_userdb._coll.find(
+        {'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}})
     steal_count = 0
     for old_user_doc in old_user_docs:
-        old_user = OldUser(old_user_doc)
-        if old_user and old_user.get_id() != user.get_id():
+        old_user = DashboardUser(data=old_user_doc)
+        if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with mobile number ({!s}) already verified.'.format(old_user, new_mobile))
-            log.debug('Old user mobile numbers BEFORE: {!r}.'.format(old_user.get_mobiles()))
-            mobiles = [m for m in old_user.get_mobiles() if m['mobile'] != new_mobile]
-            old_user.set_mobiles(mobiles)
-            log.debug('Old user mobile numbers AFTER: {!r}.'.format(old_user.get_mobiles()))
-            old_user.retrieve_modified_ts(request.db.profiles)
-            old_user.save(request)
+            log.debug('Old user mobile numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
+            if old_user.phone_numbers.primary.key == new_mobile:
+                old_numbers = old_user.phone_numbers.to_list()
+                for number in old_numbers:
+                    if number.key != new_mobile:
+                        old_user.phone_numbers.primary = number.key
+                        break
+                else:
+                    old_user._phone_numbers = PhoneNumberList([])
+            old_user.phone_numbers.remove(new_mobile)
+            log.debug('Old user mobile numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
+            request.dashboard_userdb.save(old_user)
             log.info('Removed mobile number from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified mobile number to the requesting user
-    user.add_verified_mobile(new_mobile)
+    new_mobile_obj = PhoneNumber(data={'number': new_mobile,
+                                       'verified': True,
+                                       'primary': False})
+    try:
+        user.phone_numbers.add(new_mobile_obj)
+    except DuplicateElementViolation:
+        user.phone_numbers.find(new_mobile).is_verified = True
     log.info('Mobile number verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mobile_stolen', steal_count)
     request.stats.count('dashboard/verify_mobile_completed', 1)
@@ -220,7 +230,7 @@ def verify_code(request, model_name, code):
 
     if model_name == 'norEduPersonNIN':
         user, msg = verify_nin(request, user, obj_id, reference)
-    elif model_name == 'mobile':
+    elif model_name == 'phone':
         user, msg = verify_mobile(request, user, obj_id)
     elif model_name == 'mailAliases':
         user, msg = verify_mail(request, user, obj_id)

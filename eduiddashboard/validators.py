@@ -143,11 +143,10 @@ class MobilePhoneUniqueValidator(object):
 
         request = node.bindings.get('request')
         user = request.context.user
-        user_mobiles = [m['mobile'] for m in user.get_mobiles()]
-        mobile = {'mobile': normalize_to_e_164(request, value)}
+        mobile = normalize_to_e_164(request, value)
 
         if sanitize_post_key(request, 'add') is not None:
-            if mobile['mobile'] in user_mobiles:
+            if user.phone_numbers.find(mobile):
                 err = _("This mobile phone was already registered")
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
