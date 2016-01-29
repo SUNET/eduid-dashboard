@@ -394,7 +394,7 @@ def main(global_config, **settings):
     )
 
     try:
-        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 3600))
+        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 600))
     except ValueError:
         raise ConfigurationError('session.cookie_max_age should be a valid integer')
 
