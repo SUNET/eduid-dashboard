@@ -682,9 +682,9 @@ class NinsWizard(BaseWizard):
         # Fetch the user's verified NiNs so that we can make sure that we
         # do not try to send a new verification code and add another NiN.
         user = self.context.user
-        verified_nins = user.get_nins()
+        verified_nins = user.nins
 
-        if len(verified_nins) > 0:
+        if verified_nins.count > 0:
             message = _("You already have a confirmed national identity number")
             message = get_localizer(self.request).translate(message)
             return {

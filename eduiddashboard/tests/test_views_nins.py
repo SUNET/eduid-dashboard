@@ -262,9 +262,7 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = OldUser(old_user)
-
-        self.assertIn(nin, old_user.get_nins())
+        self.assertIn(nin, old_user['norEduPersonNIN'])
 
         nin_doc = self.db.verifications.find_one({
             'model_name': 'norEduPersonNIN',
@@ -290,9 +288,7 @@ class NinsFormTests(LoggedInRequestTests):
             self.assertEqual(response_json['result'], 'success')
 
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-            old_user = OldUser(old_user)
-
-            self.assertNotIn(nin, old_user.get_nins())
+            self.assertIn(nin, old_user['norEduPersonNIN'])
 
 
 class NinsFormTestsDisableMM(LoggedInRequestTests):
