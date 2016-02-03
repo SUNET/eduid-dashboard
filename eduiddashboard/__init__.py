@@ -432,6 +432,13 @@ def main(global_config, **settings):
 
     settings['redis_db'] = int(read_setting_from_env(settings, 'redis_db', 0))
 
+    settings['redis_sentinel_hosts'] = read_list(
+        settings,
+        'redis_sentinel_hosts',
+        default=[])
+    settings['redis_sentinel_service_name'] = read_setting_from_env(settings, 'redis_sentinel_service_name',
+                                                    'redis-cluster')
+
     settings['groups_callback'] = read_setting_from_env(settings,
                                                     'groups_callback',
                                                     groups_callback)

@@ -53,15 +53,11 @@ class SessionFactory(object):
         :param settings: the pyramid settings
         :type settings: dict
         '''
-        redis_host = settings['redis_host']
-        redis_port = settings['redis_port']
-        redis_db = settings['redis_db']
         cookie_max_age = int(settings.get('session.cookie_max_age'))
         # make sure that the data in redis outlives the session cookie
         session_ttl = 2 * cookie_max_age
         secret = settings.get('session.secret')
-        self.manager = SessionManager(redis_host, redis_port, redis_db,
-                serializer=pickle, ttl=session_ttl, secret=secret)
+        self.manager = SessionManager(settings, serializer=pickle, ttl=session_ttl, secret=secret)
 
     def __call__(self, request):
         '''
