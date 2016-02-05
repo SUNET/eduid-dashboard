@@ -1,10 +1,8 @@
 from os import path
 import base64
 from saml2.s_utils import deflate_and_base64_encode
-from saml2.mdstore import UnknownPrincipal
 
 from pyramid.interfaces import ISessionFactory
-from pyramid.testing import DummyRequest
 
 from eduid_common.authn.cache import OutstandingQueriesCache
 from eduiddashboard.saml2.testing import Saml2RequestTests

@@ -1,11 +1,8 @@
-import pprint
-
-from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
+from saml2 import BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 from saml2.response import LogoutResponse
-from saml2.saml import AuthnContextClassRef
-from saml2.samlp import RequestedAuthnContext
+from saml2.ident import code, decode
 
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
@@ -23,7 +20,7 @@ from eduiddashboard.utils import (sanitize_get,
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
-from eduid_common.authn.cache import (IdentityCache, OutstandingQueriesCache,
+from eduid_common.authn.cache import (IdentityCache,
                                         StateCache, )
 from eduiddashboard.saml2.acs_actions import (acs_action,
                                               schedule_action,
@@ -53,7 +50,7 @@ def _set_name_id(session, name_id):
 
     :type name_id: saml2.saml.NameID
     """
-    session['_saml2_session_name_id'] = name_id
+    session['_saml2_session_name_id'] = code(name_id)
 
 
 def _get_name_id(session):
@@ -65,7 +62,7 @@ def _get_name_id(session):
     :rtype: saml2.saml.NameID | None
     """
     try:
-        return session['_saml2_session_name_id']
+        return decode(session['_saml2_session_name_id'])
     except KeyError:
         return None
 

@@ -6,9 +6,10 @@ addons:
 language: python
 python:
   - "2.7"
-# Have Travis CI start a mongodb server for us
+# Have Travis CI start mongodb and redis for us
 services:
   - mongodb
+  - redis-server
 # command to install dependencies
 install:
   - python setup.py develop
