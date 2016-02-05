@@ -21,7 +21,6 @@ from eduiddashboard.utils import (verify_auth_token,
 from eduiddashboard.loa import get_max_available_loa
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.saml2.views import logout_view
-from eduiddashboard.views.nins import nins_open_wizard
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
@@ -75,11 +74,7 @@ def profile_editor(context, request):
         'enable_mm_verification': enable_mm,
     }
     if enable_mm:
-        (open_wizard, datakey) = nins_open_wizard(context, request)
         view_context.update({
-            'open_wizard': open_wizard,
-            'datakey': datakey,
-            'nins_wizard_chooser_url': context.safe_route_url('nins-wizard-chooser'),
             'nins_verification_chooser_url': context.safe_route_url('nins-verification-chooser'),
         })
 
@@ -331,15 +326,6 @@ def terminate_account(context, request):
     schedule_action(request.session, 'account-termination-action')
 
     return HTTPFound(location=get_location(info))
-
-
-@view_config(route_name='nins-wizard-chooser',
-             renderer='templates/nins-wizard-chooser.jinja2',
-             request_method='GET', permission='edit')
-def nins_wizard_chooser(context, request):
-    return {
-            'has_mobile': has_confirmed_mobile(context.user),
-            }
 
 
 @view_config(route_name='nins-verification-chooser',

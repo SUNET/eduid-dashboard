@@ -13,7 +13,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash
-from eduiddashboard.views import BaseFormView, BaseActionsView, BaseWizard
+from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
 from eduiddashboard.verifications import (verify_nin, verify_code,
@@ -496,7 +496,6 @@ class NinsView(BaseFormView):
             'not_verified_nins': get_not_verified_nins_list(self.request,
                                                             self.user),
             'active_nin': self.get_active_nin(),
-            'open_wizard': nins_open_wizard(self.context, self.request),
             'has_mobile': has_confirmed_mobile(self.user),
             'enable_mm_verification': enable_mm,
         })
@@ -614,115 +613,3 @@ class NinsView(BaseFormView):
         else:
             msg = result['message']
         self.request.session.flash(msg, queue='forms')
-
-
-@view_config(route_name='wizard-nins', permission='edit', renderer='json')
-class NinsWizard(BaseWizard):
-    model = 'norEduPersonNIN'
-    route = 'wizard-nins'
-    last_step = 1
-
-    def step_0(self, data):
-        """ The NIN form """
-
-        nins_view = NinsView(self.context, self.request)
-
-        return nins_view.add_nin_external(data)
-
-    def step_1(self, data):
-        """ The verification code form """
-        nins_action_view = NINsActionsView(self.context, self.request)
-
-        result = nins_action_view._verify_action(normalize_nin(self.datakey), data)
-
-        if result['result'] == 'success':
-            self.request.stats.count('dashboard/nin_wizard_step_1_ok', 1)
-            return {
-                'status': 'success',
-            }
-        else:
-            self.request.stats.count('dashboard/nin_wizard_step_1_fail', 1)
-            return {
-                'status': 'failure',
-                'data': {
-                    'code': result['message']
-                }
-            }
-
-    def resendcode(self):
-        if self.datakey is None:
-            message = _("Your national identity number confirmation request "
-                        "can not be found")
-            message = get_localizer(self.request).translate(message)
-            return {
-                'status': 'error',
-                'text': message
-            }
-
-        nins_view = NinsView(self.context, self.request)
-        try:
-            nins_view.validate_post_data()
-        except deform.exception.ValidationFailure as e:
-            errors = e.error.asdict()
-            if 'norEduPersonNIN' in errors:
-                text = errors['norEduPersonNIN']
-            elif errors:
-                text = errors.values()[0]
-            else:
-                # Shouldn't happen!
-                text = _('There was an unknown error dealing with your request')
-            return {
-                'status': 'error',
-                'text': text,
-            }
-
-        # Always normalize the NiN before usage
-        nin = normalize_nin(self.datakey)
-
-        # Fetch the user's verified NiNs so that we can make sure that we
-        # do not try to send a new verification code and add another NiN.
-        user = self.context.user
-        verified_nins = user.nins
-
-        if verified_nins.count > 0:
-            message = _("You already have a confirmed national identity number")
-            message = get_localizer(self.request).translate(message)
-            return {
-                'status': 'error',
-                'text': message
-            }
-
-        send_verification_code(self.request,
-                               self.context.user,
-                               nin)
-        text = NINsActionsView.special_verify_messages.get('new_code_sent',
-            NINsActionsView.default_verify_messages.get('new_code_sent', ''))
-        self.request.stats.count('dashboard/nin_wizard_resend_code', 1)
-        return {
-            'status': 'success',
-            'text': text,
-        }
-
-    def get_template_context(self):
-        context = super(NinsWizard, self).get_template_context()
-        message = _('Add your national identity number')
-        message = get_localizer(self.request).translate(message)
-        context.update({
-            'wizard_title': message,
-        })
-        return context
-
-def nins_open_wizard(context, request):
-    if (context.workmode != 'personal' or
-            not request.registry.settings.get('enable_mm_verification')):
-        return (False, None)
-    ninswizard = NinsWizard(context, request)
-
-    datakey = ninswizard.obj.get('datakey', None)
-    open_wizard = ninswizard.is_open_wizard()
-
-    logger.debug('Wizard params: open: {}, datakey: {}'.format(
-                   str(open_wizard),
-                   datakey))
-
-    return (open_wizard, datakey)
