@@ -61,7 +61,7 @@ class SessionFactory(object):
         session_ttl = 2 * cookie_max_age
         secret = settings.get('session.secret')
         self.manager = SessionManager(redis_host, redis_port, redis_db,
-                serializer=pickle, ttl=session_ttl, secret=secret)
+                                      ttl=session_ttl, secret=secret)
 
     def __call__(self, request):
         '''
