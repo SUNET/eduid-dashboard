@@ -30,7 +30,7 @@ requires = [
     'eduid_lookup_mobile >= 0.0.4',
     'eduid_userdb >= 0.0.2',
     'eduid-common[webapp] > 0.1.2',
-    'pysaml2 == 1.2.0beta2',
+    'pysaml2 == 4.0.3rc1',
 
     'pymongo>=2.8,<3',
     'pyramid==1.4.1',
