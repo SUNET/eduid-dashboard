@@ -2,6 +2,7 @@ from saml2 import BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 from saml2.response import LogoutResponse
+from saml2.ident import code, decode
 
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
@@ -49,7 +50,7 @@ def _set_name_id(session, name_id):
 
     :type name_id: saml2.saml.NameID
     """
-    session['_saml2_session_name_id'] = name_id
+    session['_saml2_session_name_id'] = code(name_id)
 
 
 def _get_name_id(session):
@@ -61,7 +62,7 @@ def _get_name_id(session):
     :rtype: saml2.saml.NameID | None
     """
     try:
-        return session['_saml2_session_name_id']
+        return decode(session['_saml2_session_name_id'])
     except KeyError:
         return None
 
