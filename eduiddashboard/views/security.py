@@ -4,6 +4,7 @@ from deform import Button
 import json
 
 from datetime import datetime, timedelta
+import time
 from bson import ObjectId
 import pytz
 
@@ -226,7 +227,7 @@ def change_password_action(request, session_info, user):
 
     # set timestamp in session
     log.debug('Setting Authn ts for user {}'.format(user.get_id()))
-    request.session['re-authn-ts'] = datetime.utcnow()
+    request.session['re-authn-ts'] = int(time.time())
     # send to password change form
     return HTTPFound(request.route_url('password-change'))
 
@@ -309,13 +310,12 @@ class PasswordsView(BaseFormView):
         authn_ts = self.request.session.get('re-authn-ts', None)
         if authn_ts is None:
             raise HTTPBadRequest(_('No authentication info'))
-        else:
-            now = datetime.utcnow()
-            delta = now - authn_ts
-            if int(delta.total_seconds()) > 600:
-                msg = _('Stale authentication info. Please try again.')
-                self.request.session.flash('error|' + msg)
-                raise HTTPFound(self.context.route_url('profile-editor'))
+        now = datetime.utcnow()
+        delta = now - datetime.fromtimestamp(authn_ts)
+        if int(delta.total_seconds()) > 600:
+            msg = _('Stale authentication info. Please try again.')
+            self.request.session.flash('error|' + msg)
+            raise HTTPFound(self.context.route_url('profile-editor'))
         user = get_session_user(self.request, legacy_user = True)
         log.debug('Removing Authn ts for user {!r} before'
                 ' changing the password'.format(user.get_id()))
