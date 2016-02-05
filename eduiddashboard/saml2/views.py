@@ -1,11 +1,7 @@
-import pprint
-
-from saml2 import BINDING_HTTP_REDIRECT, BINDING_HTTP_POST
+from saml2 import BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 from saml2.response import LogoutResponse
-from saml2.saml import AuthnContextClassRef
-from saml2.samlp import RequestedAuthnContext
 
 
 from pyramid.httpexceptions import (HTTPFound, HTTPBadRequest, HTTPNotFound,
@@ -23,7 +19,7 @@ from eduiddashboard.utils import (sanitize_get,
 
 from eduiddashboard.saml2.utils import get_saml2_config, get_location
 from eduiddashboard.saml2.auth import authenticate, login, logout
-from eduid_common.authn.cache import (IdentityCache, OutstandingQueriesCache,
+from eduid_common.authn.cache import (IdentityCache,
                                         StateCache, )
 from eduiddashboard.saml2.acs_actions import (acs_action,
                                               schedule_action,
