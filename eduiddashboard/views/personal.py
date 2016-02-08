@@ -64,15 +64,19 @@ class PersonalDataView(BaseFormView):
         del(person['csrf'])  # Don't save the CSRF token in the user database
 
         new_preferred_language = person.get('preferredLanguage')
-        old_preferred_language = self.user.get_preferred_language()
+        old_preferred_language = self.user.language
 
         # Insert the new/updated user object
-        self.user.get_doc().update(person)
+        self.user.given_name = person.get('givenName')
+        self.user.display_name = person.get('displayName')
+        self.user.surname = person.get('sn')
+        self.user.language = person.get('preferredLanguage')
         try:
-            self.user.save(self.request)
+            self.request.dashboard_userdb.save(self.user)
         except UserOutOfSync:
             self.sync_user()
         else:
+            self.request.context.propagate_user_changes(self.user)
             message = _('Changes saved')
             self.request.session.flash(
                     get_localizer(self.request).translate(message),
