@@ -64,13 +64,15 @@ class ProfileFilledTests(LoggedInRequestTests):
             self._empty_user_list(user.phone_numbers)
         if 'nins' in remove:
             self._empty_user_list(user.nins)
-        self._save_user_to_userdb(user)
+        self.dashboard_db.save(user)
+        self._save_user_to_userdb(user, old_format=False)
 
         import pprint
         logger.debug('SAVED USER TO DB:\n{!s}'.format(pprint.pformat(user.to_dict())))
 
         response = self.testapp.get('/profile/userstatus/')
-        self._save_user_to_userdb(saved_user)
+        self.dashboard_db.save(saved_user, check_sync=False)
+        self._save_user_to_userdb(saved_user, old_format=False)
         logger.debug('RESTORED USER IN DB:\n{!s}'.format(pprint.pformat(saved_user.to_dict())))
         return json.loads(response.body)['profile_filled']
 
