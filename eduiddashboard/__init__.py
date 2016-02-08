@@ -394,7 +394,7 @@ def main(global_config, **settings):
     )
 
     try:
-        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 3600))
+        settings['session.cookie_max_age'] = int(settings.get('session.cookie_max_age', 600))
     except ValueError:
         raise ConfigurationError('session.cookie_max_age should be a valid integer')
 
@@ -431,6 +431,13 @@ def main(global_config, **settings):
                                                     6379))
 
     settings['redis_db'] = int(read_setting_from_env(settings, 'redis_db', 0))
+
+    settings['redis_sentinel_hosts'] = read_list(
+        settings,
+        'redis_sentinel_hosts',
+        default=[])
+    settings['redis_sentinel_service_name'] = read_setting_from_env(settings, 'redis_sentinel_service_name',
+                                                    'redis-cluster')
 
     settings['groups_callback'] = read_setting_from_env(settings,
                                                     'groups_callback',
