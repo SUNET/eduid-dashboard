@@ -224,7 +224,7 @@ class BaseFactory(object):
                 'personal_dashboard_base_url', None)
             if app_url:
                 kw['_app_url'] = app_url
-            userid = self.user.get_id()
+            userid = self.user.user_id
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
