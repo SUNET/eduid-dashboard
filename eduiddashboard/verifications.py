@@ -100,8 +100,12 @@ def verify_nin(request, user, new_nin, reference=None):
             log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified nin to the requesting user
+    if user.nins.count == 0:
+        primary = True
+    else:
+        primary = False
     new_nin_obj = Nin(number=new_nin, application='dashboard',
-            verified=True, primary=False)
+            verified=True, primary=primary)
     try:
         user.nins.add(new_nin_obj)
     except DuplicateElementViolation:

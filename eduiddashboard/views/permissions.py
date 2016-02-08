@@ -33,7 +33,7 @@ class PermissionsView(BaseFormView):
 
     schema = Permissions()
     route = 'permissions'
-    attributte = 'eduPersonEntitlement'
+    attribute = 'eduPersonEntitlement'
 
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
@@ -45,15 +45,18 @@ class PermissionsView(BaseFormView):
             tempcontext['confirmation_required'] = False
         return tempcontext
 
-    def save_success(self, new_entitlements):
+    def save_success(self, permform):
 
         # Insert the new user object
-        self.user.entitlements.append(new_entitlements)
+        data = self.schema.serialize(permform)
+        new_entitlements = data[self.attribute]
+        self.user.entitlements.extend(new_entitlements)
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.request.dashboard_userdb.save(self.user, old_format=False)
         except UserOutOfSync:
             self.sync_user()
         else:
+            self.request.context.propagate_user_changes(self.user)
             message = _('Changes saved.')
             self.request.session.flash(
                     get_localizer(self.request).translate(message),

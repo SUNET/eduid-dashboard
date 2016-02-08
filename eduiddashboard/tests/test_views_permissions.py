@@ -1,3 +1,4 @@
+from bson import ObjectId
 from eduiddashboard.testing import LoggedInRequestTests
 
 
@@ -65,8 +66,10 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        self.values_are_checked(res.form.fields.get('checkbox'),
-                                ['urn:mace:eduid.se:role:admin'])
+        q = {'_id':ObjectId('901234567890123456789012')}
+        entitlements = self.userdb_new._coll.find(q)[0]['eduPersonEntitlement']
+
+        self.assertEqual(entitlements, ['urn:mace:eduid.se:role:admin']) 
 
     def test_logged_remove_admin_permissions(self):
         self.set_logged(email ='johnsmith@example.com')
@@ -79,8 +82,10 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        self.values_are_checked(res.form.fields.get('checkbox'),
-                                ['urn:mace:eduid.se:role:ra'])
+        q = {'_id':ObjectId('901234567890123456789012')}
+        entitlements = self.userdb_new._coll.find(q)[0]['eduPersonEntitlement']
+
+        self.assertEqual(entitlements, ['urn:mace:eduid.se:role:ra']) 
 
         self.set_logged(email ='johnsmith@example.org')
 
@@ -100,8 +105,10 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        self.values_are_checked(res.form.fields.get('checkbox'),
-                                ['urn:mace:eduid.se:role:admin'])
+        q = {'_id':ObjectId('901234567890123456789012')}
+        entitlements = self.userdb_new._coll.find(q)[0]['eduPersonEntitlement']
+
+        self.assertEqual(entitlements, ['urn:mace:eduid.se:role:admin']) 
 
 
 class PermissionsFormTestsPersonalMode(LoggedInRequestTests):
