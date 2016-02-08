@@ -21,7 +21,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.4.2b0'
+version = '0.4.2b1'
 
 requires = [
     'eduid_am >= 0.6.0',
@@ -110,5 +110,7 @@ setup(name='eduid-dashboard',
       entry_points="""\
       [paste.app_factory]
       main = eduiddashboard:main
+      [console_scripts]
+      fallback_letter_proofing=eduiddashboard.scripts.fallback_letter_proofing:letter_proof_user
       """,
       )
