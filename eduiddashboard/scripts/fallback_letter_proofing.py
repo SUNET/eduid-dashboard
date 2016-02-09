@@ -8,8 +8,10 @@ from datetime import datetime
 import json
 
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.verifications import get_verification_code, verify_nin
 from eduiddashboard.idproofinglog import LetterProofing
+from eduiddashboard.session import _get_user_by_eppn
 
 import logging
 logger = logging.getLogger(__name__)
@@ -21,11 +23,11 @@ Verify a NIN for a letter verification that has failed due to a worker timeout.
 """
 
 default_config_file = '/opt/eduid/eduid-dashboard/etc/eduid-dashboard.ini'
-env = bootstrap(default_config_file)
 
 
-def verify_code(user, verification_doc):
+def verify_code(env, user, verification_doc):
     """
+    :param env: Pyramid wsgi env
     :param user: Dashboard user
     :type user:
     :param verification_doc: Mongo doc
@@ -75,12 +77,13 @@ def letter_proof_user():
         print(usage)
         return 2
 
+    env = bootstrap(default_config_file)
     eppn = args[0]
     data = args[1]
     rdata = json.loads(data)
-    user = env['request'].userdb.get_user_by_eppn(eppn)
+    user = _get_user_by_eppn(env['request'], eppn, legacy_user=True)
 
-    if rdata.get('verified', False):
+    if not user.get_nins() and rdata.get('verified', False):
         # Save data from successful verification call for later addition to user proofing collection
         rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
         rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
@@ -102,9 +105,11 @@ def letter_proof_user():
             try:
                 # This is a hack to reuse the existing proofing functionality, the users code is
                 # verified by the micro service
-                verify_code(user, verification_doc)
+                verify_code(env, user, verification_doc)
                 print "Verified NIN by physical letter saved for user {!r}.".format(user)
             except UserOutOfSync:
                 print "Verified NIN by physical letter NOT saved for user {!r}. User out of sync.".format(user)
             else:
                 print 'You have successfully verified the identity for user {!r}'.format(user)
+    else:
+        print 'User {!r} already has verified NIN ({!s}).'.format(user, user.get_nins())
