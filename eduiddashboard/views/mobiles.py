@@ -101,7 +101,7 @@ class MobilesActionsView(BaseActionsView):
         self.user.phone_numbers.remove(mobile_to_remove.number)
 
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -130,7 +130,7 @@ class MobilesActionsView(BaseActionsView):
 
         self.user.phone_numbers.primary = mobile.number
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -182,7 +182,7 @@ class MobilesView(BaseFormView):
                                    })
         self.user.phone_numbers.add(mobile)
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
 

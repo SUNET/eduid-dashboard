@@ -6,11 +6,11 @@ from pyramid.security import (Allow, Deny, Authenticated, Everyone,
 from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import sync_user_changes_to_userdb
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import (get_session_user, get_logged_in_user,
                                     has_logged_in_user, has_edit_user,
                                     store_session_user)
 
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
 
 import logging
 logger = logging.getLogger(__name__)
@@ -149,29 +149,7 @@ class BaseFactory(object):
         :return: User object
         :rtype: DashboardLegacyUser
         """
-        if self.workmode == 'personal':
-            #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
-            user = self._logged_in_user
-            if not user:
-                user = OldUser({})
-        elif self.workmode == 'admin' or self.workmode == 'helpdesk':
-            if not has_edit_user(self.request):
-                user = None
-                userid = self.request.matchdict.get('userid', '')
-                logger.debug('get_user() looking for user matching {!r}'.format(userid))
-                if EMAIL_RE.match(userid):
-                    user = self.request.userdb.get_user_by_mail(userid)
-                elif OID_RE.match(userid):
-                    user = self.request.userdb.get_user_by_oid(userid)
-                if not user:
-                    raise HTTPNotFound()
-                logger.debug('get_user() storing user {!r}'.format(user))
-                store_session_user(self.request, user, edit_user = True)
-            user = get_session_user(self.request, legacy_user = True)
-        else:
-            raise NotImplementedError("Unknown workmode: {!s}".format(self.workmode))
-
-        return user
+        return self.get_new_user()
 
     def get_new_user(self):
         """
@@ -188,8 +166,6 @@ class BaseFactory(object):
         if self.workmode == 'personal':
             user = get_logged_in_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
             self._logged_in_user = user
-            if not user:
-                user = DashboardUser({})
         elif self.workmode == 'admin' or self.workmode == 'helpdesk':
             if not has_edit_user(self.request):
                 user = None
@@ -198,7 +174,7 @@ class BaseFactory(object):
                 if EMAIL_RE.match(userid):
                     user = self.request.userdb_new.get_user_by_mail(userid)
                 elif OID_RE.match(userid):
-                    user = self.request.userdb_new.get_user_by_oid(userid)
+                    user = self.request.userdb_new.get_user_by_id(userid)
                 if not user:
                     raise HTTPNotFound()
                 logger.debug('get_user() storing user {!r}'.format(user))
@@ -231,29 +207,40 @@ class BaseFactory(object):
         # XXX what is this context user???
         logger.notice('UPDATE CONTEXT USER CALLED')
         raise NotImplementedError('update_context_user UN-implemented')
-        eppn = self.user.get('eduPersonPrincipalName')
-        self.user = self.request.userdb.get_user_by_eppn(eppn)
-        self.user.retrieve_modified_ts(self.request.db.profiles)
+        eppn = self.user.eppn
+        self.user = self.request.userdb_new.get_user_by_eppn(eppn)
+        retrieve_modified_ts(self.user, self.request.dashboard_userdb)
 
     def propagate_user_changes(self, newuser):
         logger.debug('Base factory propagate_user_changes')
         return sync_user_changes_to_userdb(newuser)
 
+    def save_dashboard_user(self, user):
+        '''
+        Save (new) user objects to the dashboard db in the new format,
+        and propagate the changes to the central user db.
+
+        May raise UserOutOfSync exception
+
+        :param user: the modified user
+        :type user: eduid_userdb.dashboard.user.DashboardUser
+        '''
+        self.request.dashboard_userdb.save(user, old_format=False)
+        self.propagate_user_changes(user)
+
+
     def get_groups(self, userid=None, request=None):
         #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
         user = self._logged_in_user
-        if not user:
-            logger.debug("No logged in user found in session (userid {!r})".format(userid))
-            user = OldUser({})
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         if required_urn is '':
             return ['']
-        if required_urn in user.get_entitlements():
+        if required_urn in user.entitlements:
             return [self.workmode]
         logger.debug("Required URN {!r} not found in user {!r} entitlements: {!r}".format(
-            required_urn, user, user.get_entitlements()))
+            required_urn, user, user.entitlements))
         return []
 
     def get_loa(self):
@@ -264,10 +251,8 @@ class BaseFactory(object):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)
         if max_loa is None:
             user = self.get_user()
-            if not user:
-                user = OldUser({})
 
-            max_loa = self.request.userdb.get_identity_proofing(user)
+            max_loa = self.request.userdb_new.get_identity_proofing(user)
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
@@ -284,16 +269,16 @@ class BaseFactory(object):
 
     def session_user_display(self):
         user = self.get_user()
-        display_name = user.get_display_name()
+        display_name = user.display_name
         if display_name:
             return display_name
 
-        gn = user.get_given_name()
-        sn = user.get_sn()
+        gn = user.given_name
+        sn = user.surname
         if gn and sn:
             return "{0} {1}".format(gn, sn)
 
-        return user.get_mail()
+        return user.mail_addresses.primary.key
 
     def get_preferred_language(self):
         """ Return always a """
@@ -336,9 +321,7 @@ class HomeFactory(BaseFactory):
 
     def get_user(self):
         # XXX what's the purpose here? Override BaseFactory.get_user() to never get edit-user?
-        user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
-        if not user:
-            user = OldUser({})
+        user = get_logged_in_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
         logger.debug('HomeFactory get_user returning {!s}'.format(user))
         return user
 
@@ -347,9 +330,7 @@ class HelpFactory(BaseFactory):
 
 
 class PersonFactory(BaseFactory):
-
-    def get_user(self):
-        return self.get_new_user()
+    pass
 
 
 class SecurityFactory(BaseFactory):
@@ -362,15 +343,11 @@ class PostalAddressFactory(BaseFactory):
 
 
 class MobilesFactory(BaseFactory):
-
-    def get_user(self):
-        return self.get_new_user()
+    pass
 
 
 class NinsFactory(BaseFactory):
-
-    def get_user(self):
-        return self.get_new_user()
+    pass
 
 
 class ResetPasswordFactory(RootFactory):
@@ -392,9 +369,6 @@ class PermissionsFactory(BaseFactory):
         ],
     }
 
-    def get_user(self):
-        return self.get_new_user()
-
 
 class VerificationsFactory(BaseFactory):
 
@@ -405,15 +379,13 @@ class VerificationsFactory(BaseFactory):
         })
         if verification_code is None:
             raise HTTPNotFound()
-        user = self.request.userdb.get_user_by_oid(verification_code['user_oid'])
-        user.retrieve_modified_ts(self.request.db.profiles)
+        user = self.request.userdb_new.get_user_by_id(verification_code['user_oid'])
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
         return user
 
 
 class StatusFactory(BaseFactory):
-
-    def get_user(self):
-        return self.get_new_user()
+    pass
 
 
 class ProofingFactory(BaseFactory):

@@ -9,10 +9,12 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
 from pyramid.i18n import get_localizer
 
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.nin import Nin
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
@@ -20,7 +22,7 @@ from eduiddashboard.verifications import (verify_nin, verify_code,
                                           get_verification_code)
 from eduiddashboard.verifications import (new_verification_code,
                                           save_as_verified)
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.idproofinglog import LetterProofing
 
 import logging
@@ -276,7 +278,7 @@ class NINsActionsView(BaseActionsView):
             verify_nin(self.request, self.user, nin)
             model_name = 'norEduPersonNIN'
             try:
-                self.request.dashboard_userdb.save(self.user)
+                self.context.save_dashboard_user(self.user)
                 logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
                 # Save the state in the verifications collection
                 save_as_verified(self.request, 'norEduPersonNIN', self.user.user_id, nin)
@@ -312,7 +314,7 @@ class NINsActionsView(BaseActionsView):
         verifications.remove({
             'model_name': self.data_attribute,
             'obj_id': remove_nin,
-            'user_oid': self.user.get_id(),
+            'user_oid': self.user.user_id,
             'verified': False,
         })
 
@@ -555,21 +557,20 @@ class NinsView(BaseFormView):
             })
 
         if old_user:
-            old_user = OldUser(old_user)
-            old_user.retrieve_modified_ts(self.request.db.profiles)
-            nins = [nin for nin in old_user.get_nins() if nin != newnin]
-            old_user.set_nins(nins)
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
-            old_user.save(self.request)
+            old_user = DashboardUser(data=old_user)
+            retrieve_modified_ts(old_user, self.request.dashboard_userdb)
+            old_user.nins.remove(newnin)
+            self.context.save_dashboard_user(old_user)
 
-        nins = self.user.get_nins()
-        nins.append(newnin)
-        self.user.set_nins(nins)
-        self.user.retrieve_address(self.request, newnin)
+        primary = False
+        if self.user.nins.count == 0:
+            primary = True
+        newnin_obj = Nin(number=newnin, application='dashboard',
+                verified=True, primary=primary)
+        self.user.nins.add(newnin_obj)
 
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             message = _('Your user profile is out of sync. Please '
                         'reload the page and try again.')

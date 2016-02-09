@@ -17,7 +17,7 @@ class IDProofingData(object):
         self._required_keys = ['created', 'eppn']
         self.data = dict()
         self.data['created'] = datetime.utcnow()
-        self.data['eppn'] = user.get_eppn()
+        self.data['eppn'] = user.eppn
 
     def validate(self, d):
         # Check that all keys are accounted for and that none of them evaluates to false

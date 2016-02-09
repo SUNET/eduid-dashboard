@@ -88,7 +88,7 @@ class EmailsActionsView(BaseActionsView):
 
         self.user.mail_addresses.primary = mail.email
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -121,7 +121,7 @@ class EmailsActionsView(BaseActionsView):
             self.user.mail_addresses.remove(remove_email)
 
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -176,7 +176,7 @@ class EmailsView(BaseFormView):
 
         self.user.mail_addresses.add(new_email)
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
 

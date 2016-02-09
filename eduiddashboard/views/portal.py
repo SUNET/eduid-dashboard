@@ -174,7 +174,7 @@ def help(context, request):
     support_email = request.registry.settings.get('mail.support_email',
                                                   'support@eduid.se')
     template_context = {
-        'user':context.user.get_doc(),
+        'user':context.user.to_dict(),
         'support_email': support_email
     }
 
@@ -199,7 +199,7 @@ def token_login(context, request):
         #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
         #request.session['loa'] = 1
         store_session_user(request, user)
-        remember_headers = remember(request, user.get('email'))
+        remember_headers = remember(request, user.mail_addresses.primary.key)
         request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
@@ -275,21 +275,21 @@ def account_termination_action(request, session_info, user):
     :type user: eduid_userdb.dashboard.DashboardLegacyUser
     """
     settings = request.registry.settings
-    logged_user = get_logged_in_user(request, legacy_user = True)
+    logged_user = get_logged_in_user(request, legacy_user = False)
 
-    if logged_user.get_id() != user.get_id():
+    if logged_user.user_id != user.user_id:
         raise HTTPUnauthorized("Wrong user")
 
     logger.info("Terminating user {!s}".format(user))
 
     # revoke all user credentials
     revoke_all_credentials(settings.get('vccs_url'), user)
-    user.set_passwords([])
+    for p in user.passwords.to_list():
+        user.passwords.remove(p.key)
 
     # flag account as terminated
-    user.set_terminated()
-    user.save(request, check_sync=False)
-    request.context.propagate_user_changes(user)
+    user.terminated = True
+    request.context.save_dashboard_user(user)
 
     # email the user
     send_termination_mail(request, user)

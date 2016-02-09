@@ -62,14 +62,14 @@ def send_termination_mail(request, user):
 
     context = {
         'support_mail': support_email,
-        'displayName': user.get_display_name()
+        'displayName': user.display_name
     }
 
     message = Message(
         subject=_("{site_name} account termination").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
-        recipients=[user.get_mail()],
+        recipients=[user.mail_addresses.primary.key],
         body=render(
             "templates/termination_email.txt.jinja2",
             context,
@@ -87,7 +87,8 @@ def send_termination_mail(request, user):
         log.debug(message.body)
     else:
         mailer.send(message)
-    log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))
+    log.debug("Sent termination mail to user {!r} with address {!s}.".format(
+        user, user.mail_addresses.primary.key))
     request.stats.count('dashboard/email_send_termination_mail', 1)
 
 
@@ -97,7 +98,7 @@ def send_reset_password_mail(request, user, reset_password_link):
 
     site_name = request.registry.settings.get("site.name", "eduID")
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
-    email = user.get_mail()
+    email = user.mail_addresses.primary.key
 
     context = {
         "email": email,

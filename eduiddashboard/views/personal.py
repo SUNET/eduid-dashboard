@@ -72,11 +72,10 @@ class PersonalDataView(BaseFormView):
         self.user.surname = person.get('sn')
         self.user.language = person.get('preferredLanguage')
         try:
-            self.request.dashboard_userdb.save(self.user)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
         else:
-            self.request.context.propagate_user_changes(self.user)
             message = _('Changes saved')
             self.request.session.flash(
                     get_localizer(self.request).translate(message),

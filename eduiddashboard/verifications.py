@@ -13,6 +13,7 @@ from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
@@ -68,7 +69,7 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
 
 def get_not_verified_objects(request, model_name, user):
     return request.db.verifications.find({
-        'user_oid': user.get_id(),
+        'user_oid': user.user_id,
         'model_name': model_name,
         'verified': False,
     })
@@ -83,6 +84,7 @@ def verify_nin(request, user, new_nin, reference=None):
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = DashboardUser(data=old_user_doc)
+        retrieve_modified_ts(old_user, request.dashboard_userdb)
         if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
             log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
@@ -96,7 +98,7 @@ def verify_nin(request, user, new_nin, reference=None):
                     old_user._nins = NinList([])
             old_user.nins.remove(new_nin)
             log.debug('Old user NINs AFTER: {!r}.'.format(old_user.nins.to_list()))
-            request.dashboard_userdb.save(old_user)
+            request.context.save_dashboard_user(old_user)
             log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified nin to the requesting user
@@ -130,6 +132,7 @@ def verify_mobile(request, user, new_mobile):
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = DashboardUser(data=old_user_doc)
+        retrieve_modified_ts(old_user, request.dashboard_userdb)
         if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with mobile number ({!s}) already verified.'.format(old_user, new_mobile))
             log.debug('Old user mobile numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
@@ -143,7 +146,7 @@ def verify_mobile(request, user, new_mobile):
                     old_user._phone_numbers = PhoneNumberList([])
             old_user.phone_numbers.remove(new_mobile)
             log.debug('Old user mobile numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
-            request.dashboard_userdb.save(old_user)
+            request.context.save_dashboard_user(old_user)
             log.info('Removed mobile number from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified mobile number to the requesting user
@@ -169,6 +172,7 @@ def verify_mail(request, user, new_mail):
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = DashboardUser(data=old_user_doc)
+        retrieve_modified_ts(old_user, request.dashboard_userdb)
         if old_user and old_user.user_id != user.user_id:
             log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
             log.debug('Old user mail BEFORE: {!s}.'.format(old_user.mail_addresses.primary.key))
@@ -184,7 +188,7 @@ def verify_mail(request, user, new_mail):
             old_user.mail_addresses.remove(new_mail)
             log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
             log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
-            request.dashboard_userdb.save(old_user)
+            request.context.save_dashboard_user(old_user)
             steal_count += 1
     # Add the verified mail address to the requesting user
     new_email = MailAddress(email=new_mail, application='dashboard',
@@ -242,7 +246,7 @@ def verify_code(request, model_name, code):
         raise NotImplementedError('Unknown validation model_name')
 
     try:
-        request.dashboard_userdb.save(user)
+        request.context.save_dashboard_user(user)
         log.info("Verified {!s} saved for user {!r}.".format(model_name, user))
         verified = {
             'verified': True,

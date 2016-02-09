@@ -52,11 +52,10 @@ class PermissionsView(BaseFormView):
         new_entitlements = data[self.attribute]
         self.user.entitlements.extend(new_entitlements)
         try:
-            self.request.dashboard_userdb.save(self.user, old_format=False)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
         else:
-            self.request.context.propagate_user_changes(self.user)
             message = _('Changes saved.')
             self.request.session.flash(
                     get_localizer(self.request).translate(message),
