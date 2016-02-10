@@ -8,7 +8,6 @@ from datetime import datetime
 import json
 
 from eduid_userdb.exceptions import UserOutOfSync
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.verifications import get_verification_code, verify_nin
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import _get_user_by_eppn
@@ -29,7 +28,7 @@ def verify_code(env, user, verification_doc):
     """
     :param env: Pyramid wsgi env
     :param user: Dashboard user
-    :type user:
+    :type user: eduid_userdb.dashboard.User
     :param verification_doc: Mongo doc
     :type verification_doc: dict
     """
@@ -62,7 +61,9 @@ def verify_code(env, user, verification_doc):
 
 def letter_proof_user():
     description = """\
-    Apply verification returned by eduid-idproofing-letter after failure. Example:
+    Apply verification returned by eduid-idproofing-letter after failure. The JSON data is found in the
+    eduid-idproofing-letter log after a users successful verification.
+    Example:
     'letter_proof_user eppn idproofing-letter-json-data'
     """
     usage = "usage: %prog eppn idproofing-letter-json-data"
