@@ -172,6 +172,3 @@ class IDProofingLog(object):
             return True
         return False
 
-
-def get_idproofinglog(request):
-    return request.registry.settings['idproofinglog']

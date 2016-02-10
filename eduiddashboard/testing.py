@@ -29,7 +29,6 @@ from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard.msgrelay import MsgRelay
 from eduiddashboard.session import store_session_user
 from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
-from eduiddashboard.utils import sync_user_changes_to_userdb
 
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -270,7 +269,7 @@ class LoggedInRequestTests(MongoTestCase):
             Make sure there is a request.context.propagate_user_changes in testing too.
             """
             logger.debug('FREDRIK: Testing dummy_request.context propagate_user_changes')
-            return sync_user_changes_to_userdb(user)
+            return self.request.amrelay.request_sync(user)
 
         request.context.propagate_user_changes = propagate_user_changes
 
