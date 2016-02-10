@@ -1,8 +1,7 @@
-__author__ = 'mathiashedstrom'
-
 from eduid_lookup_mobile.celery import app
 from eduid_lookup_mobile.tasks import find_mobiles_by_NIN, find_NIN_by_mobile
 
+__author__ = 'mathiashedstrom'
 
 class LookupMobileRelay(object):
 
@@ -10,13 +9,12 @@ class LookupMobileRelay(object):
         pass
 
     def __init__(self, settings):
-        config = {
-            'BROKER_URL': settings.get('lookup_mobile_broker_url',
-                                       'amqp://eduid:eduid@127.0.0.1:5672/lookup_mobile'),
-            'TEMPLATES_DIR': 'templates/',
-            'CELERY_RESULT_BACKEND': 'amqp',
-        }
 
+        config = settings.get('default_celery_conf')
+        config.update({
+            'BROKER_URL': settings.get('lookup_mobile_broker_url'),
+            'TEMPLATES_DIR': 'templates/',
+        })
         app.conf.update(config)
 
         self.settings = settings
@@ -42,7 +40,3 @@ class LookupMobileRelay(object):
             return result
         except:
             raise self.TaskFailed('Something went wrong')
-
-
-def get_lookuprelay(request):
-    return request.registry.settings['lookuprelay']

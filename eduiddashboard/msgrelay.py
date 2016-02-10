@@ -63,14 +63,11 @@ class MsgRelay(object):
 
     def __init__(self, settings):
 
-        config = {
-            'BROKER_URL': settings.get('msg_broker_url',
-                                       'amqp://eduid:eduid@127.0.0.1:5672/eduid_msg'),
+        config = settings.get('default_celery_conf')
+        config.update({
+            'BROKER_URL': settings.get('msg_broker_url'),
             'TEMPLATES_DIR': 'templates/',
-            'CELERY_RESULT_BACKEND': 'amqp',
-            'CELERY_TASK_SERIALIZER': 'json',
-            'MONGO_URI': settings.get('mongo_uri'),  # only needed when testing I think
-        }
+        })
         celery.conf.update(config)
 
         self._relay = get_message_relay(celery)
@@ -282,6 +279,3 @@ class MsgRelay(object):
         logger.debug('SENT postal address message for transaction log with reference: {0}'.format(reference))
         self._set_audit_log_postal_address.delay(reference)
 
-
-def get_msgrelay(request):
-    return request.registry.settings['msgrelay']
