@@ -1,4 +1,5 @@
 ## Passwords form
+from eduid_userdb.dashboard import DashboardUser
 
 from deform import Button
 import json
@@ -431,15 +432,19 @@ class BaseResetPasswordView(FormView):
         """
         if validate_email_format(text):
             user = self.request.userdb_new.get_user_by_mail(normalize_email(text), raise_on_missing=True)
-        elif text.startswith(u'0') or text.startswith(u'+'):
-            text = normalize_to_e_164(self.request, text)
-            user = self.request.userdb_new._get_user_by_filter(
-                {'mobile': {'$elemMatch': {'mobile': text, 'verified': True}}}
-            )
         else:
-            user = self.request.userdb_new.get_user_by_filter(
-                {'norEduPersonNIN': {'$elemMatch': {'norEduPersonNIN': text, 'verified': True}}}
-            )
+            if text.startswith(u'0') or text.startswith(u'+'):
+                text = normalize_to_e_164(self.request, text)
+                user = self.request.userdb_new._get_documents_by_filter(
+                    {'mobile': {'$elemMatch': {'mobile': text, 'verified': True}}}
+                )
+            else:
+                user = self.request.userdb_new._get_documents_by_filter(
+                    {'norEduPersonNIN': {'$elemMatch': {'norEduPersonNIN': text, 'verified': True}}}
+                )
+
+            assert(user.count() == 1)
+            user = DashboardUser(data=user[0])
 
         log.debug("Found user {!r} using input {!s}.".format(user, text))
         retrieve_modified_ts(user, self.request.dashboard_userdb)

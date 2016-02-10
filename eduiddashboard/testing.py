@@ -22,7 +22,6 @@ import redis
 from bson import ObjectId
 
 from eduid_userdb import UserDB
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUserDB, DashboardUser
 from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
@@ -208,15 +207,14 @@ class LoggedInRequestTests(MongoTestCase):
         self.config.registry.registerUtility(self, IDebugLogger)
 
         self.userdb = app.registry.settings['userdb']
-        _userdoc = self.userdb.get_user_by_mail(std_user)
-        self.assertIsNotNone(_userdoc, "Could not load the standard test user {!r} from the database {!s}".format(
-            std_user, self.userdb))
-        self.user = OldUser(data=_userdoc)
+        self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_am')   # central userdb in new format (User)
+        self.user = self.userdb_new.get_user_by_mail(std_user)
+        self.assertIsNotNone(self.user, "Could not load the standard test user {!r} from the database {!s}".format(
+            std_user, self.userdb_new))
         self.logged_in_user = None
 
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
-        self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_am')   # central userdb in new format (User)
         self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
         # Clean up the dashboards private database collections
         logger.debug("Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
@@ -243,7 +241,7 @@ class LoggedInRequestTests(MongoTestCase):
         super(LoggedInRequestTests, self).tearDown()
         logger.debug("tearDown: Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         for userdoc in self.db.profiles.find({}):
-            assert OldUser(userdoc)
+            assert DashboardUser(userdoc)
         self.db.profiles.drop()
         self.db.verifications.drop()
         self.db.reset_passwords.drop()

@@ -164,6 +164,7 @@ class NinsFormTests(LoggedInRequestTests):
         email = self.no_nin_user_email
         self.set_logged(email)
         user = self.dashboard_db.get_user_by_mail(email)
+        eppn = user.eppn
 
         self.assertEqual(user.nins.count, 0)
 
@@ -186,19 +187,15 @@ class NinsFormTests(LoggedInRequestTests):
                 'success': True,
                 'message': u'Ok',
                 }
-            with patch.object(OldUser, 'retrieve_address', clear=True):
-                OldUser.retrieve_address.return_value = None
-
-                response = self.testapp.post(
-                    '/profile/nins-actions/',
-                    {'identifier': nin + '  0', 'action': 'verify_mb'}
-                )
+            response = self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': nin + '  0', 'action': 'verify_mb'}
+            )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')
-        user = self.db.profiles.find_one({'mail': email})
-        user = OldUser(user)
-        self.assertEqual(len(user.get_nins()), 1)
-        self.assertEqual(user.get_nins()[0], nin)
+        user = self.dashboard_db.get_user_by_eppn(eppn)
+        self.assertEqual(len(user.nins.to_list()), 1)
+        self.assertEqual(user.nins.to_list()[0].key, nin)
 
     @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):

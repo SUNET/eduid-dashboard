@@ -162,23 +162,20 @@ def provision_credentials(vccs_url, new_password, user):
     new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                 credential_id=str(password_id))
 
-    passwords = user.get_passwords()
-
-    if not vccs.add_credentials(str(user.get_id()), [new_factor]):
+    if not vccs.add_credentials(str(user.user_id), [new_factor]):
         return False  # something failed
 
-    passwords.append({
-        'id': password_id,
-        'salt': new_factor.salt,
-    })
-    user.set_passwords(passwords)
-
+    new_password = Password(credential_id = password_id,
+                            salt = new_factor.salt,
+                            application = 'dashboard',
+                            )
+    user.passwords.add(new_password)
     return True
 
 
 def revoke_all_credentials(vccs_url, user):
     vccs = get_vccs_client(vccs_url)
-    passwords = user.get_passwords()
+    passwords = user.passwords.to_list_of_dicts()
     to_revoke = []
     for passwd_dict in passwords:
         credential_id = str(passwd_dict['id'])
@@ -191,5 +188,5 @@ def revoke_all_credentials(vccs_url, user):
                   " {!s} (user {!r})".format(
                       credential_id, user))
         to_revoke.append(factor)
-    userid = str(user.get_id())
+    userid = str(user.user_id)
     vccs.revoke_credentials(userid, to_revoke)

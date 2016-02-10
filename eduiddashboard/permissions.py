@@ -71,7 +71,7 @@ class BaseFactory(object):
     #user = None
 
     def __init__(self, request):
-        user = get_logged_in_user(request, legacy_user = True, raise_on_not_logged_in = False)
+        user = get_logged_in_user(request, legacy_user = False, raise_on_not_logged_in = False)
         if user is None:
             headers = forget(request)
             url = request.route_path('saml2-login')
