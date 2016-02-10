@@ -344,6 +344,9 @@ def main(global_config, **settings):
         'MONGO_URI': settings.get('mongo_uri'),
         'BROKER_URL': broker_url,
         'CELERY_TASK_SERIALIZER': 'json',
+        # Detect connection timeouts
+        'BROKER_HEARTBEAT': 10,
+        'BROKER_TRANSPORT_OPTIONS': {'confirm_publish': True},
     })
     settings['celery'] = celery
     settings['broker_url'] = broker_url
