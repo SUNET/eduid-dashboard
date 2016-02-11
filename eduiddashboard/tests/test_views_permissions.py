@@ -66,10 +66,9 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        q = {'_id':ObjectId('901234567890123456789012')}
-        entitlements = self.userdb_new._coll.find(q)[0]['eduPersonEntitlement']
+        user = self.userdb_new.get_user_by_id(ObjectId('901234567890123456789012'))
 
-        self.assertEqual(entitlements, ['urn:mace:eduid.se:role:admin']) 
+        self.assertEqual(user.entitlements, ['urn:mace:eduid.se:role:admin'])
 
     def test_logged_remove_admin_permissions(self):
         self.set_logged(email ='johnsmith@example.com')
@@ -82,10 +81,9 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        q = {'_id':ObjectId('901234567890123456789012')}
-        entitlements = self.userdb_new._coll.find(q)[0]['eduPersonEntitlement']
+        user = self.userdb_new.get_user_by_id(ObjectId('901234567890123456789012'))
 
-        self.assertEqual(entitlements, ['urn:mace:eduid.se:role:ra']) 
+        self.assertEqual(user.entitlements, ['urn:mace:eduid.se:role:ra'])
 
         self.set_logged(email ='johnsmith@example.org')
 
@@ -105,10 +103,9 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        q = {'_id':ObjectId('901234567890123456789012')}
-        entitlements = self.userdb_new._coll.find(q)[0]['eduPersonEntitlement']
+        user = self.userdb_new.get_user_by_id(ObjectId('901234567890123456789012'))
 
-        self.assertEqual(entitlements, ['urn:mace:eduid.se:role:admin']) 
+        self.assertEqual(user.entitlements, ['urn:mace:eduid.se:role:admin'])
 
 
 class PermissionsFormTestsPersonalMode(LoggedInRequestTests):
