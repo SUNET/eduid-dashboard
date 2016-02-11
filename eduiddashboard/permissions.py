@@ -43,6 +43,20 @@ class RootFactory(object):
         return self.request.amrelay.request_sync(user)
 
 
+    def save_dashboard_user(self, user):
+        '''
+        Save (new) user objects to the dashboard db in the new format,
+        and propagate the changes to the central user db.
+
+        May raise UserOutOfSync exception
+
+        :param user: the modified user
+        :type user: eduid_userdb.dashboard.user.DashboardUser
+        '''
+        self.request.dashboard_userdb.save(user, old_format=False)
+        self.propagate_user_changes(user)
+
+
 def is_logged(request):
     user = authenticated_userid(request)
     if user is None:
@@ -50,7 +64,7 @@ def is_logged(request):
     return has_logged_in_user(request)
 
 
-class BaseFactory(object):
+class BaseFactory(RootFactory):
     __acl__ = [
         (Allow, Authenticated, ALL_PERMISSIONS),
     ]
@@ -209,24 +223,6 @@ class BaseFactory(object):
         eppn = self.user.eppn
         self.user = self.request.userdb_new.get_user_by_eppn(eppn)
         retrieve_modified_ts(self.user, self.request.dashboard_userdb)
-
-    def propagate_user_changes(self, newuser):
-        logger.debug('Base factory propagate_user_changes')
-        return self.request.amrelay.request_sync(newuser)
-
-    def save_dashboard_user(self, user):
-        '''
-        Save (new) user objects to the dashboard db in the new format,
-        and propagate the changes to the central user db.
-
-        May raise UserOutOfSync exception
-
-        :param user: the modified user
-        :type user: eduid_userdb.dashboard.user.DashboardUser
-        '''
-        self.request.dashboard_userdb.save(user, old_format=False)
-        self.propagate_user_changes(user)
-
 
     def get_groups(self, userid=None, request=None):
         #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)

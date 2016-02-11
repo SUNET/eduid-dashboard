@@ -380,10 +380,14 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         form['email_or_username'].value = 'notexistingmail@foodomain.com'
         response = form.submit('reset')
         self.assertEqual(response.status, '302 Found')
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertEqual(len(reset_passwords_after), 0)
 
         form['email_or_username'].value = 'johnnysmith3@example.com'
         response = form.submit('reset')
         self.assertEqual(response.status, '302 Found')
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertEqual(len(reset_passwords_after), 0)
 
         self.db.reset_passwords.remove()
         form['email_or_username'].value = '0701234567'
@@ -403,7 +407,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             response = form.submit('reset')
             self.assertEqual(response.status, '302 Found')
         reset_passwords_after = list(self.db.reset_passwords.find())
-        self.assertEqual(len(reset_passwords_after), 1)
+        self.assertEqual(len(reset_passwords_after), 2)
 
     def test_unverify_nin_and_mobile(self):
         # Reset user password via e-mail
