@@ -256,7 +256,7 @@ class TerminateAccountTests(LoggedInRequestTests):
                     request.POST['RelayState'] = '/profile/account-terminated/'
                     request.context.propagate_user_changes = lambda x: None
                     from eduiddashboard.views.portal import account_termination_action
-                    user = self.userdb.get_user_by_mail(email)
+                    user = self.userdb_new.get_user_by_mail(email)
                     account_termination_action(request, FAKE_SESSION_INFO, user)
 
         # Verify the user doesn't have ANY passwords and IS terminated at this point

@@ -19,6 +19,7 @@
 
 from pyramid.security import remember, forget
 
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.utils import get_saml_attribute
 from eduiddashboard.session import store_session_user, get_logged_in_user
@@ -107,13 +108,13 @@ def authenticate(request, session_info):
 
     log.debug('Looking for user with eduPersonPrincipalName == {!r}'.format(saml_user))
     try:
-        user = request.userdb.get_user_by_eppn(saml_user)
+        user = request.userdb_new.get_user_by_eppn(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:
         log.error('No user with eduPersonPrincipalName = {!r} found'.format(saml_user))
     except request.userdb.exceptions.MultipleUsersReturned:
         log.error("There are more than one user with eduPersonPrincipalName = {!r}".format(saml_user))
     else:
-        user.retrieve_modified_ts(request.db.profiles)
+        retrieve_modified_ts(user, request.dasboard_userdb)
         return user
     return None
 
