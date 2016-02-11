@@ -1,4 +1,3 @@
-import os
 import re
 
 import logging
@@ -12,7 +11,6 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
 
-from eduid_am.celery import celery
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
 from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
@@ -27,9 +25,10 @@ from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         HelpFactory, AdminFactory, is_logged)
 
 from eduiddashboard.session import SessionFactory
-from eduiddashboard.msgrelay import MsgRelay, get_msgrelay
-from eduiddashboard.lookuprelay import LookupMobileRelay, get_lookuprelay
-from eduiddashboard.idproofinglog import IDProofingLog, get_idproofinglog
+from eduiddashboard.msgrelay import MsgRelay
+from eduiddashboard.lookuprelay import LookupMobileRelay
+from eduiddashboard.idproofinglog import IDProofingLog
+from eduiddashboard.amrelay import AmRelay
 from eduiddashboard.stats import get_stats_instance
 import eduiddashboard.loa
 
@@ -211,17 +210,17 @@ def includeme(config):
     config.registry.settings['dashboard_userdb'] = _dashboard_userdb
     config.add_request_method(lambda x: x.registry.settings['dashboard_userdb'], 'dashboard_userdb', reify=True)
 
-    msgrelay = MsgRelay(config.registry.settings)
-    config.registry.settings['msgrelay'] = msgrelay
-    config.add_request_method(get_msgrelay, 'msgrelay', reify=True)
+    config.registry.settings['msgrelay'] = MsgRelay(config.registry.settings)
+    config.add_request_method(lambda x: x.registry.settings['msgrelay'], 'msgrelay', reify=True)
 
-    lookuprelay = LookupMobileRelay(config.registry.settings)
-    config.registry.settings['lookuprelay'] = lookuprelay
-    config.add_request_method(get_lookuprelay, 'lookuprelay', reify=True)
+    config.registry.settings['lookuprelay'] = LookupMobileRelay(config.registry.settings)
+    config.add_request_method(lambda x: x.registry.settings['lookuprelay'], 'lookuprelay', reify=True)
 
-    idproofinglog = IDProofingLog(config.registry.settings)
-    config.registry.settings['idproofinglog'] = idproofinglog
-    config.add_request_method(get_idproofinglog, 'idproofinglog', reify=True)
+    config.registry.settings['idproofinglog'] = IDProofingLog(config.registry.settings)
+    config.add_request_method(lambda x: x.registry.settings['idproofinglog'], 'idproofinglog', reify=True)
+
+    config.registry.settings['amrelay'] = AmRelay(config.registry.settings)
+    config.add_request_method(lambda x: x.registry.settings['amrelay'], 'amrelay', reify=True)
 
     config.set_request_property(is_logged, 'is_logged', reify=True)
 
@@ -338,22 +337,19 @@ def main(global_config, **settings):
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
 
-    # configure Celery broker
-    broker_url = read_setting_from_env(settings, 'broker_url', 'amqp://')
-    celery.conf.update({
-        'MONGO_URI': settings.get('mongo_uri'),
-        'BROKER_URL': broker_url,
+    # configuration for Celery brokers
+    default_celery_conf = {
+        'BROKER_URL': None,  # The broker url needs to be set when instantiating the broker
         'CELERY_TASK_SERIALIZER': 'json',
-    })
-    settings['celery'] = celery
-    settings['broker_url'] = broker_url
-
-    settings['msg_broker_url'] = read_setting_from_env(settings,
-                                                       'msg_broker_url',
-                                                       'amqp://eduid_msg')
-
-    settings['lookup_mobile_broker_url'] = read_setting_from_env(settings,
-                                                                 'lookup_mobile_broker_url',
+        'CELERY_RESULT_BACKEND': 'amqp',
+        # Detect connection timeouts
+        'BROKER_HEARTBEAT': 10,
+        'BROKER_TRANSPORT_OPTIONS': {'confirm_publish': True},
+    }
+    settings['default_celery_conf'] = default_celery_conf
+    settings['am_broker_url'] = read_setting_from_env(settings, 'broker_url', 'amqp://')
+    settings['msg_broker_url'] = read_setting_from_env(settings, 'msg_broker_url', 'amqp://eduid_msg')
+    settings['lookup_mobile_broker_url'] = read_setting_from_env(settings, 'lookup_mobile_broker_url',
                                                                  'amqp://lookup_mobile')
 
     settings['workmode'] = read_setting_from_env(settings, 'workmode',

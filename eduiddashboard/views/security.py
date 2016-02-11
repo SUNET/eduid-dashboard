@@ -16,8 +16,6 @@ from pyramid.i18n import get_localizer
 from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
-from eduiddashboard.utils import sync_user_changes_to_userdb
-
 from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
@@ -64,6 +62,8 @@ def change_password(request, user, old_password, new_password):
         retrieve_modified_ts(user, request.dashboard_userdb)
         user.terminated = False
         request.context.save_dashboard_user(user)
+        # XXX save() might have requested a sync already?
+        #request.amrelay.request_sync(user)
     return added
 
 
@@ -742,7 +742,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             if sync_user:
                 # Do not perform a sync if no changes where made, there is a corner case
                 # where the user has not been created yet
-                sync_user_changes_to_userdb(user)
+                self.request.amrelay.request_sync(user)
 
         # Save new password
         new_password = new_password.replace(' ', '')

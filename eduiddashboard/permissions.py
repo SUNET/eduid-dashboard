@@ -5,7 +5,6 @@ from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.utils import sync_user_changes_to_userdb
 from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import (get_session_user, get_logged_in_user,
                                     has_logged_in_user, has_edit_user,
@@ -41,7 +40,7 @@ class RootFactory(object):
         :return:
         """
         logger.debug('Root factory propagate_user_changes')
-        return sync_user_changes_to_userdb(user)
+        return self.request.amrelay.request_sync(user)
 
 
 def is_logged(request):
@@ -213,7 +212,7 @@ class BaseFactory(object):
 
     def propagate_user_changes(self, newuser):
         logger.debug('Base factory propagate_user_changes')
-        return sync_user_changes_to_userdb(newuser)
+        return self.request.amrelay.request_sync(newuser)
 
     def save_dashboard_user(self, user):
         '''
