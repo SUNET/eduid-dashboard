@@ -429,7 +429,9 @@ class NINsActionsView(BaseActionsView):
                     msg = _('Sorry, we are experiencing temporary technical '
                             'problems, please try again later.')
             else:
-                log.error('User {!r} supplied wrong letter verification code or nin did not match.'.format(self.user))
+                log.info('User {!r} supplied wrong letter verification code or nin did not match.'.format(self.user))
+                log.debug('NIN in dashboard: {!s}, NIN in idproofing-letter: {!s}'.format(nin,
+                                                                                          rdata.get('number', None)))
                 msg = _('Your verification code seems to be wrong, '
                         'please try again.')
         logger.info("Received status code {!s} from idproofing-letter after posting verification code "
