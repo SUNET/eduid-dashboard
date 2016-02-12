@@ -114,7 +114,7 @@ def authenticate(request, session_info):
     except request.userdb.exceptions.MultipleUsersReturned:
         log.error("There are more than one user with eduPersonPrincipalName = {!r}".format(saml_user))
     else:
-        retrieve_modified_ts(user, request.dasboard_userdb)
+        retrieve_modified_ts(user, request.dashboard_userdb)
         return user
     return None
 
@@ -128,14 +128,14 @@ def login(request, session_info, user):
     :param user: Information about user as returned by authenticate()
     :return:
     """
-    log.info("User {!r} logging in (eduPersonPrincipalName: {!r})".format(user['_id'], user['eduPersonPrincipalName']))
-    request.session['eduPersonPrincipalName'] = user['eduPersonPrincipalName']
+    log.info("User {!r} logging in (eduPersonPrincipalName: {!r})".format(user.user_id, user.eppn))
+    request.session['eduPersonPrincipalName'] = user.eppn
     store_session_user(request, user)
     request.session['eduPersonAssurance'] = get_loa(
         request.registry.settings.get('available_loa'),
         session_info
     )
-    remember_headers = remember(request, user['eduPersonPrincipalName'])
+    remember_headers = remember(request, user.eppn)
     return remember_headers
 
 

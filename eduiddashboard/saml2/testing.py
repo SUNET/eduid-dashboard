@@ -8,14 +8,15 @@ from pyramid.config import Configurator
 from pyramid.interfaces import ISessionFactory, IDebugLogger
 from pyramid.security import (remember, Allow, Authenticated, Everyone,
                               ALL_PERMISSIONS)
-from pyramid.testing import DummyRequest, DummyResource
+from pyramid.testing import DummyRequest
 from pyramid import testing
 import redis
 
-from eduid_userdb.db import MongoDB
-from eduid_userdb.dashboard import UserDBWrapper
+from eduid_userdb import MongoDB, UserDB
+from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
 from eduiddashboard.session import SessionFactory
 from eduiddashboard.testing import MongoTestCase, RedisTemporaryInstance
+from eduiddashboard.testing import DummyResource
 from eduiddashboard.saml2 import includeme as saml2_includeme
 from eduid_am.celery import celery, get_attribute_manager
 
@@ -65,6 +66,16 @@ def saml2_main(global_config, **settings):
     _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     config.registry.settings['userdb'] = _userdb
     config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
+
+    # same DB using new style users
+    config.registry.settings['userdb_new'] = UserDB(config.registry.settings['mongo_uri'], db_name='eduid_am')
+    config.add_request_method(lambda x: x.registry.settings['userdb_new'], 'userdb_new', reify=True)
+
+    # Set up handle to Dashboards private UserDb (DashboardUserDB)
+    _dashboard_userdb = DashboardUserDB(config.registry.settings['mongo_uri'])
+    config.registry.settings['dashboard_userdb'] = _dashboard_userdb
+    config.add_request_method(lambda x: x.registry.settings['dashboard_userdb'], 'dashboard_userdb', reify=True)
+
     mongodb = MongoDB(db_uri=settings['mongo_uri'])
     authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
     config.registry.settings['mongodb'] = mongodb
@@ -131,9 +142,11 @@ class Saml2RequestTests(MongoTestCase):
         self.testapp = TestApp(app)
 
         self.config = testing.setUp()
-        self.config.registry.settings = self.settings
+        self.config.registry.settings.update(self.settings)
         self.config.registry.registerUtility(self, IDebugLogger)
         self.userdb = app.registry.settings['userdb']
+        self.userdb_new = app.registry.settings['userdb_new']
+        self.dashboard_userdb = app.registry.settings['dashboard_userdb']
         self.db = app.registry.settings['db']
 
     def tearDown(self):
@@ -153,7 +166,10 @@ class Saml2RequestTests(MongoTestCase):
     def dummy_request(self):
         request = DummyRequest()
         request.context = DummyResource()
+        request.context.request = request
         request.userdb = self.userdb
+        request.userdb_new = self.userdb_new
+        request.dashboard_userdb = self.dashboard_userdb
         request.db = self.db
         request.registry.settings = self.settings
         return request
