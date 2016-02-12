@@ -17,7 +17,9 @@ class PermissionsAlternativePemissionsInAdminMode(LoggedInRequestTests):
         'eduPersonEntitlement': []
     }]
 
-    def setUp(self, settings={}):
+    def setUp(self, settings=None):
+        if settings is None:
+            settings = {}
         settings.update({
             'workmode': 'admin',
             'available_permissions': """

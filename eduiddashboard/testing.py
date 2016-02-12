@@ -184,10 +184,10 @@ class MockedTask(object):
 class LoggedInRequestTests(MongoTestCase):
     """Base TestCase for those tests that need a logged in environment setup"""
 
-    def setUp(self, settings={}, skip_on_fail=False, std_user='johnsmith@example.com'):
-
+    def setUp(self, settings=None, skip_on_fail=False, std_user='johnsmith@example.com'):
         self.settings = deepcopy(SETTINGS)
-        self.settings.update(settings)
+        if settings is not None:
+            self.settings.update(settings)
         super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
 
         self.redis_instance = RedisTemporaryInstance.get_instance()
