@@ -1,5 +1,5 @@
 from eduiddashboard.testing import LoggedInRequestTests
-from eduiddashboard import read_mapping
+from eduid_common.config.parsers import IniConfigParser
 
 
 class LocaleChangeTests(LoggedInRequestTests):
@@ -8,11 +8,12 @@ class LocaleChangeTests(LoggedInRequestTests):
 
         super(LocaleChangeTests, self).setUp(settings=settings)
         self.default_language = 'en'
+        self.cp = IniConfigParser('')
 
     def test_get_default_lang(self):
         self.set_logged(email ='johnsmith@example.com')
         response = self.testapp.get('/profile/')
-        lang_name = read_mapping(self.settings, 'available_languages')[self.default_language]
+        lang_name = self.cp.read_mapping(self.settings, 'available_languages')[self.default_language]
         response.mustcontain('<span>{0}</span>'.format(lang_name))
 
     def test_change_language_with_referer(self):
