@@ -176,7 +176,7 @@ def unverify_user_nins(request, user):
     return True
 
 
-def unverify_user_mobiles(request, user):
+def remove_user_mobiles(request, user):
     """
     :param request: request object
     :type request:
@@ -185,11 +185,10 @@ def unverify_user_mobiles(request, user):
     :return: True
     :rtype: boolean
 
-    Set all verified mobile phone number to verified = False.
+    Remove all mobile phone numbers
     """
     for mobile in user.phone_numbers.to_list():
-        mobile.is_primary = False
-        mobile.is_verified = False
+        user.phone_numbers.remove(mobile.key)
     request.dashboard_userdb.save(user)
     return True
 
@@ -749,7 +748,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             if len(user.phone_numbers.to_list()):
                 # We need to unverify a users phone numbers to make sure that an attacker can not
                 # verify the account again without control over the users phone number
-                unverify_user_mobiles(self.request, user)
+                remove_user_mobiles(self.request, user)
                 sync_user = True
             if sync_user:
                 # Do not perform a sync if no changes where made, there is a corner case
