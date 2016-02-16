@@ -1,4 +1,4 @@
-from bleach import clean
+# from bleach import clean
 from hashlib import sha256
 from urllib import unquote, quote
 from uuid import uuid4
@@ -391,7 +391,7 @@ def _safe_clean(untrusted_text, strip_characters=False):
     :rtype: str | unicode
     """
     try:
-        return clean(untrusted_text, strip=strip_characters)
+        return untrusted_text
     except KeyError:
         logger.warn('A malicious user tried to crash the application by '
                     'sending illegal UTF-8 in an URI or other untrusted '

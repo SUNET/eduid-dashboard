@@ -356,10 +356,7 @@ class PasswordsView(BaseFormView):
 def reset_password(context, request):
     """ Reset password """
     enable_mm = request.registry.settings.get('enable_mm_verification')
-    user = get_session_user(request)
-    verified_phone = user.phone_numbers.count > 0
-    return {'enable_mm_verification': enable_mm,
-            'verified_phone': verified_phone}
+    return {'enable_mm_verification': enable_mm}
 
 
 @view_config(route_name='reset-password-expired', renderer='templates/reset-password-expired.jinja2',
@@ -397,6 +394,8 @@ class BaseResetPasswordView(FormView):
 
         self.classname = self.__class__.__name__.lower()
 
+        self.user = None
+
         self.form_options = {
             'formid': "{classname}-form".format(classname=self.classname),
             'bootstrap_form_style': 'form-horizontal',
@@ -407,10 +406,9 @@ class BaseResetPasswordView(FormView):
             'intro_message': self.intro_message
         }
         # Collect the users mail addresses for use with zxcvbn
-        user = get_session_user(self.request, raise_on_not_logged_in = False, legacy_user = False)
-        if user:
+        if self.user:
             mail_addresses = []
-            for item in user.mail_addresses.to_list():
+            for item in self.user.mail_addresses.to_list():
                 mail_addresses.append(item.key)
             context['user_input'] = json.dumps(mail_addresses)
         return context
@@ -466,6 +464,16 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         Button('cancel', _('Cancel')),
     )
 
+    def get_template_context(self):
+        context = super(ResetPasswordEmailView, self).get_template_context()
+        reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset'])
+        context['password_reset_email_mobile_offset'] = reset_offset
+        context['has_mobile'] = False
+        if self.user is not None:
+            if user.phone_numbers.count > 0:
+                context['has_mobile'] = True
+        return context
+
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
         email_or_username = passwords_data['email_or_username']
@@ -483,6 +491,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
             reference, reset_password_link = new_reset_password_code(self.request, user)
             has_mobile = user.phone_numbers.count > 0
             send_reset_password_mail(self.request, user, reset_password_link, has_mobile=has_mobile)
+            self.user = user
 
         self.request.session['_reset_type'] = _('email')
         return HTTPFound(location=self.request.route_url('reset-password-sent'))
