@@ -703,7 +703,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                 wait = reset_min_date - datetime.now(pytz.utc)
                 msg = _('Password reset link still not valid, wait for {!r}'.format(wait))
                 self.request.session.flash(msg)
-                return HTTPFound(self.request.referer)
+                return HTTPFound(self.request.route_path('reset-password'))
 
         if password_reset['mechanism'] == 'mobile':
             if not password_reset.get('mobile_hash_code_verified', False):
