@@ -176,7 +176,7 @@ def unverify_user_nins(request, user):
     return True
 
 
-def unverify_user_mobiles(request, user):
+def remove_user_mobiles(request, user):
     """
     :param request: request object
     :type request:
@@ -185,11 +185,10 @@ def unverify_user_mobiles(request, user):
     :return: True
     :rtype: boolean
 
-    Set all verified mobile phone number to verified = False.
+    Remove all mobile phone numbers
     """
     for mobile in user.phone_numbers.to_list():
-        mobile.is_primary = False
-        mobile.is_verified = False
+        user.phone_numbers.remove(mobile.key)
     request.context.save_dashboard_user(user)
     return True
 
@@ -357,7 +356,10 @@ class PasswordsView(BaseFormView):
 def reset_password(context, request):
     """ Reset password """
     enable_mm = request.registry.settings.get('enable_mm_verification')
-    return {'enable_mm_verification': enable_mm}
+    user = get_session_user(request)
+    verified_phone = user.phone_numbers.count > 0
+    return {'enable_mm_verification': enable_mm,
+            'verified_phone': verified_phone}
 
 
 @view_config(route_name='reset-password-expired', renderer='templates/reset-password-expired.jinja2',
@@ -477,10 +479,10 @@ class ResetPasswordEmailView(BaseResetPasswordView):
                 email_or_username))
             self.request.stats.count('dashboard/pwreset_email_init_unknown_user', 1)
             user = None
-
         if user is not None:
             reference, reset_password_link = new_reset_password_code(self.request, user)
-            send_reset_password_mail(self.request, user, reset_password_link)
+            has_mobile = user.phone_numbers.count > 0
+            send_reset_password_mail(self.request, user, reset_password_link, has_mobile=has_mobile)
 
         self.request.session['_reset_type'] = _('email')
         return HTTPFound(location=self.request.route_url('reset-password-sent'))
@@ -548,6 +550,11 @@ class ResetPasswordMobileView(BaseResetPasswordView):
     intro_message = _("Please enter a phone number associated with your eduID account, "
                       "and we'll send you an sms with a code and an e-mail with a link to "
                       "continue your password reset.")
+
+    def get_template_context(self):
+        context = super(ResetPasswordMobileView, self).get_template_context()
+        context['mobile_step_1'] = True
+        return context
 
     def reset_success(self, passwordform):
         passwords_data = self.schema.serialize(passwordform)
@@ -694,6 +701,16 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             self.request.stats.count('dashboard/pwreset_code_expired', 1)
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
+        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+        if password_reset['mechanism'] == 'email' and user.phone_numbers > 0:
+            reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset'])
+            reset_min_date = password_reset['created_at'] + timedelta(hours=reset_offset)
+            if reset_min_date > datetime.now(pytz.utc):
+                wait = reset_min_date - datetime.now(pytz.utc)
+                msg = _('Password reset link still not valid, wait for {!r}'.format(wait))
+                self.request.session.flash(msg)
+                return HTTPFound(self.request.route_path('reset-password'))
+
         if password_reset['mechanism'] == 'mobile':
             if not password_reset.get('mobile_hash_code_verified', False):
                 return HTTPFound(self.request.route_path('reset-password-expired'))
@@ -737,7 +754,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             if len(user.phone_numbers.to_list()):
                 # We need to unverify a users phone numbers to make sure that an attacker can not
                 # verify the account again without control over the users phone number
-                unverify_user_mobiles(self.request, user)
+                remove_user_mobiles(self.request, user)
                 sync_user = True
             if sync_user:
                 # Do not perform a sync if no changes where made, there is a corner case

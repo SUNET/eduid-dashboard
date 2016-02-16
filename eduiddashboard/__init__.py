@@ -471,6 +471,18 @@ def main(global_config, **settings):
         '60',
     )
 
+    settings['password_reset_timeout'] = read_setting_from_env(
+        settings,
+        'password_reset_timeout',
+        '2880',
+    )
+
+    settings['password_reset_email_mobile_offset'] = read_setting_from_env(
+        settings,
+        'password_reset_email_mobile_offset',
+        '24',
+    )
+
     settings['stathat_username'] = read_setting_from_env(settings, 'stathat_username')
 
     jinja2_settings(settings)

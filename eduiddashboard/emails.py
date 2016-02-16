@@ -92,12 +92,12 @@ def send_termination_mail(request, user):
     request.stats.count('dashboard/email_send_termination_mail', 1)
 
 
-def send_reset_password_mail(request, user, reset_password_link):
+def send_reset_password_mail(request, user, reset_password_link, has_mobile=False):
     """ Send an email with the instructions for resetting password """
     mailer = get_mailer(request)
 
     site_name = request.registry.settings.get("site.name", "eduID")
-    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "2880")) / 60
     email = user.mail_addresses.primary.key
 
     context = {
@@ -106,6 +106,8 @@ def send_reset_password_mail(request, user, reset_password_link):
         "password_reset_timeout": password_reset_timeout,
         "site_url": request.route_url("home"),
         "site_name": site_name,
+        "has_mobile": has_mobile,
+        "password_reset_email_mobile_offset": request.registry.settings.get("password_reset_email_mobile_offset", "24"),
     }
 
     message = Message(

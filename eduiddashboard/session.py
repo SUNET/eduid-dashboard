@@ -333,7 +333,7 @@ def has_logged_in_user(request):
     return _USER_EPPN in request.session
 
 
-def get_session_user(request, legacy_user, raise_on_not_logged_in=True):
+def get_session_user(request, legacy_user=False, raise_on_not_logged_in=True):
     """
     Get the session user. This is the user being worked on, in helpdesk mode
     it is not necessarily the currently logged in user. See get_logged_in_user().
