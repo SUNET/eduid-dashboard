@@ -62,8 +62,6 @@ def change_password(request, user, old_password, new_password):
         retrieve_modified_ts(user, request.dashboard_userdb)
         user.terminated = False
         request.context.save_dashboard_user(user)
-        # XXX save() might have requested a sync already?
-        #request.amrelay.request_sync(user)
     return added
 
 
@@ -187,6 +185,10 @@ def remove_user_mobiles(request, user):
 
     Remove all mobile phone numbers
     """
+    for mobile in user.phone_numbers.verified.to_list():
+        if not mobile.is_primary:
+            user.phone_numbers.remove(mobile.key)
+    user.phone_numbers.remove(user.phone_numbers.primary.key)
     for mobile in user.phone_numbers.to_list():
         user.phone_numbers.remove(mobile.key)
     request.context.save_dashboard_user(user)
@@ -643,7 +645,10 @@ class ResetPasswordMobileView2(BaseResetPasswordView):
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
         if password_reset.get('mobile_hash_code') == form_data['mobile_code']:
             self.request.db.reset_passwords.update(password_reset, {'$set': {'mobile_hash_code_verified': True}})
-            user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
+            try:
+                user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+            except self.request.userdb.exceptions.UserDoesNotExist:
+                user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
             log.debug('Mobile password reset code verified for user {!r}'.format(user))
             return HTTPFound(self.request.route_path('reset-password-step2', code=hash_code))
         log.debug('Mobile password reset code verification failed for password reset document {!r}'.format(
@@ -680,7 +685,10 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         # Collect the users mail addresses for use with zxcvbn
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
+        try:
+            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+        except self.request.userdb.exceptions.UserDoesNotExist:
+            user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
         mail_addresses = []
         for item in user.mail_addresses.to_list():
             mail_addresses.append(item.key)
@@ -709,21 +717,29 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             self.request.stats.count('dashboard/pwreset_code_expired', 1)
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
-        user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
+        try:
+            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+        except self.request.userdb.exceptions.UserDoesNotExist:
+            user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
         if password_reset['mechanism'] == 'email' and user.phone_numbers.count > 0:
-            reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset'])
-            reset_min_date = password_reset['created_at'] + timedelta(hours=reset_offset)
-            if reset_min_date > datetime.now(pytz.utc):
-                wait = reset_min_date - datetime.now(pytz.utc)
-                msg = _('Password reset link still not valid, wait for {!r}'.format(wait))
-                self.request.session.flash(msg)
-                return HTTPFound(self.request.route_path('reset-password'))
+            wait = self._check_reset_offset(password_reset)
+            if wait is not None:
+                template = 'eduiddashboard:templates/reset-password-pending.jinja2'
+                return render_to_response(template, {'wait': wait}, request=self.request)
 
         if password_reset['mechanism'] == 'mobile':
             if not password_reset.get('mobile_hash_code_verified', False):
                 return HTTPFound(self.request.route_path('reset-password-expired'))
 
         return super(ResetPasswordStep2View, self).__call__()
+
+    def _check_reset_offset(self, password_reset):
+        reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset'])
+        reset_min_date = password_reset['created_at'] + timedelta(hours=reset_offset)
+        if reset_min_date > datetime.now(pytz.utc):
+            wait = reset_min_date - datetime.now(pytz.utc)
+            return str(wait.min)
+        return None
 
     def get_suggested_password(self):
         """
@@ -737,7 +753,10 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb_new.get_user_by_eppn(password_reset['email'])
+        try:
+            user = self.request.dashboard_userdb.get_user_by_mail(password_reset['email'])
+        except self.request.userdb.exceptions.UserDoesNotExist:
+            user = self.request.dashboard_userdb.get_user_by_eppn(password_reset['email'])
 
         log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 

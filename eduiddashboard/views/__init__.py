@@ -257,7 +257,7 @@ class BaseActionsView(object):
             }
 
     def resend_code_action(self, index, post_data):
-        data = self.user.get(self.data_attribute, [])
+        data = self.user.to_dict().get(self.data_attribute, [])
 
         # Catch the unlikely event when the user have e.g. removed all entries
         # in a separate tab, or one in the middle and then tries to resend the

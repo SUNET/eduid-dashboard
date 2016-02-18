@@ -102,7 +102,7 @@ def verify_nin(request, user, new_nin, reference=None):
             log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified nin to the requesting user
-    if user.nins.count == 0:
+    if user.nins.verified.count == 0:
         primary = True
     else:
         primary = False
@@ -153,6 +153,10 @@ def verify_mobile(request, user, new_mobile):
     new_mobile_obj = PhoneNumber(data={'number': new_mobile,
                                        'verified': True,
                                        'primary': False})
+    log.debug('User had phones BEFORE verification: {!r}'.format(user.phone_numbers.to_list()))
+    if user.phone_numbers.primary is None:
+        log.debug('Setting NEW mobile number to primary: {}.'.format(new_mobile_obj))
+        new_mobile_obj.is_primary = True
     try:
         user.phone_numbers.add(new_mobile_obj)
     except DuplicateElementViolation:
@@ -193,6 +197,8 @@ def verify_mail(request, user, new_mail):
     # Add the verified mail address to the requesting user
     new_email = MailAddress(email=new_mail, application='dashboard',
             verified=True, primary=False)
+    if user.mail_addresses.primary is None:
+        new_email.is_primary = True
     try:
         user.mail_addresses.add(new_email)
     except DuplicateElementViolation:

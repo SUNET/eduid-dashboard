@@ -129,6 +129,8 @@ def profile_urls(config):
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-expired', '/reset-password-expired/',
                      factory=ResetPasswordFactory)
+    config.add_route('reset-password-pending', '/reset-password-pending/',
+                     factory=ResetPasswordFactory)
     config.add_route('reset-password-sent', '/reset-password/sent/',
                      factory=ResetPasswordFactory)
     config.add_route('reset-password-email', '/reset-password/email/',

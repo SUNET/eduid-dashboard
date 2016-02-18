@@ -135,7 +135,7 @@ class NinsFormTests(LoggedInRequestTests):
         user = self.dashboard_db.get_user_by_mail(email)
         user.nins.add(Nin(data={'number': '123456789050',
                         'verified': False,
-                        'primary': True,
+                        'primary': False,
                        }))
         self.dashboard_db.save(user)
         # Set up a pending verfication
