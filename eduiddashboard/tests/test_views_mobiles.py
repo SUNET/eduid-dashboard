@@ -72,8 +72,8 @@ class MobilesFormTests(LoggedInRequestTests):
             '/profile/mobiles-actions/',
             {'identifier': 0, 'code': mobile_doc['code'], 'action': 'verify'}
         )
-        user_after = self.dashboard_db.get_user_by_id(self.user.user_id)
-        verified_mobile = user.phone_numbers.to_list()[0]
+        user_after = self.userdb_new.get_user_by_id(self.user.user_id)
+        verified_mobile = user_after.phone_numbers.to_list()[0]
         self.assertTrue(verified_mobile.is_verified)
 
     def test_add_valid_mobile(self):
@@ -126,8 +126,6 @@ class MobilesFormTests(LoggedInRequestTests):
                 self.assertIsNotNone(getattr(response, 'form', None))
 
     def _remove_existant_mobile(self, n=1):
-        user = self.dashboard_db.get_user_by_id(self.user.user_id)
-        mobiles_number = user.phone_numbers.count
 
         return self.testapp.post(
             '/profile/mobiles-actions/',
@@ -136,6 +134,8 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_remove_existant_mobile(self):
         self.set_logged()
+        user = self.dashboard_db.get_user_by_id(self.user.user_id)
+        mobiles_number = user.phone_numbers.count
         response = self._remove_existant_mobile()
         user_after = self.dashboard_db.get_user_by_id(self.user.user_id)
         response_json = json.loads(response.body)

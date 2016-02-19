@@ -22,7 +22,7 @@
             {% if context.workmode == 'personal' %}
                 <h3>{{ _("Profile") }}</h3>
             {% else %}
-                <h3>{{ _("Editing user %(email)s", email=user.get('mail')) }}</h3>
+                <h3>{{ _("Editing user %(email)s", email=user.mail_addresses.primary.key) }}</h3>
             {% endif %}
 
             {% if pending_actions %}
@@ -54,7 +54,7 @@
             </li>
             <li id="profile-menu-eppn-li">
               <div class="profile-menu-eppn">
-                <p class="eppn-text-muted">{{ _("eduID identifier") }}: {{ user.eduPersonPrincipalName }}</p>
+                <p class="eppn-text-muted">{{ _("eduID identifier") }}: {{ user.eppn }}</p>
               </div>
             </li>
 
@@ -106,7 +106,7 @@
         <div class="progress-bar profile-filled-progress-bar"></div>
       </div>
       <div class="profile-menu-eppn hidden-md hidden-lg">
-          <p class="eppn-text-muted">{{ _("eduID identifier") }}: {{ user.eduPersonPrincipalName }}</p>
+          <p class="eppn-text-muted">{{ _("eduID identifier") }}: {{ user.eppn }}</p>
       </div>
     </div>
 

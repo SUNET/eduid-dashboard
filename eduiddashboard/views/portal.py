@@ -63,7 +63,7 @@ def profile_editor(context, request):
     view_context = {
         'tabs': tabs,
         'userid': userid,
-        'user': context.user.to_dict(),
+        'user': context.user,
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,

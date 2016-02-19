@@ -137,9 +137,14 @@ def get_not_verified_nins_list(request, user):
 
 
 def get_active_nin(self):
-    active_nins = self.user.nins.to_list()
-    if active_nins:
-        return active_nins[-1]
+    nins = self.user.nins.to_list()
+    if self.user.nins.verified.count:
+        return self.user.nins.primary.key
+    elif nins:
+        nin = nins[-1]
+        if isinstance(nin, basestring):
+            return nin
+        return nin.key
     else:
         return None
 

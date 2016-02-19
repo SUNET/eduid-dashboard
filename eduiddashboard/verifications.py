@@ -244,7 +244,7 @@ def verify_code(request, model_name, code):
 
     if model_name == 'norEduPersonNIN':
         user, msg = verify_nin(request, user, obj_id, reference)
-    elif model_name == 'phone':
+    elif model_name == 'mobile':
         user, msg = verify_mobile(request, user, obj_id)
     elif model_name == 'mailAliases':
         user, msg = verify_mail(request, user, obj_id)
