@@ -342,9 +342,9 @@ def main(global_config, **settings):
         'BROKER_URL': None,  # The broker url needs to be set when instantiating the broker
         'CELERY_TASK_SERIALIZER': 'json',
         'CELERY_RESULT_BACKEND': 'amqp',
-        # Detect connection timeouts
-        'BROKER_HEARTBEAT': 10,
-        'BROKER_TRANSPORT_OPTIONS': {'confirm_publish': True},
+        # Avoid broken connections across firewall by disabling pool
+        # http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
+        'BROKER_POOL_LIMIT': 0,
     }
     settings['default_celery_conf'] = default_celery_conf
     settings['am_broker_url'] = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
