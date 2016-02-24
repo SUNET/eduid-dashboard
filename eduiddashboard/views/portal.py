@@ -116,7 +116,7 @@ def home(context, request):
         controls = request.GET.items()
         try:
             searcher_data = searcher_form.validate(controls)
-        except deform.ValidationFailure, form:
+        except (deform.ValidationFailure, form):
             return {
                 'form': form,
                 'users': [],
@@ -194,7 +194,7 @@ def token_login(context, request):
 
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
-        user = request.userdb.get_user_by_eppn(eppn)
+        user = request.userdb_new.get_user_by_eppn(eppn)
         # these seem to be unused -- ft@ 2016-01-14
         #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
         #request.session['loa'] = 1
