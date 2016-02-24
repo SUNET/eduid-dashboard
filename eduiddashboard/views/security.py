@@ -738,7 +738,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         reset_min_date = password_reset['created_at'] + timedelta(minutes=int(reset_offset))
         if reset_min_date > datetime.now(pytz.utc):
             wait = reset_min_date - datetime.now(pytz.utc)
-            return str(wait.min)
+            return str(wait).split('.')[0]
         return None
 
     def get_suggested_password(self):
