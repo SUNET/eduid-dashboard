@@ -13,8 +13,7 @@ from pyramid.i18n import get_locale_name
 
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
-from eduid_am.config import read_setting_from_env, read_setting_from_env_bool, read_mapping, read_list
-
+from eduid_common.config.parsers import IniConfigParser
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -281,39 +280,40 @@ def main(global_config, **settings):
     ``paster serve``.
     """
     settings = dict(settings)
+    cp = IniConfigParser('')  # We don't need to provide the settings file as it is already loaded
 
-    settings['developer_mode'] = read_setting_from_env_bool(settings,
-                                                       'developer_mode',
-                                                       default=False)
+    settings['developer_mode'] = cp.read_setting_from_env_bool(settings,
+                                                               'developer_mode',
+                                                               default=False)
 
     # read pyramid_mailer options
     for key, default in (
-        ('host', 'localhost'),
-        ('port', '25'),
-        ('username', None),
-        ('password', None),
-        ('default_sender', 'no-reply@example.com'),
-        ('support_email', 'support@eduid.se')
+            ('host', 'localhost'),
+            ('port', '25'),
+            ('username', None),
+            ('password', None),
+            ('default_sender', 'no-reply@example.com'),
+            ('support_email', 'support@eduid.se')
     ):
         option = 'mail.' + key
-        settings[option] = read_setting_from_env(settings, option, default)
+        settings[option] = cp.read_setting_from_env(settings, option, default)
 
     # Parse settings before creating the configurator object
-    available_languages = read_mapping(settings, 'available_languages',
-                                       default={'en': 'English',
-                                                'sv': 'Svenska'})
+    available_languages = cp.read_mapping(settings, 'available_languages',
+                                          default={'en': 'English',
+                                                   'sv': 'Svenska'})
 
-    settings['lang_cookie_domain'] = read_setting_from_env(settings,
-                                                           'lang_cookie_domain',
-                                                           None)
+    settings['lang_cookie_domain'] = cp.read_setting_from_env(settings,
+                                                              'lang_cookie_domain',
+                                                              None)
 
-    settings['lang_cookie_name'] = read_setting_from_env(settings,
-                                                         'lang_cookie_name',
-                                                         'lang')
+    settings['lang_cookie_name'] = cp.read_setting_from_env(settings,
+                                                            'lang_cookie_name',
+                                                            'lang')
 
-    settings['enable_mm_verification'] = read_setting_from_env_bool(settings,
-                                                    'enable_mm_verification',
-                                                    default=True)
+    settings['enable_mm_verification'] = cp.read_setting_from_env_bool(settings,
+                                                                       'enable_mm_verification',
+                                                                       default=True)
 
     required_settings = (
         'mongo_uri',
@@ -334,7 +334,7 @@ def main(global_config, **settings):
             )
 
     for item in required_settings:
-        settings[item] = read_setting_from_env(settings, item, None)
+        settings[item] = cp.read_setting_from_env(settings, item, None)
         if settings[item] is None:
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
@@ -344,18 +344,18 @@ def main(global_config, **settings):
         'BROKER_URL': None,  # The broker url needs to be set when instantiating the broker
         'CELERY_TASK_SERIALIZER': 'json',
         'CELERY_RESULT_BACKEND': 'amqp',
-        # Detect connection timeouts
-        'BROKER_HEARTBEAT': 10,
-        'BROKER_TRANSPORT_OPTIONS': {'confirm_publish': True},
+        # Avoid broken connections across firewall by disabling pool
+        # http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
+        'BROKER_POOL_LIMIT': 0,
     }
     settings['default_celery_conf'] = default_celery_conf
-    settings['am_broker_url'] = read_setting_from_env(settings, 'broker_url', 'amqp://')
-    settings['msg_broker_url'] = read_setting_from_env(settings, 'msg_broker_url', 'amqp://eduid_msg')
-    settings['lookup_mobile_broker_url'] = read_setting_from_env(settings, 'lookup_mobile_broker_url',
-                                                                 'amqp://lookup_mobile')
+    settings['am_broker_url'] = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
+    settings['msg_broker_url'] = cp.read_setting_from_env(settings, 'msg_broker_url', 'amqp://eduid_msg')
+    settings['lookup_mobile_broker_url'] = cp.read_setting_from_env(settings, 'lookup_mobile_broker_url',
+                                                                    'amqp://lookup_mobile')
 
-    settings['workmode'] = read_setting_from_env(settings, 'workmode',
-                                                 'personal')
+    settings['workmode'] = cp.read_setting_from_env(settings, 'workmode',
+                                                    'personal')
 
     if settings['workmode'] not in AVAILABLE_WORK_MODES:
         raise ConfigurationError(
@@ -363,31 +363,31 @@ def main(global_config, **settings):
                 settings['workmode'])
         )
 
-    settings['permissions_mapping'] = read_mapping(
+    settings['permissions_mapping'] = cp.read_mapping(
         settings,
         'permissions_mapping',
         available_keys=AVAILABLE_WORK_MODES,
         default=REQUIRED_GROUP_PER_WORKMODE
     )
 
-    settings['available_permissions'] = read_list(
+    settings['available_permissions'] = cp.read_list(
         settings,
         'available_permissions',
         default=AVAILABLE_PERMISSIONS)
 
-    settings['required_loa'] = read_mapping(
+    settings['required_loa'] = cp.read_mapping(
         settings,
         'required_loa',
         available_keys=eduiddashboard.loa.AVAILABLE_LOA_LEVEL,
         default=REQUIRED_LOA_PER_WORKMODE,
     )
 
-    settings['available_loa'] = read_list(
+    settings['available_loa'] = cp.read_list(
         settings,
         'available_loa',
         default=eduiddashboard.loa.AVAILABLE_LOA_LEVEL)
 
-    settings['enable_postal_address_retrieve'] = read_setting_from_env_bool(
+    settings['enable_postal_address_retrieve'] = cp.read_setting_from_env_bool(
         settings, 'enable_postal_address_retrieve', True
     )
 
@@ -404,88 +404,88 @@ def main(global_config, **settings):
     except ValueError:
         raise ConfigurationError('session.timeout should be a valid integer')
 
-    settings['session.cookie_domain'] = read_setting_from_env(settings, 'session.cookie_domain',
-                                                    'dashboard.docker')
+    settings['session.cookie_domain'] = cp.read_setting_from_env(settings, 'session.cookie_domain',
+                                                                 'dashboard.docker')
 
-    settings['session.cookie_path'] = read_setting_from_env(settings, 'session.cookie_path',
-                                                    '/')
+    settings['session.cookie_path'] = cp.read_setting_from_env(settings, 'session.cookie_path',
+                                                               '/')
 
-    settings['session.cookie_httponly'] = read_setting_from_env_bool(settings, 'session.cookie_httponly',
-                                                    'true')
+    settings['session.cookie_httponly'] = cp.read_setting_from_env_bool(settings, 'session.cookie_httponly',
+                                                                        'true')
 
-    settings['session.cookie_secure'] = read_setting_from_env_bool(settings, 'session.cookie_secure',
-                                                    'false')
+    settings['session.cookie_secure'] = cp.read_setting_from_env_bool(settings, 'session.cookie_secure',
+                                                                      'false')
 
-    settings['session.key'] = read_setting_from_env(settings, 'session.key',
-                                                    'sessid')
+    settings['session.key'] = cp.read_setting_from_env(settings, 'session.key',
+                                                       'sessid')
 
-    settings['session.secret'] = read_setting_from_env(settings,
-                                                     'session.secret')
+    settings['session.secret'] = cp.read_setting_from_env(settings,
+                                                          'session.secret')
 
-    settings['redis_host'] = read_setting_from_env(settings, 'redis_host',
-                                                    'redis.docker')
+    settings['redis_host'] = cp.read_setting_from_env(settings, 'redis_host',
+                                                      'redis.docker')
 
-    settings['redis_port'] = int(read_setting_from_env(settings, 'redis_port',
-                                                    6379))
+    settings['redis_port'] = int(cp.read_setting_from_env(settings, 'redis_port',
+                                                          6379))
 
-    settings['redis_db'] = int(read_setting_from_env(settings, 'redis_db', 0))
+    settings['redis_db'] = int(cp.read_setting_from_env(settings, 'redis_db', 0))
 
-    settings['redis_sentinel_hosts'] = read_list(
+    settings['redis_sentinel_hosts'] = cp.read_list(
         settings,
         'redis_sentinel_hosts',
         default=[])
-    settings['redis_sentinel_service_name'] = read_setting_from_env(settings, 'redis_sentinel_service_name',
-                                                    'redis-cluster')
+    settings['redis_sentinel_service_name'] = cp.read_setting_from_env(settings, 'redis_sentinel_service_name',
+                                                                       'redis-cluster')
 
-    settings['groups_callback'] = read_setting_from_env(settings,
-                                                    'groups_callback',
-                                                    groups_callback)
+    settings['groups_callback'] = cp.read_setting_from_env(settings,
+                                                           'groups_callback',
+                                                           groups_callback)
 
     settings['available_languages'] = available_languages
 
-    settings['default_country_code'] = read_setting_from_env(
+    settings['default_country_code'] = cp.read_setting_from_env(
         settings,
         'default_country_code',
         '+46',  # sweden country code
     )
 
-    settings['default_country_location'] = read_setting_from_env(
+    settings['default_country_location'] = cp.read_setting_from_env(
         settings,
         'default_country_location',
         'SE',  # sweden country code
     )
 
-    settings['verification_code_timeout'] = read_setting_from_env(
+    settings['verification_code_timeout'] = cp.read_setting_from_env(
         settings,
         'verification_code_timeout',
         '30',
     )
 
-    settings['password_length'] = read_setting_from_env(
+    settings['password_length'] = cp.read_setting_from_env(
         settings,
         'password_length',
         '12',
     )
 
-    settings['password_entropy'] = read_setting_from_env(
+    settings['password_entropy'] = cp.read_setting_from_env(
         settings,
         'password_entropy',
         '60',
     )
 
-    settings['password_reset_timeout'] = read_setting_from_env(
+    settings['password_reset_timeout'] = cp.read_setting_from_env(
         settings,
         'password_reset_timeout',
         '2880',
     )
 
-    settings['password_reset_email_mobile_offset'] = read_setting_from_env(
+    settings['password_reset_email_mobile_offset'] = cp.read_setting_from_env(
         settings,
         'password_reset_email_mobile_offset',
         '24',
     )
 
-    settings['stathat_username'] = read_setting_from_env(settings, 'stathat_username')
+    settings['stathat_username'] = cp.read_setting_from_env(settings, 'stathat_username')
 
     jinja2_settings(settings)
 
@@ -497,8 +497,8 @@ def main(global_config, **settings):
 
     config.set_request_property(get_locale_name, 'locale', reify=True)
 
-    locale_path = read_setting_from_env(settings, 'locale_dirs',
-                                        'eduiddashboard:locale')
+    locale_path = cp.read_setting_from_env(settings, 'locale_dirs',
+                                           'eduiddashboard:locale')
     config.add_translation_dirs(locale_path)
 
     factory = SessionFactory(settings)

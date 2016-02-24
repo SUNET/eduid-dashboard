@@ -21,7 +21,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.5.1b1'
+version = '0.5.1b2'
 
 requires = [
     'eduid_am >= 0.6.0',
@@ -29,7 +29,7 @@ requires = [
     'vccs_client >= 0.4.1',
     'eduid_lookup_mobile >= 0.0.4',
     'eduid_userdb >= 0.0.2',
-    'eduid-common[webapp] > 0.1.2',
+    'eduid-common[webapp] >= 0.1.3b5',
     'pysaml2 == 4.0.3rc1',
 
     'pymongo>=2.8,<3',
