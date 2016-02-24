@@ -482,7 +482,7 @@ def main(global_config, **settings):
     settings['password_reset_email_mobile_offset'] = cp.read_setting_from_env(
         settings,
         'password_reset_email_mobile_offset',
-        '24',
+        '1440',
     )
 
     settings['stathat_username'] = cp.read_setting_from_env(settings, 'stathat_username')

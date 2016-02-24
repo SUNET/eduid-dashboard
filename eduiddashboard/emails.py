@@ -99,6 +99,7 @@ def send_reset_password_mail(request, user, reset_password_link, has_mobile=Fals
     site_name = request.registry.settings.get("site.name", "eduID")
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "2880")) / 60
     email = user.mail_addresses.primary.key
+    reset_offset = int(request.registry.settings.get("password_reset_email_mobile_offset", "1440")) / 60
 
     context = {
         "email": email,
@@ -107,7 +108,7 @@ def send_reset_password_mail(request, user, reset_password_link, has_mobile=Fals
         "site_url": request.route_url("home"),
         "site_name": site_name,
         "has_mobile": has_mobile,
-        "password_reset_email_mobile_offset": request.registry.settings.get("password_reset_email_mobile_offset", "24"),
+        "password_reset_email_mobile_offset": reset_offset,
     }
 
     message = Message(

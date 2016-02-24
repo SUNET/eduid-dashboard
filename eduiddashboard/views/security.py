@@ -95,7 +95,7 @@ def send_reset_password_gov_message(request, reference, nin, user, reset_passwor
     """ Send an message to the gov mailbox with the instructions for resetting password """
     user_language = user.language
     email = user.mail_addresses.primary.key
-    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
+    password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "2880")) / 60
     request.msgrelay.nin_reset_password(reference, nin, email, reset_password_link, password_reset_timeout,
                                         user_language)
 
@@ -467,7 +467,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
 
     def get_template_context(self):
         context = super(ResetPasswordEmailView, self).get_template_context()
-        reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset'])
+        reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset']) / 60
         context['password_reset_email_mobile_offset'] = reset_offset
         context['has_mobile'] = False
         if self.user is not None:
@@ -735,7 +735,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
     def _check_reset_offset(self, password_reset):
         reset_offset = int(self.request.registry.settings['password_reset_email_mobile_offset'])
-        reset_min_date = password_reset['created_at'] + timedelta(hours=reset_offset)
+        reset_min_date = password_reset['created_at'] + timedelta(minutes=int(reset_offset))
         if reset_min_date > datetime.now(pytz.utc):
             wait = reset_min_date - datetime.now(pytz.utc)
             return str(wait.min)
