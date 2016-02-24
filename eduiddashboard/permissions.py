@@ -247,7 +247,7 @@ class BaseFactory(RootFactory):
         if max_loa is None:
             user = self.get_user()
 
-            max_loa = self.request.dashboard_userdb.get_identity_proofing(user)
+            max_loa = self.request.userdb_new.get_identity_proofing(user)
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
