@@ -308,8 +308,8 @@ TEST_USER = {
         'mail': 'johnnysmith1@example.org',
         'eduPersonEntitlement': [],
         #'modified_ts': datetime.utcnow(),
-        'mobile': [{
-            'mobile': '+46701234567',
+        'phone': [{
+            'number': '+46701234567',
             'verified': True,
             'primary': True,
         }],

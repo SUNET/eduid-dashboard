@@ -154,12 +154,12 @@ class MobilesFormTests(LoggedInRequestTests):
         userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
-        self.assertEqual(0, len(userdb_after['mobile']))
+        self.assertEqual(0, len(userdb_after['phone']))
 
     def test_remove_not_existant_mobile(self):
         self.set_logged()
         userdb = self.db.profiles.find({'_id': self.user.user_id})[0]
-        mobiles_number = len(userdb['mobile'])
+        mobiles_number = len(userdb['phone'])
 
         with self.assertRaises(IndexError):
             self.testapp.post(
@@ -167,7 +167,7 @@ class MobilesFormTests(LoggedInRequestTests):
                 {'identifier': 10, 'action': 'remove'}
             )
         userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
-        self.assertEqual(mobiles_number, len(userdb_after['mobile']))
+        self.assertEqual(mobiles_number, len(userdb_after['phone']))
 
     def test_verify_not_existing_mobile(self):
         self.set_logged()
@@ -192,14 +192,14 @@ class MobilesFormTests(LoggedInRequestTests):
     def test_verify_not_existing_code(self):
         self.set_logged()
         userdb = self.db.profiles.find({'_id': self.user.user_id})[0]
-        verified_mobile = userdb['mobile'][1]
+        verified_mobile = userdb['phone'][1]
         self.assertEqual(verified_mobile['verified'], False)
         self.testapp.post(
             '/profile/mobiles-actions/',
             {'identifier': 1, 'code': 'not_existing_code', 'action': 'verify'}
         )
         userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
-        verified_mobile = userdb_after['mobile'][1]
+        verified_mobile = userdb_after['phone'][1]
         self.assertEqual(verified_mobile['verified'], False)
 
     def test_verify_existing_mobile(self):
@@ -317,7 +317,7 @@ class MobilesFormTests(LoggedInRequestTests):
         self.assertIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])
 
         mobile_doc = self.db.verifications.find_one({
-            'model_name': 'mobile',
+            'model_name': 'phone',
             'user_oid': ObjectId('901234567890123456789012'),
             'obj_id': mobile
         })

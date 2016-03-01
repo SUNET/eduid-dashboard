@@ -79,7 +79,7 @@ def new_reset_password_code(request, user, mechanism='email', next_view='reset-p
         'created_at': date,
     }
 
-    if mechanism == 'mobile':
+    if mechanism == 'phone':
         reset_doc['mobile_hash_code'] = get_short_hash()
 
     reference = request.db.reset_passwords.insert(reset_doc, safe=True, manipulate=True)
@@ -437,7 +437,7 @@ class BaseResetPasswordView(FormView):
             if text.startswith(u'0') or text.startswith(u'+'):
                 text = normalize_to_e_164(self.request, text)
                 user = self.request.userdb_new._get_documents_by_filter(
-                    {'mobile': {'$elemMatch': {'mobile': text, 'verified': True}}}
+                    {'phone': {'$elemMatch': {'number': text, 'verified': True}}}
                 )
             else:
                 user = self.request.userdb_new._get_documents_by_filter(
@@ -583,7 +583,7 @@ class ResetPasswordMobileView(BaseResetPasswordView):
                 log.info("User {!r} does not have entered mobile number set to verified".format(user))
                 log.debug("Mobile number: {!r}".format(mobile_number))
             else:
-                reference, reset_password_link = new_reset_password_code(self.request, user, 'mobile',
+                reference, reset_password_link = new_reset_password_code(self.request, user, 'phone',
                                                                          'reset-password-mobile2')
                 send_reset_password_mail(self.request, user, reset_password_link)
                 password_reset = self.request.db.reset_passwords.find_one({'_id': reference})

@@ -169,7 +169,7 @@ class EmailOrUsernameExistsValidator(object):
         else:
             try:
                 request.userdb.get_user_by_email(value)
-            except UserDoesNotExist, e:
+            except UserDoesNotExist as e:
                 if e.args:
                     msg = e.args[0]
                 else:
@@ -308,9 +308,9 @@ def validate_nin_by_mobile(request, user, nin):
     from eduid_lookup_mobile.utilities import format_NIN
     # Get list of verified mobile numbers
     verified_mobiles = []
-    for one_mobile in user.get_mobiles():
+    for one_mobile in user.phone_numbers.to_list():
         if one_mobile['verified']:
-            verified_mobiles.append(one_mobile['mobile'])
+            verified_mobiles.append(one_mobile['number'])
 
     national_identity_number = format_NIN(nin)
     status = 'no_phone'

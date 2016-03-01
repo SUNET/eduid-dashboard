@@ -90,7 +90,7 @@ class ProfileFilledTests(LoggedInRequestTests):
         [what.remove(x.key) for x in what.to_list() if not x.is_primary]
         [what.remove(x.key) for x in what.to_list()]
 
-    def _save_user_to_userdb(self, user, old_format=True):
+    def _save_user_to_userdb(self, user, old_format=False):
         """
         To not depend on having eduid-dashboard-amp available to carry the user
         from profiles to userdb, we just write the updated user into userdb.

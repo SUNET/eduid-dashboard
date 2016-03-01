@@ -83,7 +83,7 @@ def send_verification_code(request, user, mobile_number, reference=None, code=No
 
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
-    data_attribute = 'mobile'
+    data_attribute = 'phone'
     special_verify_messages = {
         'success': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),

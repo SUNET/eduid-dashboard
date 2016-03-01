@@ -48,9 +48,9 @@
                     {% endif %}
                     </td>
                     <td>
-                    {% if user.mobile | default(None) %}
-                      {% for item in user.mobile %}
-                          {{item.mobile}}{% if not loop.last %}, {% endif %}
+                    {% if user.phone_numbers | default(None) %}
+                      {% for item in user.phone_numbers %}
+                          {{item.number}}{% if not loop.last %}, {% endif %}
                       {% endfor %}
                     {% endif %}
                     </td>

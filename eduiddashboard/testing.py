@@ -99,7 +99,7 @@ SETTINGS = {
 INITIAL_VERIFICATIONS = [{
     '_id': ObjectId('234567890123456789012301'),
     'code': '9d392c',
-    'model_name': 'mobile',
+    'model_name': 'phone',
     'obj_id': '+34 6096096096',
     'user_oid': ObjectId("012345678901234567890123"),
     'timestamp': datetime.datetime.utcnow(),
@@ -188,7 +188,7 @@ class LoggedInRequestTests(MongoTestCase):
         self.settings = deepcopy(SETTINGS)
         if settings is not None:
             self.settings.update(settings)
-        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
+        super(LoggedInRequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=False)
 
         self.redis_instance = RedisTemporaryInstance.get_instance()
         self.settings['redis_host'] = 'localhost'

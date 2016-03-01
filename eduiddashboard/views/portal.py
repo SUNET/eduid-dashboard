@@ -83,7 +83,7 @@ def profile_editor(context, request):
 
 SEARCHER_FIELDS = [
     'mailAliases.email',
-    'mobile.mobile',
+    'phone.number',
     'norEduPersonNIN',
     'givenName',
     'sn',

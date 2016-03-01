@@ -100,7 +100,7 @@ class Saml2RequestTests(MongoTestCase):
     """
 
     def setUp(self, settings={}):
-        super(Saml2RequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=True)
+        super(Saml2RequestTests, self).setUp(celery, get_attribute_manager, userdb_use_old_format=False)
 
         self.settings = {
             'saml2.settings_module': path.join(path.dirname(__file__),

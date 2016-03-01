@@ -124,18 +124,18 @@ def verify_nin(request, user, new_nin, reference=None):
 
 
 def verify_mobile(request, user, new_mobile):
-    log.info('Trying to verify mobile number for user {!r}.'.format(user))
-    log.debug('Mobile number: {!s}.'.format(new_mobile))
+    log.info('Trying to verify phone number for user {!r}.'.format(user))
+    log.debug('Phone number: {!s}.'.format(new_mobile))
     # Start by removing mobile number from any other user
     old_user_docs = request.dashboard_userdb._coll.find(
-        {'mobile': {'$elemMatch': {'mobile': new_mobile, 'verified': True}}})
+        {'phone': {'$elemMatch': {'number': new_mobile, 'verified': True}}})
     steal_count = 0
     for old_user_doc in old_user_docs:
         old_user = DashboardUser(data=old_user_doc)
         retrieve_modified_ts(old_user, request.dashboard_userdb)
         if old_user and old_user.user_id != user.user_id:
-            log.debug('Found old user {!r} with mobile number ({!s}) already verified.'.format(old_user, new_mobile))
-            log.debug('Old user mobile numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
+            log.debug('Found old user {!r} with phone number ({!s}) already verified.'.format(old_user, new_mobile))
+            log.debug('Old user phone numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
             if old_user.phone_numbers.primary.key == new_mobile:
                 old_numbers = old_user.phone_numbers.to_list()
                 for number in old_numbers:
@@ -145,9 +145,9 @@ def verify_mobile(request, user, new_mobile):
                 else:
                     old_user._phone_numbers = PhoneNumberList([])
             old_user.phone_numbers.remove(new_mobile)
-            log.debug('Old user mobile numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
+            log.debug('Old user phone numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
             request.context.save_dashboard_user(old_user)
-            log.info('Removed mobile number from user {!r}.'.format(old_user))
+            log.info('Removed phone number from user {!r}.'.format(old_user))
             steal_count += 1
     # Add the verified mobile number to the requesting user
     new_mobile_obj = PhoneNumber(data={'number': new_mobile,
@@ -155,16 +155,16 @@ def verify_mobile(request, user, new_mobile):
                                        'primary': False})
     log.debug('User had phones BEFORE verification: {!r}'.format(user.phone_numbers.to_list()))
     if user.phone_numbers.primary is None:
-        log.debug('Setting NEW mobile number to primary: {}.'.format(new_mobile_obj))
+        log.debug('Setting NEW phone number to primary: {}.'.format(new_mobile_obj))
         new_mobile_obj.is_primary = True
     try:
         user.phone_numbers.add(new_mobile_obj)
     except DuplicateElementViolation:
         user.phone_numbers.find(new_mobile).is_verified = True
-    log.info('Mobile number verified for user {!r}.'.format(user))
+    log.info('Phone number verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mobile_stolen', steal_count)
     request.stats.count('dashboard/verify_mobile_completed', 1)
-    return user, _('Mobile {obj} verified')
+    return user, _('Phone {obj} verified')
 
 
 def verify_mail(request, user, new_mail):
@@ -211,7 +211,7 @@ def verify_mail(request, user, new_mail):
 
 def verify_code(request, model_name, code):
     """
-    Verify a code and act accordingly to the model_name ('norEduPersonNIN', 'mobile', or 'mailAliases').
+    Verify a code and act accordingly to the model_name ('norEduPersonNIN', 'phone', or 'mailAliases').
 
     This is what turns an unconfirmed NIN/mobile/e-mail into a confirmed one.
 
@@ -244,7 +244,7 @@ def verify_code(request, model_name, code):
 
     if model_name == 'norEduPersonNIN':
         user, msg = verify_nin(request, user, obj_id, reference)
-    elif model_name == 'mobile':
+    elif model_name == 'phone':
         user, msg = verify_mobile(request, user, obj_id)
     elif model_name == 'mailAliases':
         user, msg = verify_mail(request, user, obj_id)
