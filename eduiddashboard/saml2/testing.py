@@ -200,7 +200,7 @@ class Saml2RequestTests(MongoTestCase):
                 'objectclass': ['top', 'inetOrgPerson', 'person', 'eduPerson'],
                 'userpassword': ['1234'],
                 'edupersonaffiliation': ['student'],
-                'sn': ['Smith'],
+                'surname': ['Smith'],
                 'mail': ['johnsmith@example.com'],
                 'eduPersonPrincipalName': ['hubba-bubba@test']
             },

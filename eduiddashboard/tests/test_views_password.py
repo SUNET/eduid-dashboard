@@ -300,7 +300,7 @@ TEST_USER = {
         '_id': ObjectId('012345678901234567890123'),
         'eduPersonPrincipalName': 'heffe-leffe',
         'givenName': 'John',
-        'sn': 'Smith',
+        'surname': 'Smith',
         'displayName': 'John Smith',
         'norEduPersonNIN': ['197801011234'],
         #'photo': 'https://pointing.to/your/photo',

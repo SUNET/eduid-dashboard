@@ -86,7 +86,7 @@ SEARCHER_FIELDS = [
     'phone.number',
     'norEduPersonNIN',
     'givenName',
-    'sn',
+    'surname',
     'displayName'
 ]
 

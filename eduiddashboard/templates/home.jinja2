@@ -38,7 +38,7 @@
                 <tr>
                     <td>{{user.mail}}</td>
                     <td>{{user.givenName | default("")}}</td>
-                    <td>{{user.sn | default("")}}</td>
+                    <td>{{user.surname | default("")}}</td>
                     <td>{{user.displayName | default("")}}</td>
                     <td>
                     {% if user.norEduPersonNIN | default(None) %}

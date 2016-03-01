@@ -69,7 +69,7 @@ class PersonalDataView(BaseFormView):
         # Insert the new/updated user object
         self.user.given_name = person.get('givenName')
         self.user.display_name = person.get('displayName')
-        self.user.surname = person.get('sn')
+        self.user.surname = person.get('surname')
         self.user.language = person.get('preferredLanguage')
         try:
             self.context.save_dashboard_user(self.user)
