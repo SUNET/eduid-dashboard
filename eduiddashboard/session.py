@@ -179,7 +179,7 @@ class Session(collections.MutableMapping):
         '''
         if not queue:
             queue = 'default'
-        elif queue not in self._session['flash_messages']:
+        if queue not in self._session['flash_messages']:
             self._session['flash_messages'][queue] = []
         if not allow_duplicate:
             if msg in self._session['flash_messages'][queue]:
