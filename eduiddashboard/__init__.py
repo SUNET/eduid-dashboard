@@ -183,7 +183,7 @@ def includeme(config):
     # DB setup
     settings = config.registry.settings
     mongodb = MongoDB(db_uri=settings['mongo_uri'])
-    authninfodb = MongoDB(db_uri=settings['mongo_uri'], db_name='authninfo')
+    authninfodb = MongoDB(db_uri=settings['mongo_uri'])
 
     config.registry.settings['mongodb'] = mongodb
     config.registry.settings['authninfodb'] = authninfodb
