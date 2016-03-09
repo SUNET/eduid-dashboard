@@ -62,7 +62,7 @@ class MobilesFormTests(LoggedInRequestTests):
         user = self.dashboard_db.get_user_by_id(self.user.user_id)
 
         mobile_doc = self.db.verifications.find_one({
-            'model_name': 'mobile',
+            'model_name': 'phone',
             'user_oid': ObjectId(user.user_id),
             'obj_id': new_mobile
         })

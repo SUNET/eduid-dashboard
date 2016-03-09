@@ -74,7 +74,7 @@ def get_tab(request):
 
 def send_verification_code(request, user, mobile_number, reference=None, code=None):
     if code is None or reference is None:
-        reference, code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
+        reference, code = new_verification_code(request, 'phone', mobile_number, user, hasher=get_short_hash)
 
     user_language = request.context.get_preferred_language()
     request.msgrelay.mobile_validator(reference, mobile_number, code, user_language)
