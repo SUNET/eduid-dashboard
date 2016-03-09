@@ -42,6 +42,6 @@ fi
 echo "$0: pserving ${ini}"
 exec start-stop-daemon --start -c eduid:eduid --exec \
      /opt/eduid/bin/pserve -- "${ini}" \
-     --pid-file "${state_dir}/${eduid-name}.pid" \
+     --pid-file "${state_dir}/${eduid_name}.pid" \
      --log-file "${log_dir}/${eduid_name}.log" \
     $pserve_args

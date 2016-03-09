@@ -63,6 +63,7 @@ if sys.version_info[0] < 3:
 test_requires = [
     'WebTest==2.0.18',
     'mock==1.0.1',
+    'eduid_dashboard_amp',
 ]
 
 
