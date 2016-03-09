@@ -287,7 +287,11 @@ class NinsFormTests(LoggedInRequestTests):
 
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
             old_user_nins = [n['number'] for n in old_user['nins']]
-            self.assertIn(nin, old_user_nins)
+            self.assertNotIn(nin, old_user_nins)
+
+            new_user = self.db.profiles.find_one({'_id': ObjectId('901234567890123456789012')})
+            new_user_nins = [n['number'] for n in new_user['nins']]
+            self.assertIn(nin, new_user_nins)
 
 
 class NinsFormTestsDisableMM(LoggedInRequestTests):

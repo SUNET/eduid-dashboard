@@ -11,6 +11,7 @@ from eduid_userdb.element import DuplicateElementViolation
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserDoesNotExist
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard.utils import retrieve_modified_ts
@@ -79,28 +80,23 @@ def verify_nin(request, user, new_nin, reference=None):
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
-    old_user_docs = request.dashboard_userdb._coll.find(
-            {'nins': {'$elemMatch': {'nin': new_nin, 'verified': True}}})
+    old_user = request.dashboard_userdb.get_user_by_nin(new_nin, raise_on_missing=False)
     steal_count = 0
-    for old_user_doc in old_user_docs:
-        old_user = DashboardUser(data=old_user_doc)
+    if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
-        if old_user and old_user.user_id != user.user_id:
-            log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
-            log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
-            if old_user.nins.primary.key == new_nin:
-                old_nins = old_user.nins.to_list()
-                for nin in old_nins:
-                    if nin.key != new_nin:
-                        old_user.nins.primary = nin.key
-                        break
-                else:
-                    old_user._nins = NinList([])
-            old_user.nins.remove(new_nin)
-            log.debug('Old user NINs AFTER: {!r}.'.format(old_user.nins.to_list()))
-            request.context.save_dashboard_user(old_user)
-            log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
-            steal_count += 1
+        log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
+        log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
+        if old_user.nins.primary.key == new_nin:
+            old_nins = old_user.nins.to_list()
+            for nin in old_nins:
+                if nin.key != new_nin:
+                    old_user.nins.primary = nin.key
+                    break
+        old_user.nins.remove(new_nin)
+        log.debug('Old user NINs AFTER: {!r}.'.format(old_user.nins.to_list()))
+        request.context.save_dashboard_user(old_user)
+        log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
+        steal_count = 1
     # Add the verified nin to the requesting user
     if user.nins.verified.count == 0:
         primary = True
@@ -127,28 +123,23 @@ def verify_mobile(request, user, new_mobile):
     log.info('Trying to verify phone number for user {!r}.'.format(user))
     log.debug('Phone number: {!s}.'.format(new_mobile))
     # Start by removing mobile number from any other user
-    old_user_docs = request.dashboard_userdb._coll.find(
-        {'phone': {'$elemMatch': {'number': new_mobile, 'verified': True}}})
+    old_user = request.dashboard_userdb.get_user_by_phone(new_mobile, raise_on_missing=False)
     steal_count = 0
-    for old_user_doc in old_user_docs:
-        old_user = DashboardUser(data=old_user_doc)
+    if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
-        if old_user and old_user.user_id != user.user_id:
-            log.debug('Found old user {!r} with phone number ({!s}) already verified.'.format(old_user, new_mobile))
-            log.debug('Old user phone numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
-            if old_user.phone_numbers.primary.key == new_mobile:
-                old_numbers = old_user.phone_numbers.to_list()
-                for number in old_numbers:
-                    if number.key != new_mobile:
-                        old_user.phone_numbers.primary = number.key
-                        break
-                else:
-                    old_user._phone_numbers = PhoneNumberList([])
-            old_user.phone_numbers.remove(new_mobile)
-            log.debug('Old user phone numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
-            request.context.save_dashboard_user(old_user)
-            log.info('Removed phone number from user {!r}.'.format(old_user))
-            steal_count += 1
+        log.debug('Found old user {!r} with phone number ({!s}) already verified.'.format(old_user, new_mobile))
+        log.debug('Old user phone numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
+        if old_user.phone_numbers.primary.key == new_mobile:
+            old_numbers = old_user.phone_numbers.to_list()
+            for number in old_numbers:
+                if number.key != new_mobile:
+                    old_user.phone_numbers.primary = number.key
+                    break
+        old_user.phone_numbers.remove(new_mobile)
+        log.debug('Old user phone numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
+        request.context.save_dashboard_user(old_user)
+        log.info('Removed phone number from user {!r}.'.format(old_user))
+        steal_count = 1
     # Add the verified mobile number to the requesting user
     new_mobile_obj = PhoneNumber(data={'number': new_mobile,
                                        'verified': True,
@@ -171,29 +162,24 @@ def verify_mail(request, user, new_mail):
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
     # Start by removing mail address from any other user
-    old_user_docs = request.dashboard_userdb._coll.find(
-            {'mailAliases': {'$elemMatch': {'email': new_mail, 'verified': True}}})
+    old_user = request.dashboard_userdb.get_user_by_mail(new_mail, raise_on_missing=False)
     steal_count = 0
-    for old_user_doc in old_user_docs:
-        old_user = DashboardUser(data=old_user_doc)
+    if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
-        if old_user and old_user.user_id != user.user_id:
-            log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
-            log.debug('Old user mail BEFORE: {!s}.'.format(old_user.mail_addresses.primary.key))
-            log.debug('Old user mail aliases BEFORE: {!r}.'.format(old_user.mail_addresses.to_list()))
-            if old_user.mail_addresses.primary.key == new_mail:
-                old_addresses = old_user.mail_addresses.to_list()
-                for address in old_addresses:
-                    if address.key != new_mail:
-                        old_user.mail_addresses.primary = address.key
-                        break
-                else:
-                    old_user._mail_addresses = MailAddressList([])
-            old_user.mail_addresses.remove(new_mail)
-            log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
-            log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
-            request.context.save_dashboard_user(old_user)
-            steal_count += 1
+        log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
+        log.debug('Old user mail BEFORE: {!s}.'.format(old_user.mail_addresses.primary.key))
+        log.debug('Old user mail aliases BEFORE: {!r}.'.format(old_user.mail_addresses.to_list()))
+        if old_user.mail_addresses.primary.key == new_mail:
+            old_addresses = old_user.mail_addresses.to_list()
+            for address in old_addresses:
+                if address.key != new_mail:
+                    old_user.mail_addresses.primary = address.key
+                    break
+        old_user.mail_addresses.remove(new_mail)
+        log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
+        log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
+        request.context.save_dashboard_user(old_user)
+        steal_count = 1
     # Add the verified mail address to the requesting user
     new_email = MailAddress(email=new_mail, application='dashboard',
             verified=True, primary=False)
