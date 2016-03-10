@@ -566,7 +566,8 @@ class ResetPasswordMobileView(BaseResetPasswordView):
                 password_reset = self.request.db.reset_passwords.find_one({'_id': reference})
                 user_language = user.get_preferred_language()
                 self.request.msgrelay.mobile_validator(str(reference), mobile_number,
-                                                       password_reset['mobile_hash_code'], user_language)
+                                                       password_reset['mobile_hash_code'], user_language,
+                                                       'mobile-reset-password')
                 log.info("Mail and SMS sent to user {!r}".format(user))
 
             self.request.session['_reset_type'] = _('email')  # This is used to tell the user where to look for the next step
