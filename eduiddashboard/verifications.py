@@ -87,7 +87,7 @@ def verify_nin(request, user, new_nin, reference=None):
         log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
         log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
         if old_user.nins.primary.key == new_nin:
-            old_nins = old_user.nins.to_list()
+            old_nins = old_user.nins.verified.to_list()
             for nin in old_nins:
                 if nin.key != new_nin:
                     old_user.nins.primary = nin.key
@@ -130,7 +130,7 @@ def verify_mobile(request, user, new_mobile):
         log.debug('Found old user {!r} with phone number ({!s}) already verified.'.format(old_user, new_mobile))
         log.debug('Old user phone numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
         if old_user.phone_numbers.primary.key == new_mobile:
-            old_numbers = old_user.phone_numbers.to_list()
+            old_numbers = old_user.phone_numbers.verified.to_list()
             for number in old_numbers:
                 if number.key != new_mobile:
                     old_user.phone_numbers.primary = number.key
