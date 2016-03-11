@@ -83,7 +83,11 @@
                 <div class="loa-big hidden-xs" id="eduid-header-loa">
                 {% with loa=request.context.get_max_loa() %}
                     {% if user is defined %}
-                        {{ user.mail_addresses.primary.key }}
+                        {% if user.mail_addresses.primary %}
+                            {{ user.mail_addresses.primary.key }}
+                        {% else %}
+                            {{ user.eppn }}
+                        {% endif %}
                     {% endif %}
                         ({{_(loa)}})
                 {% endwith %}

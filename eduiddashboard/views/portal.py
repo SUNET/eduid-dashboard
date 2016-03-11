@@ -55,7 +55,7 @@ def profile_editor(context, request):
 
     enable_mm = request.registry.settings.get('enable_mm_verification')
 
-    if context.main_attribute == 'mail':
+    if context.main_attribute == 'mail' and context.user.mail_addresses.primary:
         userid = context.user.mail_addresses.primary.key
     else:
         userid =  context.user.eppn
@@ -199,7 +199,11 @@ def token_login(context, request):
         #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
         #request.session['loa'] = 1
         store_session_user(request, user)
-        remember_headers = remember(request, user.mail_addresses.primary.key)
+        if user.mail_addresses.primary:
+            userid = user.mail_addresses.primary.key
+        else:
+            userid = eppn
+        remember_headers = remember(request, userid)
         request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:

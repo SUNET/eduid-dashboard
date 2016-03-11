@@ -112,7 +112,8 @@ class EmailUniqueValidator(object):
         request = node.bindings.get('request')
         user = request.context.user
         user_emails = [e.email for e in user.mail_addresses.to_list()]
-        user_emails.append(user.mail_addresses.primary.key)
+        if user.mail_addresses.primary:
+            user_emails.append(user.mail_addresses.primary.key)
         localizer = get_localizer(request)
 
         if sanitize_post_key(request, 'add') is not None:

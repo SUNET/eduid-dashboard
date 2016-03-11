@@ -273,7 +273,9 @@ class BaseFactory(RootFactory):
         if gn and sn:
             return "{0} {1}".format(gn, sn)
 
-        return user.mail_addresses.primary.key
+        if user.mail_addresses.primary is not None:
+            return user.mail_addresses.primary.key
+        return user.eppn
 
     def get_preferred_language(self):
         """ Return always a """

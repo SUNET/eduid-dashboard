@@ -22,7 +22,11 @@
             {% if context.workmode == 'personal' %}
                 <h3>{{ _("Profile") }}</h3>
             {% else %}
-                <h3>{{ _("Editing user %(email)s", email=user.mail_addresses.primary.key) }}</h3>
+                {% if user.mail_addresses.primary %}
+                    <h3>{{ _("Editing user %(email)s", email=user.mail_addresses.primary.key) }}</h3>
+                {% else %}
+                    <h3>{{ _("Editing user %(eppn)s", eppn=user.eppn) }}</h3>
+                {% endif %}
             {% endif %}
 
             {% if pending_actions %}

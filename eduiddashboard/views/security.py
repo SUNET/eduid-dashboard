@@ -68,9 +68,10 @@ def change_password(request, user, old_password, new_password):
 def new_reset_password_code(request, user, mechanism='email', next_view='reset-password-step2'):
     hash_code = get_unique_hash()
     date = datetime.now(pytz.utc)
-    request.db.reset_passwords.remove({
-        'email': user.mail_addresses.primary.key
-    })
+    if user.mail_addresses.primary:
+        request.db.reset_passwords.remove({
+            'email': user.mail_addresses.primary.key
+        })
 
     reset_doc = {
         'email': user.eppn,
@@ -94,7 +95,10 @@ def new_reset_password_code(request, user, mechanism='email', next_view='reset-p
 def send_reset_password_gov_message(request, reference, nin, user, reset_password_link):
     """ Send an message to the gov mailbox with the instructions for resetting password """
     user_language = user.language
-    email = user.mail_addresses.primary.key
+    if user.mail_addresses.primary:
+        email = user.mail_addresses.primary.key
+    else:
+        email = user.eppn
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "2880")) / 60
     request.msgrelay.nin_reset_password(reference, nin, email, reset_password_link, password_reset_timeout,
                                         user_language)

@@ -65,11 +65,21 @@ def send_termination_mail(request, user):
         'displayName': user.display_name
     }
 
+    if user.mail_addresses.primary is not None:
+        address = user.mail_addresses.primary.key
+    elif user.mail_addresses.count > 0:
+        for a in user.mail_addresses.to_list():
+            address = a.key
+            break
+    else:
+        log.info('User {} has no email address, not possible to send a message'.format(user.eppn))
+        return
+
     message = Message(
         subject=_("{site_name} account termination").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
-        recipients=[user.mail_addresses.primary.key],
+        recipients=[address],
         body=render(
             "templates/termination_email.txt.jinja2",
             context,
@@ -88,17 +98,26 @@ def send_termination_mail(request, user):
     else:
         mailer.send(message)
     log.debug("Sent termination mail to user {!r} with address {!s}.".format(
-        user, user.mail_addresses.primary.key))
+        user, address))
     request.stats.count('dashboard/email_send_termination_mail', 1)
 
 
 def send_reset_password_mail(request, user, reset_password_link, has_mobile=False):
     """ Send an email with the instructions for resetting password """
+
+    if user.mail_addresses.primary is not None:
+        email = user.mail_addresses.primary.key
+    elif user.mail_addresses.count > 0:
+        for a in user.mail_addresses.to_list():
+            email = a.key
+            break
+    else:
+        log.info('User {} has no email address, not possible to send a message'.format(user.eppn))
+        return
     mailer = get_mailer(request)
 
     site_name = request.registry.settings.get("site.name", "eduID")
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "2880")) / 60
-    email = user.mail_addresses.primary.key
     reset_offset = int(request.registry.settings.get("password_reset_email_mobile_offset", "1440")) / 60
 
     context = {
