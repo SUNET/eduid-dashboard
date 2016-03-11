@@ -172,12 +172,16 @@ def verify_mail(request, user, new_mail):
         if old_user.mail_addresses.primary.key == new_mail:
             old_addresses = old_user.mail_addresses.to_list()
             for address in old_addresses:
-                if address.key != new_mail:
+                if address.is_verified and address.key != new_mail:
                     old_user.mail_addresses.primary = address.key
                     break
         old_user.mail_addresses.remove(new_mail)
-        log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
-        log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
+        if old_user.mail_addresses.primary is not None:
+            log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
+        if old_user.mail_addresses.count > 0:
+            log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
+        else:
+            log.debug('Old user has NO mail AFTER.')
         request.context.save_dashboard_user(old_user)
         steal_count = 1
     # Add the verified mail address to the requesting user
