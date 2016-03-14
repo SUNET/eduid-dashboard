@@ -6,6 +6,7 @@ from datetime import datetime
 
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.element import PrimaryElementViolation
 from eduiddashboard.testing import LoggedInRequestTests
 
 import logging
@@ -132,8 +133,8 @@ class NinsFormTests(LoggedInRequestTests):
         user = self.userdb.get_user_by_mail(email)
         user.set_nins([{'number': '123456789050',
                         'verified': False,
-                        'primary': True,
-                       }])
+                        'primary': False,
+                        }])
         self.userdb.save(user)
         # Set up a pending verfication
         verification_data = {
@@ -153,6 +154,7 @@ class NinsFormTests(LoggedInRequestTests):
             '/profile/nins-actions/',
             {'identifier': '123456789050  0', 'action': 'verify'}
         )
+
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'getcode')
 
