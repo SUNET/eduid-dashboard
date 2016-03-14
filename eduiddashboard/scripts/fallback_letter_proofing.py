@@ -8,7 +8,7 @@ from datetime import datetime
 import json
 
 from eduid_userdb.exceptions import UserOutOfSync
-from eduiddashboard.verifications import get_verification_code, verify_nin
+from eduiddashboard.verifications import verify_nin, save_as_verified
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import _get_user_by_eppn
 
@@ -101,12 +101,11 @@ def letter_proof_user():
         print "Logging proofing data for user {!r}.".format(user)
         if env['request'].idproofinglog.log_verification(proofing_data):
             print "Finished logging proofing data for user {!r}.".format(user)
-            verification_doc = get_verification_code(env['request'], 'norEduPersonNIN', obj_id=rdata['number'],
-                                                     user=user)
             try:
                 # This is a hack to reuse the existing proofing functionality, the users code is
                 # verified by the micro service
-                verify_code(env, user, verification_doc)
+                verify_nin(env, user, rdata['number'])
+                save_as_verified(env, 'norEduPersonNIN', user.get_id(), rdata['number'])
                 print "Verified NIN by physical letter saved for user {!r}.".format(user)
             except UserOutOfSync:
                 print "Verified NIN by physical letter NOT saved for user {!r}. User out of sync.".format(user)

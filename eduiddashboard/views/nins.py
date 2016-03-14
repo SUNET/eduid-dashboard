@@ -408,13 +408,11 @@ class NINsActionsView(BaseActionsView):
                 logger.info("Logging proofing data for user {!r}.".format(self.user))
                 if self.request.idproofinglog.log_verification(proofing_data):
                     logger.info("Finished logging proofing data for user {!r}.".format(self.user))
-                    # TODO: How do we know we which verification object we will get back?
-                    code_data = get_verification_code(self.request,
-                                                      'norEduPersonNIN', obj_id=nin, user=self.user)
                     try:
                         # This is a hack to reuse the existing proofing functionality, the users code is
                         # verified by the micro service
-                        verify_code(self.request, 'norEduPersonNIN', code_data['code'])
+                        verify_nin(self.request, self.user, nin)
+                        save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
                         logger.info("Verified NIN by physical letter saved "
                                     "for user {!r}.".format(self.user))
                     except UserOutOfSync:
