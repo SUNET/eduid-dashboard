@@ -16,10 +16,7 @@ from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduiddashboard.verifications import (verify_nin, verify_code,
-                                          get_verification_code)
-from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verified)
+from eduiddashboard.verifications import verify_nin, new_verification_code, save_as_verified
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.idproofinglog import LetterProofing
 
