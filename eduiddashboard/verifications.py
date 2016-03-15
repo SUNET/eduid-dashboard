@@ -239,9 +239,6 @@ def save_as_verified(request, model_name, user_oid, obj_id):
             "verified": True,
             "obj_id": obj_id,
         })
-    n = old_verified.count()
-    if n > 1:
-        log.warn('Too many verifications ({!s}) for NIN {!s}'.format(n, obj_id))
 
     for old in old_verified:
         if old['user_oid'] == user_oid:
