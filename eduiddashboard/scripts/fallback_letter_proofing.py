@@ -104,8 +104,8 @@ def letter_proof_user():
             try:
                 # This is a hack to reuse the existing proofing functionality, the users code is
                 # verified by the micro service
-                verify_nin(env, user, rdata['number'])
-                save_as_verified(env, 'norEduPersonNIN', user.get_id(), rdata['number'])
+                verify_nin(env['request'], user, rdata['number'])
+                save_as_verified(env['request'], 'norEduPersonNIN', user.get_id(), rdata['number'])
                 print "Verified NIN by physical letter saved for user {!r}.".format(user)
             except UserOutOfSync:
                 print "Verified NIN by physical letter NOT saved for user {!r}. User out of sync.".format(user)
