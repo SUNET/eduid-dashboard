@@ -1,17 +1,24 @@
+"""
+Module to handle verification of nin, phone and mail addresses.
+
+XXX when we 'steal' e-mail addresses from a user, we simply remove it. However,
+we will only find the e-mail address on the user if it is verified. This is a
+discrepancy between verified/unverified addresses, we ought to either
+
+* remove both verified and non-verified elements
+* never remove, but just downgrade to unverified
+"""
 from datetime import datetime, timedelta
 
 from bson.tz_util import utc
 
 from pyramid.i18n import get_localizer
 
-from eduid_userdb.nin import Nin, NinList
-from eduid_userdb.mail import MailAddress, MailAddressList
-from eduid_userdb.phone import PhoneNumber, PhoneNumberList
+from eduid_userdb.nin import Nin
+from eduid_userdb.mail import MailAddress
+from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.element import DuplicateElementViolation
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb.exceptions import UserOutOfSync
-from eduid_userdb.exceptions import UserDoesNotExist
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard.utils import retrieve_modified_ts
@@ -158,45 +165,82 @@ def verify_mobile(request, user, new_mobile):
     return user, _('Phone {obj} verified')
 
 
-def verify_mail(request, user, new_mail):
+def set_email_verified(request, user, new_mail):
+    """
+    Mark an e-mail address as verified on a user.
+
+    This process also includes *removing* the e-mail address from any other user
+    that had it as a verified e-mail address.
+
+    :param request: The HTTP request
+    :param user: The user
+    :param new_mail: The e-mail address to mark as verified
+
+    :type request: pyramid.request.Request
+    :type user: User
+    :type new_mail: str | unicode
+
+    :return: User and status message
+    :rtype: User, str | unicode
+    """
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
-    # Start by removing mail address from any other user
+    # Start by removing the email address from any other user that currently has it (verified)
     old_user = request.dashboard_userdb.get_user_by_mail(new_mail, raise_on_missing=False)
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
-        log.debug('Found old user {!r} with mail address ({!s}) already verified.'.format(old_user, new_mail))
-        log.debug('Old user mail BEFORE: {!s}.'.format(old_user.mail_addresses.primary.key))
-        log.debug('Old user mail aliases BEFORE: {!r}.'.format(old_user.mail_addresses.to_list()))
-        if old_user.mail_addresses.primary.key == new_mail:
-            old_addresses = old_user.mail_addresses.to_list()
-            for address in old_addresses:
-                if address.is_verified and address.key != new_mail:
-                    old_user.mail_addresses.primary = address.key
-                    break
-        old_user.mail_addresses.remove(new_mail)
-        if old_user.mail_addresses.primary is not None:
-            log.debug('Old user mail AFTER: {!s}.'.format(old_user.mail_addresses.primary.key))
-        if old_user.mail_addresses.count > 0:
-            log.debug('Old user mail aliases AFTER: {!r}.'.format(old_user.mail_addresses.to_list()))
-        else:
-            log.debug('Old user has NO mail AFTER.')
+        old_user = _remove_mail_from_user(new_mail, old_user)
         request.context.save_dashboard_user(old_user)
         steal_count = 1
     # Add the verified mail address to the requesting user
-    new_email = MailAddress(email=new_mail, application='dashboard',
-            verified=True, primary=False)
+    _add_mail_to_user(new_mail, user)
+    log.info('Mail address verified for user {!r}.'.format(user))
+    request.stats.count('dashboard/verify_mail_stolen', steal_count)
+    request.stats.count('dashboard/verify_mail_completed', 1)
+    return user, _('Email {obj} verified'.format(obj=new_mail))
+
+
+def _remove_mail_from_user(email, user):
+    """
+    Remove an email address from one user because it is being verified by another user.
+    Part of set_email_verified() above.
+    """
+    log.debug('Removing mail address {!s} from user {!s}'.format(email, user))
+    if user.mail_addresses.primary:
+        # only in the test suite could primary ever be None here
+        log.debug('Old user mail BEFORE: {!s}'.format(user.mail_addresses.primary.key))
+    log.debug('Old user mail aliases BEFORE: {!r}'.format(user.mail_addresses.to_list()))
+    if user.mail_addresses.primary and user.mail_addresses.primary.key == email:
+        # Promote some other verified e-mail address to primary
+        old_addresses = user.mail_addresses.to_list()
+        for address in old_addresses:
+            if address.is_verified and address.key != email:
+                user.mail_addresses.primary = address.key
+                break
+    user.mail_addresses.remove(email)
+    if user.mail_addresses.primary is not None:
+        log.debug('Old user mail AFTER: {!s}.'.format(user.mail_addresses.primary.key))
+    if user.mail_addresses.count > 0:
+        log.debug('Old user mail aliases AFTER: {!r}.'.format(user.mail_addresses.to_list()))
+    else:
+        log.debug('Old user has NO mail AFTER.')
+    return user
+
+
+def _add_mail_to_user(email, user):
+    """
+    Add an email address to a user.
+    Part of set_email_verified() above.
+    """
+    new_email = MailAddress(email = email, application = 'dashboard',
+                            verified = True, primary = False)
     if user.mail_addresses.primary is None:
         new_email.is_primary = True
     try:
         user.mail_addresses.add(new_email)
     except DuplicateElementViolation:
-        user.mail_addresses.find(new_mail).is_verified = True
-    log.info('Mail address verified for user {!r}.'.format(user))
-    request.stats.count('dashboard/verify_mail_stolen', steal_count)
-    request.stats.count('dashboard/verify_mail_completed', 1)
-    return user, _('Email {obj} verified'.format(obj=new_mail))
+        user.mail_addresses.find(email).is_verified = True
 
 
 def verify_code(request, model_name, code):
@@ -206,9 +250,9 @@ def verify_code(request, model_name, code):
     This is what turns an unconfirmed NIN/mobile/e-mail into a confirmed one.
 
     :param request: The HTTP request
-    :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
     :param code: The user supplied code
-    :type request: webob.request.BaseRequest
+    :type request: pyramid.request.Request
     :return: string of verified data
     """
     this_verification = request.db.verifications.find_one(
@@ -237,7 +281,7 @@ def verify_code(request, model_name, code):
     elif model_name == 'phone':
         user, msg = verify_mobile(request, user, obj_id)
     elif model_name == 'mailAliases':
-        user, msg = verify_mail(request, user, obj_id)
+        user, msg = set_email_verified(request, user, obj_id)
     else:
         raise NotImplementedError('Unknown validation model_name')
 
