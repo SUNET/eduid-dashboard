@@ -342,6 +342,7 @@ def main(global_config, **settings):
     # configuration for Celery brokers
     default_celery_conf = {
         'BROKER_URL': None,  # The broker url needs to be set when instantiating the broker
+        'MONGO_URI': settings.get('mongo_uri'),
         'CELERY_TASK_SERIALIZER': 'json',
         'CELERY_RESULT_BACKEND': 'amqp',
         # Avoid broken connections across firewall by disabling pool

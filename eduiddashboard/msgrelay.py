@@ -7,7 +7,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 TEMPLATES_RELATION = {
-    'phone-validator': 'dummy',
+    'mobile-validator': 'mobile-confirm',
+    'mobile-reset-password': 'mobile-reset-password',
     'nin-validator': 'nin-confirm',
     'nin-reset-password': 'nin-reset-password',
 }
@@ -88,7 +89,7 @@ class MsgRelay(object):
             'sitelink': self.settings.get('personal_dashboard_base_url'),
         }
 
-    def mobile_validator(self, reference, targetphone, code, language):
+    def mobile_validator(self, reference, targetphone, code, language, template_name='mobile-validator'):
         """
             The template keywords are:
                 * sitename: (eduID by default)
@@ -102,17 +103,15 @@ class MsgRelay(object):
             'phonenumber': targetphone,
         })
         lang = self.get_language(language)
+        template = TEMPLATES_RELATION.get(template_name)
 
         logger.debug('SENT mobile validator message code: {0} phone number: {1} with reference {2}'.format(
                      code, targetphone, reference))
         res = self._send_message.delay('sms', reference, content, targetphone,
-                                       TEMPLATES_RELATION.get('phone-validator'),
+                                       template,
                                        lang)
         logger.debug('Extra debug: Send message result: {!r}, parameters:\n{!r}'.format(
-            res, ['sms', reference, content, targetphone,
-                  TEMPLATES_RELATION.get('phone-validator'),
-                  lang]
-        ))
+            res, ['sms', reference, content, targetphone, template, lang]))
 
     def nin_reachable(self, nin):
 

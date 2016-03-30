@@ -18,10 +18,7 @@ from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduiddashboard.verifications import (verify_nin, verify_code,
-                                          get_verification_code)
-from eduiddashboard.verifications import (new_verification_code,
-                                          save_as_verified)
+from eduiddashboard.verifications import verify_nin, new_verification_code, save_as_verified
 from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.idproofinglog import LetterProofing
 
@@ -392,7 +389,11 @@ class NINsActionsView(BaseActionsView):
         result = 'error'
         msg = _('There was a problem with the letter service. '
                 'Please try again later.')
-        if response.status_code == 200:
+        if response.status_code != 200:
+            # Do nothing, just return above error message and log microservice return code
+            logger.info("Received status code {!s} from idproofing-letter after posting verification code "
+                        "for user {!r}.".format(response.status_code, self.user))
+        else:
             rdata = response.json().get('data', {})
             if rdata.get('verified', False) and nin == rdata.get('number', None):
                 # Save data from successful verification call for later addition to user proofing collection
@@ -411,13 +412,17 @@ class NINsActionsView(BaseActionsView):
                 logger.info("Logging proofing data for user {!r}.".format(self.user))
                 if self.request.idproofinglog.log_verification(proofing_data):
                     logger.info("Finished logging proofing data for user {!r}.".format(self.user))
-                    # TODO: How do we know we which verification object we will get back?
-                    code_data = get_verification_code(self.request,
-                                                      'norEduPersonNIN', obj_id=nin, user=self.user)
                     try:
                         # This is a hack to reuse the existing proofing functionality, the users code is
                         # verified by the micro service
-                        verify_code(self.request, 'norEduPersonNIN', code_data['code'])
+                        verify_nin(self.request, self.user, nin)
+                        try:
+                            self.user.save(self.request)
+                        except UserOutOfSync:
+                            log.info("Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.".format(
+                                self.user))
+                            raise
+                        save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
                         logger.info("Verified NIN by physical letter saved "
                                     "for user {!r}.".format(self.user))
                     except UserOutOfSync:
@@ -437,8 +442,6 @@ class NINsActionsView(BaseActionsView):
                                                                                           rdata.get('number', None)))
                 msg = _('Your verification code seems to be wrong, '
                         'please try again.')
-        logger.info("Received status code {!s} from idproofing-letter after posting verification code "
-                    "for user {!r}.".format(response.status_code, self.user))
         return {
             'result': result,
             'message': get_localizer(self.request).translate(msg),

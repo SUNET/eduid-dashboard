@@ -7,6 +7,7 @@ from datetime import datetime
 from eduid_userdb.nin import Nin
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.element import PrimaryElementViolation
 from eduiddashboard.testing import LoggedInRequestTests
 
 import logging
@@ -156,6 +157,7 @@ class NinsFormTests(LoggedInRequestTests):
             '/profile/nins-actions/',
             {'identifier': '123456789050  0', 'action': 'verify'}
         )
+
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'getcode')
 
