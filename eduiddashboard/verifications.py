@@ -126,43 +126,77 @@ def verify_nin(request, user, new_nin, reference=None):
     return user, _('National identity number {obj} verified')
 
 
-def verify_mobile(request, user, new_mobile):
+def set_phone_verified(request, user, new_number):
+    """
+    Mark a phone number as verified on a user.
+
+    This process also includes *removing* the phone number from any other user
+    that had it as a verified e-mail address.
+
+    :param request: The HTTP request
+    :param user: The user
+    :param new_number: The phone number to mark as verified
+
+    :type request: pyramid.request.Request
+    :type user: User
+    :type new_number: str | unicode
+
+    :return: User and status message
+    :rtype: User, str | unicode
+    """
     log.info('Trying to verify phone number for user {!r}.'.format(user))
-    log.debug('Phone number: {!s}.'.format(new_mobile))
+    log.debug('Phone number: {!s}.'.format(new_number))
     # Start by removing mobile number from any other user
-    old_user = request.dashboard_userdb.get_user_by_phone(new_mobile, raise_on_missing=False)
+    old_user = request.dashboard_userdb.get_user_by_phone(new_number, raise_on_missing=False)
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
-        log.debug('Found old user {!r} with phone number ({!s}) already verified.'.format(old_user, new_mobile))
-        log.debug('Old user phone numbers BEFORE: {!r}.'.format(old_user.phone_numbers.to_list()))
-        if old_user.phone_numbers.primary.key == new_mobile:
-            old_numbers = old_user.phone_numbers.verified.to_list()
-            for number in old_numbers:
-                if number.key != new_mobile:
-                    old_user.phone_numbers.primary = number.key
-                    break
-        old_user.phone_numbers.remove(new_mobile)
-        log.debug('Old user phone numbers AFTER: {!r}.'.format(old_user.phone_numbers.to_list()))
+        _remove_phone_from_user(new_number, old_user)
         request.context.save_dashboard_user(old_user)
         log.info('Removed phone number from user {!r}.'.format(old_user))
         steal_count = 1
     # Add the verified mobile number to the requesting user
-    new_mobile_obj = PhoneNumber(data={'number': new_mobile,
-                                       'verified': True,
-                                       'primary': False})
-    log.debug('User had phones BEFORE verification: {!r}'.format(user.phone_numbers.to_list()))
-    if user.phone_numbers.primary is None:
-        log.debug('Setting NEW phone number to primary: {}.'.format(new_mobile_obj))
-        new_mobile_obj.is_primary = True
-    try:
-        user.phone_numbers.add(new_mobile_obj)
-    except DuplicateElementViolation:
-        user.phone_numbers.find(new_mobile).is_verified = True
+    _add_phone_to_user(new_number, user)
     log.info('Phone number verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mobile_stolen', steal_count)
     request.stats.count('dashboard/verify_mobile_completed', 1)
     return user, _('Phone {obj} verified')
+
+
+def _remove_phone_from_user(number, user):
+    """
+    Remove a phone number from one user because it is being verified by another user.
+    Part of set_phone_verified() above.
+    """
+    log.debug('Found old user {!r} with phone number ({!s}) already verified.'.format(user, number))
+    log.debug('Old user phone numbers BEFORE: {!r}.'.format(user.phone_numbers.to_list()))
+    if user.phone_numbers.primary.number == number:
+        # Promote some other verified phone number to primary
+        for phone in user.phone_numbers.verified.to_list():
+            if phone.number != number:
+                user.phone_numbers.primary = phone.number
+                break
+    user.phone_numbers.remove(number)
+    log.debug('Old user phone numbers AFTER: {!r}.'.format(user.phone_numbers.to_list()))
+    return user
+
+
+def _add_phone_to_user(new_number, user):
+    """
+    Add a phone number to a user.
+    Part of set_phone_verified() above.
+    """
+    phone = PhoneNumber(data={'number': new_number,
+                              'verified': True,
+                              'primary': False})
+    log.debug('User had phones BEFORE verification: {!r}'.format(user.phone_numbers.to_list()))
+    if user.phone_numbers.primary is None:
+        log.debug('Setting NEW phone number to primary: {}.'.format(phone))
+        phone.is_primary = True
+    try:
+        user.phone_numbers.add(phone)
+    except DuplicateElementViolation:
+        user.phone_numbers.find(new_number).is_verified = True
 
 
 def set_email_verified(request, user, new_mail):
@@ -209,18 +243,17 @@ def _remove_mail_from_user(email, user):
     log.debug('Removing mail address {!s} from user {!s}'.format(email, user))
     if user.mail_addresses.primary:
         # only in the test suite could primary ever be None here
-        log.debug('Old user mail BEFORE: {!s}'.format(user.mail_addresses.primary.key))
+        log.debug('Old user mail BEFORE: {!s}'.format(user.mail_addresses.primary))
     log.debug('Old user mail aliases BEFORE: {!r}'.format(user.mail_addresses.to_list()))
-    if user.mail_addresses.primary and user.mail_addresses.primary.key == email:
+    if user.mail_addresses.primary and user.mail_addresses.primary.email == email:
         # Promote some other verified e-mail address to primary
-        old_addresses = user.mail_addresses.to_list()
-        for address in old_addresses:
-            if address.is_verified and address.key != email:
-                user.mail_addresses.primary = address.key
+        for address in user.mail_addresses.to_list():
+            if address.is_verified and address.email != email:
+                user.mail_addresses.primary = address.email
                 break
     user.mail_addresses.remove(email)
     if user.mail_addresses.primary is not None:
-        log.debug('Old user mail AFTER: {!s}.'.format(user.mail_addresses.primary.key))
+        log.debug('Old user mail AFTER: {!s}.'.format(user.mail_addresses.primary))
     if user.mail_addresses.count > 0:
         log.debug('Old user mail aliases AFTER: {!r}.'.format(user.mail_addresses.to_list()))
     else:
@@ -279,7 +312,7 @@ def verify_code(request, model_name, code):
     if model_name == 'norEduPersonNIN':
         user, msg = verify_nin(request, user, obj_id, reference)
     elif model_name == 'phone':
-        user, msg = verify_mobile(request, user, obj_id)
+        user, msg = set_phone_verified(request, user, obj_id)
     elif model_name == 'mailAliases':
         user, msg = set_email_verified(request, user, obj_id)
     else:
