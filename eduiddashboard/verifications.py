@@ -83,7 +83,25 @@ def get_not_verified_objects(request, model_name, user):
     })
 
 
-def verify_nin(request, user, new_nin, reference=None):
+def set_nin_verified(request, user, new_nin, reference=None):
+    """
+    Mark a National Identity Number (NIN) as verified on a user.
+
+    This process also includes *removing* the NIN from any other user
+    that had it as a verified NIN.
+
+    :param request: The HTTP request
+    :param user: The user
+    :param new_nin: The National Identity Number to mark as verified
+    :param reference: A reference to the verification code - used for audit logging
+
+    :type request: pyramid.request.Request
+    :type user: User
+    :type new_nin: str | unicode
+
+    :return: User and status message
+    :rtype: User, str | unicode
+    """
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
@@ -91,39 +109,63 @@ def verify_nin(request, user, new_nin, reference=None):
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
-        log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(old_user, new_nin))
-        log.debug('Old user NINs BEFORE: {!r}.'.format(old_user.nins.to_list()))
-        if old_user.nins.primary.key == new_nin:
-            old_nins = old_user.nins.verified.to_list()
-            for nin in old_nins:
-                if nin.key != new_nin:
-                    old_user.nins.primary = nin.key
-                    break
-        old_user.nins.remove(new_nin)
-        log.debug('Old user NINs AFTER: {!r}.'.format(old_user.nins.to_list()))
+        _remove_nin_from_user(new_nin, old_user)
         request.context.save_dashboard_user(old_user)
         log.info('Removed NIN and associated addresses from user {!r}.'.format(old_user))
         steal_count = 1
     # Add the verified nin to the requesting user
-    if user.nins.verified.count == 0:
-        primary = True
-    else:
-        primary = False
-    new_nin_obj = Nin(number=new_nin, application='dashboard',
-            verified=True, primary=primary)
+    _add_nin_to_user(new_nin, user)
+    _nin_verified_transaction_audit(request, reference)
+    log.info('NIN verified for user {!r}.'.format(user))
+    request.stats.count('dashboard/verify_nin_stolen', steal_count)
+    request.stats.count('dashboard/verify_nin_completed', 1)
+    return user, _('National identity number {obj} verified')
+
+
+def _remove_nin_from_user(nin, user):
+    """
+    Remove a NIN from one user because it is being verified by another user.
+    Part of set_nin_verified() above.
+    """
+    log.debug('Found old user {!r} with NIN ({!s}) already verified.'.format(user, nin))
+    log.debug('Old user NINs BEFORE: {!r}.'.format(user.nins.to_list()))
+    if user.nins.primary.number == nin:
+        old_nins = user.nins.verified.to_list()
+        for this in old_nins:
+            if this.number != nin:
+                user.nins.primary = this.number
+                break
+    user.nins.remove(nin)
+    log.debug('Old user NINs AFTER: {!r}.'.format(user.nins.to_list()))
+    return user
+
+
+def _add_nin_to_user(new_nin, user):
+    """
+    Add a NIN to a user.
+    Part of set_nin_verified() above.
+    """
+    primary = user.nins.verified.count == 0
+    new_nin_obj = Nin(number = new_nin,
+                      application = 'dashboard',
+                      verified = True,
+                      primary = primary,
+                      )
     try:
         user.nins.add(new_nin_obj)
     except DuplicateElementViolation:
         user.nins.find(new_nin).is_verified = True
+
+
+def _nin_verified_transaction_audit(request, reference):
+    """
+    Part of set_nin_verified above.
+    """
     # Connect the verification to the transaction audit log
     if reference is not None:
         request.msgrelay.postal_address_to_transaction_audit_log(reference)
     # Reset session eduPersonIdentityProofing on NIN verification
     request.session['eduPersonIdentityProofing'] = None
-    log.info('NIN verified for user {!r}.'.format(user))
-    request.stats.count('dashboard/verify_nin_stolen', steal_count)
-    request.stats.count('dashboard/verify_nin_completed', 1)
-    return user, _('National identity number {obj} verified')
 
 
 def set_phone_verified(request, user, new_number):
@@ -131,7 +173,7 @@ def set_phone_verified(request, user, new_number):
     Mark a phone number as verified on a user.
 
     This process also includes *removing* the phone number from any other user
-    that had it as a verified e-mail address.
+    that had it as a verified phone number.
 
     :param request: The HTTP request
     :param user: The user
@@ -310,7 +352,7 @@ def verify_code(request, model_name, code):
     assert user.user_id == this_verification['user_oid'], assert_error_msg
 
     if model_name == 'norEduPersonNIN':
-        user, msg = verify_nin(request, user, obj_id, reference)
+        user, msg = set_nin_verified(request, user, obj_id, reference)
     elif model_name == 'phone':
         user, msg = set_phone_verified(request, user, obj_id)
     elif model_name == 'mailAliases':

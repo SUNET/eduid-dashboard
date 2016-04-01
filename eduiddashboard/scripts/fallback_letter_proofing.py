@@ -8,7 +8,7 @@ from datetime import datetime
 import json
 
 from eduid_userdb.exceptions import UserOutOfSync
-from eduiddashboard.verifications import verify_nin, save_as_verified
+from eduiddashboard.verifications import set_nin_verified, save_as_verified
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import _get_user_by_eppn
 
@@ -42,7 +42,7 @@ def verify_code(env, user, verification_doc):
     assert_error_msg = 'Requesting users ID does not match verifications user ID'
     assert user.get_id() == verification_doc['user_oid'], assert_error_msg
 
-    user, msg = verify_nin(env['request'], user, obj_id, reference)
+    user, msg = set_nin_verified(env['request'], user, obj_id, reference)
 
     try:
         user.save(env['request'])
@@ -104,7 +104,7 @@ def letter_proof_user():
             try:
                 # This is a hack to reuse the existing proofing functionality, the users code is
                 # verified by the micro service
-                verify_nin(env['request'], user, rdata['number'])
+                set_nin_verified(env['request'], user, rdata['number'])
                 try:
                     user.save(env['request'])
                 except UserOutOfSync:

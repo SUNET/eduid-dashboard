@@ -18,7 +18,7 @@ from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduiddashboard.verifications import verify_nin, new_verification_code, save_as_verified
+from eduiddashboard.verifications import set_nin_verified, new_verification_code, save_as_verified
 from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.idproofinglog import LetterProofing
 
@@ -277,7 +277,7 @@ class NINsActionsView(BaseActionsView):
         validation = validate_nin_by_mobile(self.request, self.user, nin)
         result = validation['success'] and 'success' or 'error'
         if result == 'success':
-            verify_nin(self.request, self.user, nin)
+            set_nin_verified(self.request, self.user, nin)
             model_name = 'norEduPersonNIN'
             try:
                 self.context.save_dashboard_user(self.user)
@@ -415,7 +415,7 @@ class NINsActionsView(BaseActionsView):
                     try:
                         # This is a hack to reuse the existing proofing functionality, the users code is
                         # verified by the micro service
-                        verify_nin(self.request, self.user, nin)
+                        set_nin_verified(self.request, self.user, nin)
                         try:
                             self.user.save(self.request)
                         except UserOutOfSync:
