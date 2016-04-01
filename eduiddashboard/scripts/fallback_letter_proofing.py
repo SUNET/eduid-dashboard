@@ -42,7 +42,7 @@ def verify_code(env, user, verification_doc):
     assert_error_msg = 'Requesting users ID does not match verifications user ID'
     assert user.get_id() == verification_doc['user_oid'], assert_error_msg
 
-    user, msg = set_nin_verified(env['request'], user, obj_id, reference)
+    set_nin_verified(env['request'], user, obj_id, reference)
 
     try:
         user.save(env['request'])
@@ -110,7 +110,7 @@ def letter_proof_user():
                 except UserOutOfSync:
                     print 'Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.'.format(user)
                     raise
-                save_as_verified(env['request'], 'norEduPersonNIN', user.get_id(), rdata['number'])
+                save_as_verified(env['request'], 'norEduPersonNIN', user, rdata['number'])
                 print "Verified NIN by physical letter saved for user {!r}.".format(user)
             except UserOutOfSync:
                 print "Verified NIN by physical letter NOT saved for user {!r}. User out of sync.".format(user)

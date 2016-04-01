@@ -440,10 +440,12 @@ class BaseResetPasswordView(FormView):
         else:
             if text.startswith(u'0') or text.startswith(u'+'):
                 text = normalize_to_e_164(self.request, text)
+                # XXX use self.request.userdb.get_user_by_phone()
                 user = self.request.userdb_new._get_documents_by_filter(
                     {'phone': {'$elemMatch': {'number': text, 'verified': True}}}
                 )
             else:
+                # XXX use self.request.userdb.get_user_by_nin()
                 user = self.request.userdb_new._get_documents_by_filter(
                     {'norEduPersonNIN': {'$elemMatch': {'norEduPersonNIN': text, 'verified': True}}}
                 )
@@ -475,7 +477,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         context['password_reset_email_mobile_offset'] = reset_offset
         context['has_mobile'] = False
         if self.user is not None:
-            if user.phone_numbers.count > 0:
+            if self.user.phone_numbers.count > 0:
                 context['has_mobile'] = True
         return context
 

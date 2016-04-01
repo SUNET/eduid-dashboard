@@ -283,7 +283,7 @@ class NINsActionsView(BaseActionsView):
                 self.context.save_dashboard_user(self.user)
                 logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
                 # Save the state in the verifications collection
-                save_as_verified(self.request, 'norEduPersonNIN', self.user.user_id, nin)
+                save_as_verified(self.request, 'norEduPersonNIN', self.user, nin)
             except UserOutOfSync:
                 logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
                 raise
@@ -422,7 +422,7 @@ class NINsActionsView(BaseActionsView):
                             log.info("Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.".format(
                                 self.user))
                             raise
-                        save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
+                        save_as_verified(self.request, 'norEduPersonNIN', self.user, nin)
                         logger.info("Verified NIN by physical letter saved "
                                     "for user {!r}.".format(self.user))
                     except UserOutOfSync:
@@ -587,8 +587,7 @@ class NinsView(BaseFormView):
         else:
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
-        save_as_verified(self.request, 'norEduPersonNIN',
-                            self.user.get_id(), newnin)
+        save_as_verified(self.request, 'norEduPersonNIN', self.user, newnin)
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')

@@ -25,6 +25,9 @@ from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb import User
+
 
 def dummy_message(request, message):
     """
@@ -34,6 +37,31 @@ def dummy_message(request, message):
 
 
 def get_verification_code(request, model_name, obj_id=None, code=None, user=None):
+    """
+    Match a user supplied code (`code') against an actual entry in the database.
+
+    :param request: The HTTP request
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
+    :param obj_id: The data covered by the verification, like the phone number or nin or ...
+    :param code: User supplied code
+    :param user: The user
+
+    :type request: pyramid.request.Request
+    :type model_name: str | unicode
+    :type obj_id: str | unicode
+    :type code: str | unicode
+    :type user: User | OldUser
+
+    :returns: Verification entry from the database
+    :rtype: dict
+    """
+    userid = None
+    if user is not None:
+        try:
+            userid = user.user_id
+        except AttributeError:
+            userid = user.get_id()
+
     filters = {
         'model_name': model_name,
     }
@@ -41,8 +69,8 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
         filters['obj_id'] = obj_id
     if code is not None:
         filters['code'] = code
-    if user is not None:
-        filters['user_oid'] = user.user_id
+    if userid is not None:
+        filters['user_oid'] = userid
     log.debug("Verification code lookup filters : {!r}".format(filters))
     result = request.db.verifications.find_one(filters)
     if result:
@@ -54,16 +82,36 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
 
 
 def new_verification_code(request, model_name, obj_id, user, hasher=None):
+    """
+    Match a user supplied code (`code') against an actual entry in the database.
+
+    :param request: The HTTP request
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
+    :param obj_id: The data covered by the verification, like the phone number or nin or ...
+    :param user: The user
+    :param hasher: Callable used to generate the code
+
+    :type request: pyramid.request.Request
+    :type model_name: str | unicode
+    :type obj_id: str | unicode
+    :type user: User | OldUser
+    :type hasher: callable
+    """
+    try:
+        userid = user.user_id
+    except AttributeError:
+        userid = user.get_id()
+
     if hasher is None:
         hasher = get_unique_hash
     code = hasher()
     obj = {
-        "model_name": model_name,
-        "obj_id": obj_id,
-        "user_oid": user.user_id,
-        "code": code,
-        "verified": False,
-        "timestamp": datetime.now(utc),
+        'model_name': model_name,
+        'obj_id': obj_id,
+        'user_oid': userid,
+        'code': code,
+        'verified': False,
+        'timestamp': datetime.now(utc),
     }
     doc_id = request.db.verifications.insert(obj)
     reference = unicode(doc_id)
@@ -73,14 +121,6 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
     log.info('Created new {!s} verification code for user {!r}.'.format(model_name, user))
     log.debug('Verification object id {!s}. Code: {!s}.'.format(obj_id, code))
     return reference, code
-
-
-def get_not_verified_objects(request, model_name, user):
-    return request.db.verifications.find({
-        'user_oid': user.user_id,
-        'model_name': model_name,
-        'verified': False,
-    })
 
 
 def set_nin_verified(request, user, new_nin, reference=None):
@@ -99,8 +139,8 @@ def set_nin_verified(request, user, new_nin, reference=None):
     :type user: User
     :type new_nin: str | unicode
 
-    :return: User and status message
-    :rtype: User, str | unicode
+    :return: Status message
+    :rtype: str | unicode
     """
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
@@ -119,7 +159,7 @@ def set_nin_verified(request, user, new_nin, reference=None):
     log.info('NIN verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_nin_stolen', steal_count)
     request.stats.count('dashboard/verify_nin_completed', 1)
-    return user, _('National identity number {obj} verified')
+    return _('National identity number {obj} verified')
 
 
 def _remove_nin_from_user(nin, user):
@@ -183,8 +223,8 @@ def set_phone_verified(request, user, new_number):
     :type user: User
     :type new_number: str | unicode
 
-    :return: User and status message
-    :rtype: User, str | unicode
+    :return: Status message
+    :rtype: str | unicode
     """
     log.info('Trying to verify phone number for user {!r}.'.format(user))
     log.debug('Phone number: {!s}.'.format(new_number))
@@ -202,7 +242,7 @@ def set_phone_verified(request, user, new_number):
     log.info('Phone number verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mobile_stolen', steal_count)
     request.stats.count('dashboard/verify_mobile_completed', 1)
-    return user, _('Phone {obj} verified')
+    return _('Phone {obj} verified')
 
 
 def _remove_phone_from_user(number, user):
@@ -256,8 +296,8 @@ def set_email_verified(request, user, new_mail):
     :type user: User
     :type new_mail: str | unicode
 
-    :return: User and status message
-    :rtype: User, str | unicode
+    :return: Status message
+    :rtype: str | unicode
     """
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
@@ -274,7 +314,7 @@ def set_email_verified(request, user, new_mail):
     log.info('Mail address verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mail_stolen', steal_count)
     request.stats.count('dashboard/verify_mail_completed', 1)
-    return user, _('Email {obj} verified'.format(obj=new_mail))
+    return _('Email {obj} verified'.format(obj=new_mail))
 
 
 def _remove_mail_from_user(email, user):
@@ -352,11 +392,11 @@ def verify_code(request, model_name, code):
     assert user.user_id == this_verification['user_oid'], assert_error_msg
 
     if model_name == 'norEduPersonNIN':
-        user, msg = set_nin_verified(request, user, obj_id, reference)
+        msg = set_nin_verified(request, user, obj_id, reference)
     elif model_name == 'phone':
-        user, msg = set_phone_verified(request, user, obj_id)
+        msg = set_phone_verified(request, user, obj_id)
     elif model_name == 'mailAliases':
-        user, msg = set_email_verified(request, user, obj_id)
+        msg = set_email_verified(request, user, obj_id)
     else:
         raise NotImplementedError('Unknown validation model_name')
 
@@ -380,7 +420,25 @@ def verify_code(request, model_name, code):
     return obj_id
 
 
-def save_as_verified(request, model_name, user_oid, obj_id):
+def save_as_verified(request, model_name, user, obj_id):
+    """
+    Update a verification code entry in the database, indicating it has been
+    (successfully) used.
+
+    :param request: The HTTP request
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
+    :param user: The user
+    :param obj_id: The data covered by the verification, like the phone number or nin or ...
+
+    :type request: pyramid.request.Request
+    :type model_name: str | unicode
+    :type user: User | OldUser
+    :type obj_id: str | unicode
+    """
+    try:
+        userid = user.user_id
+    except AttributeError:
+        userid = user.get_id()
 
     old_verified = request.db.verifications.find(
         {
@@ -390,13 +448,13 @@ def save_as_verified(request, model_name, user_oid, obj_id):
         })
 
     for old in old_verified:
-        if old['user_oid'] == user_oid:
+        if old['user_oid'] == userid:
             return obj_id
     # User was not verified before, create a verification document
     result = request.db.verifications.find_and_modify(
         {
             "model_name": model_name,
-            "user_oid": user_oid,
+            "user_oid": userid,
             "obj_id": obj_id,
         }, {
             "$set": {
