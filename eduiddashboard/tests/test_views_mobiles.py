@@ -174,7 +174,6 @@ class MobilesFormTests(LoggedInRequestTests):
             {'identifier': 1, 'code': '9d392c', 'action': 'verify'}
         )
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
-        from nose.tools import set_trace;set_trace()
         verified_mobile = userdb_after['phone'][1]
         self.assertEqual(verified_mobile['verified'], True)
 
