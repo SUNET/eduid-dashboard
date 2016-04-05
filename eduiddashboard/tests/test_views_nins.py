@@ -193,10 +193,9 @@ class NinsFormTests(LoggedInRequestTests):
                 )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')
-        user = self.db.profiles.find_one({'mail': email})
-        user = OldUser(user)
-        self.assertEqual(len(user.get_nins()), 1)
-        self.assertEqual(user.get_nins()[0], nin)
+        user = self.dashboard_db.get_user_by_eppn('babba-labba')
+        self.assertEqual(user.nins.count, 1)
+        self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], nin)
 
     @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):

@@ -393,6 +393,7 @@ def verify_code(request, model_name, code):
         return None
 
     user = get_session_user(request, legacy_user=False)
+    retrieve_modified_ts(user, request.dashboard_userdb)
 
     assert_error_msg = 'Requesting users ID does not match verifications user ID'
     assert user.user_id == this_verification['user_oid'], assert_error_msg
