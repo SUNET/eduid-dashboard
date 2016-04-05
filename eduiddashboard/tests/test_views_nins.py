@@ -1,12 +1,11 @@
 import json
-from mock import patch, Mock
+from mock import patch
 import unittest
 from bson import ObjectId
 from datetime import datetime
 
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduid_userdb.element import PrimaryElementViolation
 from eduiddashboard.testing import LoggedInRequestTests
 
 import logging
