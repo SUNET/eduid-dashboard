@@ -421,19 +421,19 @@ def main(global_config, **settings):
     settings['session.secret'] = cp.read_setting_from_env(settings,
                                                           'session.secret')
 
-    settings['redis_host'] = cp.read_setting_from_env(settings, 'redis_host',
+    settings['REDIS_HOST'] = cp.read_setting_from_env(settings, 'redis_host',
                                                       'redis.docker')
 
-    settings['redis_port'] = int(cp.read_setting_from_env(settings, 'redis_port',
+    settings['REDIS_PORT'] = int(cp.read_setting_from_env(settings, 'redis_port',
                                                           6379))
 
-    settings['redis_db'] = int(cp.read_setting_from_env(settings, 'redis_db', 0))
+    settings['REDIS_DB'] = int(cp.read_setting_from_env(settings, 'redis_db', 0))
 
-    settings['redis_sentinel_hosts'] = cp.read_list(
+    settings['REDIS_SENTINEL_HOSTS'] = cp.read_list(
         settings,
         'redis_sentinel_hosts',
         default=[])
-    settings['redis_sentinel_service_name'] = cp.read_setting_from_env(settings, 'redis_sentinel_service_name',
+    settings['REDIS_SENTINEL_SERVICE_NAME'] = cp.read_setting_from_env(settings, 'redis_sentinel_service_name',
                                                                        'redis-cluster')
 
     settings['groups_callback'] = cp.read_setting_from_env(settings,

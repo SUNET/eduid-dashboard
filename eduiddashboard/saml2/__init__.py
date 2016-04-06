@@ -44,21 +44,23 @@ def configure_auth(config, settings):
 def includeme(config):
     settings = config.registry.settings
 
+    settings['SAML2_SETTINGS_MODULE'] = read_setting_from_env(settings, 'saml2.settings_module', None)
+    settings['SAML2_LOGIN_REDIRECT_URL'] = read_setting_from_env(settings, 'saml2.login_redirect_url', None)
+    settings['SAML2_LOGOUT_REDIRECT_URL'] = read_setting_from_env(settings, 'saml2.logout_redirect_url', None)
     for item in (
-        'saml2.settings_module',
-        'saml2.login_redirect_url',
-        'saml2.logout_redirect_url',
+        'SAML2_SETTINGS_MODULE',
+        'SAML2_LOGIN_REDIRECT_URL',
+        'SAML2_LOGOUT_REDIRECT_URL',
     ):
-        settings[item] = read_setting_from_env(settings, item, None)
         if settings[item] is None:
             raise ConfigurationError(
                 'The {0} configuration option is required'.format(item))
 
-    settings['saml2.strip_saml_user_suffix'] = read_setting_from_env(settings, 'saml2.strip_saml_user_suffix', '')
+    settings['SAML2_STRIP_SAML_USER_SUFFIX'] = read_setting_from_env(settings, 'saml2.strip_saml_user_suffix', '')
 
     config.add_request_method(get_saml2_config_from_request, 'saml2_config',
                               reify=True)
-    settings['saml2_config'] = get_saml2_config(settings.get('saml2.settings_module'))
+    settings['SAML2_CONFIG'] = get_saml2_config(settings.get('SAML2_SETTINGS_MODULE'))
 
     config = configure_auth(config, settings)
     # saml2 views
