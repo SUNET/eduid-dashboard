@@ -121,9 +121,9 @@ class Saml2RequestTests(MongoTestCase):
         self.settings['mongo_uri'] = self.mongodb_uri('')
 
         self.redis_instance = RedisTemporaryInstance.get_instance()
-        self.settings['redis_host'] = 'localhost'
-        self.settings['redis_port'] = self.redis_instance._port
-        self.settings['redis_db'] = '0'
+        self.settings['REDIS_HOST'] = 'localhost'
+        self.settings['REDIS_PORT'] = self.redis_instance._port
+        self.settings['REDIS_DB'] = '0'
         self.redis_conn = redis.Redis(host='localhost',
                 port=self.redis_instance._port, db=0)
 
