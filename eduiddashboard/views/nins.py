@@ -12,13 +12,14 @@ from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
-from eduiddashboard.utils import get_icon_string, get_short_hash
+from eduiddashboard.utils import get_icon_string, get_short_hash, retrieve_modified_ts
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
-from eduiddashboard.verifications import verify_nin, new_verification_code, save_as_verified
+from eduiddashboard.verifications import set_nin_verified, new_verification_code, save_as_verified
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.idproofinglog import LetterProofing
+from eduiddashboard.session import get_session_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -250,6 +251,8 @@ class NINsActionsView(BaseActionsView):
 
     def verify_mb_action(self, data, post_data):
         """
+        Verify a users identity using their mobile phone subscriber records.
+
         Only the active (the last one) NIN can be verified
         """
         nin, index = data.split()
@@ -273,16 +276,19 @@ class NINsActionsView(BaseActionsView):
 
         validation = validate_nin_by_mobile(self.request, self.user, nin)
         result = validation['success'] and 'success' or 'error'
+        model_name = 'norEduPersonNIN'
         if result == 'success':
-            verify_nin(self.request, self.user, nin)
+            session_user = get_session_user(self.request, legacy_user = False)
+            retrieve_modified_ts(session_user, self.request.dashboard_userdb)
+            set_nin_verified(self.request, session_user, nin)
             try:
-                self.user.save(self.request)
-                model_name = 'norEduPersonNIN'
-                logger.info("Verified  by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
+                #self.user.save(self.request)
+                self.request.context.save_dashboard_user(session_user)
+                logger.info("Verified by mobile, {!s} saved for user {!r}.".format(model_name, session_user))
                 # Save the state in the verifications collection
-                save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
+                save_as_verified(self.request, 'norEduPersonNIN', session_user, nin)
             except UserOutOfSync:
-                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
+                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, session_user))
                 raise
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
@@ -412,7 +418,7 @@ class NINsActionsView(BaseActionsView):
                     try:
                         # This is a hack to reuse the existing proofing functionality, the users code is
                         # verified by the micro service
-                        verify_nin(self.request, self.user, nin)
+                        set_nin_verified(self.request, self.user, nin)
                         try:
                             self.user.save(self.request)
                         except UserOutOfSync:

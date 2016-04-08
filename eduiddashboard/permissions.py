@@ -10,6 +10,7 @@ from eduiddashboard.session import (get_session_user, get_logged_in_user,
                                     store_session_user)
 
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
+from eduid_userdb import User
 
 import logging
 logger = logging.getLogger(__name__)
@@ -42,6 +43,22 @@ class RootFactory(object):
         logger.debug('Root factory propagate_user_changes')
         return self.request.amrelay.request_sync(user)
 
+    def save_dashboard_user(self, user):
+        """
+        Save (new) user objects to the dashboard db in the new format,
+        and propagate the changes to the central user db.
+
+        May raise UserOutOfSync exception
+
+        :param user: the modified user
+        :type user: eduid_userdb.dashboard.user.DashboardUser
+        """
+        if isinstance(user, User):
+            # turn it into a DashboardUser before saving it in the dashboard private db
+            user = DashboardUser(data = user.to_dict())
+        self.request.dashboard_userdb.save(user, old_format=False)
+        self.propagate_user_changes(user)
+
 
 def is_logged(request):
     user = authenticated_userid(request)
@@ -50,7 +67,7 @@ def is_logged(request):
     return has_logged_in_user(request)
 
 
-class BaseFactory(object):
+class BaseFactory(RootFactory):
     __acl__ = [
         (Allow, Authenticated, ALL_PERMISSIONS),
     ]
