@@ -99,4 +99,4 @@ class ProfileFilledTests(LoggedInRequestTests):
         :return:
         """
         test_doc = {'_id': user.user_id}
-        self.userdb_new._coll.update(test_doc, user.to_dict(old_userdb_format=old_format), upsert=False)
+        self.dashboard_db._coll.update(test_doc, user.to_dict(old_userdb_format=old_format), upsert=False)
