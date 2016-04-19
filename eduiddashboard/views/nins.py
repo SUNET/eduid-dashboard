@@ -227,7 +227,7 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+        user = get_session_user(self.request, raise_on_not_logged_in = False)
         nins = get_not_verified_nins_list(self.request, user)
 
         if len(nins) > index:
@@ -255,7 +255,7 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        session_user = get_session_user(self.request, legacy_user = False)
+        session_user = get_session_user(self.request)
         retrieve_modified_ts(session_user, self.request.dashboard_userdb)
         nins = get_not_verified_nins_list(self.request, session_user)
 
@@ -304,7 +304,7 @@ class NINsActionsView(BaseActionsView):
 
         nin, index = data.split()
         index = int(index)
-        user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+        user = get_session_user(self.request, raise_on_not_logged_in = False)
         nins = get_not_verified_nins_list(self.request, user)
 
         if len(nins) > index:
@@ -504,7 +504,7 @@ class NinsView(BaseFormView):
 
         settings = self.request.registry.settings
         enable_mm = settings.get('enable_mm_verification')
-        session_user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+        session_user = get_session_user(self.request, raise_on_not_logged_in = False)
 
         context.update({
             'nins': session_user.nins.to_list_of_dicts(),
