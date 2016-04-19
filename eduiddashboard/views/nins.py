@@ -504,13 +504,13 @@ class NinsView(BaseFormView):
 
         settings = self.request.registry.settings
         enable_mm = settings.get('enable_mm_verification')
-        user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+        session_user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
 
         context.update({
-            'nins': self.user.get_nins(),
-            'not_verified_nins': get_not_verified_nins_list(self.request, user),
+            'nins': session_user.nins.to_list_of_dicts(),
+            'not_verified_nins': get_not_verified_nins_list(self.request, session_user),
             'active_nin': self.get_active_nin(),
-            'has_mobile': has_confirmed_mobile(self.user),
+            'has_mobile': has_confirmed_mobile(session_user),
             'enable_mm_verification': enable_mm,
         })
         if enable_mm:

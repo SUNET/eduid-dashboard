@@ -55,9 +55,9 @@ def get_status(request, user):
 
 
 def has_confirmed_mobile(user):
-    mobiles = user.get_mobiles()
-    for m in mobiles:
-        if m['verified']:
+    mobiles = user.phone_numbers
+    for m in mobiles.to_list():
+        if m.is_verified:
             return True
     return False
 

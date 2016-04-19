@@ -12,7 +12,7 @@ class PersonalDataFormTests(LoggedInRequestTests):
         response = self.testapp.get('/profile/personaldata/')
         form = response.forms[self.formname]
         form['givenName'].value = 'Foo'
-        form['sn'].value = 'Bar'
+        form['surname'].value = 'Bar'
         form['displayName'].value = 'Mr Foo'
         response = form.submit('save')
         self.assertIn('Bar', response.body)

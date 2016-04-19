@@ -27,7 +27,8 @@ from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
-from eduiddashboard.session import store_session_user, get_logged_in_user
+from eduiddashboard.session import (store_session_user, get_logged_in_user,
+                                    get_session_user)
 
 import logging
 logger = logging.getLogger(__name__)
@@ -41,6 +42,7 @@ def profile_editor(context, request):
     """
 
     #context.user.retrieve_modified_ts(request.db.profiles)
+    session_user = get_session_user(request)
 
     view_context = {}
 
@@ -65,7 +67,7 @@ def profile_editor(context, request):
         'max_loa': max_loa,
         'polling_timeout_for_admin': request.registry.settings.get(
             'polling_timeout_for_admin', 2000),
-        'has_mobile': has_confirmed_mobile(context.user),
+        'has_mobile': has_confirmed_mobile(session_user),
         'enable_mm_verification': enable_mm,
     }
     if enable_mm:
@@ -111,7 +113,7 @@ def home(context, request):
         controls = request.GET.items()
         try:
             searcher_data = searcher_form.validate(controls)
-        except deform.ValidationFailure, form:
+        except deform.ValidationFailure as form:
             return {
                 'form': form,
                 'users': [],
@@ -327,8 +329,9 @@ def terminate_account(context, request):
              renderer='templates/nins-verification-chooser.jinja2',
              request_method='GET', permission='edit')
 def nins_verification_chooser(context, request):
+    user =  get_session_user(request)
     return {
-            'has_mobile': has_confirmed_mobile(context.user),
+            'has_mobile': has_confirmed_mobile(user),
             }
 
 
