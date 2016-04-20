@@ -213,7 +213,6 @@ class MailsFormTests(LoggedInRequestTests):
         userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
-        self.assertEqual(userdb_after['mail'], userdb_after['mailAliases'][0]['email'])
 
     def test_setprimary_not_verified_mail(self):
         self.set_logged()

@@ -99,7 +99,7 @@ SETTINGS = {
 INITIAL_VERIFICATIONS = [{
     '_id': ObjectId('234567890123456789012301'),
     'code': '9d392c',
-    'model_name': 'mobile',
+    'model_name': 'phone',
     'obj_id': '+34 6096096096',
     'user_oid': ObjectId("012345678901234567890123"),
     'timestamp': datetime.datetime.utcnow(),

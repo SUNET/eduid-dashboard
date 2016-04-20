@@ -74,7 +74,7 @@ def get_tab(request):
 
 def send_verification_code(request, user, mobile_number, reference=None, code=None):
     if code is None or reference is None:
-        reference, code = new_verification_code(request, 'mobile', mobile_number, user, hasher=get_short_hash)
+        reference, code = new_verification_code(request, 'phone', mobile_number, user, hasher=get_short_hash)
 
     user_language = request.context.get_preferred_language()
     request.msgrelay.mobile_validator(reference, mobile_number, code, user_language)
@@ -83,7 +83,7 @@ def send_verification_code(request, user, mobile_number, reference=None, code=No
 
 @view_config(route_name='mobiles-actions', permission='edit')
 class MobilesActionsView(BaseActionsView):
-    data_attribute = 'mobile'
+    data_attribute = 'phone'
     special_verify_messages = {
         'success': _('The mobile phone number has been verified'),
         'error': _('The confirmation code used is invalid, please try again or request a new code'),
@@ -93,17 +93,15 @@ class MobilesActionsView(BaseActionsView):
     }
 
     def get_verification_data_id(self, data_to_verify):
-        return data_to_verify['mobile']
+        return data_to_verify['number']
 
     def remove_action(self, index, post_data):
-        mobiles = self.user.get_mobiles()
+        mobiles = self.user.phone_numbers.to_list()
         mobile_to_remove = mobiles[index]
-        mobiles.remove(mobile_to_remove)
-
-        self.user.set_mobiles(mobiles)
+        self.user.phone_numbers.remove(mobile_to_remove.number)
 
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             return self.sync_user()
 
@@ -115,14 +113,14 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def setprimary_action(self, index, post_data):
-        mobiles = self.user.get_mobiles()
+        mobiles = self.user.phone_numbers.to_list()
 
         try:
-            mobile = self.user.get_mobiles()[index]
+            mobile = mobiles[index]
         except IndexError:
             return self.sync_user()
 
-        if not mobile.get('verified', False):
+        if not mobile.is_verified:
             message = _('You need to confirm your mobile number '
                         'before it can become primary')
             return {
@@ -130,15 +128,9 @@ class MobilesActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message),
             }
 
-        # set all to False, and then set the new primary to True using the index
-        for mobile in mobiles:
-            mobile['primary'] = False
-
-        mobiles[index]['primary'] = True
-
-        self.user.set_mobiles(mobiles)
+        self.user.phone_numbers.primary = mobile.number
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             return self.sync_user()
 

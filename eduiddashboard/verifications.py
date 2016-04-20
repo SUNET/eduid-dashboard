@@ -41,7 +41,7 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
     Match a user supplied code (`code') against an actual entry in the database.
 
     :param request: The HTTP request
-    :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
     :param obj_id: The data covered by the verification, like the phone number or nin or ...
     :param code: User supplied code
     :param user: The user
@@ -55,7 +55,7 @@ def get_verification_code(request, model_name, obj_id=None, code=None, user=None
     :returns: Verification entry from the database
     :rtype: dict
     """
-    assert model_name in ['norEduPersonNIN', 'mobile', 'mailAliases']
+    assert model_name in ['norEduPersonNIN', 'phone', 'mailAliases']
 
     userid = None
     if user is not None:
@@ -88,7 +88,7 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
     Match a user supplied code (`code') against an actual entry in the database.
 
     :param request: The HTTP request
-    :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
     :param obj_id: The data covered by the verification, like the phone number or nin or ...
     :param user: The user
     :param hasher: Callable used to generate the code
@@ -99,7 +99,7 @@ def new_verification_code(request, model_name, obj_id, user, hasher=None):
     :type user: User | OldUser
     :type hasher: callable
     """
-    assert model_name in ['norEduPersonNIN', 'mobile', 'mailAliases']
+    assert model_name in ['norEduPersonNIN', 'phone', 'mailAliases']
 
     try:
         userid = user.user_id
@@ -374,7 +374,7 @@ def verify_code(request, model_name, code):
     :type request: pyramid.request.Request
     :return: string of verified data
     """
-    assert model_name in ['norEduPersonNIN', 'mobile', 'mailAliases']
+    assert model_name in ['norEduPersonNIN', 'phone', 'mailAliases']
 
     this_verification = request.db.verifications.find_one(
         {
@@ -400,7 +400,7 @@ def verify_code(request, model_name, code):
 
     if model_name == 'norEduPersonNIN':
         msg = set_nin_verified(request, user, obj_id, reference)
-    elif model_name == 'mobile':
+    elif model_name == 'phone':
         msg = set_phone_verified(request, user, obj_id)
     elif model_name == 'mailAliases':
         msg = set_email_verified(request, user, obj_id)
