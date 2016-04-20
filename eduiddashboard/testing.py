@@ -330,7 +330,7 @@ class LoggedInRequestTests(MongoTestCase):
                     values.remove(field.value)
                 else:
                     # restore the checkbox whose value was not found in values
-                    field.checked = old_status
+                    field.checked = False
         values = [x for x in values if x not in ignore_not_found]
         self.assertEqual(values, [], "Failed checking one or more checkboxes: {!r}".format(values))
 
