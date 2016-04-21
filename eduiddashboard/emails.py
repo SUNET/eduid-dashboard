@@ -8,6 +8,7 @@ from eduiddashboard.verifications import (generate_verification_link,
                                           new_verification_code)
 from eduiddashboard.utils import get_short_hash
 from eduiddashboard import log
+from eduiddashboard.session import get_session_user
 
 
 def send_verification_mail(request, email, reference=None, code=None):
@@ -56,20 +57,30 @@ def send_verification_mail(request, email, reference=None, code=None):
 
 
 def send_termination_mail(request, user):
+    user = get_session_user(request)   # XXX remove when context users  are new users
     mailer = get_mailer(request)
     support_email = request.registry.settings.get('mail.support_email', 'support@eduid.se')
     site_name = request.registry.settings.get("site.name", "eduID")
 
     context = {
         'support_mail': support_email,
-        'displayName': user.get_display_name()
+        'displayName': user.display_name
     }
+    if user.mail_addresses.primary is not None:
+        address = user.mail_addresses.primary.email
+    elif user.mail_addresses.count > 0:
+        for a in user.mail_addresses.to_list():
+            address = a.email
+            break
+    else:
+        log.info('User {!r} has no email address, not possible to send a message'.format(user))
+        return
 
     message = Message(
         subject=_("{site_name} account termination").format(
             site_name=site_name),
         sender=request.registry.settings.get("mail.default_sender"),
-        recipients=[user.get_mail()],
+        recipients=[address],
         body=render(
             "templates/termination_email.txt.jinja2",
             context,
@@ -87,7 +98,7 @@ def send_termination_mail(request, user):
         log.debug(message.body)
     else:
         mailer.send(message)
-    log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, user.get_mail()))
+    log.debug("Sent termination mail to user {!r} with address {!s}.".format(user, address))
     request.stats.count('dashboard/email_send_termination_mail', 1)
 
 
