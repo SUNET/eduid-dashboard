@@ -303,12 +303,12 @@ def _get_age(nin):
 
 
 def validate_nin_by_mobile(request, user, nin):
+    user = get_session_user(request)  # XXX remove when the user in args (in context) is newuser
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN
     # Get list of verified mobile numbers
     verified_mobiles = []
-    user = get_session_user(request)  # XXX remove when the user in args is newuser
     for one_mobile in user.phone_numbers.to_list():
         if one_mobile.is_verified:
             verified_mobiles.append(one_mobile.number)
