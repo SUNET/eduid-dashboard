@@ -39,13 +39,13 @@ def get_status(request, user):
     pending_action_type = ''
     verification_needed = -1
 
-    all_nins = user.get_nins()
-    if all_nins:
+    all_nins = user.nins
+    if all_nins.count:
         completed_fields = 1
 
     unverified_nins = get_not_verified_nins_list(request, user)
 
-    if not all_nins and not unverified_nins:
+    if not all_nins.count and not unverified_nins:
         pending_actions = _('Add national identity number')
     if unverified_nins and request.registry.settings.get('enable_mm_verification'):
         pending_actions = _('Validation required for national identity number')
@@ -106,24 +106,21 @@ def get_not_verified_nins_list(request, user):
     :return: List of NINs pending confirmation
     :rtype: [string]
     """
-    users_nins = user.get_nins()
+    users_nins = user.nins.to_list()
     res = []
     user_already_verified = []
     user_not_verified = []
     verifications = request.db.verifications.find({
         'model_name': 'norEduPersonNIN',
-        'user_oid': user.get_id(),
+        'user_oid': user.user_id,
     }, sort=[('timestamp', 1)])
     if users_nins:
-        if isinstance(users_nins[0], dict):
-            for this in users_nins:
-                if this['verified']:
-                    user_already_verified.append(this['number'])
-                else:
-                    user_not_verified.append(this['number'])
-        else:
-            # old style, list of strings (understood to be verified)
-            user_already_verified = users_nins
+        for this in users_nins:
+            if this.is_verified:
+                user_already_verified.append(this.number)
+            else:
+                user_not_verified.append(this.number)
+
     for this in verifications:
         if this['verified'] and this['obj_id'] in user_not_verified:    # XXX: This will never happen with DashboardLegacyUser
             # Found to be verified after all, filter out from user_not_verified
@@ -230,7 +227,8 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        nins = get_not_verified_nins_list(self.request, self.user)
+        user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+        nins = get_not_verified_nins_list(self.request, user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -257,7 +255,9 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        nins = get_not_verified_nins_list(self.request, self.user)
+        session_user = get_session_user(self.request, legacy_user = False)
+        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
+        nins = get_not_verified_nins_list(self.request, session_user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -278,8 +278,6 @@ class NINsActionsView(BaseActionsView):
         result = validation['success'] and 'success' or 'error'
         model_name = 'norEduPersonNIN'
         if result == 'success':
-            session_user = get_session_user(self.request, legacy_user = False)
-            retrieve_modified_ts(session_user, self.request.dashboard_userdb)
             set_nin_verified(self.request, session_user, nin)
             try:
                 #self.user.save(self.request)
@@ -306,7 +304,8 @@ class NINsActionsView(BaseActionsView):
 
         nin, index = data.split()
         index = int(index)
-        nins = get_not_verified_nins_list(self.request, self.user)
+        user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+        nins = get_not_verified_nins_list(self.request, user)
 
         if len(nins) > index:
             remove_nin = nins[index]
@@ -319,7 +318,7 @@ class NINsActionsView(BaseActionsView):
         verifications.remove({
             'model_name': self.data_attribute,
             'obj_id': remove_nin,
-            'user_oid': self.user.get_id(),
+            'user_oid': user.user_id,
             'verified': False,
         })
 
@@ -505,11 +504,11 @@ class NinsView(BaseFormView):
 
         settings = self.request.registry.settings
         enable_mm = settings.get('enable_mm_verification')
+        user = get_session_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
 
         context.update({
             'nins': self.user.get_nins(),
-            'not_verified_nins': get_not_verified_nins_list(self.request,
-                                                            self.user),
+            'not_verified_nins': get_not_verified_nins_list(self.request, user),
             'active_nin': self.get_active_nin(),
             'has_mobile': has_confirmed_mobile(self.user),
             'enable_mm_verification': enable_mm,

@@ -5,6 +5,8 @@ from time import time
 from zope.interface import implementer
 from pyramid.interfaces import ISessionFactory, ISession
 from eduid_common.session.session import SessionManager
+from eduid_userdb.exceptions import UserDoesNotExist
+from eduiddashboard.utils import retrieve_modified_ts
 
 import logging
 logger = logging.getLogger(__name__)
@@ -333,7 +335,7 @@ def has_logged_in_user(request):
     return _USER_EPPN in request.session
 
 
-def get_session_user(request, legacy_user, raise_on_not_logged_in=True):
+def get_session_user(request, legacy_user=False, raise_on_not_logged_in=True):
     """
     Get the session user. This is the user being worked on, in helpdesk mode
     it is not necessarily the currently logged in user. See get_logged_in_user().
@@ -397,7 +399,12 @@ def _get_user_by_eppn(request, eppn, legacy_user):
         logger.debug('Loading modified_ts from dashboard db (profiles) for user {!r}'.format(user))
         user.retrieve_modified_ts(request.db.profiles)
         return user
-    return request.userdb_new.get_user_by_eppn(eppn)
+    try:
+        return request.dashboard_userdb.get_user_by_eppn(eppn)
+    except UserDoesNotExist:
+        user = request.userdb_new.get_user_by_eppn(eppn)
+        retrieve_modified_ts(user, request.dashboard_userdb)
+        return user
 
 
 

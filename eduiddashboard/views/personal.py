@@ -18,9 +18,11 @@ def get_status(request, user):
     """
     schema = Person()
     completed_fields = 0
+    user_data = user.to_dict()
 
     for field in schema.children:
-        if field.name != 'csrf' and user.get(field.name, None) is not None:
+        fname = 'surname' if field.name == 'sn' else field.name
+        if fname != 'csrf' and user_data.get(fname, None) is not None:
             completed_fields += 1
 
     status = {
