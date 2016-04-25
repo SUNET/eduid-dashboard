@@ -160,9 +160,13 @@ class EmailsView(BaseFormView):
 
     def get_template_context(self):
         context = super(EmailsView, self).get_template_context()
+        if self.user.mail_addresses.primary is not None:
+            email = self.user.mail_addresses.primary.email
+        else:
+            email = 'none'
         context.update({
             'mails': self.user.mail_addresses.to_list(),
-            'primary_email': self.user.mail_addresses.primary.email,
+            'primary_email': email,
         })
 
         return context
