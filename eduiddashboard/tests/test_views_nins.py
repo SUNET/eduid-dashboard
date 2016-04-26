@@ -288,6 +288,10 @@ class NinsFormTests(LoggedInRequestTests):
             response_json = json.loads(response.body)
             self.assertEqual(response_json['result'], 'success')
 
+            old_user = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                                 include_unconfirmed = True)
+            logging.debug('Extra debug, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, old_user))
+
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
             old_user = OldUser(old_user)
 
