@@ -291,7 +291,7 @@ class NinsFormTests(LoggedInRequestTests):
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
             old_user = OldUser(old_user)
 
-            logging.debug('Old user is now:\n{!s}'.format(pprint.pformat(old_user)))
+            logging.debug('Old user is now:\n{!s}'.format(pprint.pformat(old_user.items())))
             self.assertNotIn(nin, old_user.get_nins())
 
 
