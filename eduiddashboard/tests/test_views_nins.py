@@ -251,6 +251,11 @@ class NinsFormTests(LoggedInRequestTests):
         nin = '197801011234'
         form['norEduPersonNIN'].value = nin
 
+        # Extra debug
+        foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                             include_unconfirmed = True)
+        logging.debug('Extra debug #1, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
+
         from eduiddashboard.msgrelay import MsgRelay
 
         with patch.multiple(MsgRelay, nin_validator=return_true,
@@ -259,6 +264,11 @@ class NinsFormTests(LoggedInRequestTests):
             response = form.submit('add')
 
         self.assertEqual(response.status, '200 OK')
+
+        # Extra debug
+        foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                              include_unconfirmed = True)
+        logging.debug('Extra debug #2, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)
@@ -288,9 +298,10 @@ class NinsFormTests(LoggedInRequestTests):
             response_json = json.loads(response.body)
             self.assertEqual(response_json['result'], 'success')
 
-            old_user = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+            # Extra debug
+            foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
                                                  include_unconfirmed = True)
-            logging.debug('Extra debug, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, old_user))
+            logging.debug('Extra debug #3, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
             old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
             old_user = OldUser(old_user)
