@@ -243,18 +243,23 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_steal_verified_nin(self):
+        logging.debug('\n\n\ntest_steal_verified_nin starting\n\n\n')
+        am_user = self.amdb.get_user_by_eppn('hubba-bubba')
+        logging.debug('User {!s} with the NIN in AM is now:\n{!s}'.format(am_user,
+                                                                          pprint.pformat(am_user.to_dict())))
+
         self.set_logged(email=self.no_nin_user_email)
 
         response_form = self.testapp.get('/profile/nins/')
 
         form = response_form.forms[self.formname]
-        nin = '197801011234'
+        nin = am_user.nins.primary.number
         form['norEduPersonNIN'].value = nin
 
         # Extra debug
         foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
                                              include_unconfirmed = True)
-        logging.debug('Extra debug #1, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
+        logging.debug('Extra debug #1, searched for {!r} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
         from eduiddashboard.msgrelay import MsgRelay
 
@@ -268,7 +273,7 @@ class NinsFormTests(LoggedInRequestTests):
         # Extra debug
         foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
                                               include_unconfirmed = True)
-        logging.debug('Extra debug #2, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
+        logging.debug('Extra debug #2, searched for {!r} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)
