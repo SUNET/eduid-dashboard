@@ -245,8 +245,13 @@ class NinsFormTests(LoggedInRequestTests):
     def test_steal_verified_nin(self):
         logging.debug('\n\n\ntest_steal_verified_nin starting\n\n\n')
         am_user = self.amdb.get_user_by_eppn('hubba-bubba')
-        logging.debug('User {!s} with the NIN in AM is now:\n{!s}'.format(am_user,
-                                                                          pprint.pformat(am_user.to_dict())))
+        logging.debug('User {!s} with the NIN in AM is now:\n{!s}\n\n'.format(am_user,
+                                                                              pprint.pformat(am_user.to_dict())))
+        # Extra debug
+        nin = am_user.nins.primary.number
+        foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                              include_unconfirmed = True)
+        logging.debug('Extra debug #1, searched for {!r} in {!r}: {!r}\n\n\n'.format(nin, self.amdb, foo_users))
 
         self.set_logged(email=self.no_nin_user_email)
 
@@ -261,13 +266,13 @@ class NinsFormTests(LoggedInRequestTests):
                                              include_unconfirmed = True)
         logging.debug('Extra debug #1, searched for {!r} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
+        #
+        # Add the NIN (still pending verification) to the user we're logged in as (the user without a NIN)
+        #
         from eduiddashboard.msgrelay import MsgRelay
-
         with patch.multiple(MsgRelay, nin_validator=return_true,
                             nin_reachable=return_true):
-                
             response = form.submit('add')
-
         self.assertEqual(response.status, '200 OK')
 
         # Extra debug
@@ -280,6 +285,9 @@ class NinsFormTests(LoggedInRequestTests):
 
         self.assertIn(nin, old_user.get_nins())
 
+        #
+        # Find the verification created when we called 'add' above
+        #
         nin_doc = self.db.verifications.find_one({
             'model_name': 'norEduPersonNIN',
             'user_oid': ObjectId('901234567890123456789012'),
@@ -295,6 +303,9 @@ class NinsFormTests(LoggedInRequestTests):
             with patch.object(MsgRelay, 'postal_address_to_transaction_audit_log'):
                 MsgRelay.postal_address_to_transaction_audit_log.return_value = True
 
+                #
+                # Verify the new NIN using the verificaction code
+                #
                 response = self.testapp.post(
                     '/profile/nins-actions/',
                     {'identifier': '197801011234 0', 'action': 'verify', 'code': nin_doc['code']}
