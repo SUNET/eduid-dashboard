@@ -39,7 +39,7 @@ class PermissionsView(BaseFormView):
         tempcontext = super(PermissionsView, self).get_template_context()
         ma = self.context.main_attribute
         user = get_session_user(self.request, raise_on_not_logged_in = False)
-        if self.context.user.get(ma) == user.to_dict().get(ma):
+        if self.context.user.to_dict().get(ma) == user.to_dict().get(ma):
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False

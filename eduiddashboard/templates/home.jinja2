@@ -38,7 +38,7 @@
                 <tr>
                     <td>{{user.mail}}</td>
                     <td>{{user.givenName | default("")}}</td>
-                    <td>{{user.sn | default("")}}</td>
+                    <td>{{user.surname | default("")}}</td>
                     <td>{{user.displayName | default("")}}</td>
                     <td>
                     {% if user.norEduPersonNIN | default(None) %}
@@ -48,9 +48,9 @@
                     {% endif %}
                     </td>
                     <td>
-                    {% if user.mobile | default(None) %}
-                      {% for item in user.mobile %}
-                          {{item.mobile}}{% if not loop.last %}, {% endif %}
+                    {% if user.phone_numbers | default(None) %}
+                      {% for item in user.phone_numbers %}
+                          {{item.number}}{% if not loop.last %}, {% endif %}
                       {% endfor %}
                     {% endif %}
                     </td>
