@@ -150,6 +150,7 @@ def set_nin_verified(request, user, new_nin, reference=None):
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
     old_user = request.dashboard_userdb.get_user_by_nin(new_nin, raise_on_missing=False)
+    log.debug('Searched for NIN in {!s}: {!r}'.format(request.dashboard_userdb, old_user))
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
