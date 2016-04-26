@@ -69,9 +69,7 @@ def send_termination_mail(request, user):
     if user.mail_addresses.primary is not None:
         address = user.mail_addresses.primary.email
     elif user.mail_addresses.count > 0:
-        for a in user.mail_addresses.to_list():
-            address = a.email
-            break
+        address = user.mail_addresses.to_list()[0].email
     else:
         log.info('User {!r} has no email address, not possible to send a message'.format(user))
         return
@@ -108,7 +106,14 @@ def send_reset_password_mail(request, user, reset_password_link):
 
     site_name = request.registry.settings.get("site.name", "eduID")
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
-    email = user.mail_addresses.primary.email
+
+    if user.mail_addresses.primary is not None:
+        email = user.mail_addresses.primary.email
+    elif user.mail_addresses.count > 0:
+        email = user.mail_addresses.to_list()[0].email
+    else:
+        log.info('User {!r} has no email address, not possible to send a message'.format(user))
+        return
 
     context = {
         "email": email,
