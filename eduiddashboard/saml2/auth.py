@@ -19,6 +19,8 @@
 
 from pyramid.security import remember, forget
 
+from eduid_userdb.exceptions import UserDoesNotExist, MultipleUsersReturned
+
 from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.utils import get_saml_attribute
@@ -109,9 +111,9 @@ def authenticate(request, session_info):
     log.debug('Looking for user with eduPersonPrincipalName == {!r}'.format(saml_user))
     try:
         user = request.userdb_new.get_user_by_eppn(saml_user)
-    except request.userdb.exceptions.UserDoesNotExist:
+    except UserDoesNotExist:
         log.error('No user with eduPersonPrincipalName = {!r} found'.format(saml_user))
-    except request.userdb.exceptions.MultipleUsersReturned:
+    except MultipleUsersReturned:
         log.error("There are more than one user with eduPersonPrincipalName = {!r}".format(saml_user))
     else:
         retrieve_modified_ts(user, request.dashboard_userdb)
@@ -147,7 +149,7 @@ def logout(request):
     :return:
     """
     if request.session is not None:
-        user = get_logged_in_user(request, raise_on_not_logged_in = False, legacy_user = True)
+        user = get_logged_in_user(request, raise_on_not_logged_in = False, legacy_user = False)
         if user:
             log.info("User {!r} logging out".format(user))
         request.session.delete()

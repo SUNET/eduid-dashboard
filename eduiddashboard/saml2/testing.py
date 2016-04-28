@@ -15,7 +15,6 @@ import redis
 from eduid_userdb import UserDB
 from eduid_userdb.db import MongoDB
 from eduid_userdb.dashboard import DashboardUserDB
-from eduid_userdb.dashboard import UserDBWrapper
 from eduiddashboard.session import SessionFactory
 from eduiddashboard.testing import MongoTestCase, RedisTemporaryInstance
 from eduiddashboard.saml2 import includeme as saml2_includeme
@@ -64,13 +63,10 @@ def saml2_main(global_config, **settings):
     config.set_session_factory(factory)
 
     config.include('pyramid_jinja2')
-    _userdb = UserDBWrapper(config.registry.settings['mongo_uri'])
     _userdb_new = UserDB(config.registry.settings['mongo_uri'], 'eduid_am')   # central userdb in new format (User)
     _dashboard_db = DashboardUserDB(config.registry.settings['mongo_uri'], 'eduid_dashboard')
-    config.registry.settings['userdb'] = _userdb
     config.registry.settings['userdb_new'] = _userdb_new
     config.registry.settings['dashboard_userdb'] = _dashboard_db
-    config.add_request_method(lambda x: x.registry.settings['userdb'], 'userdb', reify=True)
     config.add_request_method(lambda x: x.registry.settings['userdb_new'], 'userdb_new', reify=True)
     config.add_request_method(lambda x: x.registry.settings['dashboard_userdb'], 'dashboard_userdb', reify=True)
     mongodb = MongoDB(db_uri=settings['mongo_uri'])
@@ -141,10 +137,9 @@ class Saml2RequestTests(MongoTestCase):
         self.config = testing.setUp()
         self.config.registry.settings.update(self.settings)
         self.config.registry.registerUtility(self, IDebugLogger)
-        self.userdb = app.registry.settings['userdb']
-        self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_am')   # central userdb in new format (User)
+        self.userdb_new = app.registry.settings['userdb_new']
         self.db = app.registry.settings['db']
-        self.dashboard_db = DashboardUserDB(self.mongodb_uri('eduid_dashboard'))
+        self.dashboard_db = app.registry.settings['dashboard_userdb']
 
     def tearDown(self):
         super(Saml2RequestTests, self).tearDown()
@@ -165,7 +160,6 @@ class Saml2RequestTests(MongoTestCase):
         request = DummyRequest()
         request.context = DummyResource()
         request.context.request = request
-        request.userdb = self.userdb
         request.userdb_new = self.userdb_new
         request.db = self.db
         request.registry.settings = self.settings
