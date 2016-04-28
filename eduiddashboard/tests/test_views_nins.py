@@ -4,6 +4,7 @@ import unittest
 from bson import ObjectId
 from datetime import datetime
 
+from eduid_userdb.nin import Nin
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
@@ -32,9 +33,10 @@ class NinsFormTests(LoggedInRequestTests):
         super(NinsFormTests, self).setUp()
         # these tests want the self.user user to not have a NIN
         self.no_nin_user_email = 'johnsmith@example.org'
-        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
-        user.set_nins([])
-        self.userdb.save(user)
+        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
+        for nin in user.nins.to_list():
+            user.nins.remove(nin.number)
+        self.userdb_new.save(user)
 
     def test_logged_get(self):
         self.set_logged(email=self.no_nin_user_email)
@@ -129,19 +131,22 @@ class NinsFormTests(LoggedInRequestTests):
     def test_verify_existant_nin(self):
         # Add a non-verified NIN to the user with no NINs
         email = self.no_nin_user_email
-        user = self.userdb.get_user_by_mail(email)
-        user.set_nins([{'number': '123456789050',
+        user = self.userdb_new.get_user_by_mail(email)
+        for nin in user.nins.to_list():
+            user.nins.remove(nin.number)
+        new_nin = Nin(data={'number': '123456789050',
                         'verified': False,
                         'primary': False,
-                        }])
-        self.userdb.save(user)
+                        })
+        user.nins.add(new_nin)
+        self.userdb_new.save(user)
         # Set up a pending verfication
         verification_data = {
             '_id': ObjectId(),
             'code': '123124',
             'model_name': 'norEduPersonNIN',
             'obj_id': '123456789050',
-            'user_oid': user.get_id(),
+            'user_oid': user.user_id,
             'timestamp': datetime.utcnow(),
             'verified': False,
         }
@@ -161,9 +166,9 @@ class NinsFormTests(LoggedInRequestTests):
         ''' '''
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
+        user = self.userdb_new.get_user_by_mail(email)
 
-        self.assertEqual(len(user.get_nins()), 0)
+        self.assertEqual(user.nins.count, 0)
 
         # First we add a nin...
         nin = '200010100001'
@@ -212,7 +217,7 @@ class NinsFormTests(LoggedInRequestTests):
 
         nins_before = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user.get_id()
+            'user_oid': self.user.user_id
         }).count()
 
         response = self.testapp.post(
@@ -222,7 +227,7 @@ class NinsFormTests(LoggedInRequestTests):
 
         nins_after = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user.get_id()
+            'user_oid': self.user.user_id
         }).count()
 
         response_json = json.loads(response.body)
@@ -286,10 +291,9 @@ class NinsFormTests(LoggedInRequestTests):
             response_json = json.loads(response.body)
             self.assertEqual(response_json['result'], 'success')
 
-            old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-            old_user = OldUser(old_user)
+            old_user = self.dashboard_db.get_user_by_id('012345678901234567890123')
 
-            self.assertNotIn(nin, old_user.get_nins())
+            self.assertNotIn(nin, [n.number for n in old_user.nins.to_list()])
 
 
 class NinsFormTestsDisableMM(LoggedInRequestTests):
@@ -301,9 +305,10 @@ class NinsFormTestsDisableMM(LoggedInRequestTests):
         super(NinsFormTestsDisableMM, self).setUp(settings=disable_mm)
         # these tests want the self.user user to not have a NIN
         self.no_nin_user_email = 'johnsmith@example.org'
-        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
-        user.set_nins([])
-        self.userdb.save(user)
+        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
+        for nin in user.nins.to_list():
+            user.nins.remove(nin)
+        self.userdb_new.save(user)
 
     def test_add_valid_nin(self):
         self.set_logged(email=self.no_nin_user_email)
