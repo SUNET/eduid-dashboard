@@ -233,8 +233,7 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        user = get_session_user(self.request, raise_on_not_logged_in = False)
-        nins = get_not_verified_nins_list(self.request, user)
+        nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -261,9 +260,7 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        session_user = get_session_user(self.request)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
-        nins = get_not_verified_nins_list(self.request, session_user)
+        nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -284,6 +281,8 @@ class NINsActionsView(BaseActionsView):
         result = validation['success'] and 'success' or 'error'
         model_name = 'norEduPersonNIN'
         if result == 'success':
+            session_user = get_session_user(self.request, legacy_user = False)
+            retrieve_modified_ts(session_user, self.request.dashboard_userdb)
             set_nin_verified(self.request, session_user, nin)
             try:
                 #self.user.save(self.request)
@@ -511,7 +510,7 @@ class NinsView(BaseFormView):
         enable_mm = settings.get('enable_mm_verification')
 
         context.update({
-            'nins': self.user.nins.to_list_of_dicts(),
+            'nins': self.user.nins,
             'not_verified_nins': get_not_verified_nins_list(self.request, self.user),
             'active_nin': self.get_active_nin(),
             'has_mobile': has_confirmed_mobile(self.user),
@@ -593,8 +592,7 @@ class NinsView(BaseFormView):
         else:
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
-        save_as_verified(self.request, 'norEduPersonNIN',
-                            self.user.get_id(), newnin)
+        save_as_verified(self.request, 'norEduPersonNIN', self.user, newnin)
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')

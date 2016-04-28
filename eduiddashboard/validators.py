@@ -110,10 +110,8 @@ class EmailUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        user = get_session_user(request)
+        user = request.context.user
         user_emails = [e.email for e in user.mail_addresses.to_list()]
-        if user.mail_addresses.primary:
-            user_emails.append(user.mail_addresses.primary.email)
         localizer = get_localizer(request)
 
         if sanitize_post_key(request, 'add') is not None:
@@ -143,7 +141,7 @@ class MobilePhoneUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        user = get_session_user(request)
+        user = request.context.user
         mobile = normalize_to_e_164(request, value)
         if sanitize_post_key(request, 'add') is not None:
             if user.phone_numbers.find(mobile):
@@ -210,7 +208,7 @@ class NINUniqueValidator(object):
         value = normalize_nin(copy(value))
 
         request = node.bindings.get('request')
-        user = get_session_user(request)
+        user = request.context.user
         user_nins = user.nins
 
         unverified_user_nins = request.db.verifications.find({
@@ -303,7 +301,6 @@ def _get_age(nin):
 
 
 def validate_nin_by_mobile(request, user, nin):
-    user = get_session_user(request)  # XXX remove when the user in args (in context) is newuser
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN

@@ -139,7 +139,7 @@ class Saml2RequestTests(MongoTestCase):
         self.testapp = TestApp(app)
 
         self.config = testing.setUp()
-        self.config.registry.settings = self.settings
+        self.config.registry.settings.update(self.settings)
         self.config.registry.registerUtility(self, IDebugLogger)
         self.userdb = app.registry.settings['userdb']
         self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_am')   # central userdb in new format (User)
@@ -164,6 +164,7 @@ class Saml2RequestTests(MongoTestCase):
     def dummy_request(self):
         request = DummyRequest()
         request.context = DummyResource()
+        request.context.request = request
         request.userdb = self.userdb
         request.userdb_new = self.userdb_new
         request.db = self.db
@@ -197,7 +198,7 @@ class Saml2RequestTests(MongoTestCase):
                 'objectclass': ['top', 'inetOrgPerson', 'person', 'eduPerson'],
                 'userpassword': ['1234'],
                 'edupersonaffiliation': ['student'],
-                'sn': ['Smith'],
+                'surname': ['Smith'],
                 'mail': ['johnsmith@example.com'],
                 'eduPersonPrincipalName': ['hubba-bubba@test']
             },

@@ -25,7 +25,7 @@ from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
 from eduiddashboard import log
-from eduiddashboard.session import store_session_user, get_session_user
+from eduiddashboard.session import store_session_user
 
 
 def get_dummy_status(request, user):
@@ -57,8 +57,7 @@ class BaseFormView(FormView):
 
     def __init__(self, context, request):
         super(BaseFormView, self).__init__(request)
-        self.user = get_session_user(self.request)
-        retrieve_modified_ts(self.user, request.dashboard_userdb)
+        self.user = context.user
         self.context = context
         self.response = request.response
 
@@ -142,8 +141,7 @@ class BaseActionsView(object):
     def __init__(self, context, request):
         self.request = request
         self.context = context
-        self.user = get_session_user(request)
-        retrieve_modified_ts(self.user, request.dashboard_userdb)
+        self.user = context.user
         self.verify_messages = {}
         for msgid, msg in self.default_verify_messages.items():
             if msgid not in self.special_verify_messages:

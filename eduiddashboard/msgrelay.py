@@ -68,6 +68,7 @@ class MsgRelay(object):
         config.update({
             'BROKER_URL': settings.get('msg_broker_url'),
             'TEMPLATES_DIR': 'templates/',
+            'MONGO_URI': settings.get('mongo_uri'),
         })
         celery.conf.update(config)
 

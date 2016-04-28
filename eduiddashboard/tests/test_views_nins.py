@@ -189,7 +189,7 @@ class NinsFormTests(LoggedInRequestTests):
 
                 response = self.testapp.post(
                     '/profile/nins-actions/',
-                    {'identifier': nin + '  0', 'action': 'verify_mb'}
+                    {'identifier': nin + ' 0', 'action': 'verify_mb'}
                 )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')

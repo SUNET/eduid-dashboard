@@ -364,12 +364,12 @@ def _add_mail_to_user(email, user):
 
 def verify_code(request, model_name, code):
     """
-    Verify a code and act accordingly to the model_name ('norEduPersonNIN', 'mobile', or 'mailAliases').
+    Verify a code and act accordingly to the model_name ('norEduPersonNIN', 'phone', or 'mailAliases').
 
     This is what turns an unconfirmed NIN/mobile/e-mail into a confirmed one.
 
     :param request: The HTTP request
-    :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
     :param code: The user supplied code
     :type request: pyramid.request.Request
     :return: string of verified data
@@ -433,7 +433,7 @@ def save_as_verified(request, model_name, user, obj_id):
     (successfully) used.
 
     :param request: The HTTP request
-    :param model_name: 'norEduPersonNIN', 'mobile', or 'mailAliases'
+    :param model_name: 'norEduPersonNIN', 'phone', or 'mailAliases'
     :param user: The user
     :param obj_id: The data covered by the verification, like the phone number or nin or ...
 
@@ -447,7 +447,7 @@ def save_as_verified(request, model_name, user, obj_id):
     except AttributeError:
         userid = user.get_id()
 
-    assert model_name in ['norEduPersonNIN', 'mobile', 'mailAliases']
+    assert model_name in ['norEduPersonNIN', 'phone', 'mailAliases']
 
     old_verified = request.db.verifications.find(
         {
