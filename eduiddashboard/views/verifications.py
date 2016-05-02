@@ -5,10 +5,8 @@ from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.i18n import get_localizer
 
 from eduid_userdb.exceptions import UserOutOfSync
-from eduiddashboard.views import sync_user
 from eduiddashboard.verifications import verify_code, get_verification_code
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
 @view_config(route_name='verifications', permission='edit')

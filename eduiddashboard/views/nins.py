@@ -609,7 +609,7 @@ class NinsView(BaseFormView):
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
         save_as_verified(self.request, 'norEduPersonNIN',
-                            self.user.get_id(), newnin)
+                            self.user, newnin)
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')
@@ -627,7 +627,27 @@ class NinsView(BaseFormView):
 
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
-        self.add_success_other(ninform)
+        newnin = self.schema.serialize(ninform)
+        newnin = newnin['norEduPersonNIN']
+        newnin = normalize_nin(newnin)
+
+        user = get_session_user(self.request, legacy_user=False)
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
+
+        message = set_nin_verified(self.request, user, newnin)
+
+        try:
+            self.request.context.save_dashboard_user(user)
+        except UserOutOfSync:
+            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(user))
+            raise
+
+        log.info("Saved user {!r} after NIN vetting using mobile phone".format(user))
+        self.request.session.flash(
+            get_localizer(self.request).translate(message),
+            queue='forms')
+
+        self.request.stats.count('dashboard/nin_add_mobile', 1)
 
     def add_by_letter_success(self, ninform):
         """

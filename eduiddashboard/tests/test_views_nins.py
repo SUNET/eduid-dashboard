@@ -199,6 +199,40 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(user.nins.count, 1)
         self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], nin)
 
+    def test_verify_nin_by_mobile(self):
+        email = self.no_nin_user_email
+        self.set_logged(email)
+        user = self.userdb.get_user_by_mail(email)
+        self.assertEqual(len(user.get_nins()), 0)
+
+        # Add a verified phone number to the user in the central userdb
+        user.add_mobile({
+            'mobile': '666666666',
+            'verified': True
+            })
+        self.userdb.save(user)
+
+        new_nin = '200010100001'
+
+        response_form = self.testapp.get('/profile/nins/')
+        form = response_form.forms[self.formname]
+        from eduiddashboard.lookuprelay import LookupMobileRelay
+        with patch.object(LookupMobileRelay, 'find_NIN_by_mobile', clear=True):
+            LookupMobileRelay.find_NIN_by_mobile.return_value = new_nin
+            from eduiddashboard.msgrelay import MsgRelay
+            with patch.object(MsgRelay, 'get_full_postal_address', clear=True):
+                MsgRelay.get_full_postal_address.return_value = {
+                    'Address2': u'StreetName 104',
+                    'PostalCode': u'74142',
+                    'City': u'STOCKHOLM',
+                }
+                form['norEduPersonNIN'].value = new_nin
+                form.submit('add_by_mobile')
+
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 1)
+        self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], new_nin)
+
     @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):
         self.set_logged()
