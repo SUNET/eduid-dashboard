@@ -632,12 +632,20 @@ class NinsView(BaseFormView):
         newnin = normalize_nin(newnin)
 
         user = get_session_user(self.request, legacy_user=False)
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
 
         message = set_nin_verified(self.request, user, newnin)
 
+        try:
+            self.request.context.save_dashboard_user(user)
+        except UserOutOfSync:
+            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(user))
+            raise
+
+        log.info("Saved user {!r} after NIN vetting using mobile phone".format(user))
         self.request.session.flash(
-                get_localizer(self.request).translate(message),
-                queue='forms')
+            get_localizer(self.request).translate(message),
+            queue='forms')
 
         self.request.stats.count('dashboard/nin_add_mobile', 1)
 
