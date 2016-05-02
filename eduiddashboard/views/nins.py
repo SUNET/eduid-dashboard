@@ -275,12 +275,13 @@ class NINsActionsView(BaseActionsView):
 #                'message': get_localizer(self.request).translate(message),
 #            }
 
-        validation = validate_nin_by_mobile(self.request, self.user, nin)
+        session_user = get_session_user(self.request, legacy_user = False)
+        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
+
+        validation = validate_nin_by_mobile(self.request, session_user, nin)
         result = validation['success'] and 'success' or 'error'
         model_name = 'norEduPersonNIN'
         if result == 'success':
-            session_user = get_session_user(self.request, legacy_user = False)
-            retrieve_modified_ts(session_user, self.request.dashboard_userdb)
             set_nin_verified(self.request, session_user, nin)
             try:
                 #self.user.save(self.request)
