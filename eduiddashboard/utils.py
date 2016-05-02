@@ -216,7 +216,7 @@ def retrieve_modified_ts(user, dashboard_userdb):
         dashboard_user.modified_ts = True  # use current time
         logger.debug("Updating user {!s} with new modified_ts: {!s}".format(
             dashboard_user, dashboard_user.modified_ts))
-        dashboard_userdb.save(dashboard_user)
+        dashboard_userdb.save(dashboard_user, check_sync = False)
 
     user.modified_ts = dashboard_user.modified_ts
     logger.debug("Updating {!s} with modified_ts from dashboard user {!s}: {!s}".format(
