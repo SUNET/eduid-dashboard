@@ -49,7 +49,7 @@ class TeleAdressProofing(IDProofingData):
     def __init__(self, user, reason, nin, mobile_number, user_postal_address):
         """
         :param user: user object
-        :type user: User
+        :type user: eduid_userdb.User
         :param reason: Reason for mobile phone number match to user
         :type reason: str
         :param nin: National identity number
