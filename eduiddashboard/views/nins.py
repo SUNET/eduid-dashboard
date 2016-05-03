@@ -361,7 +361,8 @@ class NINsActionsView(BaseActionsView):
         '''
         nin, index = data.split()
         index = int(index)
-        nins = get_not_verified_nins_list(self.request, self.user)
+        session_user = get_session_user(self.request)
+        nins = get_not_verified_nins_list(self.request, session_user)
 
         if len(nins) > index:
             new_nin = nins[index]
