@@ -7,6 +7,7 @@ from pyramid.view import view_config
 from pyramid.i18n import get_localizer
 
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.mail import MailAddress
 from eduiddashboard.emails import send_verification_mail
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
@@ -164,8 +165,8 @@ class EmailsView(BaseFormView):
     def get_template_context(self):
         context = super(EmailsView, self).get_template_context()
         context.update({
-            'mails': self.user.get_mail_aliases(),
-            'primary_email': self.user.get_mail(),
+            'mails': self.user.mail_addresses.to_list(),
+            'primary_email': self.user.mail_addresses.primary.email,
         })
 
         return context
@@ -173,21 +174,13 @@ class EmailsView(BaseFormView):
     def add_success(self, emailform):
         newemail = self.schema.serialize(emailform)
 
-        # We need to add the new email to the emails list
+        new_email = MailAddress(email=newemail['mail'],
+                application='dashboard',
+                verified=False, primary=False)
 
-        emails = self.user.get_mail_aliases()
-
-        mailsubdoc = {
-            'email': newemail['mail'],
-            'verified': False,
-            'added_timestamp': datetime.utcnow()
-        }
-
-        emails.append(mailsubdoc)
-
-        self.user.set_mail_aliases(emails)
+        self.user.mail_addresses.add(new_email)
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
 
@@ -200,5 +193,5 @@ class EmailsView(BaseFormView):
             second_msg = _('A confirmation email has been sent to your email '
                     'address. Please enter your confirmation code '
                     '<a href="#" class="verifycode" '
-                    'data-identifier="${id}">here</a>.', mapping={'id': len(emails)})
+                    'data-identifier="${id}">here</a>.', mapping={'id': self.user.mail_addresses.count})
             self.request.session.flash(get_localizer(self.request).translate(second_msg), queue='forms')

@@ -9,6 +9,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 
 from eduiddashboard.views import BaseFormView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -64,12 +65,15 @@ class PersonalDataView(BaseFormView):
         del(person['csrf'])  # Don't save the CSRF token in the user database
 
         new_preferred_language = person.get('preferredLanguage')
-        old_preferred_language = self.user.get_preferred_language()
+        old_preferred_language = self.user.language
 
         # Insert the new/updated user object
-        self.user.get_doc().update(person)
+        self.user.given_name = person.get('givenName')
+        self.user.display_name = person.get('displayName')
+        self.user.surname = person.get('surname')
+        self.user.language = person.get('preferredLanguage')
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
         else:
