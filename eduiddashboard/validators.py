@@ -304,14 +304,18 @@ def _get_age(nin):
 
 
 def validate_nin_by_mobile(request, user, nin):
+    """
+
+    :param request:
+    :param user: eduid_userdb.User
+    :param nin:
+    :return:
+    """
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN
     # Get list of verified mobile numbers
-    verified_mobiles = []
-    for one_mobile in user.get_mobiles():
-        if one_mobile['verified']:
-            verified_mobiles.append(one_mobile['mobile'])
+    verified_mobiles = [x.number for x in user.phone_numbers.to_list() if x.is_verified]
 
     national_identity_number = format_NIN(nin)
     status = 'no_phone'
@@ -400,7 +404,8 @@ class NINRegisteredMobileValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         settings = request.registry.settings
-        result = validate_nin_by_mobile(request, request.context.user, value)
+        user = get_session_user(request, legacy_user = False)
+        result = validate_nin_by_mobile(request, user, value)
 
         if not result['success']:
             localizer = get_localizer(request)

@@ -17,7 +17,8 @@ from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
 from eduiddashboard.verifications import set_nin_verified, new_verification_code, save_as_verified
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
+from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
+from eduid_userdb import User
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import get_session_user
 
@@ -274,7 +275,10 @@ class NINsActionsView(BaseActionsView):
 #                'message': get_localizer(self.request).translate(message),
 #            }
 
-        validation = validate_nin_by_mobile(self.request, self.user, nin)
+        session_user = get_session_user(self.request, legacy_user = False)
+        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
+
+        validation = validate_nin_by_mobile(self.request, session_user, nin)
         result = validation['success'] and 'success' or 'error'
         model_name = 'norEduPersonNIN'
         if result == 'success':
@@ -373,6 +377,19 @@ class NINsActionsView(BaseActionsView):
         return send_letter(self.request, self.user, nin)
 
     def finish_letter_action(self, data, post_data):
+        """
+        Contact the eduid-idproofing-letter service and give it the code the user supplied.
+
+        If the letter proofing service approves of the code, this code does the following:
+          * Put together some LetterProofing data with information about the user, the vetting, the
+            users registered address etc. (Kantara requirement)
+          * Log what the letter proofing service returned on the user (we put it there for now...)
+          * Upgrade the NIN in question to verified=True
+          * Mark the verification code as used
+
+        :returns: status, message in a dict
+        :rtype: dict
+        """
         nin, index = data.split()
         index = int(index)
 
@@ -382,72 +399,74 @@ class NINsActionsView(BaseActionsView):
 
         code = post_data['verification_code']
 
-        data = {'eppn': self.user.get_eppn(),
+        session_user = get_session_user(self.request, legacy_user = False)
+        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
+
+        # small helper function to make rest of the function more readable
+        def make_result(result, msg):
+            return dict(result = result, message = msg)
+
+        data = {'eppn': session_user.eppn,
                 'verification_code': code}
-        logger.info("Posting letter verification code for user {!r}.".format(self.user))
+        logger.info("Posting letter verification code for user {!r}.".format(session_user))
         response = requests.post(verify_letter_url, data=data)
         logger.info("Received response from idproofing-letter after posting verification code "
-                    "for user {!r}.".format(self.user))
-        result = 'error'
-        msg = _('There was a problem with the letter service. '
-                'Please try again later.')
+                    "for user {!r}.".format(session_user))
         if response.status_code != 200:
             # Do nothing, just return above error message and log microservice return code
             logger.info("Received status code {!s} from idproofing-letter after posting verification code "
-                        "for user {!r}.".format(response.status_code, self.user))
-        else:
-            rdata = response.json().get('data', {})
-            if rdata.get('verified', False) and nin == rdata.get('number', None):
-                # Save data from successful verification call for later addition to user proofing collection
-                rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
-                rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
-                letter_proofings = self.user.get_letter_proofing_data()
-                letter_proofings.append(rdata)
-                self.user.set_letter_proofing_data(letter_proofings)
-                # Look up users official address at the time of verification per Kantara requirements
-                logger.info("Looking up address via Navet for user {!r}.".format(self.user))
-                user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
-                logger.info("Finished looking up address via Navet for user {!r}.".format(self.user))
-                proofing_data = LetterProofing(self.user, rdata['number'], rdata['official_address'],
-                                               rdata['transaction_id'], user_postal_address)
-                # Log verification event and fail if that goes wrong
-                logger.info("Logging proofing data for user {!r}.".format(self.user))
-                if self.request.idproofinglog.log_verification(proofing_data):
-                    logger.info("Finished logging proofing data for user {!r}.".format(self.user))
-                    try:
-                        # This is a hack to reuse the existing proofing functionality, the users code is
-                        # verified by the micro service
-                        set_nin_verified(self.request, self.user, nin)
-                        try:
-                            self.user.save(self.request)
-                        except UserOutOfSync:
-                            log.info("Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.".format(
-                                self.user))
-                            raise
-                        save_as_verified(self.request, 'norEduPersonNIN', self.user.get_id(), nin)
-                        logger.info("Verified NIN by physical letter saved "
-                                    "for user {!r}.".format(self.user))
-                    except UserOutOfSync:
-                        log.error("Verified NIN by physical letter NOT saved "
-                                  "for user {!r}. User out of sync.".format(self.user))
-                        return self.sync_user()
-                    else:
-                        result = 'success'
-                        msg = _('You have successfully verified your identity')
-                else:
-                    log.error('Logging of letter proofing data for user {!r} failed.'.format(self.user))
-                    msg = _('Sorry, we are experiencing temporary technical '
-                            'problems, please try again later.')
-            else:
-                log.info('User {!r} supplied wrong letter verification code or nin did not match.'.format(self.user))
-                log.debug('NIN in dashboard: {!s}, NIN in idproofing-letter: {!s}'.format(nin,
-                                                                                          rdata.get('number', None)))
-                msg = _('Your verification code seems to be wrong, '
-                        'please try again.')
-        return {
-            'result': result,
-            'message': get_localizer(self.request).translate(msg),
-        }
+                        "for user {!r}.".format(response.status_code, session_user))
+            return make_result('error', _('There was a problem with the letter service. '
+                                          'Please try again later.'))
+
+        rdata = response.json().get('data', {})
+        if not (rdata.get('verified', False) and nin == rdata.get('number', None)):
+            log.info('User {!r} supplied wrong letter verification code or nin did not match.'.format(
+                session_user))
+            log.debug('NIN in dashboard: {!s}, NIN in idproofing-letter: {!s}'.format(
+                nin, rdata.get('number', None)))
+            return make_result('error', _('Your verification code seems to be wrong, please try again.'))
+
+        # Save data from successful verification call for later addition to user proofing collection.
+        # Convert session_user to a DashboardUser manually instead of letting save_dashboard_user do
+        # it to get access to add_letter_proofing_data().
+        user = DashboardUser(data = session_user.to_dict())
+        rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
+        rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
+        user.add_letter_proofing_data(rdata)
+
+        # Look up users official address at the time of verification per Kantara requirements
+        logger.info("Looking up address via Navet for user {!r}.".format(session_user))
+        user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
+        logger.info("Finished looking up address via Navet for user {!r}.".format(session_user))
+        proofing_data = LetterProofing(session_user, rdata['number'], rdata['official_address'],
+                                       rdata['transaction_id'], user_postal_address)
+
+        # Log verification event and fail if that goes wrong
+        logger.info("Logging proofing data for user {!r}.".format(session_user))
+        if not self.request.idproofinglog.log_verification(proofing_data):
+            log.error('Logging of letter proofing data for user {!r} failed.'.format(session_user))
+            return make_result('error', _('Sorry, we are experiencing temporary technical '
+                                          'problems, please try again later.'))
+
+        logger.info("Finished logging proofing data for user {!r}.".format(session_user))
+        # This is a hack to reuse the existing proofing functionality, the users code has
+        # already been verified by the micro service but we decided the dashboard could
+        # continue 'upgrading' the users until we've made the planned proofing consumer
+        set_nin_verified(self.request, user, nin)
+        try:
+            self.request.context.save_dashboard_user(user)
+        except UserOutOfSync:
+            log.error("Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.".format(
+                session_user))
+            return self.sync_user()
+
+        # Finally mark the verification as used
+        save_as_verified(self.request, 'norEduPersonNIN', session_user, nin)
+        logger.info("Verified NIN by physical letter saved for user {!r}.".format(
+            session_user))
+
+        return make_result('success', _('You have successfully verified your identity'))
 
 
 @view_config(route_name='nins', permission='edit',
@@ -591,7 +610,7 @@ class NinsView(BaseFormView):
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
         save_as_verified(self.request, 'norEduPersonNIN',
-                            self.user.get_id(), newnin)
+                            self.user, newnin)
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')
@@ -609,7 +628,27 @@ class NinsView(BaseFormView):
 
     def add_by_mobile_success(self, ninform):
         """ This method is bounded to the "add_by_mobile"-button by it's name """
-        self.add_success_other(ninform)
+        newnin = self.schema.serialize(ninform)
+        newnin = newnin['norEduPersonNIN']
+        newnin = normalize_nin(newnin)
+
+        user = get_session_user(self.request, legacy_user=False)
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
+
+        message = set_nin_verified(self.request, user, newnin)
+
+        try:
+            self.request.context.save_dashboard_user(user)
+        except UserOutOfSync:
+            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(user))
+            raise
+
+        log.info("Saved user {!r} after NIN vetting using mobile phone".format(user))
+        self.request.session.flash(
+            get_localizer(self.request).translate(message),
+            queue='forms')
+
+        self.request.stats.count('dashboard/nin_add_mobile', 1)
 
     def add_by_letter_success(self, ninform):
         """

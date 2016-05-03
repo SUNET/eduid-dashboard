@@ -15,7 +15,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         self.collection = self.conn['eduid_dashboard']['id_proofing_log']
 
     def test_id_proofing_data(self):
-        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+        user = self.userdb_new.get_user_by_mail('johnsmith@example.org')
 
         proofing_data = IDProofingData(user)
 
@@ -24,11 +24,11 @@ class TestIDProofingLog(LoggedInRequestTests):
         result = self.collection.find({})
         self.assertEquals(result.count(), 1)
         hit = result.next()
-        self.assertEquals(hit['eppn'], user.get_eppn())
+        self.assertEquals(hit['eppn'], user.eppn)
         self.assertIsNotNone(hit['created'])
 
     def test_teleadress_proofing(self):
-        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+        user = self.userdb_new.get_user_by_mail('johnsmith@example.org')
         data = {
             'reason': 'matched',
             'nin': 'some_nin',
@@ -43,12 +43,12 @@ class TestIDProofingLog(LoggedInRequestTests):
         result = self.collection.find({})
         self.assertEquals(result.count(), 1)
         hit = result.next()
-        self.assertEquals(hit['eppn'], user.get_eppn())
+        self.assertEquals(hit['eppn'], user.eppn)
         self.assertEquals(hit['reason'], 'matched')
         self.assertEquals(hit['proofing_method'], 'TeleAdress')
 
     def test_teleadress_proofing_relation(self):
-        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+        user = self.userdb_new.get_user_by_mail('johnsmith@example.org')
         data = {
             'reason': 'matched_by_navet',
             'nin': 'some_nin',
@@ -66,12 +66,12 @@ class TestIDProofingLog(LoggedInRequestTests):
         result = self.collection.find()
         self.assertEquals(result.count(), 1)
         hit = result.next()
-        self.assertEquals(hit['eppn'], user.get_eppn())
+        self.assertEquals(hit['eppn'], user.eppn)
         self.assertEquals(hit['reason'], 'matched_by_navet')
         self.assertEquals(hit['proofing_method'], 'TeleAdress')
 
     def test_teleadress_proofing_extend_bug(self):
-        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+        user = self.userdb_new.get_user_by_mail('johnsmith@example.org')
         data_match = {
             'reason': 'matched',
             'nin': 'some_nin',
@@ -98,7 +98,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         self.assertEqual(required_keys1, required_keys2)
 
     def test_letter_proofing_relation(self):
-        user = self.userdb.get_user_by_mail('johnsmith@example.org')
+        user = self.userdb_new.get_user_by_mail('johnsmith@example.org')
         data = {
             'nin': 'some_nin',
             'letter_sent_to': {'name': {'some': 'data'}, 'address': {'some': 'data'}},
@@ -113,7 +113,7 @@ class TestIDProofingLog(LoggedInRequestTests):
         result = self.collection.find()
         self.assertEquals(result.count(), 1)
         hit = result.next()
-        self.assertEquals(hit['eppn'], user.get_eppn())
+        self.assertEquals(hit['eppn'], user.eppn)
         self.assertIsNotNone(hit['letter_sent_to'])
         self.assertIsNotNone(hit['transaction_id'])
         self.assertEquals(hit['proofing_method'], 'eduid-idproofing-letter')
