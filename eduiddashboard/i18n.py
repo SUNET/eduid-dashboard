@@ -17,9 +17,9 @@ def locale_negotiator(request):
     if cookie_lang and cookie_lang in available_languages:
         return cookie_lang
 
-    user = get_session_user(request, legacy_user = True, raise_on_not_logged_in = False)
+    user = get_session_user(request, legacy_user = False, raise_on_not_logged_in = False)
     if user:
-        preferredLanguage = user.get_preferred_language()
+        preferredLanguage = user.language
         if preferredLanguage:
             return preferredLanguage
 

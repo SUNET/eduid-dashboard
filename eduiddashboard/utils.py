@@ -109,8 +109,11 @@ def get_available_tabs(context, request):
         tabs = filter_tabs(default_tabs, ['passwords', 'authorization'])
     else:
         tabs = default_tabs
+    # Import here to avoid circular import
+    from eduiddashboard.session import get_session_user
+    user = get_session_user(request, legacy_user = False, raise_on_not_logged_in = False)
     for tab in tabs:
-        tab['status'] = tab['status'](context.request, context.user)
+        tab['status'] = tab['status'](request, user)
     return tabs
 
 

@@ -20,18 +20,18 @@ def get_status(request, user):
 
     return msg and icon
     """
-    mobiles = user.get_mobiles()
+    mobiles = user.phone_numbers
     pending_actions = None
     pending_action_type = ''
     verification_needed = -1
     completed = 0
 
-    if not mobiles:
+    if not mobiles.count:
         pending_actions = _('Add mobile number')
         pending_actions = get_localizer(request).translate(pending_actions)
     else:
-        for n, mobile in enumerate(mobiles):
-            if mobile['verified']:
+        for n, mobile in enumerate(mobiles.to_list()):
+            if mobile.is_verified:
                 completed = 1
             else:
                 verification_needed = n
@@ -55,9 +55,9 @@ def get_status(request, user):
 
 
 def has_confirmed_mobile(user):
-    mobiles = user.get_mobiles()
-    for m in mobiles:
-        if m['verified']:
+    mobiles = user.phone_numbers
+    for m in mobiles.to_list():
+        if m.is_verified:
             return True
     return False
 
