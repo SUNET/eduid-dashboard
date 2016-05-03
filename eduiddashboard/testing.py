@@ -5,6 +5,7 @@ import atexit
 from copy import deepcopy
 import random
 import subprocess
+import pprint
 
 from mock import patch
 
@@ -229,7 +230,9 @@ class LoggedInRequestTests(MongoTestCase):
         # since otherwise the out-of-sync check will trigger on every save to the dashboard
         # applications database because there is no document there with the right modified_ts
         for userdoc in self.userdb_new._get_all_docs():
-            logger.debug("COPYING USER INTO PROFILES:\n{!s}".format(userdoc))
+            logger.debug("Copying user {!r}\nfrom {!r}\nto {!r}:\n{!s}".format(userdoc.get('eduPersonPrincipalName'),
+                                                                               self.userdb_new, self.db.profiles,
+                                                                               pprint.pformat(userdoc)))
             self.db.profiles.insert(userdoc)
 
         self.initial_verifications = (getattr(self, 'initial_verifications', None)
