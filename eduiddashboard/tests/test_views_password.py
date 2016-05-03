@@ -212,6 +212,10 @@ FAKE_SESSION_INFO = {
 
 class TerminateAccountTests(LoggedInRequestTests):
 
+    def setUp(self, settings={}):
+        super(TerminateAccountTests, self).setUp(settings=settings)
+        self.config.registry.settings['password_reset_email_mobile_offset'] = 0
+
     def test_reset_password_unterminates_account(self):
         email = 'johnsmith@example.com'
         # Set up a bunch of faked passwords to make sure they are all revoked
@@ -277,13 +281,17 @@ class TerminateAccountTests(LoggedInRequestTests):
             'mechanism': 'email',
             'created_at': date
         }, safe=True)
-        response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
-        self.assertIn('Please choose a new password for your eduID account', response.text)
-        form = response.forms['resetpasswordstep2view-form']
-        with patch('eduiddashboard.vccs.get_vccs_client'):
-            from eduiddashboard.vccs import get_vccs_client
-            get_vccs_client.return_value = FakeVCCSClient()
-            form.submit('reset')
+
+        from eduiddashboard.views.security import ResetPasswordStep2View
+        with patch.object(ResetPasswordStep2View, '_check_reset_offset', clear=True):
+            ResetPasswordStep2View._check_reset_offset.return_value = None
+            response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
+            self.assertIn('Please choose a new password for your eduID account', response.text)
+            form = response.forms['resetpasswordstep2view-form']
+            with patch('eduiddashboard.vccs.get_vccs_client'):
+                from eduiddashboard.vccs import get_vccs_client
+                get_vccs_client.return_value = FakeVCCSClient()
+                form_resp = form.submit('reset')
 
         # Verify the user has a password and is NOT terminated again
         user = self.dashboard_db.get_user_by_mail(email)
@@ -295,7 +303,7 @@ TEST_USER = {
         '_id': ObjectId('012345678901234567890123'),
         'eduPersonPrincipalName': 'heffe-leffe',
         'givenName': 'John',
-        'sn': 'Smith',
+        'surname': 'Smith',
         'displayName': 'John Smith',
         'norEduPersonNIN': ['197801011234'],
         #'photo': 'https://pointing.to/your/photo',
@@ -303,8 +311,8 @@ TEST_USER = {
         'mail': 'johnnysmith1@example.org',
         'eduPersonEntitlement': [],
         #'modified_ts': datetime.utcnow(),
-        'mobile': [{
-            'mobile': '+46701234567',
+        'phone': [{
+            'number': '+46701234567',
             'verified': True,
             'primary': True,
         }],
@@ -382,10 +390,14 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         form['email_or_username'].value = 'notexistingmail@foodomain.com'
         response = form.submit('reset')
         self.assertEqual(response.status, '302 Found')
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertEqual(len(reset_passwords_after), 0)
 
         form['email_or_username'].value = 'johnnysmith3@example.com'
         response = form.submit('reset')
         self.assertEqual(response.status, '302 Found')
+        reset_passwords_after = list(self.db.reset_passwords.find())
+        self.assertEqual(len(reset_passwords_after), 0)
 
         self.db.reset_passwords.remove()
         form['email_or_username'].value = '0701234567'
@@ -418,13 +430,17 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'mechanism': 'email',
             'created_at': date
         }, safe=True)
-        response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
-        self.assertIn('Please choose a new password for your eduID account', response.text)
-        form = response.forms['resetpasswordstep2view-form']
-        with patch('eduiddashboard.vccs.get_vccs_client'):
-            from eduiddashboard.vccs import get_vccs_client
-            get_vccs_client.return_value = FakeVCCSClient()
-            form.submit('reset')
+
+        from eduiddashboard.views.security import ResetPasswordStep2View
+        with patch.object(ResetPasswordStep2View, '_check_reset_offset', clear=True):
+            ResetPasswordStep2View._check_reset_offset.return_value = None
+            response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
+            self.assertIn('Please choose a new password for your eduID account', response.text)
+            form = response.forms['resetpasswordstep2view-form']
+            with patch('eduiddashboard.vccs.get_vccs_client'):
+                from eduiddashboard.vccs import get_vccs_client
+                get_vccs_client.return_value = FakeVCCSClient()
+                form_resp = form.submit('reset')
 
         # Verify the user has no nins and no verified phone numbers
         user = self.dashboard_db.get_user_by_mail(email)
@@ -473,7 +489,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'created_at': date
         }, safe=True)
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
-        self.assertIn('Please choose a new password for your eduID account', response.text)
+        self.assertIn('The password reset link you have used is still invalid.', response.text)
 
     def test_reset_password_invalid_code(self):
         hash_code = '123456'

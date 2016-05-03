@@ -39,6 +39,40 @@ class MobilesFormTests(LoggedInRequestTests):
         self.assertIn('alert-danger', response.body)
         self.assertIsNotNone(getattr(response, 'form', None))
 
+    def test_add_valid_mobile_first(self):
+        self.set_logged()
+        self._remove_existant_mobile()
+        self._remove_existant_mobile()
+        self._remove_existant_mobile(0)
+
+        response_form = self.testapp.get('/profile/mobiles/')
+
+        form = response_form.forms[self.formname]
+        new_mobile = '+34678455654'
+        form['mobile'].value = new_mobile
+
+        with patch.object(MsgRelay, 'mobile_validator', clear=True):
+            MsgRelay.mobile_validator.return_value = True
+                
+            response = form.submit('add')
+        
+        user = self.dashboard_db.get_user_by_id(self.user.user_id)
+
+        mobile_doc = self.db.verifications.find_one({
+            'model_name': 'phone',
+            'user_oid': ObjectId(user.user_id),
+            'obj_id': new_mobile
+        })
+        verified_mobile = user.phone_numbers.find('+34678455654')
+        self.assertFalse(verified_mobile.is_verified)
+        self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': 0, 'code': mobile_doc['code'], 'action': 'verify'}
+        )
+        user_after = self.userdb_new.get_user_by_id(self.user.user_id)
+        verified_mobile = user_after.phone_numbers.to_list()[0]
+        self.assertTrue(verified_mobile.is_verified)
+
     def test_add_valid_mobile(self):
         self.set_logged()
 
