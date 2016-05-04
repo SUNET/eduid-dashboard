@@ -12,7 +12,7 @@ from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
-from eduiddashboard.utils import get_icon_string, get_short_hash, retrieve_modified_ts
+from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
@@ -257,7 +257,6 @@ class NINsActionsView(BaseActionsView):
         nin, index = data.split()
         index = int(index)
         session_user = get_session_user(self.request)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
         nins = get_not_verified_nins_list(self.request, session_user)
 
         if len(nins) > index:
@@ -274,9 +273,6 @@ class NINsActionsView(BaseActionsView):
 #                'result': 'bad',
 #                'message': get_localizer(self.request).translate(message),
 #            }
-
-        session_user = get_session_user(self.request, legacy_user = False)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
 
         validation = validate_nin_by_mobile(self.request, session_user, nin)
         result = validation['success'] and 'success' or 'error'
@@ -400,7 +396,6 @@ class NINsActionsView(BaseActionsView):
         code = post_data['verification_code']
 
         session_user = get_session_user(self.request, legacy_user = False)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
 
         # small helper function to make rest of the function more readable
         def make_result(result, msg):
@@ -631,18 +626,15 @@ class NinsView(BaseFormView):
         newnin = newnin['norEduPersonNIN']
         newnin = normalize_nin(newnin)
 
-        user = get_session_user(self.request, legacy_user=False)
-        retrieve_modified_ts(user, self.request.dashboard_userdb)
-
-        message = set_nin_verified(self.request, user, newnin)
+        message = set_nin_verified(self.request, self.user, newnin)
 
         try:
-            self.request.context.save_dashboard_user(user)
+            self.request.context.save_dashboard_user(self.user)
         except UserOutOfSync:
-            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(user))
+            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(self.user))
             raise
 
-        log.info("Saved user {!r} after NIN vetting using mobile phone".format(user))
+        log.info("Saved user {!r} after NIN vetting using mobile phone".format(self.user))
         self.request.session.flash(
             get_localizer(self.request).translate(message),
             queue='forms')
