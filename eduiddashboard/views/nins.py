@@ -146,7 +146,7 @@ def letter_status(request, user, nin):
     settings = request.registry.settings
     letter_url = settings.get('letter_service_url')
     state_url = urlparse.urljoin(letter_url, 'get-state')
-    data = {'eppn': user.get_eppn()}
+    data = {'eppn': user.eppn}
     response = requests.post(state_url, data=data)
 
     sent, result = False, 'error'
@@ -186,7 +186,7 @@ def send_letter(request, user, nin):
     letter_url = settings.get('letter_service_url')
     send_letter_url = urlparse.urljoin(letter_url, 'send-letter')
 
-    data = {'eppn': user.get_eppn(), 'nin': nin}
+    data = {'eppn': user.eppn, 'nin': nin}
     response = requests.post(send_letter_url, data=data)
     result = 'error'
     msg = _('There was a problem with the letter service. '
