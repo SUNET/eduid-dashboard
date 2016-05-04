@@ -58,7 +58,6 @@ class BaseFormView(FormView):
     def __init__(self, context, request):
         super(BaseFormView, self).__init__(request)
         self.user = get_session_user(self.request)
-        retrieve_modified_ts(self.user, request.dashboard_userdb)
         self.context = context
         self.response = request.response
 
