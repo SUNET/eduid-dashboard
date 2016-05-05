@@ -68,6 +68,8 @@ class PersonalDataView(BaseFormView):
 
         # Insert the new/updated user object
         self.user.get_doc().update(person)
+        if 'sn' in self.user.get_doc():
+            self.user.get_doc()['sn'] = person['surname']
         try:
             self.user.save(self.request)
         except UserOutOfSync:
