@@ -64,6 +64,7 @@ class PersonalDataView(BaseFormView):
         person = self.schema.serialize(user_modified)
         del(person['csrf'])  # Don't save the CSRF token in the user database
 
+        self.user = get_session_user(self.request)
         new_preferred_language = person.get('preferredLanguage')
         old_preferred_language = self.user.language
 

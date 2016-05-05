@@ -13,6 +13,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
 from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -178,6 +179,7 @@ class EmailsView(BaseFormView):
                 application='dashboard',
                 verified=False, primary=False)
 
+        self.user = get_session_user(self.request)
         self.user.mail_addresses.add(new_email)
         try:
             self.context.save_dashboard_user(self.user)

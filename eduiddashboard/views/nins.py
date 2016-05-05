@@ -544,6 +544,7 @@ class NinsView(BaseFormView):
         return True
 
     def add_success_personal(self, ninform, msg):
+        self.user = get_session_user(self.request)
         self.addition_with_code_validation(ninform)
 
         msg = get_localizer(self.request).translate(msg)
@@ -566,6 +567,7 @@ class NinsView(BaseFormView):
                 'status': 'failure',
                 'data': e.error.asdict()
             }
+        self.user = get_session_user(self.request)
         self.addition_with_code_validation(validated)
         self.request.stats.count('dashboard/nin_add_external', 1)
         return {
@@ -627,6 +629,7 @@ class NinsView(BaseFormView):
         newnin = newnin['norEduPersonNIN']
         newnin = normalize_nin(newnin)
 
+        self.user = get_session_user(self.request)
         message = set_nin_verified(self.request, self.user, newnin)
 
         try:
@@ -648,6 +651,7 @@ class NinsView(BaseFormView):
         """
         form = self.schema.serialize(ninform)
         nin = normalize_nin(form['norEduPersonNIN'])
+        self.user = get_session_user(self.request)
         result = letter_status(self.request, self.user, nin)
         if result['result'] == 'success':
             result2 = send_letter(self.request, self.user, nin)

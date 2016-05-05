@@ -37,8 +37,7 @@ class PermissionsView(BaseFormView):
 
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
-        user = get_session_user(self.request, raise_on_not_logged_in = False)
-        if self.context.user.get('eduPersonPrincipalName') == user.eppn:
+        if self.context.user.get('eduPersonPrincipalName') == self.user.eppn:
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False
@@ -46,6 +45,7 @@ class PermissionsView(BaseFormView):
 
     def save_success(self, permform):
         data = self.schema.serialize(permform)
+        self.user = get_session_user(self.request, raise_on_not_logged_in = False)
         self.user.entitlements = data[self.attribute]
         try:
             self.context.save_dashboard_user(self.user)

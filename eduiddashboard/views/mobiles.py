@@ -13,6 +13,7 @@ from eduiddashboard.models import Mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash, normalize_to_e_164
 from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -188,6 +189,7 @@ class MobilesView(BaseFormView):
                                    'primary': False,
                                    'created_ts': datetime.utcnow()
                                    })
+        self.user = get_session_user(self.request)
         self.user.phone_numbers.add(mobile)
         try:
             self.context.save_dashboard_user(self.user)
