@@ -2,7 +2,7 @@ import json
 from mock import patch
 import unittest
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pprint
 
@@ -228,6 +228,65 @@ class NinsFormTests(LoggedInRequestTests):
                 }
                 form['norEduPersonNIN'].value = new_nin
                 form.submit('add_by_mobile')
+
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 1)
+        self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], new_nin)
+
+    def test_verify_nin_by_letter(self):
+        email = self.no_nin_user_email
+        self.set_logged(email)
+        user = self.userdb.get_user_by_mail(email)
+        self.assertEqual(len(user.get_nins()), 0)
+
+        new_nin = '200010100001'
+
+        response_form = self.testapp.get('/profile/nins/')
+        form = response_form.forms[self.formname]
+
+        # Need a response object with a json method and self.status_code.
+        class MockResponse:
+            def __init__(self, json_data, status_code):
+                self.json_data = json_data
+                self.status_code = status_code
+
+            def json(self):
+                return self.json_data
+
+        in_24h = datetime.now() + timedelta(hours=24)
+        letter_expires = in_24h.strftime('%s')
+        now_ts = datetime.now().strftime('%s')
+
+        # Send letter
+        import requests
+        with patch.object(requests, 'post', clear=True):
+            requests.post.return_value = MockResponse({'success': True, 'letter_expires': letter_expires}, 200)
+            form['norEduPersonNIN'].value = new_nin
+            form.submit('add_by_letter')
+
+        # Data returned from idproofing_letter after a successful proofing
+        ret_data = {
+            'verified': True,
+            'number': '200010100001',
+            'created_ts': now_ts,
+            'verified_ts': now_ts,
+            'official_address': {'name': 'name', 'address': 'address'},
+            'transaction_id': 'transaction_id'
+        }
+        # Verify NIN
+        with patch.object(requests, 'post', clear=True):
+            requests.post.return_value = MockResponse({'data': ret_data}, 200)
+            from eduiddashboard.msgrelay import MsgRelay
+            with patch.object(MsgRelay, 'get_full_postal_address', clear=True):
+                MsgRelay.get_full_postal_address.return_value = {
+                    'Address2': u'StreetName 104',
+                    'PostalCode': u'74142',
+                    'City': u'STOCKHOLM',
+                }
+                self.testapp.post(
+                    '/profile/nins-actions/',
+                    {'verification_code': 'bogus_code', 'identifier': '200010100001 0', 'action': 'finish_letter'}
+                )
 
         user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
