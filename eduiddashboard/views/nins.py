@@ -12,7 +12,7 @@ from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
-from eduiddashboard.utils import get_icon_string, get_short_hash, retrieve_modified_ts
+from eduiddashboard.utils import get_icon_string, get_short_hash
 from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
@@ -135,7 +135,7 @@ def get_not_verified_nins_list(request, user):
 
 
 def get_active_nin(self):
-    active_nins = self.user.get_nins()
+    active_nins = self.user.nins.to_list()
     if active_nins:
         return active_nins[-1]
     else:
@@ -146,7 +146,7 @@ def letter_status(request, user, nin):
     settings = request.registry.settings
     letter_url = settings.get('letter_service_url')
     state_url = urlparse.urljoin(letter_url, 'get-state')
-    data = {'eppn': user.get_eppn()}
+    data = {'eppn': user.eppn}
     response = requests.post(state_url, data=data)
 
     sent, result = False, 'error'
@@ -186,7 +186,7 @@ def send_letter(request, user, nin):
     letter_url = settings.get('letter_service_url')
     send_letter_url = urlparse.urljoin(letter_url, 'send-letter')
 
-    data = {'eppn': user.get_eppn(), 'nin': nin}
+    data = {'eppn': user.eppn, 'nin': nin}
     response = requests.post(send_letter_url, data=data)
     result = 'error'
     msg = _('There was a problem with the letter service. '
@@ -257,7 +257,6 @@ class NINsActionsView(BaseActionsView):
         nin, index = data.split()
         index = int(index)
         session_user = get_session_user(self.request)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
         nins = get_not_verified_nins_list(self.request, session_user)
 
         if len(nins) > index:
@@ -274,9 +273,6 @@ class NINsActionsView(BaseActionsView):
 #                'result': 'bad',
 #                'message': get_localizer(self.request).translate(message),
 #            }
-
-        session_user = get_session_user(self.request, legacy_user = False)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
 
         validation = validate_nin_by_mobile(self.request, session_user, nin)
         result = validation['success'] and 'success' or 'error'
@@ -401,7 +397,6 @@ class NINsActionsView(BaseActionsView):
         code = post_data['verification_code']
 
         session_user = get_session_user(self.request, legacy_user = False)
-        retrieve_modified_ts(session_user, self.request.dashboard_userdb)
 
         # small helper function to make rest of the function more readable
         def make_result(result, msg):
@@ -524,13 +519,12 @@ class NinsView(BaseFormView):
 
         settings = self.request.registry.settings
         enable_mm = settings.get('enable_mm_verification')
-        session_user = get_session_user(self.request, raise_on_not_logged_in = False)
 
         context.update({
-            'nins': session_user.nins.to_list_of_dicts(),
-            'not_verified_nins': get_not_verified_nins_list(self.request, session_user),
+            'nins': self.user.nins.to_list_of_dicts(),
+            'not_verified_nins': get_not_verified_nins_list(self.request, self.user),
             'active_nin': self.get_active_nin(),
-            'has_mobile': has_confirmed_mobile(session_user),
+            'has_mobile': has_confirmed_mobile(self.user),
             'enable_mm_verification': enable_mm,
         })
         if enable_mm:
@@ -550,6 +544,7 @@ class NinsView(BaseFormView):
         return True
 
     def add_success_personal(self, ninform, msg):
+        self.user = get_session_user(self.request)
         self.addition_with_code_validation(ninform)
 
         msg = get_localizer(self.request).translate(msg)
@@ -572,6 +567,7 @@ class NinsView(BaseFormView):
                 'status': 'failure',
                 'data': e.error.asdict()
             }
+        self.user = get_session_user(self.request)
         self.addition_with_code_validation(validated)
         self.request.stats.count('dashboard/nin_add_external', 1)
         return {
@@ -633,18 +629,16 @@ class NinsView(BaseFormView):
         newnin = newnin['norEduPersonNIN']
         newnin = normalize_nin(newnin)
 
-        user = get_session_user(self.request, legacy_user=False)
-        retrieve_modified_ts(user, self.request.dashboard_userdb)
-
-        message = set_nin_verified(self.request, user, newnin)
+        self.user = get_session_user(self.request)
+        message = set_nin_verified(self.request, self.user, newnin)
 
         try:
-            self.request.context.save_dashboard_user(user)
+            self.request.context.save_dashboard_user(self.user)
         except UserOutOfSync:
-            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(user))
+            log.info("Failed to save user {!r} after mobile phone vetting. User out of sync.".format(self.user))
             raise
 
-        log.info("Saved user {!r} after NIN vetting using mobile phone".format(user))
+        log.info("Saved user {!r} after NIN vetting using mobile phone".format(self.user))
         self.request.session.flash(
             get_localizer(self.request).translate(message),
             queue='forms')
@@ -657,6 +651,7 @@ class NinsView(BaseFormView):
         """
         form = self.schema.serialize(ninform)
         nin = normalize_nin(form['norEduPersonNIN'])
+        self.user = get_session_user(self.request)
         result = letter_status(self.request, self.user, nin)
         if result['result'] == 'success':
             result2 = send_letter(self.request, self.user, nin)

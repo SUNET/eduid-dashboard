@@ -16,10 +16,10 @@
   
       {% for mobile in mobiles %}
       <tr class='mobile-row' data-identifier="{{ loop.index0 }}">
-        <td class='identifier'>{{ mobile.mobile }}</td>
+        <td class='identifier'>{{ mobile.number }}</td>
         <td class='non-identifier'>
-        {% if mobile.verified|default(False) %}
-          {% if mobile.primary|default(False) %}
+        {% if mobile.is_verified|default(False) %}
+          {% if mobile.is_primary|default(False) %}
             <span class="nobutton">{{ _('Primary') }}</span>
           {% else %}
             <input type='button' class='btn btn-link' value="{{_('Make primary')}}"

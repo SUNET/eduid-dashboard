@@ -6,12 +6,14 @@ from datetime import datetime
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
+from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash, normalize_to_e_164
 from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -175,21 +177,22 @@ class MobilesView(BaseFormView):
     def get_template_context(self):
         context = super(MobilesView, self).get_template_context()
         context.update({
-            'mobiles': self.user.get_mobiles(),
+            'mobiles': self.user.phone_numbers.to_list(),
         })
         return context
 
     def add_success(self, mobileform):
         mobile_number = self.schema.serialize(mobileform)['mobile']
         mobile_number = normalize_to_e_164(self.request, mobile_number)
-        mobile = {'mobile':  mobile_number,
-                  'verified': False,
-                  'primary': False,
-                  'added_timestamp': datetime.utcnow()
-                  }
-        self.user.add_mobile(mobile)
+        mobile = PhoneNumber(data={'number':  mobile_number,
+                                   'verified': False,
+                                   'primary': False,
+                                   'created_ts': datetime.utcnow()
+                                   })
+        self.user = get_session_user(self.request)
+        self.user.phone_numbers.add(mobile)
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             self.sync_user()
 

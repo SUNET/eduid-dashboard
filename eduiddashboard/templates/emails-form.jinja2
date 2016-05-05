@@ -18,7 +18,7 @@
       <tr class='emailrow' data-identifier="{{ loop.index0 }}">
         <td class='identifier'>{{ mail.email }}</td>
         <td class='non-identifier'>
-        {% if mail.verified %}
+        {% if mail.is_verified %}
           {% if mail.email == primary_email %}
             <span class="nobutton">{{ _('Primary') }}</span>
           {% else %}

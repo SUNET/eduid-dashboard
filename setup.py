@@ -62,7 +62,7 @@ if sys.version_info[0] < 3:
 
 test_requires = [
     'WebTest==2.0.18',
-    'mock==1.0.1',
+    'mock',
     'eduid_dashboard_amp',
 ]
 
@@ -73,9 +73,9 @@ docs_extras = [
 
 
 testing_extras = test_requires + [
-    'nose==1.2.1',
-    'coverage==3.6',
-    'nosexcover==1.0.8',
+    'nose',
+    'coverage',
+    'nosexcover',
 ]
 
 waitress_extras = requires + [

@@ -376,7 +376,11 @@ def get_logged_in_user(request, legacy_user, raise_on_not_logged_in=True):
     user = _get_user_by_eppn(request, request.session[_USER_EPPN],
                              legacy_user = legacy_user,
                              )
-    logger.debug('Returning the logged in user {!r} as session user to {!s}'.format(user, caller_name()))
+    try:
+        logger.debug('Returning the logged in user {!r} as session user to {!s}'.format(user, caller_name()))
+    except IndexError:
+        # if the caller is in some template we may get an IndexError
+        logger.debug('Returning the logged in user {!r} as session user'.format(user))
     return user
 
 
