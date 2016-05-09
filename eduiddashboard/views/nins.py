@@ -652,6 +652,10 @@ class NinsView(BaseFormView):
         form = self.schema.serialize(ninform)
         nin = normalize_nin(form['norEduPersonNIN'])
         session_user = get_session_user(self.request)
+
+        # self.user needs to be new user in get_template_context
+        self.user = session_user
+
         result = letter_status(self.request, session_user, nin)
         if result['result'] == 'success':
             result2 = send_letter(self.request, session_user, nin)
