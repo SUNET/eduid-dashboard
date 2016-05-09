@@ -367,7 +367,7 @@ class NINsActionsView(BaseActionsView):
         else:
             return self.sync_user()
 
-        return letter_status(self.request, self.user, nin)
+        return letter_status(self.request, session_user, nin)
 
     def send_letter_action(self, data, post_data):
         nin, index = data.split()
@@ -651,13 +651,17 @@ class NinsView(BaseFormView):
         """
         form = self.schema.serialize(ninform)
         nin = normalize_nin(form['norEduPersonNIN'])
-        self.user = get_session_user(self.request)
-        result = letter_status(self.request, self.user, nin)
+        session_user = get_session_user(self.request)
+
+        # self.user needs to be a new user in get_template_context
+        self.user = session_user
+
+        result = letter_status(self.request, session_user, nin)
         if result['result'] == 'success':
-            result2 = send_letter(self.request, self.user, nin)
+            result2 = send_letter(self.request, session_user, nin)
             if result2['result'] == 'success':
                 new_verification_code(self.request, 'norEduPersonNIN',
-                                      nin, self.user)
+                                      nin, session_user)
             msg = result2['message']
         else:
             msg = result['message']
