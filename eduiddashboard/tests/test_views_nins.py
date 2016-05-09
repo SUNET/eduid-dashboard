@@ -264,6 +264,11 @@ class NinsFormTests(LoggedInRequestTests):
             form['norEduPersonNIN'].value = new_nin
             form.submit('add_by_letter')
 
+            # Show the pop-up message and if the user's letter has not expired then continue.
+            self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': '200010100001 0', 'action': 'verify_lp'})
+
         # Data returned from idproofing_letter after a successful proofing
         ret_data = {
             'verified': True,
