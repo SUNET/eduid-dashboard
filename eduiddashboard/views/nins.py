@@ -134,12 +134,10 @@ def get_not_verified_nins_list(request, user):
     return list(set(res))
 
 
-def get_active_nin(self):
-    active_nins = self.user.nins.to_list()
-    if active_nins:
-        return active_nins[-1]
-    else:
-        return None
+def get_verified_nins(user):
+    user_nins = user.nins.to_list()
+    verified_nins = [nin.number for nin in user_nins if nin.is_verified]
+    return verified_nins
 
 
 def letter_status(request, user, nin):
@@ -480,8 +478,6 @@ class NinsView(BaseFormView):
 
     bootstrap_form_style = 'form-inline'
 
-    get_active_nin = get_active_nin
-
     def __init__(self, *args, **kwargs):
         super(NinsView, self).__init__(*args, **kwargs)
 
@@ -523,7 +519,7 @@ class NinsView(BaseFormView):
         context.update({
             'nins': self.user.nins.to_list_of_dicts(),
             'not_verified_nins': get_not_verified_nins_list(self.request, self.user),
-            'active_nin': self.get_active_nin(),
+            'verified_nins': get_verified_nins(self.user),
             'has_mobile': has_confirmed_mobile(self.user),
             'enable_mm_verification': enable_mm,
         })
