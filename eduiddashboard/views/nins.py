@@ -653,7 +653,7 @@ class NinsView(BaseFormView):
         nin = normalize_nin(form['norEduPersonNIN'])
         session_user = get_session_user(self.request)
 
-        # self.user needs to be new user in get_template_context
+        # self.user needs to be a new user in get_template_context
         self.user = session_user
 
         result = letter_status(self.request, session_user, nin)
