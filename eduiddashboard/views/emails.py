@@ -74,6 +74,7 @@ class EmailsActionsView(BaseActionsView):
 
     def setprimary_action(self, index, post_data):
 
+        self.user = get_session_user(self.request)
         try:
             mail = self.user.mail_addresses.to_list()[index]
         except IndexError:
@@ -100,6 +101,7 @@ class EmailsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message)}
 
     def remove_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         emails = self.user.mail_addresses.to_list()
         if len(emails) == 1:
             message = _('Error: You only have one email address and it  '

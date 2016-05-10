@@ -226,8 +226,8 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        user = get_session_user(self.request, raise_on_not_logged_in = False)
-        nins = get_not_verified_nins_list(self.request, user)
+        self.user = get_session_user(self.request, raise_on_not_logged_in = False)
+        nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -254,8 +254,8 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        session_user = get_session_user(self.request)
-        nins = get_not_verified_nins_list(self.request, session_user)
+        self.user = get_session_user(self.request)
+        nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -272,19 +272,19 @@ class NINsActionsView(BaseActionsView):
 #                'message': get_localizer(self.request).translate(message),
 #            }
 
-        validation = validate_nin_by_mobile(self.request, session_user, nin)
+        validation = validate_nin_by_mobile(self.request, self.user, nin)
         result = validation['success'] and 'success' or 'error'
         model_name = 'norEduPersonNIN'
         if result == 'success':
-            set_nin_verified(self.request, session_user, nin)
+            set_nin_verified(self.request, self.user, nin)
             try:
                 #self.user.save(self.request)
-                self.request.context.save_dashboard_user(session_user)
-                logger.info("Verified by mobile, {!s} saved for user {!r}.".format(model_name, session_user))
+                self.request.context.save_dashboard_user(self.user)
+                logger.info("Verified by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
                 # Save the state in the verifications collection
-                save_as_verified(self.request, 'norEduPersonNIN', session_user, nin)
+                save_as_verified(self.request, 'norEduPersonNIN', self.user, nin)
             except UserOutOfSync:
-                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, session_user))
+                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
                 raise
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
@@ -299,6 +299,7 @@ class NINsActionsView(BaseActionsView):
     def remove_action(self, data, post_data):
         """ Only not verified nins can be removed """
         raise HTTPNotImplemented  # Temporary remove the functionality
+        self.user = get_session_user(self.request)
 
         nin, index = data.split()
         index = int(index)
@@ -330,6 +331,7 @@ class NINsActionsView(BaseActionsView):
         send_verification_code(self.request, self.user, data_id, reference, code)
 
     def resend_code_action(self, data, post_data):
+        self.user = get_session_user(self.request)
         nin, index = data.split()
         index = int(index)
         nins = get_not_verified_nins_list(self.request, self.user)
@@ -354,8 +356,8 @@ class NINsActionsView(BaseActionsView):
         '''
         nin, index = data.split()
         index = int(index)
-        session_user = get_session_user(self.request)
-        nins = get_not_verified_nins_list(self.request, session_user)
+        self.user = get_session_user(self.request)
+        nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             new_nin = nins[index]
@@ -364,9 +366,10 @@ class NINsActionsView(BaseActionsView):
         else:
             return self.sync_user()
 
-        return letter_status(self.request, session_user, nin)
+        return letter_status(self.request, self.user, nin)
 
     def send_letter_action(self, data, post_data):
+        self.user = get_session_user(request)
         nin, index = data.split()
         return send_letter(self.request, self.user, nin)
 
@@ -393,56 +396,56 @@ class NINsActionsView(BaseActionsView):
 
         code = post_data['verification_code']
 
-        session_user = get_session_user(self.request, legacy_user = False)
+        self.user = get_session_user(self.request)
 
         # small helper function to make rest of the function more readable
         def make_result(result, msg):
             return dict(result = result, message = msg)
 
-        data = {'eppn': session_user.eppn,
+        data = {'eppn': self.user.eppn,
                 'verification_code': code}
-        logger.info("Posting letter verification code for user {!r}.".format(session_user))
+        logger.info("Posting letter verification code for user {!r}.".format(self.user))
         response = requests.post(verify_letter_url, data=data)
         logger.info("Received response from idproofing-letter after posting verification code "
-                    "for user {!r}.".format(session_user))
+                    "for user {!r}.".format(self.user))
         if response.status_code != 200:
             # Do nothing, just return above error message and log microservice return code
             logger.info("Received status code {!s} from idproofing-letter after posting verification code "
-                        "for user {!r}.".format(response.status_code, session_user))
+                        "for user {!r}.".format(response.status_code, self.user))
             return make_result('error', _('There was a problem with the letter service. '
                                           'Please try again later.'))
 
         rdata = response.json().get('data', {})
         if not (rdata.get('verified', False) and nin == rdata.get('number', None)):
             log.info('User {!r} supplied wrong letter verification code or nin did not match.'.format(
-                session_user))
+                self.user))
             log.debug('NIN in dashboard: {!s}, NIN in idproofing-letter: {!s}'.format(
                 nin, rdata.get('number', None)))
             return make_result('error', _('Your verification code seems to be wrong, please try again.'))
 
         # Save data from successful verification call for later addition to user proofing collection.
-        # Convert session_user to a DashboardUser manually instead of letting save_dashboard_user do
+        # Convert self.user to a DashboardUser manually instead of letting save_dashboard_user do
         # it to get access to add_letter_proofing_data().
-        user = DashboardUser(data = session_user.to_dict())
+        user = DashboardUser(data = self.user.to_dict())
         rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
         rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
         user.add_letter_proofing_data(rdata)
 
         # Look up users official address at the time of verification per Kantara requirements
-        logger.info("Looking up address via Navet for user {!r}.".format(session_user))
+        logger.info("Looking up address via Navet for user {!r}.".format(self.user))
         user_postal_address = self.request.msgrelay.get_full_postal_address(rdata['number'])
-        logger.info("Finished looking up address via Navet for user {!r}.".format(session_user))
-        proofing_data = LetterProofing(session_user, rdata['number'], rdata['official_address'],
+        logger.info("Finished looking up address via Navet for user {!r}.".format(self.user))
+        proofing_data = LetterProofing(self.user, rdata['number'], rdata['official_address'],
                                        rdata['transaction_id'], user_postal_address)
 
         # Log verification event and fail if that goes wrong
-        logger.info("Logging proofing data for user {!r}.".format(session_user))
+        logger.info("Logging proofing data for user {!r}.".format(self.user))
         if not self.request.idproofinglog.log_verification(proofing_data):
-            log.error('Logging of letter proofing data for user {!r} failed.'.format(session_user))
+            log.error('Logging of letter proofing data for user {!r} failed.'.format(self.user))
             return make_result('error', _('Sorry, we are experiencing temporary technical '
                                           'problems, please try again later.'))
 
-        logger.info("Finished logging proofing data for user {!r}.".format(session_user))
+        logger.info("Finished logging proofing data for user {!r}.".format(self.user))
         # This is a hack to reuse the existing proofing functionality, the users code has
         # already been verified by the micro service but we decided the dashboard could
         # continue 'upgrading' the users until we've made the planned proofing consumer
@@ -451,13 +454,14 @@ class NINsActionsView(BaseActionsView):
             self.request.context.save_dashboard_user(user)
         except UserOutOfSync:
             log.error("Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.".format(
-                session_user))
+                self.user))
             return self.sync_user()
+        self.user = user
 
         # Finally mark the verification as used
-        save_as_verified(self.request, 'norEduPersonNIN', session_user, nin)
+        save_as_verified(self.request, 'norEduPersonNIN', self.user, nin)
         logger.info("Verified NIN by physical letter saved for user {!r}.".format(
-            session_user))
+            self.user))
 
         return make_result('success', _('You have successfully verified your identity'))
 

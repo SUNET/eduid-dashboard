@@ -141,8 +141,7 @@ class BaseActionsView(object):
     def __init__(self, context, request):
         self.request = request
         self.context = context
-        self.user = get_session_user(request)
-        retrieve_modified_ts(self.user, request.dashboard_userdb)
+        self.user = context.user
         self.verify_messages = {}
         for msgid, msg in self.default_verify_messages.items():
             if msgid not in self.special_verify_messages:
@@ -191,6 +190,7 @@ class BaseActionsView(object):
         """ Common action to verify some given data.
             You can override in subclasses
         """
+        self.user = get_session_user(self.request)
 
         # Catch the unlikely event when the user have e.g. removed all entries
         # in a separate tab, or one in the middle and then tries to resend the
@@ -258,6 +258,7 @@ class BaseActionsView(object):
             }
 
     def resend_code_action(self, index, post_data):
+        self.user = get_session_user(request)
         data = self.user.to_dict().get(self.data_attribute, [])
 
         # Catch the unlikely event when the user have e.g. removed all entries

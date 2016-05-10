@@ -97,6 +97,7 @@ class MobilesActionsView(BaseActionsView):
         return data_to_verify['number']
 
     def remove_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         mobiles = self.user.phone_numbers.to_list()
         mobile_to_remove = mobiles[index]
         self.user.phone_numbers.remove(mobile_to_remove.number)
@@ -114,6 +115,7 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def setprimary_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         mobiles = self.user.phone_numbers.to_list()
 
         try:
