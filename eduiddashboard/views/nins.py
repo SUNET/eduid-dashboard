@@ -302,8 +302,7 @@ class NINsActionsView(BaseActionsView):
 
         nin, index = data.split()
         index = int(index)
-        user = get_session_user(self.request, raise_on_not_logged_in = False)
-        nins = get_not_verified_nins_list(self.request, user)
+        nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
             remove_nin = nins[index]
@@ -316,7 +315,7 @@ class NINsActionsView(BaseActionsView):
         verifications.remove({
             'model_name': self.data_attribute,
             'obj_id': remove_nin,
-            'user_oid': user.user_id,
+            'user_oid': self.user.user_id,
             'verified': False,
         })
 

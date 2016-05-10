@@ -33,7 +33,7 @@ def get_dummy_status(request, user):
 
 
 def sync_user(request, context, old_user):
-    user = request.userdb.get_user_by_id(old_user.get_id())
+    user = request.userdb.get_user_by_id(old_user.user_id)
 
     if isinstance(user, DashboardUser):
         retrieve_modified_ts(user, request.dashboard_userdb)
@@ -141,7 +141,8 @@ class BaseActionsView(object):
     def __init__(self, context, request):
         self.request = request
         self.context = context
-        self.user = context.user
+        self.user = get_session_user(request)
+        retrieve_modified_ts(self.user, request.dashboard_userdb)
         self.verify_messages = {}
         for msgid, msg in self.default_verify_messages.items():
             if msgid not in self.special_verify_messages:
@@ -199,7 +200,7 @@ class BaseActionsView(object):
         # resend the code for corresponds to the same entry we get from
         # data[index].
         try:
-            _data = self.user.get(self.data_attribute, [])
+            _data = self.user.to_dict().get(self.data_attribute, [])
             data_to_verify = _data[index]
         except IndexError:
             log.warning('Index error in verify_action, user {!s}'.format(self.user))
@@ -257,7 +258,7 @@ class BaseActionsView(object):
             }
 
     def resend_code_action(self, index, post_data):
-        data = self.user.get(self.data_attribute, [])
+        data = self.user.to_dict().get(self.data_attribute, [])
 
         # Catch the unlikely event when the user have e.g. removed all entries
         # in a separate tab, or one in the middle and then tries to resend the
