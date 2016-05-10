@@ -6,6 +6,7 @@ from datetime import datetime
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
+from eduid_userdb.element import PrimaryElementViolation
 from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
@@ -100,7 +101,23 @@ class MobilesActionsView(BaseActionsView):
         self.user = get_session_user(self.request)
         mobiles = self.user.phone_numbers.to_list()
         mobile_to_remove = mobiles[index]
-        self.user.phone_numbers.remove(mobile_to_remove.number)
+
+        try:
+            self.user.phone_numbers.remove(mobile_to_remove.number)
+        except PrimaryElementViolation:
+            # The exception was raised because it would result in zero
+            # primary mobiles while there still exits verified ones.
+            # Therefore we first we have to set one of the other
+            # verified mobiles as primary before we can try to
+            # remove the previous one again.
+            verified_mobiles = self.user.phone_numbers.verified.to_list()
+
+            for mobile in verified_mobiles:
+                if mobile.number != mobile_to_remove.number:
+                    self.user.phone_numbers.primary = mobile.number
+                    break
+
+            self.user.phone_numbers.remove(mobile_to_remove.number)
 
         try:
             self.context.save_dashboard_user(self.user)
