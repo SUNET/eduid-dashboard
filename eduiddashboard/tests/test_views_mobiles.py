@@ -120,6 +120,21 @@ class MobilesFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'success')
         self.assertEqual(0, len(userdb_after['mobile']))
 
+    def test_remove_primary_mobile_and_set_other_verified_to_primary(self):
+        self.set_logged()
+
+        with patch.object(UserDBWrapper, 'exists_by_field', clear=True):
+            UserDBWrapper.exists_by_field.return_value = True
+
+            response = self.testapp.post(
+                '/profile/mobiles-actions/',
+                {'identifier': 0, 'action': 'remove'}
+            )
+
+            # If this test fail we'll get a PrimaryElementViolation
+            # so an assertion for the correct HTTP response code is enough.
+            self.assertEqual(response.status, '200 OK')
+
     def test_remove_not_existant_mobile(self):
         self.set_logged()
         userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
