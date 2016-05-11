@@ -258,7 +258,7 @@ class BaseActionsView(object):
             }
 
     def resend_code_action(self, index, post_data):
-        self.user = get_session_user(request)
+        self.user = get_session_user(self.request)
         data = self.user.to_dict().get(self.data_attribute, [])
 
         # Catch the unlikely event when the user have e.g. removed all entries
