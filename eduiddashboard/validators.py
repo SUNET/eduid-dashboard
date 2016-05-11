@@ -25,8 +25,7 @@ class OldPasswordValidator(object):
         if not request.registry.settings.get('use_vccs', True):
             return
 
-        old_password = value
-        old_password = old_password.replace(" ", "")
+        old_password = value.replace(" ", "")
 
         user = get_session_user(request)
 
@@ -314,7 +313,6 @@ def validate_nin_by_mobile(request, user, nin):
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN
     # Get list of verified mobile numbers
-    verified_mobiles = []
     verified_mobiles = [x.number for x in user.phone_numbers.to_list() if x.is_verified]
 
     national_identity_number = format_NIN(nin)
@@ -404,7 +402,7 @@ class NINRegisteredMobileValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         settings = request.registry.settings
-        user = get_session_user(request, legacy_user = False)
+        user = get_session_user(request)
         result = validate_nin_by_mobile(request, user, value)
 
         if not result['success']:
