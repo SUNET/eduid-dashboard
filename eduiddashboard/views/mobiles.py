@@ -100,7 +100,11 @@ class MobilesActionsView(BaseActionsView):
     def remove_action(self, index, post_data):
         self.user = get_session_user(self.request)
         mobiles = self.user.phone_numbers.to_list()
-        mobile_to_remove = mobiles[index]
+
+        try:
+            mobile_to_remove = mobiles[index]
+        except IndexError:
+            return self.sync_user()
 
         try:
             self.user.phone_numbers.remove(mobile_to_remove.number)
