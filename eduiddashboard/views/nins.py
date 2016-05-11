@@ -369,7 +369,7 @@ class NINsActionsView(BaseActionsView):
         return letter_status(self.request, self.user, nin)
 
     def send_letter_action(self, data, post_data):
-        self.user = get_session_user(request)
+        self.user = get_session_user(self.request)
         nin, index = data.split()
         return send_letter(self.request, self.user, nin)
 
