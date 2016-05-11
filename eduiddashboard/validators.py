@@ -25,10 +25,9 @@ class OldPasswordValidator(object):
         if not request.registry.settings.get('use_vccs', True):
             return
 
-        old_password = value
-        old_password = old_password.replace(" ", "")
+        old_password = value.replace(" ", "")
 
-        user = get_session_user(request, legacy_user = False)
+        user = get_session_user(request)
 
         vccs_url = request.registry.settings.get('vccs_url')
         password = check_password(vccs_url, old_password, user)
@@ -61,13 +60,13 @@ class PasswordValidator(object):
             return
 
         # Get a users e-mail addresses to make sure a user does not use one of those as password
-        user = get_session_user(request, raise_on_not_logged_in = False, legacy_user = True)
+        user = get_session_user(request, raise_on_not_logged_in = False)
         if not user:
             # User is resetting a forgotten password
             hash_code = request.matchdict['code']
             password_reset = request.db.reset_passwords.find_one({'hash_code': hash_code})
-            user = request.userdb.get_user_by_mail(password_reset['email'])
-        mail_addresses = [item['email'] for item in user.get_mail_aliases()]
+            user = request.userdb_new.get_user_by_mail(password_reset['email'])
+        mail_addresses = [item.email for item in user.mail_addresses.to_list()]
 
         veredict = zxcvbn.password_strength(value, user_inputs=mail_addresses)
 
@@ -110,9 +109,10 @@ class EmailUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        user = request.context.user
-        user_emails = [e['email'] for e in user.get_mail_aliases()]
-        user_emails.append(user.get_mail())
+        user = get_session_user(request)
+        user_emails = [e.email for e in user.mail_addresses.to_list()]
+        if user.mail_addresses.primary:
+            user_emails.append(user.mail_addresses.primary.email)
         localizer = get_localizer(request)
 
         if sanitize_post_key(request, 'add') is not None:
@@ -142,12 +142,10 @@ class MobilePhoneUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        user = request.context.user
-        user_mobiles = [m['mobile'] for m in user.get_mobiles()]
-        mobile = {'mobile': normalize_to_e_164(request, value)}
-
+        user = get_session_user(request)
+        mobile = normalize_to_e_164(request, value)
         if sanitize_post_key(request, 'add') is not None:
-            if mobile['mobile'] in user_mobiles:
+            if user.phone_numbers.find(mobile):
                 err = _("This mobile phone was already registered")
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
@@ -170,7 +168,7 @@ class EmailOrUsernameExistsValidator(object):
         else:
             try:
                 request.userdb.get_user_by_email(value)
-            except UserDoesNotExist, e:
+            except UserDoesNotExist as e:
                 if e.args:
                     msg = e.args[0]
                 else:
@@ -211,24 +209,24 @@ class NINUniqueValidator(object):
         value = normalize_nin(copy(value))
 
         request = node.bindings.get('request')
-        user = request.context.user
-        user_nins = user.get_nins()
+        user = get_session_user(request)
+        user_nins = user.nins
 
         unverified_user_nins = request.db.verifications.find({
             'obj_id': value,
             'model_name': 'norEduPersonNIN',
-            'user_oid': user.get_id(),
+            'user_oid': user.user_id,
             'verified': False
         })
 
         # Search the request.POST for any post that starts with "add".
         for post_value in request.POST:
-            if post_value.startswith('add') and (value in user_nins or
+            if post_value.startswith('add') and (user_nins.find(value) or
                                       unverified_user_nins.count() > 0):
                 err = _('National identity number already added')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
-            elif post_value.startswith('add') and len(user_nins) > 0:
+            elif post_value.startswith('add') and user_nins.count > 0:
                 err = _('You already have a confirmed national identity number')
                 raise colander.Invalid(node, get_localizer(request).translate(err))
 
@@ -404,7 +402,7 @@ class NINRegisteredMobileValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         settings = request.registry.settings
-        user = get_session_user(request, legacy_user = False)
+        user = get_session_user(request)
         result = validate_nin_by_mobile(request, user, value)
 
         if not result['success']:
