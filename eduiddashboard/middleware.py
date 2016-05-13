@@ -25,8 +25,8 @@ def reauthn_ts_tween_factory(handler, registry):
             acs_url != referer and
             chp_url != referer and
             request.session.get('re-authn-ts', False)):
-            user = get_session_user(request, legacy_user = True)
-            log.debug('Removing stale Authn ts for user {} '.format(user.get_id()))
+            user = get_session_user(request)
+            log.debug('Removing stale Authn ts for user {!r} '.format(user))
             del request.session['re-authn-ts']
 
         return response
