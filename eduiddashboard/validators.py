@@ -311,7 +311,6 @@ def validate_nin_by_mobile(request, user, nin):
     :type nin: str
     :return:dict
     """
-    user = get_session_user(request)  # XXX remove when the user in args (in context) is newuser
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN
