@@ -303,11 +303,13 @@ def _get_age(nin):
 
 def validate_nin_by_mobile(request, user, nin):
     """
-
-    :param request:
-    :param user: eduid_userdb.User
-    :param nin:
-    :return:
+    :param request: The pyramid request
+    :param user: The eduid user
+    :param nin: The NIN
+    :type request: pyramid.request.Request
+    :type user: eduid_userdb.User
+    :type nin: str
+    :return:dict
     """
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
