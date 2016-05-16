@@ -144,10 +144,34 @@ class MobilePhoneUniqueValidator(object):
         request = node.bindings.get('request')
         user = get_session_user(request)
         mobile = normalize_to_e_164(request, value)
+
+        # The debug logs below were added to help figure out how a user
+        # managed to get by past this function with a duplicated phone number,
+        # which was caught by userdb while saving the user.
+
+        log.debug("User {!r} tried to add a phone number {!r}: "
+                  "entering 1st code-section that will verify that it's unique."
+                  .format(user.eppn, mobile))
+
         if sanitize_post_key(request, 'add') is not None:
+            log.debug("User {!r} tried to add a phone number {!r}: "
+                      "1st code-section evaluated, POST request OK."
+                      .format(user.eppn, mobile))
+
             if user.phone_numbers.find(mobile):
+                log.debug("User {!r} tried to add a phone number {!r}: "
+                          "2nd code-section evaluated, the user had already "
+                          "added the phone number."
+                          .format(user.eppn, mobile))
+
                 err = _("This mobile phone was already registered")
                 raise colander.Invalid(node, get_localizer(request).translate(err))
+
+            else:
+                log.debug("User {!r} tried to add a phone number {!r}: "
+                          "2nd code-section evaluated, the phone number "
+                          "has not previously been added by the user."
+                          .format(user.eppn, mobile))
 
 
 class EmailOrUsernameExistsValidator(object):
