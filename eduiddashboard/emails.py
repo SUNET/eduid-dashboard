@@ -108,7 +108,7 @@ def send_reset_password_mail(request, user, reset_password_link):
 
     site_name = request.registry.settings.get("site.name", "eduID")
     password_reset_timeout = int(request.registry.settings.get("password_reset_timeout", "120")) / 60
-    email = user.get_mail()
+    email = user.mail_addresses.primary.email
 
     context = {
         "email": email,
