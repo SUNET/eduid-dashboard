@@ -14,7 +14,10 @@ from pyramid.renderers import render_to_response, render
 from pyramid.security import authenticated_userid
 from pyramid.view import view_config, forbidden_view_config
 
-from eduid_common.authn.eduid_saml2 import get_authn_request, get_authn_response
+from eduid_common.authn.eduid_saml2 import (get_authn_request,
+                                            get_authn_response,
+                                            BadSAMLResponse)
+
 from eduiddashboard.utils import (sanitize_get,
                                   sanitize_session_get,
                                   sanitize_post_key)
@@ -171,6 +174,11 @@ def assertion_consumer_service(request):
         # If we don't catch this exception a status code 500 will be returned.
         return HTTPFound(location='/')
 
+    except BadSAMLResponse:
+        # Raised by get_authn_response when e.g. an AssertionError is detected,
+        # This would, as in the case of UnsolicitedResponse, result in
+        # a status code 500 being returned if not caught.
+        return HTTPFound(location='/')
 
     log.debug('Trying to locate the user authenticated by the IdP')
 
