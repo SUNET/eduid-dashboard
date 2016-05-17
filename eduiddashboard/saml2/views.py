@@ -2,6 +2,7 @@ from saml2 import BINDING_HTTP_REDIRECT
 from saml2.client import Saml2Client
 from saml2.metadata import entity_descriptor
 from saml2.response import LogoutResponse
+from saml2.response import UnsolicitedResponse
 from saml2.ident import code, decode
 
 
@@ -160,8 +161,16 @@ def assertion_consumer_service(request):
         raise HTTPBadRequest("Couldn't find 'SAMLResponse' in POST data.")
     xmlstr = request.POST['SAMLResponse']
 
-    session_info = get_authn_response(request.registry.settings,
-                                      request.session, xmlstr)
+    try:
+        session_info = get_authn_response(request.registry.settings,
+                                          request.session, xmlstr)
+    except UnsolicitedResponse:
+        # When the user has either cleared her/his cookies, closed and opened
+        # the browser, or in some other way lost the session information needed
+        # an UnsolicitedResponse is raised.
+        # If we don't catch this exception a status code 500 will be returned.
+        return HTTPFound(location='/')
+
 
     log.debug('Trying to locate the user authenticated by the IdP')
 
