@@ -1,4 +1,8 @@
 import logging
+import urlparse
+from urllib import urlencode
+
+from pyramid.httpexceptions import HTTPFound
 
 from eduiddashboard.session import get_session_user
 
@@ -32,3 +36,26 @@ def reauthn_ts_tween_factory(handler, registry):
         return response
 
     return clean_reauthn_ts_from_session
+
+
+def authn_tween_factory(handler, registry):
+
+    def check_authn(request):
+        settings = registry.settings
+        cookie_name = settings.get('SESSION_COOKIE_NAME')
+        if request.cookies and cookie_name in request.cookies:
+            return handler(request)
+        ts_url = settings.get('token_service_url')
+        next_url = request.url
+
+        params = {'next': next_url}
+
+        url_parts = list(urlparse.urlparse(ts_url))
+        query = urlparse.parse_qs(url_parts[4])
+        query.update(params)
+
+        url_parts[4] = urlencode(query)
+        location = urlparse.urlunparse(url_parts)
+
+        return HTTPFound(location=location)
+    return check_authn
