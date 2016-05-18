@@ -319,7 +319,7 @@ def set_email_verified(request, user, new_mail):
     log.info('Mail address verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mail_stolen', steal_count)
     request.stats.count('dashboard/verify_mail_completed', 1)
-    return _('Email {obj} verified'.format(obj=new_mail))
+    return _('Email {obj} verified')
 
 
 def _remove_mail_from_user(email, user):
