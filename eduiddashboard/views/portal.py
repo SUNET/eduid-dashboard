@@ -273,19 +273,19 @@ def account_termination_action(request, session_info, user):
     settings = request.registry.settings
     logged_user = get_logged_in_user(request, legacy_user = True)
 
-    if logged_user.get_id() != user.get_id():
+    if logged_user.get_id() != user.user_id:
         raise HTTPUnauthorized("Wrong user")
 
     logger.info("Terminating user {!s}".format(user))
 
     # revoke all user credentials
-    revoke_all_credentials(settings.get('vccs_url'), user)
-    user.set_passwords([])
+    revoke_all_credentials(settings.get('vccs_url'), logged_user)
+    logged_user.set_passwords([])
 
     # flag account as terminated
-    user.set_terminated()
-    user.save(request, check_sync=False)
-    request.context.propagate_user_changes(user)
+    logged_user.set_terminated()
+    logged_user.save(request, check_sync=False)
+    request.context.propagate_user_changes(logged_user)
 
     # email the user
     send_termination_mail(request, user)
