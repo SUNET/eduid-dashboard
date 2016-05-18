@@ -19,6 +19,7 @@
 
 from pyramid.security import remember, forget
 
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
 from eduiddashboard.saml2.utils import get_saml_attribute
 from eduiddashboard.session import store_session_user, get_logged_in_user
@@ -107,13 +108,13 @@ def authenticate(request, session_info):
 
     log.debug('Looking for user with eduPersonPrincipalName == {!r}'.format(saml_user))
     try:
-        user = request.userdb.get_user_by_eppn(saml_user)
+        user = request.userdb_new.get_user_by_eppn(saml_user)
     except request.userdb.exceptions.UserDoesNotExist:
         log.error('No user with eduPersonPrincipalName = {!r} found'.format(saml_user))
     except request.userdb.exceptions.MultipleUsersReturned:
         log.error("There are more than one user with eduPersonPrincipalName = {!r}".format(saml_user))
     else:
-        user.retrieve_modified_ts(request.db.profiles)
+        retrieve_modified_ts(user, request.dashboard_userdb)
         return user
     return None
 
@@ -127,14 +128,14 @@ def login(request, session_info, user):
     :param user: Information about user as returned by authenticate()
     :return:
     """
-    log.info("User {!r} logging in (eduPersonPrincipalName: {!r})".format(user['_id'], user['eduPersonPrincipalName']))
-    request.session['eduPersonPrincipalName'] = user['eduPersonPrincipalName']
+    log.info("User {!r} logging in (eduPersonPrincipalName: {!r})".format(user, user.eppn))
+    request.session['eduPersonPrincipalName'] = user.eppn
     store_session_user(request, user)
     request.session['eduPersonAssurance'] = get_loa(
         request.registry.settings.get('available_loa'),
         session_info
     )
-    remember_headers = remember(request, user['eduPersonPrincipalName'])
+    remember_headers = remember(request, user.eppn)
     return remember_headers
 
 
@@ -148,7 +149,7 @@ def logout(request):
     if request.session is not None:
         user = get_logged_in_user(request, raise_on_not_logged_in = False, legacy_user = True)
         if user:
-            log.info("User {!r} logging out".format(user.get_id()))
+            log.info("User {!r} logging out".format(user))
         request.session.delete()
 
     headers = forget(request)

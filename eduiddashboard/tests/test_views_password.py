@@ -7,6 +7,7 @@ import simplejson as json
 import vccs_client
 import pytz
 
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
@@ -215,13 +216,14 @@ class TerminateAccountTests(LoggedInRequestTests):
         email = 'johnsmith@example.com'
         # Set up a bunch of faked passwords to make sure they are all revoked
         user = self.userdb_new.get_user_by_mail(email)
+        retrieve_modified_ts(user, self.dashboard_db)
         for i in range(7):
             pw = Password(credential_id=ObjectId(),
                           salt=str(i) * 64,
                           application='dashboard_unittest',
                           )
             user.passwords.add(pw)
-        self.userdb_new.save(user)
+        self.dashboard_db.save(user)
 
         logging.log(logging.DEBUG, "Fetching /profile/security\n\n" + ('-=-' * 30) + "\n\n")
 
@@ -230,7 +232,7 @@ class TerminateAccountTests(LoggedInRequestTests):
         form = response.forms['terminate-account-form']
 
         # Verify the user has eight passwords
-        user = self.userdb_new.get_user_by_mail(email)
+        user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(len(user.passwords.to_list_of_dicts()), 8)
 
         logging.log(logging.DEBUG, "Submitting termination request\n\n" + ('-=-' * 30) + "\n\n")
@@ -256,7 +258,7 @@ class TerminateAccountTests(LoggedInRequestTests):
                     request.POST['RelayState'] = '/profile/account-terminated/'
                     request.context.propagate_user_changes = lambda x: None
                     from eduiddashboard.views.portal import account_termination_action
-                    user = self.userdb.get_user_by_mail(email)
+                    user = self.userdb_new.get_user_by_mail(email)
                     account_termination_action(request, FAKE_SESSION_INFO, user)
 
         # Verify the user doesn't have ANY passwords and IS terminated at this point
