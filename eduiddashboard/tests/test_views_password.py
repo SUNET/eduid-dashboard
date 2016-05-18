@@ -215,7 +215,7 @@ class TerminateAccountTests(LoggedInRequestTests):
     def test_reset_password_unterminates_account(self):
         email = 'johnsmith@example.com'
         # Set up a bunch of faked passwords to make sure they are all revoked
-        user = self.dashboard_db.get_user_by_mail(email)
+        user = self.userdb_new.get_user_by_mail(email)
         retrieve_modified_ts(user, self.dashboard_db)
         for i in range(7):
             pw = Password(credential_id=ObjectId(),
