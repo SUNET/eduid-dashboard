@@ -9,6 +9,7 @@ from pyramid.httpexceptions import HTTPNotFound, HTTPNotImplemented
 from pyramid.i18n import get_localizer
 
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.nin import Nin
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
@@ -17,8 +18,12 @@ from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
 from eduiddashboard.verifications import set_nin_verified, new_verification_code, save_as_verified
+<<<<<<< HEAD
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
 from eduid_userdb import User
+=======
+from eduid_userdb.dashboard import DashboardUser
+>>>>>>> 08e65cd
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import get_session_user
 
@@ -138,6 +143,19 @@ def get_verified_nins(user):
     user_nins = user.nins.to_list()
     verified_nins = [nin.number for nin in user_nins if nin.is_verified]
     return verified_nins
+
+
+def get_active_nin(self):
+    nins = self.user.nins.to_list()
+    if self.user.nins.verified.count:
+        return self.user.nins.primary.number
+    elif nins:
+        nin = nins[-1]
+        if isinstance(nin, basestring):
+            return nin
+        return nin.number
+    else:
+        return None
 
 
 def letter_status(request, user, nin):
@@ -584,21 +602,20 @@ class NinsView(BaseFormView):
             })
 
         if old_user:
-            old_user = OldUser(old_user)
-            old_user.retrieve_modified_ts(self.request.db.profiles)
-            nins = [nin for nin in old_user.get_nins() if nin != newnin]
-            old_user.set_nins(nins)
-            addresses = [a for a in old_user.get_addresses() if not a['verified']]
-            old_user.set_addresses(addresses)
-            old_user.save(self.request)
+            old_user = DashboardUser(data=old_user)
+            retrieve_modified_ts(old_user, self.request.dashboard_userdb)
+            old_user.nins.remove(newnin)
+            self.context.save_dashboard_user(old_user)
 
-        nins = self.user.get_nins()
-        nins.append(newnin)
-        self.user.set_nins(nins)
-        self.user.retrieve_address(self.request, newnin)
+        primary = False
+        if self.user.nins.count == 0:
+            primary = True
+        newnin_obj = Nin(number=newnin, application='dashboard',
+                verified=True, primary=primary)
+        self.user.nins.add(newnin_obj)
 
         try:
-            self.user.save(self.request)
+            self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
             message = _('Your user profile is out of sync. Please '
                         'reload the page and try again.')

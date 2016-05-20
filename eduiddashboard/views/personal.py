@@ -9,7 +9,6 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 
 from eduiddashboard.views import BaseFormView
-from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
