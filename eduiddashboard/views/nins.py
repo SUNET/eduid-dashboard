@@ -18,12 +18,7 @@ from eduiddashboard.views import BaseFormView, BaseActionsView
 from eduiddashboard import log
 from eduiddashboard.validators import validate_nin_by_mobile
 from eduiddashboard.verifications import set_nin_verified, new_verification_code, save_as_verified
-<<<<<<< HEAD
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
-from eduid_userdb import User
-=======
 from eduid_userdb.dashboard import DashboardUser
->>>>>>> 08e65cd
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import get_session_user
 
