@@ -140,19 +140,6 @@ def get_verified_nins(user):
     return verified_nins
 
 
-def get_active_nin(self):
-    nins = self.user.nins.to_list()
-    if self.user.nins.verified.count:
-        return self.user.nins.primary.number
-    elif nins:
-        nin = nins[-1]
-        if isinstance(nin, basestring):
-            return nin
-        return nin.number
-    else:
-        return None
-
-
 def letter_status(request, user, nin):
     settings = request.registry.settings
     letter_url = settings.get('letter_service_url')
