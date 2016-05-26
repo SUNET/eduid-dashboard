@@ -56,9 +56,14 @@ def profile_editor(context, request):
 
     enable_mm = request.registry.settings.get('enable_mm_verification')
 
+    if context.main_attribute == 'mail' and session_user.mail_addresses.primary:
+        userid = session_user.mail_addresses.primary.email
+    else:
+        userid =  session_user.eppn
+
     view_context = {
         'tabs': tabs,
-        'userid': context.user.get(context.main_attribute),
+        'userid': userid,
         'user': context.user.get_doc(),
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
@@ -190,12 +195,16 @@ def token_login(context, request):
 
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
-        user = request.userdb.get_user_by_eppn(eppn)
+        user = request.userdb_new.get_user_by_eppn(eppn)
         # these seem to be unused -- ft@ 2016-01-14
         #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
         #request.session['loa'] = 1
         store_session_user(request, user)
-        remember_headers = remember(request, user.get('email'))
+        if user.mail_addresses.primary:
+            userid = user.mail_addresses.primary.email
+        else:
+            userid = eppn
+        remember_headers = remember(request, userid)
         request.stats.count('dashboard/token_login_success', 1)
         return HTTPFound(location=next_url, headers=remember_headers)
     else:
@@ -271,24 +280,24 @@ def account_termination_action(request, session_info, user):
     :type user: eduid_userdb.dashboard.DashboardLegacyUser
     """
     settings = request.registry.settings
-    logged_user = get_logged_in_user(request, legacy_user = True)
+    logged_user = get_logged_in_user(request, legacy_user = False)
 
-    if logged_user.get_id() != user.user_id:
+    if logged_user.user_id != user.user_id:
         raise HTTPUnauthorized("Wrong user")
 
     logger.info("Terminating user {!s}".format(user))
 
     # revoke all user credentials
-    revoke_all_credentials(settings.get('vccs_url'), logged_user)
-    logged_user.set_passwords([])
+    revoke_all_credentials(settings.get('vccs_url'), user)
+    for p in logged_user.passwords.to_list():
+        logged_user.passwords.remove(p.id)
 
     # flag account as terminated
-    logged_user.set_terminated()
-    logged_user.save(request, check_sync=False)
-    request.context.propagate_user_changes(logged_user)
+    logged_user.terminated = True
+    request.context.save_dashboard_user(logged_user)
 
     # email the user
-    send_termination_mail(request, user)
+    send_termination_mail(request, logged_user)
 
     logger.debug("Logging out after terminating user {!s}".format(user))
     # logout

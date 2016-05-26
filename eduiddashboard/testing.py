@@ -15,7 +15,7 @@ from webtest import TestApp, TestRequest
 
 from pyramid.interfaces import ISessionFactory, IDebugLogger
 from pyramid.security import remember
-from pyramid.testing import DummyRequest, DummyResource
+from pyramid.testing import DummyRequest, DummyResource as PyramidDummyResource
 from pyramid import testing
 
 import pymongo
@@ -30,11 +30,16 @@ from eduiddashboard import main as eduiddashboard_main
 from eduiddashboard.msgrelay import MsgRelay
 from eduiddashboard.session import store_session_user
 from eduiddashboard.loa import AVAILABLE_LOA_LEVEL
+from eduiddashboard.permissions import BaseFactory
 
 from eduid_am.celery import celery, get_attribute_manager
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+class DummyResource(PyramidDummyResource, BaseFactory):
+    pass
 
 
 SETTINGS = {
@@ -262,9 +267,11 @@ class LoggedInRequestTests(MongoTestCase):
     def dummy_request(self, cookies={}):
         request = DummyRequest()
         request.context = DummyResource()
+        request.context.request = request
         request.userdb = self.userdb
         request.userdb_new = self.userdb_new
         request.db = self.db
+        request.dashboard_userdb = self.dashboard_db
         request.registry.settings = self.settings
 
         def propagate_user_changes(user):
