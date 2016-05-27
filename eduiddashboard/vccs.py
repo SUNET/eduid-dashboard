@@ -162,11 +162,10 @@ def provision_credentials(vccs_url, new_password, user):
     new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                 credential_id=str(password_id))
 
-    passwords = user.get_passwords()
-
     if not vccs.add_credentials(str(user.get_id()), [new_factor]):
         return False  # something failed
 
+    passwords = user.get_passwords()
     passwords.append({
         'id': password_id,
         'salt': new_factor.salt,

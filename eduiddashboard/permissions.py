@@ -5,11 +5,12 @@ from pyramid.security import (Allow, Deny, Authenticated, Everyone,
                               ALL_PERMISSIONS)
 from pyramid.security import forget, authenticated_userid
 from eduiddashboard.i18n import TranslationString as _
+from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import (get_session_user, get_logged_in_user,
                                     has_logged_in_user, has_edit_user,
                                     store_session_user)
 
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
+from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb import User
 
 import logging
@@ -87,7 +88,7 @@ class BaseFactory(RootFactory):
     #user = None
 
     def __init__(self, request):
-        user = get_logged_in_user(request, legacy_user = True, raise_on_not_logged_in = False)
+        user = get_logged_in_user(request, legacy_user = False, raise_on_not_logged_in = False)
         if user is None:
             headers = forget(request)
             url = request.route_path('saml2-login')
@@ -163,11 +164,11 @@ class BaseFactory(RootFactory):
         '/users/{userid}/'.
 
         :return: User object
-        :rtype: DashboardLegacyUser
+        :rtype: DashboardUser
         """
         if self.workmode == 'personal':
-            #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
-            user = self._logged_in_user
+            user = get_logged_in_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
+            self._logged_in_user = user
             if not user:
                 user = OldUser({})
         elif self.workmode == 'admin' or self.workmode == 'helpdesk':
@@ -176,14 +177,14 @@ class BaseFactory(RootFactory):
                 userid = self.request.matchdict.get('userid', '')
                 logger.debug('get_user() looking for user matching {!r}'.format(userid))
                 if EMAIL_RE.match(userid):
-                    user = self.request.userdb.get_user_by_mail(userid)
+                    user = self.request.userdb_new.get_user_by_mail(userid)
                 elif OID_RE.match(userid):
-                    user = self.request.userdb.get_user_by_oid(userid)
+                    user = self.request.userdb_new.get_user_by_oid(userid)
                 if not user:
                     raise HTTPNotFound()
                 logger.debug('get_user() storing user {!r}'.format(user))
                 store_session_user(self.request, user, edit_user = True)
-            user = get_session_user(self.request, legacy_user = True)
+            user = get_session_user(self.request)
         else:
             raise NotImplementedError("Unknown workmode: {!s}".format(self.workmode))
 
@@ -204,36 +205,29 @@ class BaseFactory(RootFactory):
                 'personal_dashboard_base_url', None)
             if app_url:
                 kw['_app_url'] = app_url
-            userid = self.user.get_id()
+            userid = self.user.user_id
             return self.request.route_url(route, userid=userid, **kw)
 
     def update_context_user(self):
         # XXX what is this context user???
         logger.notice('UPDATE CONTEXT USER CALLED')
         raise NotImplementedError('update_context_user UN-implemented')
-        eppn = self.user.get('eduPersonPrincipalName')
-        self.user = self.request.userdb.get_user_by_eppn(eppn)
-        self.user.retrieve_modified_ts(self.request.db.profiles)
-
-    def propagate_user_changes(self, newuser):
-        logger.debug('Base factory propagate_user_changes')
-        return self.request.amrelay.request_sync(newuser)
+        eppn = self.user.eppn
+        self.user = self.request.userdb_new.get_user_by_eppn(eppn)
+        retrieve_modified_ts(self.user, self.request.dashboard_userdb)
 
     def get_groups(self, userid=None, request=None):
         #user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
         user = self._logged_in_user
-        if not user:
-            logger.debug("No logged in user found in session (userid {!r})".format(userid))
-            user = OldUser({})
         permissions_mapping = self.request.registry.settings.get(
             'permissions_mapping', {})
         required_urn = permissions_mapping.get(self.workmode, '')
         if required_urn is '':
             return ['']
-        if required_urn in user.get_entitlements():
+        if required_urn in user.entitlements:
             return [self.workmode]
         logger.debug("Required URN {!r} not found in user {!r} entitlements: {!r}".format(
-            required_urn, user, user.get_entitlements()))
+            required_urn, user, user.entitlements))
         return []
 
     def get_loa(self):
@@ -244,10 +238,7 @@ class BaseFactory(RootFactory):
         max_loa = self.request.session.get('eduPersonIdentityProofing', None)
         if max_loa is None:
             user = self.get_user()
-            if not user:
-                user = OldUser({})
-
-            max_loa = self.request.userdb.get_identity_proofing(user)
+            max_loa = self.request.userdb_new.get_identity_proofing(user)
             self.request.session['eduPersonIdentityProofing'] = max_loa
 
         return max_loa
@@ -264,20 +255,22 @@ class BaseFactory(RootFactory):
 
     def session_user_display(self):
         user = self.get_user()
-        display_name = user.get_display_name()
+        display_name = user.display_name
         if display_name:
             return display_name
 
-        gn = user.get_given_name()
-        sn = user.get_sn()
+        gn = user.given_name
+        sn = user.surname
         if gn and sn:
             return "{0} {1}".format(gn, sn)
 
-        return user.get_mail()
+        if user.mail_addresses.primary is not None:
+            return user.mail_addresses.primary.email
+        return user.eppn
 
     def get_preferred_language(self):
         """ Return always a """
-        lang = self.get_user().get_preferred_language()
+        lang = self.get_user().language
         if lang is not None:
             return lang
         available_languages = self.request.registry.settings.get('available_languages', {}).keys()

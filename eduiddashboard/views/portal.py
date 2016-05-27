@@ -27,8 +27,7 @@ from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
-from eduiddashboard.session import (store_session_user, get_logged_in_user,
-                                    get_session_user)
+from eduiddashboard.session import store_session_user, get_logged_in_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -40,9 +39,6 @@ def profile_editor(context, request):
     """
         Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
-
-    session_user = get_session_user(request)
-
     view_context = {}
 
     tabs = get_available_tabs(context, request)
@@ -56,22 +52,22 @@ def profile_editor(context, request):
 
     enable_mm = request.registry.settings.get('enable_mm_verification')
 
-    if context.main_attribute == 'mail' and session_user.mail_addresses.primary:
-        userid = session_user.mail_addresses.primary.email
+    if context.main_attribute == 'mail' and context.user.mail_addresses.primary:
+        userid = context.user.mail_addresses.primary.email
     else:
-        userid =  session_user.eppn
+        userid =  context.user.eppn
 
     view_context = {
         'tabs': tabs,
         'userid': userid,
-        'user': context.user.get_doc(),
+        'user': context.user,
         'profile_filled': profile_filled,
         'pending_actions': pending_actions,
         'workmode': context.workmode,
         'max_loa': max_loa,
         'polling_timeout_for_admin': request.registry.settings.get(
             'polling_timeout_for_admin', 2000),
-        'has_mobile': has_confirmed_mobile(session_user),
+        'has_mobile': has_confirmed_mobile(context.user),
         'enable_mm_verification': enable_mm,
     }
     if enable_mm:
@@ -175,7 +171,7 @@ def help(context, request):
     support_email = request.registry.settings.get('mail.support_email',
                                                   'support@eduid.se')
     template_context = {
-        'user':context.user.get_doc(),
+        'user':context.user.to_dict(),
         'support_email': support_email
     }
 
@@ -196,9 +192,6 @@ def token_login(context, request):
     if verify_auth_token(shared_key, eppn, token, nonce, timestamp):
         # Do the auth
         user = request.userdb_new.get_user_by_eppn(eppn)
-        # these seem to be unused -- ft@ 2016-01-14
-        #request.session['mail'] = user.get('email'),    # XXX setting this to a tuple? Guessing it is not used
-        #request.session['loa'] = 1
         store_session_user(request, user)
         if user.mail_addresses.primary:
             userid = user.mail_addresses.primary.email
@@ -337,9 +330,8 @@ def terminate_account(context, request):
              renderer='templates/nins-verification-chooser.jinja2',
              request_method='GET', permission='edit')
 def nins_verification_chooser(context, request):
-    user =  get_session_user(request)
     return {
-            'has_mobile': has_confirmed_mobile(user),
+            'has_mobile': has_confirmed_mobile(context.user),
             }
 
 
