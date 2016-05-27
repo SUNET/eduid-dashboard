@@ -65,7 +65,14 @@ class PasswordValidator(object):
             # User is resetting a forgotten password
             hash_code = request.matchdict['code']
             password_reset = request.db.reset_passwords.find_one({'hash_code': hash_code})
-            user = request.userdb_new.get_user_by_mail(password_reset['email'])
+
+            if password_reset.get('eppn'):
+                user = request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+            # Legacy password reset codes were connected to the user by email
+            elif password_reset.get('email'):
+                user = request.userdb_new.get_user_by_mail(password_reset['email'])
+
         mail_addresses = [item.email for item in user.mail_addresses.to_list()]
 
         veredict = zxcvbn.password_strength(value, user_inputs=mail_addresses)

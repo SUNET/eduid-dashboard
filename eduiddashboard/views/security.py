@@ -68,12 +68,20 @@ def change_password(request, user, old_password, new_password):
 def new_reset_password_code(request, user, mechanism='email', next_view='reset-password-step2'):
     hash_code = get_unique_hash()
     date = datetime.now(pytz.utc)
+
+    # Remove previous password reset codes
     request.db.reset_passwords.remove({
-        'email': user.eppn
+        'eppn': user.eppn
     })
 
+    # Also remove legacy password reset codes
+    if user.mail_addresses.primary:
+        request.db.reset_passwords.remove({
+            'email': user.mail_addresses.primary.email
+        })
+
     reset_doc = {
-        'email': user.eppn,
+        'eppn': user.eppn,
         'hash_code': hash_code,
         'mechanism': mechanism,
         'created_at': date,
@@ -625,7 +633,14 @@ class ResetPasswordMobileView2(BaseResetPasswordView):
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
         if password_reset.get('mobile_hash_code') == form_data['mobile_code']:
             self.request.db.reset_passwords.update(password_reset, {'$set': {'mobile_hash_code_verified': True}})
-            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
+            if password_reset.get('eppn'):
+                user = self.request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+            # Legacy password reset codes were connected to the user by email
+            elif password_reset.get('email'):
+                user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
             log.debug('Mobile password reset code verified for user {!r}'.format(user))
             return HTTPFound(self.request.route_path('reset-password-step2', code=hash_code))
         log.debug('Mobile password reset code verification failed for password reset document {!r}'.format(
@@ -662,7 +677,14 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         # Collect the users mail addresses for use with zxcvbn
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
+        if password_reset.get('eppn'):
+            user = self.request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+        # Legacy password reset codes were connected to the user by email
+        elif password_reset.get('email'):
+            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
         mail_addresses = []
         for item in user.mail_addresses.to_list():
             mail_addresses.append(item.email)
@@ -709,7 +731,13 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
+        if password_reset.get('eppn'):
+            user = self.request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+        # Legacy password reset codes were connected to the user by email
+        elif password_reset.get('email'):
+            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
 
         log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 
