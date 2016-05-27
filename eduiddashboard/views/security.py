@@ -199,7 +199,14 @@ def remove_user_mobiles(request, user):
     for mobile in user.phone_numbers.verified.to_list():
         if not mobile.is_primary:
             user.phone_numbers.remove(mobile.number)
-    user.phone_numbers.remove(user.phone_numbers.primary.number)
+
+    if len(user.phone_numbers.verified.to_list()) != 0:
+        # One of the verified phone numbers were primary and
+        # since this is a PrimaryElementList we have to remove
+        # it last.
+        user.phone_numbers.remove(user.phone_numbers.primary.number)
+
+    # This is the equivalent code for old users
     for mobile in user.phone_numbers.to_list():
         user.phone_numbers.remove(mobile.number)
     request.context.save_dashboard_user(user)
