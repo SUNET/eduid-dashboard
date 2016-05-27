@@ -37,7 +37,8 @@ class PermissionsView(BaseFormView):
 
     def get_template_context(self):
         tempcontext = super(PermissionsView, self).get_template_context()
-        if self.context.user.get('eduPersonPrincipalName') == self.user.eppn:
+        session_user = get_session_user(self.request, raise_on_not_logged_in = False)
+        if self.context.user.eppn == session_user.eppn:
             tempcontext['confirmation_required'] = True
         else:
             tempcontext['confirmation_required'] = False
