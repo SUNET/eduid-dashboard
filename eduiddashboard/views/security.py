@@ -761,6 +761,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                 retrieve_modified_ts(user, self.request.dashboard_userdb)
                 # We need to unverify a users phone numbers to make sure that an attacker can not
                 # verify the account again without control over the users phone number
+                # This should be changed to only unverify the phone numbers instead of removing them.
                 remove_user_mobiles(self.request, user)
 
         # Save new password
