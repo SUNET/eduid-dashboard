@@ -2,10 +2,8 @@ import json
 from bson import ObjectId
 
 from mock import patch
-import unittest
 
 from eduid_userdb.dashboard import UserDBWrapper
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard.msgrelay import MsgRelay
@@ -98,10 +96,10 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_remove_existant_mobile(self):
         self.set_logged()
-        user = self.dashboard_db.get_user_by_id(self.user.get_id())
+        user = self.dashboard_db.get_user_by_id(self.user.user_id)
         mobiles_number = user.phone_numbers.count
         response = self._remove_existant_mobile()
-        user_after = self.dashboard_db.get_user_by_id(self.user.get_id())
+        user_after = self.dashboard_db.get_user_by_id(self.user.user_id)
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
         self.assertEqual(mobiles_number - 1, user_after.phone_numbers.count)
@@ -115,7 +113,7 @@ class MobilesFormTests(LoggedInRequestTests):
             '/profile/mobiles-actions/',
             {'identifier': 0, 'action': 'remove'}
         )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
         self.assertEqual(0, len(userdb_after['mobile']))
@@ -137,21 +135,21 @@ class MobilesFormTests(LoggedInRequestTests):
 
     def test_remove_not_existant_mobile(self):
         self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
+        userdb = self.db.profiles.find({'_id': self.user.user_id})[0]
         mobiles_number = len(userdb['mobile'])
 
-        self.testapp.post(
-            '/profile/mobiles-actions/',
-            {'identifier': 10, 'action': 'remove'}
-        )
-
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        with self.assertRaises(IndexError):
+            self.testapp.post(
+                '/profile/mobiles-actions/',
+                {'identifier': 10, 'action': 'remove'}
+            )
+        userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
         self.assertEqual(mobiles_number, len(userdb_after['mobile']))
 
     def test_verify_not_existing_mobile(self):
         self.set_logged()
 
-        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user.user_id)
         old_phones = old_user.phone_numbers.to_list_of_dicts()
         amount_of_phone_numbers = len(old_phones)
 
@@ -163,41 +161,41 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user.user_id)
         updated_phones = updated_user.phone_numbers.to_list_of_dicts()
 
         self.assertEqual(old_phones, updated_phones)
 
     def test_verify_not_existing_code(self):
         self.set_logged()
-        userdb = self.db.profiles.find({'_id': self.user['_id']})[0]
+        userdb = self.db.profiles.find({'_id': self.user.user_id})[0]
         verified_mobile = userdb['mobile'][1]
         self.assertEqual(verified_mobile['verified'], False)
         self.testapp.post(
             '/profile/mobiles-actions/',
             {'identifier': 1, 'code': 'not_existing_code', 'action': 'verify'}
         )
-        userdb_after = self.db.profiles.find({'_id': self.user['_id']})[0]
+        userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
         verified_mobile = userdb_after['mobile'][1]
         self.assertEqual(verified_mobile['verified'], False)
 
     def test_verify_existing_mobile(self):
         self.set_logged()
-        user = self.dashboard_db.get_user_by_id(self.user.get_id())
+        user = self.dashboard_db.get_user_by_id(self.user.user_id)
         verified_mobile = user.phone_numbers.to_list()[1]
         self.assertFalse(verified_mobile.is_verified)
         self.testapp.post(
             '/profile/mobiles-actions/',
             {'identifier': 1, 'code': '9d392c', 'action': 'verify'}
         )
-        user = self.dashboard_db.get_user_by_id(self.user.get_id())
+        user = self.dashboard_db.get_user_by_id(self.user.user_id)
         verified_mobile = user.phone_numbers.to_list()[1]
         self.assertTrue(verified_mobile.is_verified)
 
     def test_setprimary_nonexistent_mobile(self):
         self.set_logged()
 
-        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user.user_id)
 
         old_phones = old_user.phone_numbers.to_list_of_dicts()
         amount_of_phone_numbers = len(old_phones)
@@ -210,7 +208,7 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'out_of_sync')
 
-        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user.user_id)
         updated_phones = updated_user.phone_numbers.to_list_of_dicts()
 
         self.assertEqual(old_phones, updated_phones)
@@ -219,7 +217,7 @@ class MobilesFormTests(LoggedInRequestTests):
         self.set_logged()
         index = 1
 
-        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user.user_id)
         old_primary_phone = old_user.phone_numbers.primary.number
         phone_to_test = old_user.phone_numbers.find('+34 6096096096')
 
@@ -239,7 +237,7 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'bad')
 
-        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user.user_id)
         updated_primary_mobile = updated_user.phone_numbers.primary.number
 
         self.assertEqual(old_primary_phone, updated_primary_mobile)
@@ -248,7 +246,7 @@ class MobilesFormTests(LoggedInRequestTests):
         self.set_logged()
         index = 2
 
-        old_user = self.userdb_new.get_user_by_id(self.user['_id'])
+        old_user = self.userdb_new.get_user_by_id(self.user.user_id)
         phone_to_test = old_user.phone_numbers.find('+34607507507')
 
         # Make sure that the phone number that we are
@@ -267,7 +265,7 @@ class MobilesFormTests(LoggedInRequestTests):
         response_json = json.loads(response.body)
         self.assertEqual(response_json['result'], 'success')
 
-        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user.user_id)
         updated_phone_to_test = updated_user.phone_numbers.find('+34607507507')
 
         self.assertEqual(updated_phone_to_test.is_primary, True)
@@ -291,9 +289,9 @@ class MobilesFormTests(LoggedInRequestTests):
             self.assertEqual(response.status, '200 OK')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = OldUser(old_user)
+        old_user = DashboardUser(data=old_user)
 
-        self.assertIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])
+        self.assertIn(mobile, [mo.number for mo in old_user.phone_numbers.to_list()])
 
         mobile_doc = self.db.verifications.find_one({
             'model_name': 'mobile',
@@ -315,6 +313,6 @@ class MobilesFormTests(LoggedInRequestTests):
                 self.assertEqual(response_json['result'], 'success')
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = OldUser(old_user)
+        old_user = DashboardUser(data=old_user)
 
-        self.assertNotIn(mobile, [mo['mobile'] for mo in old_user.get_mobiles()])
+        self.assertNotIn(mobile, [mo.number for mo in old_user.phone_numbers.to_list()])

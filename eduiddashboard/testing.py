@@ -23,7 +23,6 @@ import redis
 from bson import ObjectId
 
 from eduid_userdb import UserDB
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduid_userdb.dashboard import DashboardUserDB, DashboardUser
 from eduid_userdb.testing import MongoTestCase
 from eduiddashboard import main as eduiddashboard_main
@@ -212,13 +211,6 @@ class LoggedInRequestTests(MongoTestCase):
         self.config.registry.settings = self.settings
         self.config.registry.registerUtility(self, IDebugLogger)
 
-        self.userdb = app.registry.settings['userdb']
-        _userdoc = self.userdb.get_user_by_mail(std_user)
-        self.assertIsNotNone(_userdoc, "Could not load the standard test user {!r} from the database {!s}".format(
-            std_user, self.userdb))
-        self.user = OldUser(data=_userdoc)
-        self.logged_in_user = None
-
         #self.db = get_db(self.settings)
         self.db = app.registry.settings['mongodb'].get_database('eduid_dashboard')    # central userdb, raw mongodb
         self.userdb_new = UserDB(self.mongodb_uri(''), 'eduid_am')   # central userdb in new format (User)
@@ -229,13 +221,16 @@ class LoggedInRequestTests(MongoTestCase):
         self.db.verifications.drop()
         self.db.reset_passwords.drop()
 
+        self.user = self.userdb_new.get_user_by_mail(std_user)
+        self.assertIsNotNone(self.user, "Could not load the standard test user {!r} from the database {!s}".format(
+            std_user, self.userdb_new))
+        self.logged_in_user = None
+
         # Copy all the users from the eduid userdb into the dashboard applications userdb
         # since otherwise the out-of-sync check will trigger on every save to the dashboard
         # applications database because there is no document there with the right modified_ts
-        for userdoc in self.userdb._get_all_docs():
-            logger.debug("Copying user {!r}\nfrom {!r}\nto {!r}:\n{!s}".format(userdoc.get('eduPersonPrincipalName'),
-                                                                               self.userdb, self.db.profiles,
-                                                                               pprint.pformat(userdoc)))
+        for userdoc in self.userdb_new._get_all_docs():
+            logger.debug("COPYING USER INTO PROFILES:\n{!s}".format(userdoc))
             self.db.profiles.insert(userdoc)
 
         self.initial_verifications = (getattr(self, 'initial_verifications', None)
@@ -250,7 +245,7 @@ class LoggedInRequestTests(MongoTestCase):
         super(LoggedInRequestTests, self).tearDown()
         logger.debug("tearDown: Dropping profiles, verifications and reset_passwords from {!s}".format(self.db))
         for userdoc in self.db.profiles.find({}):
-            assert OldUser(userdoc)
+            assert DashboardUser(data=userdoc)
         self.db.profiles.drop()
         self.db.verifications.drop()
         self.db.reset_passwords.drop()
@@ -268,7 +263,6 @@ class LoggedInRequestTests(MongoTestCase):
         request = DummyRequest()
         request.context = DummyResource()
         request.context.request = request
-        request.userdb = self.userdb
         request.userdb_new = self.userdb_new
         request.db = self.db
         request.dashboard_userdb = self.dashboard_db
@@ -287,15 +281,15 @@ class LoggedInRequestTests(MongoTestCase):
 
     def set_logged(self, email='johnsmith@example.com', extra_session_data={}):
         request = self.set_user_cookie(email)
-        user_obj = self.userdb.get_user_by_mail(email, raise_on_missing=True)
+        user_obj = self.userdb_new.get_user_by_mail(email, raise_on_missing=True)
         if not user_obj:
             logging.error("User {!s} not found in database {!r}. Users:".format(email, self.userdb))
-            for this in self.userdb._get_all_userdocs():
-                this_user = OldUser(this)
+            for this in self.userdb_new._get_all_userdocs():
+                this_user = DashboardUser(this)
                 logging.debug("  User: {!s}".format(this_user))
         # user only exists in eduid-userdb, so need to clear modified-ts to be able
         # to save it to eduid-dashboard.profiles
-        user_obj.set_modified_ts(None)
+        user_obj.modified_ts = None
         dummy = DummyRequest()
         dummy.session = {
             'eduPersonAssurance': loa(3),
@@ -303,7 +297,7 @@ class LoggedInRequestTests(MongoTestCase):
         }
         store_session_user(dummy, user_obj)
         # XXX ought to set self.user = user_obj
-        self.logged_in_user = self.userdb_new.get_user_by_id(user_obj.get_id())
+        self.logged_in_user = self.userdb_new.get_user_by_id(user_obj.user_id)
         dummy.session.update(extra_session_data)
         request = self.add_to_session(dummy.session)
         return request
@@ -333,7 +327,6 @@ class LoggedInRequestTests(MongoTestCase):
         for field in fields:
             if field.attrs['type'] == 'checkbox':
                 # A webtest.app.Checkbox only has a value if it is checked (!)
-                old_status = field.checked
                 field.checked = True
                 if field.value in values:
                     logger.debug("Checked checkbox {!r} (value {!r})".format(field.id, field.value))
@@ -349,7 +342,7 @@ class LoggedInRequestTests(MongoTestCase):
 
         self.assertEqual(values, checked)
 
-    def sync_user_from_dashboard_to_userdb(self, user_id, old_format = True):
+    def sync_user_from_dashboard_to_userdb(self, user_id, old_format = False):
         """
         When there is no eduid-dashboard-amp Attribute Manager plugin loaded to
         sync users from dashboard to userdb, this crude function can do it.
@@ -366,7 +359,7 @@ class LoggedInRequestTests(MongoTestCase):
         test_doc = {'_id': user_id}
         user_doc = user.to_dict(old_userdb_format=old_format)
         # Fixups to turn the DashboardUser into a User
-        del user_doc['terminated']
+        user_doc['terminated'] = True
         self.userdb_new._coll.update(test_doc, user_doc, upsert=False)
 
 

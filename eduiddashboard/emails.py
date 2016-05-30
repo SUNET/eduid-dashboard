@@ -8,7 +8,6 @@ from eduiddashboard.verifications import (generate_verification_link,
                                           new_verification_code)
 from eduiddashboard.utils import get_short_hash
 from eduiddashboard import log
-from eduiddashboard.session import get_session_user
 
 
 def send_verification_mail(request, email, reference=None, code=None):
@@ -57,7 +56,6 @@ def send_verification_mail(request, email, reference=None, code=None):
 
 
 def send_termination_mail(request, user):
-    user = get_session_user(request)   # XXX remove when context users  are new users
     mailer = get_mailer(request)
     support_email = request.registry.settings.get('mail.support_email', 'support@eduid.se')
     site_name = request.registry.settings.get("site.name", "eduID")

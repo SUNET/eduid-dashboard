@@ -169,8 +169,6 @@ class BaseFactory(RootFactory):
         if self.workmode == 'personal':
             user = get_logged_in_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
             self._logged_in_user = user
-            if not user:
-                user = OldUser({})
         elif self.workmode == 'admin' or self.workmode == 'helpdesk':
             if not has_edit_user(self.request):
                 user = None
@@ -179,7 +177,7 @@ class BaseFactory(RootFactory):
                 if EMAIL_RE.match(userid):
                     user = self.request.userdb_new.get_user_by_mail(userid)
                 elif OID_RE.match(userid):
-                    user = self.request.userdb_new.get_user_by_oid(userid)
+                    user = self.request.userdb_new.get_user_by_id(userid)
                 if not user:
                     raise HTTPNotFound()
                 logger.debug('get_user() storing user {!r}'.format(user))
@@ -309,9 +307,7 @@ class HomeFactory(BaseFactory):
 
     def get_user(self):
         # XXX what's the purpose here? Override BaseFactory.get_user() to never get edit-user?
-        user = get_logged_in_user(self.request, legacy_user = True, raise_on_not_logged_in = False)
-        if not user:
-            user = OldUser({})
+        user = get_logged_in_user(self.request, legacy_user = False, raise_on_not_logged_in = False)
         logger.debug('HomeFactory get_user returning {!s}'.format(user))
         return user
 
@@ -369,8 +365,8 @@ class VerificationsFactory(BaseFactory):
         })
         if verification_code is None:
             raise HTTPNotFound()
-        user = self.request.userdb.get_user_by_oid(verification_code['user_oid'])
-        user.retrieve_modified_ts(self.request.db.profiles)
+        user = self.request.userdb_new.get_user_by_id(verification_code['user_oid'])
+        retrieve_modified_ts(user, self.request.dashboard_userdb)
         return user
 
 

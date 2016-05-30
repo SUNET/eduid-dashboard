@@ -46,8 +46,7 @@ class PermissionsView(BaseFormView):
 
     def save_success(self, permform):
         data = self.schema.serialize(permform)
-        self.user = get_session_user(self.request, raise_on_not_logged_in = False)
-        self.user.entitlements = data[self.attribute]
+        self.user.entitlements.extend(data[self.attribute])
         try:
             self.context.save_dashboard_user(self.user)
         except UserOutOfSync:
