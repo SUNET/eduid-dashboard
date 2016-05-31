@@ -7,9 +7,11 @@ from datetime import datetime, timedelta
 import pprint
 
 from eduid_userdb.nin import Nin
+from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
+from eduiddashboard.utils import retrieve_modified_ts
 
 import logging
 logger = logging.getLogger(__name__)
@@ -169,8 +171,17 @@ class NinsFormTests(LoggedInRequestTests):
         email = self.no_nin_user_email
         self.set_logged(email)
         user = self.userdb_new.get_user_by_mail(email)
+        retrieve_modified_ts(user, self.dashboard_db)
 
         self.assertEqual(user.nins.count, 0)
+
+        # Add a verified phone number to the user in the central userdb
+        user.phone_numbers.add(PhoneNumber({
+            'number': '666666666',
+            'primary': True,
+            'verified': True
+            }))
+        self.dashboard_db.save(user)
 
         # First we add a nin...
         nin = '200010100001'
@@ -191,32 +202,34 @@ class NinsFormTests(LoggedInRequestTests):
                 'success': True,
                 'message': u'Ok',
                 }
-            with patch.object(OldUser, 'retrieve_address', clear=True):
-                OldUser.retrieve_address.return_value = None
-
-                response = self.testapp.post(
-                    '/profile/nins-actions/',
-                    {'identifier': nin + ' 0', 'action': 'verify_mb'}
-                )
+            response = self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': nin + ' 0', 'action': 'verify_mb'}
+            )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')
-        user = self.dashboard_db.get_user_by_eppn('babba-labba')
+        user = self.userdb_new.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
         self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], nin)
 
     def test_verify_nin_by_mobile(self):
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
-        self.assertEqual(len(user.get_nins()), 0)
+        user = self.userdb_new.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 0)
 
         # Add a verified phone number to the user in the central userdb
-        user.add_mobile({
-            'mobile': '666666666',
+        user.phone_numbers.add(PhoneNumber({
+            'number': '666666666',
+            'primary': True,
             'verified': True
-            })
-        self.userdb.save(user)
+            }))
+        user.modified_ts = None
+        self.userdb_new.save(user)
+        retrieve_modified_ts(user, self.dashboard_db)
+        self.dashboard_db.save(user)
 
+        # First we add a nin...
         new_nin = '200010100001'
 
         response_form = self.testapp.get('/profile/nins/')
@@ -232,17 +245,17 @@ class NinsFormTests(LoggedInRequestTests):
                     'City': u'STOCKHOLM',
                 }
                 form['norEduPersonNIN'].value = new_nin
-                form.submit('add_by_mobile')
+                resp = form.submit('add_by_mobile')
 
         user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
-        self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], new_nin)
+        self.assertEqual(user.nins.primary.number, new_nin)
 
     def test_verify_nin_by_letter(self):
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
-        self.assertEqual(len(user.get_nins()), 0)
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 0)
 
         new_nin = '200010100001'
 

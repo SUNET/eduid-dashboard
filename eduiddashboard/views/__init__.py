@@ -25,7 +25,7 @@ from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
 from eduiddashboard import log
-from eduiddashboard.session import store_session_user
+from eduiddashboard.session import get_session_user, store_session_user
 
 
 def get_dummy_status(request, user):
@@ -57,7 +57,7 @@ class BaseFormView(FormView):
 
     def __init__(self, context, request):
         super(BaseFormView, self).__init__(request)
-        self.user = context.user
+        self.user = get_session_user(self.request)
         self.context = context
         self.response = request.response
 

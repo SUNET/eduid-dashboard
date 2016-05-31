@@ -138,11 +138,10 @@ class MobilesFormTests(LoggedInRequestTests):
         userdb = self.db.profiles.find({'_id': self.user.user_id})[0]
         mobiles_number = len(userdb['mobile'])
 
-        with self.assertRaises(IndexError):
-            self.testapp.post(
-                '/profile/mobiles-actions/',
-                {'identifier': 10, 'action': 'remove'}
-            )
+        self.testapp.post(
+            '/profile/mobiles-actions/',
+            {'identifier': 10, 'action': 'remove'}
+        )
         userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
         self.assertEqual(mobiles_number, len(userdb_after['mobile']))
 
