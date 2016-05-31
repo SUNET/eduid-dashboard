@@ -4,7 +4,6 @@ from mock import patch
 
 from eduiddashboard.testing import LoggedInRequestTests
 from eduid_userdb.dashboard import UserDBWrapper as UserDB
-from eduid_userdb.userdb import User
 
 class PersonalDataFormTests(LoggedInRequestTests):
 

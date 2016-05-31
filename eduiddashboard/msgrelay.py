@@ -278,4 +278,3 @@ class MsgRelay(object):
         """
         logger.debug('SENT postal address message for transaction log with reference: {0}'.format(reference))
         self._set_audit_log_postal_address.delay(reference)
-

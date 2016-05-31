@@ -32,7 +32,6 @@ class NinsFormTests(LoggedInRequestTests):
     #    'norEduPersonNIN': []
     #}]
 
-
     def setUp(self):
         super(NinsFormTests, self).setUp()
         # these tests want the self.user user to not have a NIN
@@ -245,7 +244,7 @@ class NinsFormTests(LoggedInRequestTests):
                     'City': u'STOCKHOLM',
                 }
                 form['norEduPersonNIN'].value = new_nin
-                resp = form.submit('add_by_mobile')
+                form.submit('add_by_mobile')
 
         user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)

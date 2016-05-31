@@ -344,7 +344,6 @@ TEST_VERIFICATIONS = [
     }]
 
 
-
 def return_true(*args, **kwargs):
     return True
 
@@ -550,7 +549,6 @@ class ResetPasswordFormTests(LoggedInRequestTests):
 
         reset_password = self.db.reset_passwords.find_one({'hash_code': hash_code})
         self.assertEqual(reset_password.get('mobile_hash_code_verified', False), False)
-
 
     def test_reset_password_mobile_invalid_code(self):
         hash_code = '123456'

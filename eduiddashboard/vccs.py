@@ -1,5 +1,4 @@
 from bson import ObjectId
-from datetime import datetime
 from eduid_userdb.dashboard import DashboardLegacyUser, DashboardUser
 from eduid_userdb import Password
 

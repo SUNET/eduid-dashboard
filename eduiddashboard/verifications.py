@@ -25,9 +25,6 @@ from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduid_userdb import User
-
 
 def dummy_message(request, message):
     """

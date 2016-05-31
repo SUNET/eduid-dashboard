@@ -282,7 +282,7 @@ class MobilesFormTests(LoggedInRequestTests):
 
         with patch.object(MsgRelay, 'mobile_validator', clear=True):
             MsgRelay.mobile_validator.return_value = True
-                
+
             response = form.submit('add')
 
             self.assertEqual(response.status, '200 OK')

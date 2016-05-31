@@ -5,7 +5,6 @@ import atexit
 from copy import deepcopy
 import random
 import subprocess
-import pprint
 
 from mock import patch
 

@@ -7,7 +7,6 @@ import time
 import pytz
 import logging
 from pwgen import pwgen
-from datetime import datetime
 
 from pyramid.i18n import TranslationString as _
 from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
@@ -15,8 +14,6 @@ from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 from eduiddashboard.compat import text_type
 
 from eduid_userdb.exceptions import UserDBValueError
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
-from eduid_userdb import User
 
 
 logger = logging.getLogger(__name__)
