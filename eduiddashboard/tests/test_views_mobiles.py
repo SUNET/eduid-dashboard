@@ -105,18 +105,26 @@ class MobilesFormTests(LoggedInRequestTests):
         self.assertEqual(mobiles_number - 1, user_after.phone_numbers.count)
 
     def test_remove_primary_mobile(self):
-        """ Expect zero numbers after removing the primary one when the primary one was the only verified number. """
-        self.skipTest("Requires some new logic in dashboard when removing the primary number")
         self.set_logged()
 
-        response = self.testapp.post(
-            '/profile/mobiles-actions/',
-            {'identifier': 0, 'action': 'remove'}
-        )
-        userdb_after = self.db.profiles.find({'_id': self.user.user_id})[0]
-        response_json = json.loads(response.body)
-        self.assertEqual(response_json['result'], 'success')
-        self.assertEqual(0, len(userdb_after['mobile']))
+        old_user = self.userdb_new.get_user_by_id(self.user.user_id)
+        old_primary_phone = old_user.phone_numbers.primary.number
+        old_phone_count = len(old_user.phone_numbers.to_list())
+
+        with patch.object(UserDBWrapper, 'exists_by_field', clear=True):
+            UserDBWrapper.exists_by_field.return_value = False
+            response = self._remove_existant_mobile(n=0)
+
+            response_json = json.loads(response.body)
+            self.assertEqual(response.status, '200 OK')
+            self.assertEqual(response_json['result'], 'success')
+
+            updated_user = self.dashboard_db.get_user_by_id(self.user.user_id)
+            updated_primary_phone = updated_user.phone_numbers.primary.number
+            updated_phone_count = len(updated_user.phone_numbers.to_list())
+
+            self.assertNotEqual(old_primary_phone, updated_primary_phone)
+            self.assertTrue(updated_phone_count < old_phone_count)
 
     def test_remove_primary_mobile_and_set_other_verified_to_primary(self):
         self.set_logged()
