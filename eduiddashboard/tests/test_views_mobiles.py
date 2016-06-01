@@ -295,8 +295,14 @@ class MobilesFormTests(LoggedInRequestTests):
             self.assertEqual(response.status, '200 OK')
 
         old_user = self.dashboard_db.get_user_by_mail('johnsmith@example.com')
-
         self.assertIn(mobile, [mo.number for mo in old_user.phone_numbers.to_list()])
+
+        new_user = self.dashboard_db.get_user_by_mail('johnsmith@example.org')
+        self.assertIn(mobile, [mo.number for mo in new_user.phone_numbers.to_list()])
+
+        # After adding the e-mail address to the user we're logged in as, make sure it is synced to
+        # userdb even if there is no eduid-dashboard-amp around to do it
+        self.sync_user_from_dashboard_to_userdb(self.logged_in_user.user_id)
 
         mobile_doc = self.db.verifications.find_one({
             'model_name': 'phone',
@@ -317,7 +323,6 @@ class MobilesFormTests(LoggedInRequestTests):
                 response_json = json.loads(response.body)
                 self.assertEqual(response_json['result'], 'success')
 
-        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = DashboardUser(data=old_user)
+        old_user = self.dashboard_db.get_user_by_mail('johnsmith@example.com')
 
         self.assertNotIn(mobile, [mo.number for mo in old_user.phone_numbers.to_list()])

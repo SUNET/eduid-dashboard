@@ -166,7 +166,6 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'getcode')
 
     def test_verify_existant_nin_by_mobile(self):
-        ''' '''
         email = self.no_nin_user_email
         self.set_logged(email)
         user = self.userdb_new.get_user_by_mail(email)
@@ -207,7 +206,7 @@ class NinsFormTests(LoggedInRequestTests):
             )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')
-        user = self.userdb_new.get_user_by_mail(email)
+        user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
         self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], nin)
 
