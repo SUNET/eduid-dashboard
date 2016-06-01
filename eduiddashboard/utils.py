@@ -1,4 +1,4 @@
-#from bleach import clean
+from bleach import clean
 from hashlib import sha256
 from urllib import unquote, quote
 from uuid import uuid4
