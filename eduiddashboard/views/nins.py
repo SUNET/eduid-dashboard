@@ -21,6 +21,7 @@ from eduiddashboard.verifications import set_nin_verified, new_verification_code
 from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import get_session_user
+from eduiddashboard.utils import retrieve_modified_ts
 
 import logging
 logger = logging.getLogger(__name__)
@@ -226,7 +227,6 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        self.user = get_session_user(self.request, raise_on_not_logged_in = False)
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -254,7 +254,6 @@ class NINsActionsView(BaseActionsView):
         """
         nin, index = data.split()
         index = int(index)
-        self.user = get_session_user(self.request)
         nins = get_not_verified_nins_list(self.request, self.user)
 
         if len(nins) > index:
@@ -276,15 +275,17 @@ class NINsActionsView(BaseActionsView):
         result = validation['success'] and 'success' or 'error'
         model_name = 'norEduPersonNIN'
         if result == 'success':
-            set_nin_verified(self.request, self.user, nin)
+            session_user = get_session_user(self.request, legacy_user = False)
+            retrieve_modified_ts(session_user, self.request.dashboard_userdb)
+            set_nin_verified(self.request, session_user, nin)
             try:
                 #self.user.save(self.request)
-                self.request.context.save_dashboard_user(self.user)
-                logger.info("Verified by mobile, {!s} saved for user {!r}.".format(model_name, self.user))
+                self.request.context.save_dashboard_user(session_user)
+                logger.info("Verified by mobile, {!s} saved for user {!r}.".format(model_name, session_user))
                 # Save the state in the verifications collection
-                save_as_verified(self.request, 'norEduPersonNIN', self.user, nin)
+                save_as_verified(self.request, 'norEduPersonNIN', session_user, nin)
             except UserOutOfSync:
-                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, self.user))
+                logger.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(model_name, session_user))
                 raise
         settings = self.request.registry.settings
         msg = get_localizer(self.request).translate(validation['message'],
@@ -520,7 +521,7 @@ class NinsView(BaseFormView):
         enable_mm = settings.get('enable_mm_verification')
 
         context.update({
-            'nins': self.user.nins.to_list_of_dicts(),
+            'nins': self.user.nins,
             'not_verified_nins': get_not_verified_nins_list(self.request, self.user),
             'verified_nins': get_verified_nins(self.user),
             'has_mobile': has_confirmed_mobile(self.user),
@@ -604,8 +605,7 @@ class NinsView(BaseFormView):
         else:
             message = _('Your national identity number has been confirmed')
         # Save the state in the verifications collection
-        save_as_verified(self.request, 'norEduPersonNIN',
-                            self.user, newnin)
+        save_as_verified(self.request, 'norEduPersonNIN', self.user, newnin)
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')

@@ -6,9 +6,12 @@ from datetime import datetime, timedelta
 
 import pprint
 
+from eduid_userdb.nin import Nin
+from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
+from eduiddashboard.utils import retrieve_modified_ts
 
 import logging
 logger = logging.getLogger(__name__)
@@ -29,14 +32,14 @@ class NinsFormTests(LoggedInRequestTests):
     #    'norEduPersonNIN': []
     #}]
 
-
     def setUp(self):
         super(NinsFormTests, self).setUp()
         # these tests want the self.user user to not have a NIN
         self.no_nin_user_email = 'johnsmith@example.org'
-        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
-        user.set_nins([])
-        self.userdb.save(user)
+        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
+        for nin in user.nins.to_list():
+            user.nins.remove(nin.number)
+        self.userdb_new.save(user)
 
     def test_logged_get(self):
         self.set_logged(email=self.no_nin_user_email)
@@ -131,19 +134,22 @@ class NinsFormTests(LoggedInRequestTests):
     def test_verify_existant_nin(self):
         # Add a non-verified NIN to the user with no NINs
         email = self.no_nin_user_email
-        user = self.userdb.get_user_by_mail(email)
-        user.set_nins([{'number': '123456789050',
+        user = self.userdb_new.get_user_by_mail(email)
+        for nin in user.nins.to_list():
+            user.nins.remove(nin.number)
+        new_nin = Nin(data={'number': '123456789050',
                         'verified': False,
                         'primary': False,
-                        }])
-        self.userdb.save(user)
+                        })
+        user.nins.add(new_nin)
+        self.userdb_new.save(user)
         # Set up a pending verfication
         verification_data = {
             '_id': ObjectId(),
             'code': '123124',
             'model_name': 'norEduPersonNIN',
             'obj_id': '123456789050',
-            'user_oid': user.get_id(),
+            'user_oid': user.user_id,
             'timestamp': datetime.utcnow(),
             'verified': False,
         }
@@ -160,12 +166,20 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'getcode')
 
     def test_verify_existant_nin_by_mobile(self):
-        ''' '''
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
+        user = self.userdb_new.get_user_by_mail(email)
+        retrieve_modified_ts(user, self.dashboard_db)
 
-        self.assertEqual(len(user.get_nins()), 0)
+        self.assertEqual(user.nins.count, 0)
+
+        # Add a verified phone number to the user in the central userdb
+        user.phone_numbers.add(PhoneNumber({
+            'number': '666666666',
+            'primary': True,
+            'verified': True
+            }))
+        self.dashboard_db.save(user)
 
         # First we add a nin...
         nin = '200010100001'
@@ -186,32 +200,34 @@ class NinsFormTests(LoggedInRequestTests):
                 'success': True,
                 'message': u'Ok',
                 }
-            with patch.object(OldUser, 'retrieve_address', clear=True):
-                OldUser.retrieve_address.return_value = None
-
-                response = self.testapp.post(
-                    '/profile/nins-actions/',
-                    {'identifier': nin + '  0', 'action': 'verify_mb'}
-                )
+            response = self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': nin + ' 0', 'action': 'verify_mb'}
+            )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')
-        user = self.dashboard_db.get_user_by_eppn('babba-labba')
+        user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
         self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], nin)
 
     def test_verify_nin_by_mobile(self):
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
-        self.assertEqual(len(user.get_nins()), 0)
+        user = self.userdb_new.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 0)
 
         # Add a verified phone number to the user in the central userdb
-        user.add_mobile({
-            'mobile': '666666666',
+        user.phone_numbers.add(PhoneNumber({
+            'number': '666666666',
+            'primary': True,
             'verified': True
-            })
-        self.userdb.save(user)
+            }))
+        user.modified_ts = None
+        self.userdb_new.save(user)
+        retrieve_modified_ts(user, self.dashboard_db)
+        self.dashboard_db.save(user)
 
+        # First we add a nin...
         new_nin = '200010100001'
 
         response_form = self.testapp.get('/profile/nins/')
@@ -231,13 +247,13 @@ class NinsFormTests(LoggedInRequestTests):
 
         user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
-        self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], new_nin)
+        self.assertEqual(user.nins.primary.number, new_nin)
 
     def test_verify_nin_by_letter(self):
         email = self.no_nin_user_email
         self.set_logged(email)
-        user = self.userdb.get_user_by_mail(email)
-        self.assertEqual(len(user.get_nins()), 0)
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 0)
 
         new_nin = '200010100001'
 
@@ -312,7 +328,7 @@ class NinsFormTests(LoggedInRequestTests):
 
         nins_before = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user.get_id()
+            'user_oid': self.user.user_id
         }).count()
 
         response = self.testapp.post(
@@ -322,7 +338,7 @@ class NinsFormTests(LoggedInRequestTests):
 
         nins_after = self.db.verifications.find({
             'model_name': 'norEduPersonNIN',
-            'user_oid': self.user.get_id()
+            'user_oid': self.user.user_id
         }).count()
 
         response_json = json.loads(response.body)
@@ -412,17 +428,9 @@ class NinsFormTests(LoggedInRequestTests):
             response_json = json.loads(response.body)
             self.assertEqual(response_json['result'], 'success')
 
-            # Extra debug
-            foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
-                                                 include_unconfirmed = True)
-            logging.debug('Extra debug #3, searched for {!s} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
+            old_user = self.dashboard_db.get_user_by_id('012345678901234567890123')
 
-            old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-            old_user = OldUser(old_user)
-
-            logging.debug('Loaded old user {!r} from {!r}'.format(old_user, self.db.profiles))
-            logging.debug('Old user is now:\n{!s}'.format(pprint.pformat(old_user.items())))
-            self.assertNotIn(nin, old_user.get_nins())
+            self.assertNotIn(nin, [n.number for n in old_user.nins.to_list()])
 
 
 class NinsFormTestsDisableMM(LoggedInRequestTests):
@@ -434,9 +442,10 @@ class NinsFormTestsDisableMM(LoggedInRequestTests):
         super(NinsFormTestsDisableMM, self).setUp(settings=disable_mm)
         # these tests want the self.user user to not have a NIN
         self.no_nin_user_email = 'johnsmith@example.org'
-        user = self.userdb.get_user_by_mail(self.no_nin_user_email)
-        user.set_nins([])
-        self.userdb.save(user)
+        user = self.userdb_new.get_user_by_mail(self.no_nin_user_email)
+        for nin in user.nins.to_list():
+            user.nins.remove(nin)
+        self.userdb_new.save(user)
 
     def test_add_valid_nin(self):
         self.set_logged(email=self.no_nin_user_email)

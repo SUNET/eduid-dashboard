@@ -4,7 +4,6 @@ from mock import patch
 
 from eduiddashboard.testing import LoggedInRequestTests
 from eduid_userdb.dashboard import UserDBWrapper as UserDB
-from eduid_userdb.userdb import User
 
 class PersonalDataFormTests(LoggedInRequestTests):
 
@@ -40,7 +39,7 @@ class PersonalDataFormTests(LoggedInRequestTests):
             response = form.submit('save')
             self.assertEqual(response.status, '200 OK')
 
-        updated_user = self.dashboard_db.get_user_by_id(self.user['_id'])
+        updated_user = self.dashboard_db.get_user_by_id(self.user.user_id)
 
         self.assertEqual(u'Foo', updated_user.given_name)
         self.assertEqual(u'Mr Foo', updated_user.display_name)

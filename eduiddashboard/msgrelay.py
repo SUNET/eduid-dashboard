@@ -68,6 +68,7 @@ class MsgRelay(object):
         config.update({
             'BROKER_URL': settings.get('msg_broker_url'),
             'TEMPLATES_DIR': 'templates/',
+            'MONGO_URI': settings.get('mongo_uri'),
         })
         celery.conf.update(config)
 
@@ -277,4 +278,3 @@ class MsgRelay(object):
         """
         logger.debug('SENT postal address message for transaction log with reference: {0}'.format(reference))
         self._set_audit_log_postal_address.delay(reference)
-

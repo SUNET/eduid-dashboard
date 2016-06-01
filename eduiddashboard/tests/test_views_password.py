@@ -108,7 +108,7 @@ class PasswordFormTests(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
-        self.set_logged(email = self.user.get_mail(),
+        self.set_logged(email = self.user.mail_addresses.primary.email,
                         extra_session_data = {'re-authn-ts': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
@@ -127,7 +127,7 @@ class PasswordFormTests(LoggedInRequestTests):
         response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
-        self.set_logged(email = self.user.get_mail(),
+        self.set_logged(email = self.user.mail_addresses.primary.email,
                         extra_session_data = {'re-authn-ts': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
@@ -152,7 +152,7 @@ class PasswordFormTests(LoggedInRequestTests):
         form['old_password'].value = self.initial_password
         form['custom_password'].value = '0l8m vta8 j9lr'
         form['repeated_password'].value = form['custom_password'].value
-        self.set_logged(email = self.user.get_mail(),
+        self.set_logged(email = self.user.mail_addresses.primary.email,
                         extra_session_data = {'re-authn-ts': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
@@ -184,7 +184,7 @@ class PasswordFormTests(LoggedInRequestTests):
         ]:
             form['custom_password'].value = password
             form['repeated_password'].value = form['custom_password'].value
-            self.set_logged(email = self.user.get_mail(),
+            self.set_logged(email = self.user.mail_addresses.primary.email,
                             extra_session_data = {'re-authn-ts': int(time.time())})
             from eduiddashboard.validators import CSRFTokenValidator
             with patch.object(CSRFTokenValidator, '__call__', clear=True):
@@ -283,7 +283,7 @@ class TerminateAccountTests(LoggedInRequestTests):
         with patch('eduiddashboard.vccs.get_vccs_client'):
             from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient()
-            form_resp = form.submit('reset')
+            form.submit('reset')
 
         # Verify the user has a password and is NOT terminated again
         user = self.dashboard_db.get_user_by_mail(email)
@@ -344,7 +344,6 @@ TEST_VERIFICATIONS = [
     }]
 
 
-
 def return_true(*args, **kwargs):
     return True
 
@@ -398,10 +397,10 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         self.assertEqual(len(reset_passwords_after), 1)
         self.db.reset_passwords.remove()
 
-        for email in self.user['mailAliases']:
-            if not email['verified']:
+        for email in self.user.mail_addresses.to_list():
+            if not email.is_verified:
                 continue
-            form['email_or_username'].value = email['email']
+            form['email_or_username'].value = email.email
             response = form.submit('reset')
             self.assertEqual(response.status, '302 Found')
         reset_passwords_after = list(self.db.reset_passwords.find())
@@ -424,7 +423,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
         with patch('eduiddashboard.vccs.get_vccs_client'):
             from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient()
-            form_resp = form.submit('reset')
+            form.submit('reset')
 
         # Verify the user has no nins and no verified phone numbers
         user = self.dashboard_db.get_user_by_mail(email)
@@ -550,7 +549,6 @@ class ResetPasswordFormTests(LoggedInRequestTests):
 
         reset_password = self.db.reset_passwords.find_one({'hash_code': hash_code})
         self.assertEqual(reset_password.get('mobile_hash_code_verified', False), False)
-
 
     def test_reset_password_mobile_invalid_code(self):
         hash_code = '123456'

@@ -116,10 +116,8 @@ class EmailUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        user = get_session_user(request)
+        user = request.context.user
         user_emails = [e.email for e in user.mail_addresses.to_list()]
-        if user.mail_addresses.primary:
-            user_emails.append(user.mail_addresses.primary.email)
         localizer = get_localizer(request)
 
         if sanitize_post_key(request, 'add') is not None:
@@ -149,7 +147,7 @@ class MobilePhoneUniqueValidator(object):
     def __call__(self, node, value):
 
         request = node.bindings.get('request')
-        user = get_session_user(request)
+        user = request.context.user
         mobile = normalize_to_e_164(request, value)
 
         # The debug logs below were added to help figure out how a user
@@ -240,7 +238,7 @@ class NINUniqueValidator(object):
         value = normalize_nin(copy(value))
 
         request = node.bindings.get('request')
-        user = get_session_user(request)
+        user = request.context.user
         user_nins = user.nins
 
         unverified_user_nins = request.db.verifications.find({

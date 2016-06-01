@@ -1,5 +1,4 @@
 from bson import ObjectId
-from datetime import datetime
 from eduid_userdb.dashboard import DashboardLegacyUser, DashboardUser
 from eduid_userdb import Password
 
@@ -162,15 +161,14 @@ def provision_credentials(vccs_url, new_password, user):
     new_factor = vccs_client.VCCSPasswordFactor(new_password,
                                                 credential_id=str(password_id))
 
-    if not vccs.add_credentials(str(user.get_id()), [new_factor]):
+    if not vccs.add_credentials(str(user.user_id), [new_factor]):
         return False  # something failed
 
-    passwords = user.get_passwords()
-    passwords.append({
-        'id': password_id,
-        'salt': new_factor.salt,
-    })
-    user.set_passwords(passwords)
+    new_password = Password(credential_id = password_id,
+                            salt = new_factor.salt,
+                            application = 'dashboard',
+                            )
+    user.passwords.add(new_password)
 
     return True
 
