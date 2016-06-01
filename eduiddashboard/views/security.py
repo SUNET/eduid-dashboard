@@ -15,7 +15,6 @@ from pyramid.i18n import get_localizer
 from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
-from eduid_userdb.dashboard import DashboardUser
 from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
