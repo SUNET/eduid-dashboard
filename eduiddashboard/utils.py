@@ -1,4 +1,4 @@
-#from bleach import clean
+from bleach import clean
 from hashlib import sha256
 from urllib import unquote, quote
 from uuid import uuid4
@@ -7,7 +7,6 @@ import time
 import pytz
 import logging
 from pwgen import pwgen
-from bleach import clean
 
 from pyramid.i18n import TranslationString as _
 from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
@@ -233,6 +232,7 @@ def sanitize_session_get(request, *args):
     Wrapper around request.session.get() to sanitize untrusted input.
     """
     return _sanitize_common(request, 'session', *args)
+
 
 def sanitize_cookies_get(request, *args):
     """
