@@ -278,8 +278,7 @@ class MobilesFormTests(LoggedInRequestTests):
         self.assertEqual(updated_phone_to_test.is_primary, True)
 
     def test_steal_verified_mobile(self):
-        self.skipTest("Requires new logic in Dashboard to re-assign primary mobile of user who looses their primary")
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email='johnsmith@example.org')
 
         response_form = self.testapp.get('/profile/mobiles/')
 
@@ -295,13 +294,12 @@ class MobilesFormTests(LoggedInRequestTests):
 
             self.assertEqual(response.status, '200 OK')
 
-        old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
-        old_user = DashboardUser(data=old_user)
+        old_user = self.dashboard_db.get_user_by_mail('johnsmith@example.com')
 
         self.assertIn(mobile, [mo.number for mo in old_user.phone_numbers.to_list()])
 
         mobile_doc = self.db.verifications.find_one({
-            'model_name': 'mobile',
+            'model_name': 'phone',
             'user_oid': ObjectId('901234567890123456789012'),
             'obj_id': mobile
         })
