@@ -7,6 +7,7 @@ import time
 import pytz
 import logging
 from pwgen import pwgen
+from bleach import clean
 
 from pyramid.i18n import TranslationString as _
 from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
@@ -388,7 +389,7 @@ def _safe_clean(untrusted_text, strip_characters=False):
     :rtype: str | unicode
     """
     try:
-        return untrusted_text
+        return clean(untrusted_text, strip=strip_characters)
     except KeyError:
         logger.warn('A malicious user tried to crash the application by '
                     'sending illegal UTF-8 in an URI or other untrusted '
