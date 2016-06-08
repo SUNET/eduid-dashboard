@@ -43,13 +43,23 @@ def authn_tween_factory(handler, registry):
 
     def check_authn(request):
         settings = registry.settings
-        cookie_name = settings.get('SESSION_COOKIE_NAME', 'sessid')
-        if ((request.cookies and cookie_name in request.cookies) or
+        cookie_name = settings.get('session.key')
+        if ((cookie_name in request.cookies and
+                 'eduPersonPrincipalName' in request.session) or
                 ('eppn' in request.params and
                  'token' in request.params and
                  'nonce' in request.params)):
             remember(request, request.session['eduPersonPrincipalName'])
             return handler(request)
+
+        try:
+            reset_password_url = request.route_url('reset-password')
+        except KeyError:
+            pass
+        else:
+            if reset_password_url in request.url:
+                return handler(request)
+        
         ts_url = settings.get('token_service_url')
         next_url = request.url
 
