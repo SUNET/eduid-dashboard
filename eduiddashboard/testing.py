@@ -83,6 +83,7 @@ SETTINGS = {
     'nin_service_url': 'http://minameddelanden.se/',
     'mobile_service_name': 'TeleAdress',
     'letter_service_url': 'http://letter-proofing.example.com/',
+    'token_service_url': 'http://authn.example.com/saml2/login/',
     'available_languages': '''
             en = English
             sv = Svenska
@@ -97,6 +98,7 @@ SETTINGS = {
     'staff_link': 'http://eduid.se/privacy.html',
     'faq_link': 'http://eduid.se/privacy.html',
     'privacy_link': 'http://eduid.se/privacy.html',
+    'lang_cookie_domain': 'localhost',
     }
 
 
@@ -293,6 +295,8 @@ class LoggedInRequestTests(MongoTestCase):
         dummy.session = {
             'eduPersonAssurance': loa(3),
             'eduPersonIdentityProofing': loa(3),
+            'eduPersonPrincipalName': 'hubba-bubba',
+            'user_eppn': 'hubba-bubba',
         }
         store_session_user(dummy, user_obj)
         # XXX ought to set self.user = user_obj
