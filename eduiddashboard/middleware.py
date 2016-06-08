@@ -61,11 +61,12 @@ def authn_tween_factory(handler, registry):
                 return handler(request)
         
         ts_url = settings.get('token_service_url')
+        login_url = urlparse.urljoin(ts_url, 'login')
         next_url = request.url
 
         params = {'next': next_url}
 
-        url_parts = list(urlparse.urlparse(ts_url))
+        url_parts = list(urlparse.urlparse(login_url))
         query = urlparse.parse_qs(url_parts[4])
         query.update(params)
 
