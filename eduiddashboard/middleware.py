@@ -49,7 +49,14 @@ def authn_tween_factory(handler, registry):
                 ('eppn' in request.params and
                  'token' in request.params and
                  'nonce' in request.params)):
-            remember(request, request.session['eduPersonPrincipalName'])
+            try:
+                remember(request, request.session['eduPersonPrincipalName'])
+            except KeyError:
+                # we have just signed up, there is no eppn in the session,
+                # we must have it as a request.param
+                eppn = request.params['eppn']
+                remember(request, eppn)
+                request.session['eduPersonPrincipalName'] = eppn
             return handler(request)
 
         try:
