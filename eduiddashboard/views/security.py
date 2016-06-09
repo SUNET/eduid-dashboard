@@ -15,6 +15,7 @@ from pyramid.i18n import get_localizer
 from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
+from eduid_userdb.exceptions import UserDoesNotExist
 from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
@@ -474,7 +475,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
             user = self._search_user(email_or_username)
             log.debug("Reset password via email initiated for user {!r}".format(user))
             self.request.stats.count('dashboard/pwreset_email_init', 1)
-        except self.request.userdb.exceptions.UserDoesNotExist:
+        except UserDoesNotExist:
             log.debug("Tried to initiate reset password via email but user {!r} does not exist".format(
                 email_or_username))
             self.request.stats.count('dashboard/pwreset_email_init_unknown_user', 1)
@@ -513,7 +514,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
             user = self._search_user(email_or_username)
             log.debug("Reset password via mm initiated for user {!r}.".format(user))
             self.request.stats.count('dashboard/pwreset_mm_init', 1)
-        except self.request.userdb.exceptions.UserDoesNotExist:
+        except UserDoesNotExist:
             log.debug("Tried to initiate reset password via mm but user {!r} does not exist".format(email_or_username))
             self.request.stats.count('dashboard/pwreset_mm_init_unknown_user', 1)
             user = None
@@ -559,7 +560,7 @@ class ResetPasswordMobileView(BaseResetPasswordView):
             user = self._search_user(mobile_number)
             log.info("Reset password via mobile initiated for user {!r}".format(user))
             log.debug("Mobile number: {!r}".format(mobile_number))
-        except self.request.userdb.exceptions.UserDoesNotExist:
+        except UserDoesNotExist:
             log.info("User with mobile number {!r} does not exist".format(mobile_number))
             user = None
 
