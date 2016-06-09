@@ -6,6 +6,7 @@ from datetime import datetime
 from pyramid.i18n import get_localizer
 from pyramid.view import view_config
 
+from eduid_userdb.element import PrimaryElementViolation
 from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.i18n import TranslationString as _
@@ -13,6 +14,7 @@ from eduiddashboard.models import Mobile
 from eduiddashboard.utils import get_icon_string, get_short_hash, normalize_to_e_164
 from eduiddashboard.verifications import new_verification_code
 from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -96,9 +98,30 @@ class MobilesActionsView(BaseActionsView):
         return data_to_verify['number']
 
     def remove_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         mobiles = self.user.phone_numbers.to_list()
-        mobile_to_remove = mobiles[index]
-        self.user.phone_numbers.remove(mobile_to_remove.number)
+
+        try:
+            mobile_to_remove = mobiles[index]
+        except IndexError:
+            return self.sync_user()
+
+        try:
+            self.user.phone_numbers.remove(mobile_to_remove.number)
+        except PrimaryElementViolation:
+            # The exception was raised because it would result in zero
+            # primary mobiles while there still exits verified ones.
+            # Therefore we first we have to set one of the other
+            # verified mobiles as primary before we can try to
+            # remove the previous one again.
+            verified_mobiles = self.user.phone_numbers.verified.to_list()
+
+            for mobile in verified_mobiles:
+                if mobile.number != mobile_to_remove.number:
+                    self.user.phone_numbers.primary = mobile.number
+                    break
+
+            self.user.phone_numbers.remove(mobile_to_remove.number)
 
         try:
             self.context.save_dashboard_user(self.user)
@@ -113,6 +136,7 @@ class MobilesActionsView(BaseActionsView):
         }
 
     def setprimary_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         mobiles = self.user.phone_numbers.to_list()
 
         try:
@@ -180,6 +204,7 @@ class MobilesView(BaseFormView):
                                    'primary': False,
                                    'created_ts': datetime.utcnow()
                                    })
+        self.user = get_session_user(self.request)
         self.user.phone_numbers.add(mobile)
         try:
             self.context.save_dashboard_user(self.user)

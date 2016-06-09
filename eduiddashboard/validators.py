@@ -25,8 +25,7 @@ class OldPasswordValidator(object):
         if not request.registry.settings.get('use_vccs', True):
             return
 
-        old_password = value
-        old_password = old_password.replace(" ", "")
+        old_password = value.replace(" ", "")
 
         user = get_session_user(request)
 
@@ -66,7 +65,14 @@ class PasswordValidator(object):
             # User is resetting a forgotten password
             hash_code = request.matchdict['code']
             password_reset = request.db.reset_passwords.find_one({'hash_code': hash_code})
-            user = request.userdb_new.get_user_by_mail(password_reset['email'])
+
+            if password_reset.get('eppn'):
+                user = request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+            # Legacy password reset codes were connected to the user by email
+            elif password_reset.get('email'):
+                user = request.userdb_new.get_user_by_mail(password_reset['email'])
+
         mail_addresses = [item.email for item in user.mail_addresses.to_list()]
 
         veredict = zxcvbn.password_strength(value, user_inputs=mail_addresses)
@@ -143,10 +149,34 @@ class MobilePhoneUniqueValidator(object):
         request = node.bindings.get('request')
         user = request.context.user
         mobile = normalize_to_e_164(request, value)
+
+        # The debug logs below were added to help figure out how a user
+        # managed to get by past this function with a duplicated phone number,
+        # which was caught by userdb while saving the user.
+
+        log.debug("User {!r} tried to add a phone number {!r}: "
+                  "entering 1st code-section that will verify that it's unique."
+                  .format(user.eppn, mobile))
+
         if sanitize_post_key(request, 'add') is not None:
+            log.debug("User {!r} tried to add a phone number {!r}: "
+                      "1st code-section evaluated, POST request OK."
+                      .format(user.eppn, mobile))
+
             if user.phone_numbers.find(mobile):
+                log.debug("User {!r} tried to add a phone number {!r}: "
+                          "2nd code-section evaluated, the user had already "
+                          "added the phone number."
+                          .format(user.eppn, mobile))
+
                 err = _("This mobile phone was already registered")
                 raise colander.Invalid(node, get_localizer(request).translate(err))
+
+            else:
+                log.debug("User {!r} tried to add a phone number {!r}: "
+                          "2nd code-section evaluated, the phone number "
+                          "has not previously been added by the user."
+                          .format(user.eppn, mobile))
 
 
 class EmailOrUsernameExistsValidator(object):
@@ -301,14 +331,20 @@ def _get_age(nin):
 
 
 def validate_nin_by_mobile(request, user, nin):
+    """
+    :param request: The pyramid request
+    :param user: The eduid user
+    :param nin: The NIN
+    :type request: pyramid.request.Request
+    :type user: eduid_userdb.User
+    :type nin: str
+    :return:dict
+    """
     log.info('Trying to verify nin via mobile number for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(nin))
     from eduid_lookup_mobile.utilities import format_NIN
     # Get list of verified mobile numbers
-    verified_mobiles = []
-    for one_mobile in user.phone_numbers.to_list():
-        if one_mobile.is_verified:
-            verified_mobiles.append(one_mobile.number)
+    verified_mobiles = [x.number for x in user.phone_numbers.to_list() if x.is_verified]
 
     national_identity_number = format_NIN(nin)
     status = 'no_phone'
@@ -397,7 +433,8 @@ class NINRegisteredMobileValidator(object):
     def __call__(self, node, value):
         request = node.bindings.get('request')
         settings = request.registry.settings
-        result = validate_nin_by_mobile(request, request.context.user, value)
+        user = get_session_user(request)
+        result = validate_nin_by_mobile(request, user, value)
 
         if not result['success']:
             localizer = get_localizer(request)

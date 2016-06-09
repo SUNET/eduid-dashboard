@@ -50,13 +50,13 @@ admin = urn:mace:eduid.se:role:admin
                          status=302)
 
     def test_logged_withoutpermissions_get(self):
-        self.set_logged(email ='johnsmith@example.org')
+        self.set_logged(email='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
                          status=401)
 
     def test_logged_addpermissions(self):
-        self.set_logged()
+        self.set_logged(email='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.org/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
@@ -66,12 +66,12 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        user = self.dashboard_db.get_user_by_id(ObjectId('901234567890123456789012'))
+        user = self.dashboard_db.get_user_by_mail('johnsmith@example.org')
 
         self.assertEqual(user.entitlements, ['urn:mace:eduid.se:role:admin'])
 
     def test_logged_remove_admin_permissions(self):
-        self.set_logged(email ='johnsmith@example.com')
+        self.set_logged(email='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.org/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
@@ -81,7 +81,7 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        user = self.userdb_new.get_user_by_id(ObjectId('901234567890123456789012'))
+        user = self.dashboard_db.get_user_by_mail('johnsmith@example.org')
 
         self.assertEqual(user.entitlements, ['urn:mace:eduid.se:role:ra'])
 
@@ -91,7 +91,7 @@ admin = urn:mace:eduid.se:role:admin
                          status=401)
 
     def test_logged_add_dirty_permissions(self):
-        self.set_logged()
+        self.set_logged(email='johnsmith@example.com')
         res = self.testapp.get('/users/johnsmith@example.org/permissions/',
                                status=200)
         self.assertIsNotNone(getattr(res, 'form', None))
@@ -103,7 +103,7 @@ admin = urn:mace:eduid.se:role:admin
 
         res = res.form.submit('save')
 
-        user = self.userdb_new.get_user_by_id(ObjectId('901234567890123456789012'))
+        user = self.dashboard_db.get_user_by_mail('johnsmith@example.org')
 
         self.assertEqual(user.entitlements, ['urn:mace:eduid.se:role:admin'])
 

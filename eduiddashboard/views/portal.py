@@ -39,7 +39,6 @@ def profile_editor(context, request):
     """
         Profile editor doesn't have forms. All forms are handle by ajax urls.
     """
-
     view_context = {}
 
     tabs = get_available_tabs(context, request)

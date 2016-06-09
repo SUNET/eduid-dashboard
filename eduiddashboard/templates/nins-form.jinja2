@@ -12,13 +12,15 @@
 
   <div class="table-responsive">
     <table class='table table-striped table-form nins'>
-    {% if active_nin %}
-        <tr class='ninrow' data-identifier="0">
-            <td class='identifier'>{{ active_nin }}</td>
-            <td class='non-identifier'><span class='nobutton'>{{_("Verified")}}</span></td>
-            <td class='non-identifier'><span class='nobutton'>{{_("Active")}}</span></td>
-            <td class='non-identifier'></td>
-        </tr>
+    {% if verified_nins %}
+        {% for nin in verified_nins %}
+            <tr class='ninrow' data-identifier="{{ loop.index0 }}">
+                <td class='identifier'>{{ nin }}</td>
+                <td class='non-identifier'><span class='nobutton'>{{_("Verified")}}</span></td>
+                <td class='non-identifier'><span class='nobutton'>{{_("Active")}}</span></td>
+                <td class='non-identifier'></td>
+            </tr>
+        {% endfor %}
     {% else %}
         {% if not_verified_nins %}
             {% for nin in not_verified_nins %}
@@ -59,18 +61,18 @@
     </table>
   </div>
 
-    {% if active_nin %}
+    {% if verified_nins %}
         <p>{% trans %}Your identity is already confirmed. No further action is required here.{% endtrans %}</p>
     {% endif %}
 {% endblock %}
 
 {% block form_generic_form %}
-  {% if not active_nin and not not_verified_nins %}
+  {% if not verified_nins and not not_verified_nins %}
      {% trans %}<p>Add your Swedish national identity number and initiate the confirmation process using
                 one of the buttons below.</p>{% endtrans %}
   {% endif %}
     <!-- Hiding a form does not make in unusable. we should really have different forms for adding and validating NINs -->
-    <div class='form-content {% if active_nin or not_verified_nins %} hidden{% endif %}'>
+    <div class='form-content {% if verified_nins or not_verified_nins %} hidden{% endif %}'>
       {{ form|safe }}
     </div>
 {% endblock %}

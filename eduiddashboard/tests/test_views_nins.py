@@ -2,12 +2,16 @@ import json
 from mock import patch
 import unittest
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timedelta
+
+import pprint
 
 from eduid_userdb.nin import Nin
+from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.dashboard import UserDBWrapper
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
+from eduiddashboard.utils import retrieve_modified_ts
 
 import logging
 logger = logging.getLogger(__name__)
@@ -27,7 +31,6 @@ class NinsFormTests(LoggedInRequestTests):
     #    #'eduPersonEntitlement': ['urn:mace:eduid.se:role:admin'],
     #    'norEduPersonNIN': []
     #}]
-
 
     def setUp(self):
         super(NinsFormTests, self).setUp()
@@ -163,12 +166,20 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'getcode')
 
     def test_verify_existant_nin_by_mobile(self):
-        ''' '''
         email = self.no_nin_user_email
         self.set_logged(email)
         user = self.userdb_new.get_user_by_mail(email)
+        retrieve_modified_ts(user, self.dashboard_db)
 
         self.assertEqual(user.nins.count, 0)
+
+        # Add a verified phone number to the user in the central userdb
+        user.phone_numbers.add(PhoneNumber({
+            'number': '666666666',
+            'primary': True,
+            'verified': True
+            }))
+        self.dashboard_db.save(user)
 
         # First we add a nin...
         nin = '200010100001'
@@ -189,18 +200,118 @@ class NinsFormTests(LoggedInRequestTests):
                 'success': True,
                 'message': u'Ok',
                 }
-            with patch.object(OldUser, 'retrieve_address', clear=True):
-                OldUser.retrieve_address.return_value = None
-
-                response = self.testapp.post(
-                    '/profile/nins-actions/',
-                    {'identifier': nin + ' 0', 'action': 'verify_mb'}
-                )
+            response = self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': nin + ' 0', 'action': 'verify_mb'}
+            )
         response_json = json.loads(response.body)
         self.assertEqual(response_json['message'], 'Ok')
-        user = self.dashboard_db.get_user_by_eppn('babba-labba')
+        user = self.dashboard_db.get_user_by_mail(email)
         self.assertEqual(user.nins.count, 1)
         self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], nin)
+
+    def test_verify_nin_by_mobile(self):
+        email = self.no_nin_user_email
+        self.set_logged(email)
+        user = self.userdb_new.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 0)
+
+        # Add a verified phone number to the user in the central userdb
+        user.phone_numbers.add(PhoneNumber({
+            'number': '666666666',
+            'primary': True,
+            'verified': True
+            }))
+        user.modified_ts = None
+        self.userdb_new.save(user)
+        retrieve_modified_ts(user, self.dashboard_db)
+        self.dashboard_db.save(user)
+
+        # First we add a nin...
+        new_nin = '200010100001'
+
+        response_form = self.testapp.get('/profile/nins/')
+        form = response_form.forms[self.formname]
+        from eduiddashboard.lookuprelay import LookupMobileRelay
+        with patch.object(LookupMobileRelay, 'find_NIN_by_mobile', clear=True):
+            LookupMobileRelay.find_NIN_by_mobile.return_value = new_nin
+            from eduiddashboard.msgrelay import MsgRelay
+            with patch.object(MsgRelay, 'get_full_postal_address', clear=True):
+                MsgRelay.get_full_postal_address.return_value = {
+                    'Address2': u'StreetName 104',
+                    'PostalCode': u'74142',
+                    'City': u'STOCKHOLM',
+                }
+                form['norEduPersonNIN'].value = new_nin
+                form.submit('add_by_mobile')
+
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 1)
+        self.assertEqual(user.nins.primary.number, new_nin)
+
+    def test_verify_nin_by_letter(self):
+        email = self.no_nin_user_email
+        self.set_logged(email)
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 0)
+
+        new_nin = '200010100001'
+
+        response_form = self.testapp.get('/profile/nins/')
+        form = response_form.forms[self.formname]
+
+        # Need a response object with a json method and self.status_code.
+        class MockResponse:
+            def __init__(self, json_data, status_code):
+                self.json_data = json_data
+                self.status_code = status_code
+
+            def json(self):
+                return self.json_data
+
+        in_24h = datetime.now() + timedelta(hours=24)
+        letter_expires = in_24h.strftime('%s')
+        now_ts = datetime.now().strftime('%s')
+
+        # Send letter
+        import requests
+        with patch.object(requests, 'post', clear=True):
+            requests.post.return_value = MockResponse({'success': True, 'letter_expires': letter_expires}, 200)
+            form['norEduPersonNIN'].value = new_nin
+            form.submit('add_by_letter')
+
+            # Show the pop-up message and if the user's letter has not expired then continue.
+            self.testapp.post(
+                '/profile/nins-actions/',
+                {'identifier': '200010100001 0', 'action': 'verify_lp'})
+
+        # Data returned from idproofing_letter after a successful proofing
+        ret_data = {
+            'verified': True,
+            'number': '200010100001',
+            'created_ts': now_ts,
+            'verified_ts': now_ts,
+            'official_address': {'name': 'name', 'address': 'address'},
+            'transaction_id': 'transaction_id'
+        }
+        # Verify NIN
+        with patch.object(requests, 'post', clear=True):
+            requests.post.return_value = MockResponse({'data': ret_data}, 200)
+            from eduiddashboard.msgrelay import MsgRelay
+            with patch.object(MsgRelay, 'get_full_postal_address', clear=True):
+                MsgRelay.get_full_postal_address.return_value = {
+                    'Address2': u'StreetName 104',
+                    'PostalCode': u'74142',
+                    'City': u'STOCKHOLM',
+                }
+                self.testapp.post(
+                    '/profile/nins-actions/',
+                    {'verification_code': 'bogus_code', 'identifier': '200010100001 0', 'action': 'finish_letter'}
+                )
+
+        user = self.dashboard_db.get_user_by_mail(email)
+        self.assertEqual(user.nins.count, 1)
+        self.assertEqual(user.nins.to_list_of_dicts()[0]['number'], new_nin)
 
     @unittest.skip('Functionality temporary removed')
     def test_remove_existant_verified_nin(self):
@@ -246,28 +357,51 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(response_json['result'], 'out_of_sync')
 
     def test_steal_verified_nin(self):
+        logging.debug('\n\n\ntest_steal_verified_nin starting\n\n\n')
+        am_user = self.amdb.get_user_by_eppn('hubba-bubba')
+        logging.debug('User {!s} with the NIN in AM is now:\n{!s}\n\n'.format(am_user,
+                                                                              pprint.pformat(am_user.to_dict())))
+        # Extra debug
+        nin = am_user.nins.primary.number
+        foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                              include_unconfirmed = True)
+        logging.debug('Extra debug #1, searched for {!r} in {!r}: {!r}\n\n\n'.format(nin, self.amdb, foo_users))
+
         self.set_logged(email=self.no_nin_user_email)
 
         response_form = self.testapp.get('/profile/nins/')
 
         form = response_form.forms[self.formname]
-        nin = '197801011234'
+        nin = am_user.nins.primary.number
         form['norEduPersonNIN'].value = nin
 
-        from eduiddashboard.msgrelay import MsgRelay
+        # Extra debug
+        foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                             include_unconfirmed = True)
+        logging.debug('Extra debug #1, searched for {!r} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
+        #
+        # Add the NIN (still pending verification) to the user we're logged in as (the user without a NIN)
+        #
+        from eduiddashboard.msgrelay import MsgRelay
         with patch.multiple(MsgRelay, nin_validator=return_true,
                             nin_reachable=return_true):
-                
             response = form.submit('add')
-
         self.assertEqual(response.status, '200 OK')
+
+        # Extra debug
+        foo_users = self.amdb.get_user_by_nin(nin, raise_on_missing = False, return_list = True,
+                                              include_unconfirmed = True)
+        logging.debug('Extra debug #2, searched for {!r} in {!r}: {!r}'.format(nin, self.amdb, foo_users))
 
         old_user = self.db.profiles.find_one({'_id': ObjectId('012345678901234567890123')})
         old_user = OldUser(old_user)
 
         self.assertIn(nin, old_user.get_nins())
 
+        #
+        # Find the verification created when we called 'add' above
+        #
         nin_doc = self.db.verifications.find_one({
             'model_name': 'norEduPersonNIN',
             'user_oid': ObjectId('901234567890123456789012'),
@@ -283,6 +417,9 @@ class NinsFormTests(LoggedInRequestTests):
             with patch.object(MsgRelay, 'postal_address_to_transaction_audit_log'):
                 MsgRelay.postal_address_to_transaction_audit_log.return_value = True
 
+                #
+                # Verify the new NIN using the verificaction code
+                #
                 response = self.testapp.post(
                     '/profile/nins-actions/',
                     {'identifier': '197801011234 0', 'action': 'verify', 'code': nin_doc['code']}

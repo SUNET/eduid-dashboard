@@ -1,13 +1,9 @@
 import json
-from copy import deepcopy
-from bson import ObjectId
 
 from pyramid.httpexceptions import (HTTPOk,
-                                    HTTPMethodNotAllowed,
                                     HTTPBadRequest)
 from pyramid.i18n import get_localizer
 from pyramid.response import Response
-from pyramid.renderers import render_to_response
 
 from pyramid_deform import FormView
 from eduid_userdb.dashboard import DashboardUser
@@ -17,15 +13,13 @@ from eduid_userdb.exceptions import UserOutOfSync
 from eduiddashboard.forms import BaseForm
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import (get_short_hash,
-                                  sanitize_get,
-                                  sanitize_post_key,
                                   sanitize_post_multidict,
                                   retrieve_modified_ts)
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
                                           new_verification_code)
 from eduiddashboard import log
-from eduiddashboard.session import store_session_user
+from eduiddashboard.session import get_session_user, store_session_user
 
 
 def get_dummy_status(request, user):
@@ -57,7 +51,7 @@ class BaseFormView(FormView):
 
     def __init__(self, context, request):
         super(BaseFormView, self).__init__(request)
-        self.user = context.user
+        self.user = get_session_user(self.request)
         self.context = context
         self.response = request.response
 
@@ -190,6 +184,7 @@ class BaseActionsView(object):
         """ Common action to verify some given data.
             You can override in subclasses
         """
+        self.user = get_session_user(self.request)
 
         # Catch the unlikely event when the user have e.g. removed all entries
         # in a separate tab, or one in the middle and then tries to resend the
@@ -257,6 +252,7 @@ class BaseActionsView(object):
             }
 
     def resend_code_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         data = self.user.to_dict().get(self.data_attribute, [])
 
         # Catch the unlikely event when the user have e.g. removed all entries

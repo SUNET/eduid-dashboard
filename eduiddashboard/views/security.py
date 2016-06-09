@@ -16,7 +16,6 @@ from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
 from eduid_userdb.exceptions import UserDoesNotExist
-from eduid_userdb.dashboard import DashboardUser
 from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
@@ -69,12 +68,20 @@ def change_password(request, user, old_password, new_password):
 def new_reset_password_code(request, user, mechanism='email', next_view='reset-password-step2'):
     hash_code = get_unique_hash()
     date = datetime.now(pytz.utc)
+
+    # Remove previous password reset codes
     request.db.reset_passwords.remove({
-        'email': user.eppn
+        'eppn': user.eppn
     })
 
+    # Also remove legacy password reset codes
+    if user.mail_addresses.primary:
+        request.db.reset_passwords.remove({
+            'email': user.mail_addresses.primary.email
+        })
+
     reset_doc = {
-        'email': user.eppn,
+        'eppn': user.eppn,
         'hash_code': hash_code,
         'mechanism': mechanism,
         'created_at': date,
@@ -178,7 +185,7 @@ def unverify_user_nins(request, user):
     return True
 
 
-def remove_user_mobiles(request, user):
+def unverify_user_mobiles(request, user):
     """
     :param request: request object
     :type request:
@@ -187,14 +194,13 @@ def remove_user_mobiles(request, user):
     :return: True
     :rtype: boolean
 
-    remove all verified mobile phone numbers.
+    unverify all verified mobile phone numbers.
     """
-    for mobile in user.phone_numbers.verified.to_list():
-        if not mobile.is_primary:
-            user.phone_numbers.remove(mobile.number)
-    user.phone_numbers.remove(user.phone_numbers.primary.number)
-    for mobile in user.phone_numbers.to_list():
-        user.phone_numbers.remove(mobile.number)
+    verified = user.phone_numbers.verified.to_list()
+    if verified:
+        user.phone_numbers.primary.is_primary = False
+        for phone_number in verified:
+            phone_number.is_verified = False
     request.context.save_dashboard_user(user)
     return True
 
@@ -626,7 +632,14 @@ class ResetPasswordMobileView2(BaseResetPasswordView):
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
         if password_reset.get('mobile_hash_code') == form_data['mobile_code']:
             self.request.db.reset_passwords.update(password_reset, {'$set': {'mobile_hash_code_verified': True}})
-            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
+            if password_reset.get('eppn'):
+                user = self.request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+            # Legacy password reset codes were connected to the user by email
+            elif password_reset.get('email'):
+                user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
             log.debug('Mobile password reset code verified for user {!r}'.format(user))
             return HTTPFound(self.request.route_path('reset-password-step2', code=hash_code))
         log.debug('Mobile password reset code verification failed for password reset document {!r}'.format(
@@ -663,7 +676,14 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         # Collect the users mail addresses for use with zxcvbn
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
+        if password_reset.get('eppn'):
+            user = self.request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+        # Legacy password reset codes were connected to the user by email
+        elif password_reset.get('email'):
+            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
         mail_addresses = []
         for item in user.mail_addresses.to_list():
             mail_addresses.append(item.email)
@@ -710,7 +730,13 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         form_data = self.schema.serialize(passwordform)
         hash_code = self.request.matchdict['code']
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
-        user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
+
+        if password_reset.get('eppn'):
+            user = self.request.userdb_new.get_user_by_eppn(password_reset['eppn'])
+
+        # Legacy password reset codes were connected to the user by email
+        elif password_reset.get('email'):
+            user = self.request.userdb_new.get_user_by_mail(password_reset['email'])
 
         log.debug("Loaded user {!s} from {!s}".format(user, self.request.userdb))
 
@@ -734,7 +760,8 @@ class ResetPasswordStep2View(BaseResetPasswordView):
                 retrieve_modified_ts(user, self.request.dashboard_userdb)
                 # We need to unverify a users phone numbers to make sure that an attacker can not
                 # verify the account again without control over the users phone number
-                remove_user_mobiles(self.request, user)
+                # This should be changed to only unverify the phone numbers instead of removing them.
+                unverify_user_mobiles(self.request, user)
 
         # Save new password
         new_password = new_password.replace(' ', '')

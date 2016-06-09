@@ -403,12 +403,9 @@ def _get_user_by_eppn(request, eppn, legacy_user):
         logger.debug('Loading modified_ts from dashboard db (profiles) for user {!r}'.format(user))
         user.retrieve_modified_ts(request.db.profiles)
         return user
-    try:
-        return request.dashboard_userdb.get_user_by_eppn(eppn)
-    except UserDoesNotExist:
-        user = request.userdb_new.get_user_by_eppn(eppn)
-        retrieve_modified_ts(user, request.dashboard_userdb)
-        return user
+    user = request.userdb_new.get_user_by_eppn(eppn)
+    retrieve_modified_ts(user, request.dashboard_userdb)
+    return user
 
 
 

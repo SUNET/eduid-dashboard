@@ -25,9 +25,6 @@ from eduiddashboard.utils import retrieve_modified_ts
 from eduiddashboard.session import get_session_user
 from eduiddashboard import log
 
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
-from eduid_userdb import User
-
 
 def dummy_message(request, message):
     """
@@ -149,7 +146,8 @@ def set_nin_verified(request, user, new_nin, reference=None):
     log.info('Trying to verify NIN for user {!r}.'.format(user))
     log.debug('NIN: {!s}.'.format(new_nin))
     # Start by removing nin from any other user
-    old_user = request.dashboard_userdb.get_user_by_nin(new_nin, raise_on_missing=False)
+    old_user = request.userdb_new.get_user_by_nin(new_nin, raise_on_missing=False)
+    log.debug('Searched for NIN {!r} in {!s}: {!r}'.format(new_nin, request.userdb_new, old_user))
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
@@ -233,7 +231,7 @@ def set_phone_verified(request, user, new_number):
     log.info('Trying to verify phone number for user {!r}.'.format(user))
     log.debug('Phone number: {!s}.'.format(new_number))
     # Start by removing mobile number from any other user
-    old_user = request.dashboard_userdb.get_user_by_phone(new_number, raise_on_missing=False)
+    old_user = request.userdb_new.get_user_by_phone(new_number, raise_on_missing=False)
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
@@ -306,7 +304,7 @@ def set_email_verified(request, user, new_mail):
     log.info('Trying to verify mail address for user {!r}.'.format(user))
     log.debug('Mail address: {!s}.'.format(new_mail))
     # Start by removing the email address from any other user that currently has it (verified)
-    old_user = request.dashboard_userdb.get_user_by_mail(new_mail, raise_on_missing=False)
+    old_user = request.userdb_new.get_user_by_mail(new_mail, raise_on_missing=False)
     steal_count = 0
     if old_user and old_user.user_id != user.user_id:
         retrieve_modified_ts(old_user, request.dashboard_userdb)
@@ -318,7 +316,7 @@ def set_email_verified(request, user, new_mail):
     log.info('Mail address verified for user {!r}.'.format(user))
     request.stats.count('dashboard/verify_mail_stolen', steal_count)
     request.stats.count('dashboard/verify_mail_completed', 1)
-    return _('Email {obj} verified'.format(obj=new_mail))
+    return _('Email {obj} verified')
 
 
 def _remove_mail_from_user(email, user):

@@ -1,5 +1,4 @@
 from bson import ObjectId
-from datetime import datetime
 from eduid_userdb.dashboard import DashboardLegacyUser, DashboardUser
 from eduid_userdb import Password
 
@@ -176,10 +175,10 @@ def provision_credentials(vccs_url, new_password, user):
 
 def revoke_all_credentials(vccs_url, user):
     vccs = get_vccs_client(vccs_url)
-    passwords = user.passwords.to_list_of_dicts()
+    passwords = user.passwords.to_list()
     to_revoke = []
-    for passwd_dict in passwords:
-        credential_id = str(passwd_dict['id'])
+    for passwd in passwords:
+        credential_id = str(passwd.id)
         factor = vccs_client.VCCSRevokeFactor(
             credential_id,
             'subscriber requested termination',

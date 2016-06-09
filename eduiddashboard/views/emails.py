@@ -14,6 +14,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Email
 from eduiddashboard.utils import get_icon_string
 from eduiddashboard.views import BaseFormView, BaseActionsView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -73,6 +74,7 @@ class EmailsActionsView(BaseActionsView):
 
     def setprimary_action(self, index, post_data):
 
+        self.user = get_session_user(self.request)
         try:
             mail = self.user.mail_addresses.to_list()[index]
         except IndexError:
@@ -99,6 +101,7 @@ class EmailsActionsView(BaseActionsView):
                 'message': get_localizer(self.request).translate(message)}
 
     def remove_action(self, index, post_data):
+        self.user = get_session_user(self.request)
         emails = self.user.mail_addresses.to_list()
         if len(emails) == 1:
             message = _('Error: You only have one email address and it  '
@@ -178,6 +181,7 @@ class EmailsView(BaseFormView):
                 application='dashboard',
                 verified=False, primary=False)
 
+        self.user = get_session_user(self.request)
         self.user.mail_addresses.add(new_email)
         try:
             self.context.save_dashboard_user(self.user)

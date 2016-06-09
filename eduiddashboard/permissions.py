@@ -311,6 +311,7 @@ class HomeFactory(BaseFactory):
         logger.debug('HomeFactory get_user returning {!s}'.format(user))
         return user
 
+
 class HelpFactory(BaseFactory):
     pass
 

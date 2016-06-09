@@ -9,6 +9,7 @@ from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import Person
 
 from eduiddashboard.views import BaseFormView
+from eduiddashboard.session import get_session_user
 
 
 def get_status(request, user):
@@ -63,6 +64,7 @@ class PersonalDataView(BaseFormView):
         person = self.schema.serialize(user_modified)
         del(person['csrf'])  # Don't save the CSRF token in the user database
 
+        self.user = get_session_user(self.request)
         new_preferred_language = person.get('preferredLanguage')
         old_preferred_language = self.user.language
 

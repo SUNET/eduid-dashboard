@@ -21,14 +21,14 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.5.1b3'
+version = '0.5.1b5'
 
 requires = [
     'eduid_am >= 0.6.0',
     'eduid_msg >= 0.9.0',
     'vccs_client >= 0.4.1',
     'eduid_lookup_mobile >= 0.0.4',
-    'eduid_userdb >= 0.0.2',
+    'eduid_userdb >= 0.2.2',
     'eduid-common[webapp] >= 0.1.3b5',
     'pysaml2 == 4.0.3rc1',
 
@@ -62,7 +62,7 @@ if sys.version_info[0] < 3:
 
 test_requires = [
     'WebTest==2.0.18',
-    'mock==1.0.1',
+    'mock',
     'eduid_dashboard_amp',
 ]
 
@@ -73,9 +73,9 @@ docs_extras = [
 
 
 testing_extras = test_requires + [
-    'nose==1.2.1',
-    'coverage==3.6',
-    'nosexcover==1.0.8',
+    'nose',
+    'coverage',
+    'nosexcover',
 ]
 
 waitress_extras = requires + [

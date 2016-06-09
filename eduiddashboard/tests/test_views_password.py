@@ -215,7 +215,7 @@ class TerminateAccountTests(LoggedInRequestTests):
     def test_reset_password_unterminates_account(self):
         email = 'johnsmith@example.com'
         # Set up a bunch of faked passwords to make sure they are all revoked
-        user = self.dashboard_db.get_user_by_mail(email)
+        user = self.userdb_new.get_user_by_mail(email)
         retrieve_modified_ts(user, self.dashboard_db)
         for i in range(7):
             pw = Password(credential_id=ObjectId(),
@@ -342,7 +342,6 @@ TEST_VERIFICATIONS = [
         'timestamp': datetime.utcnow(),
         'verified': True,
     }]
-
 
 
 def return_true(*args, **kwargs):
@@ -550,7 +549,6 @@ class ResetPasswordFormTests(LoggedInRequestTests):
 
         reset_password = self.db.reset_passwords.find_one({'hash_code': hash_code})
         self.assertEqual(reset_password.get('mobile_hash_code_verified', False), False)
-
 
     def test_reset_password_mobile_invalid_code(self):
         hash_code = '123456'

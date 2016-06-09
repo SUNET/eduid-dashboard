@@ -1,4 +1,4 @@
-#from bleach import clean
+from bleach import clean
 from hashlib import sha256
 from urllib import unquote, quote
 from uuid import uuid4
@@ -7,7 +7,6 @@ import time
 import pytz
 import logging
 from pwgen import pwgen
-from datetime import datetime
 
 from pyramid.i18n import TranslationString as _
 from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
@@ -15,8 +14,6 @@ from pyramid.httpexceptions import HTTPForbidden, HTTPBadRequest
 from eduiddashboard.compat import text_type
 
 from eduid_userdb.exceptions import UserDBValueError
-from eduid_userdb.dashboard import DashboardLegacyUser as OldUser, DashboardUser
-from eduid_userdb import User
 
 
 logger = logging.getLogger(__name__)
@@ -216,7 +213,7 @@ def retrieve_modified_ts(user, dashboard_userdb):
         dashboard_user.modified_ts = True  # use current time
         logger.debug("Updating user {!s} with new modified_ts: {!s}".format(
             dashboard_user, dashboard_user.modified_ts))
-        dashboard_userdb.save(dashboard_user)
+        dashboard_userdb.save(dashboard_user, check_sync = False)
 
     user.modified_ts = dashboard_user.modified_ts
     logger.debug("Updating {!s} with modified_ts from dashboard user {!s}: {!s}".format(
@@ -235,6 +232,7 @@ def sanitize_session_get(request, *args):
     Wrapper around request.session.get() to sanitize untrusted input.
     """
     return _sanitize_common(request, 'session', *args)
+
 
 def sanitize_cookies_get(request, *args):
     """
@@ -391,7 +389,7 @@ def _safe_clean(untrusted_text, strip_characters=False):
     :rtype: str | unicode
     """
     try:
-        return untrusted_text
+        return clean(untrusted_text, strip=strip_characters)
     except KeyError:
         logger.warn('A malicious user tried to crash the application by '
                     'sending illegal UTF-8 in an URI or other untrusted '
