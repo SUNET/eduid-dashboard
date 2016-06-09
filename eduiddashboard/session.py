@@ -41,15 +41,18 @@ class SessionFactory(CommonSessionFactory):
         cookies = request.cookies
         token = cookies.get(session_name, None)
         if token is not None:
-            base_session = self.manager.get_session(token=token)
-            session = Session(request, base_session)
-        else:
-            base_session = self.manager.get_session(data={})
-            base_session['flash_messages'] = {'default': []}
-            base_session.commit()
-            session = Session(request, base_session, new=True)
-            session.set_cookie()
-        return session
+            try:
+                base_session = self.manager.get_session(token=token)
+                existing_session = Session(request, base_session)
+                return existing_session
+            except KeyError:  # No session data found
+                pass
+        base_session = self.manager.get_session(data={})
+        base_session['flash_messages'] = {'default': []}
+        base_session.commit()
+        new_session = Session(request, base_session, new=True)
+        new_session.set_cookie()
+        return new_session
 
 
 def store_session_user(request, user, edit_user=False):
