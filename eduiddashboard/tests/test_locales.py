@@ -19,7 +19,7 @@ class LocaleChangeTests(LoggedInRequestTests):
     def test_change_language_with_referer(self):
         self.set_logged(email = 'johnsmith@example.com')
         host = self.settings['dashboard_hostname']
-        referer = 'http://{hostname}/profile/'.format(hostname=host)
+        referer = 'http://{hostname}/'.format(hostname=host)
         response = self.testapp.get('/set_language/?lang=sv',
                                     extra_environ={
                                         'HTTP_REFERER': referer,
@@ -51,18 +51,23 @@ class LocaleChangeTests(LoggedInRequestTests):
         self.set_logged(email = 'johnsmith@example.com')
         host = self.settings['dashboard_hostname']
         dashboard_baseurl = self.settings['dashboard_baseurl']
-        referer = 'http://{hostname}/profile/'.format(hostname=host)
+        referer = 'http://{hostname}/'.format(hostname=host)
         invalid_host = 'attacker.controlled.site'
-        response = self.testapp.get('/set_language/?lang=sv',
-                                    extra_environ={
+        import urlparse
+        url = urlparse.urljoin(referer, '/set_language/?lang=sv')
+        response = self.testapp.get(url, extra_environ={
                                         'HTTP_REFERER': referer,
                                         'HTTP_HOST': invalid_host
                                     },
                                     status=302)
+        # the semantics checked by this test have changed.
+        # now, if the invalid_host does not coincide with the
+        # cookie domain, the authn cookie is not sent in the request,
+        # and therefore the request is taken as unauthn and
+        # redirected to the authn service.
         cookies = self.testapp.cookies
-        self.assertIsNotNone(cookies.get('lang', None))
-        self.assertEqual('sv', cookies.get('lang', None))
-        self.assertEqual(dashboard_baseurl, response.location)
+        self.assertIsNone(cookies.get('lang', None))
+        self.assertTrue(self.settings['token_service_url'] in response.location)
 
     def test_change_language_without_referer(self):
         self.set_logged(email ='johnsmith@example.com')
