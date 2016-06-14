@@ -30,7 +30,7 @@ from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
-from eduiddashboard.session import store_session_user, get_logged_in_user
+from eduiddashboard.session import store_session_user, get_logged_in_user, get_session_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -281,7 +281,7 @@ def account_terminated(context, request):
         raise HTTPFound(context.route_url('profile-editor'))
 
     user = get_session_user(request)
-    log.debug('Removing Authn ts for user {!r} before'
+    logger.debug('Removing Authn ts for user {!r} before'
             ' changing the password'.format(user))
     del request.session['reauthn-for-termination']
 
