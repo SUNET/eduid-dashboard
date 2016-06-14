@@ -481,7 +481,6 @@ def main(global_config, **settings):
                           locale_negotiator=locale_negotiator)
 
     config.add_tween('eduiddashboard.middleware.authn_tween_factory')
-    config.add_tween('eduiddashboard.middleware.reauthn_ts_tween_factory')
 
     config.set_request_property(get_locale_name, 'locale', reify=True)
 
