@@ -269,7 +269,7 @@ def account_terminated(context, request):
     """
     settings = request.registry.settings
 
-    authn_ts = self.request.session.get('reauthn-for-termination', None)
+    authn_ts = request.session.get('reauthn-for-termination', None)
     if authn_ts is None:
         raise HTTPBadRequest(_('No authentication info'))
     now = datetime.utcnow()
