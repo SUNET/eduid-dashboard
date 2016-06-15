@@ -93,8 +93,7 @@ class BaseFactory(RootFactory):
         self.request = request
         settings = self.request.registry.settings
         self.workmode = settings.get('workmode')
-        self.main_attribute = self.request.registry.settings.get(
-            'saml2.user_main_attribute', 'mail')
+        self.main_attribute = 'eduPersonPrincipalName'
         self._cached_user = None
 
         if not self.authorize():
