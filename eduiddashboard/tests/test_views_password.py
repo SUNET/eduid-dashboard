@@ -104,12 +104,12 @@ class PasswordFormTests(LoggedInRequestTests):
         form = response.forms['start-password-change-form']
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
-        self.assertIn('idp.example.com', form_response.location)
+        self.assertIn('authn.example.com', form_response.location)
         response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
         self.set_logged(email = self.user.mail_addresses.primary.email,
-                        extra_session_data = {'re-authn-ts': int(time.time())})
+                        extra_session_data = {'reauthn-for-chpass': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
 
@@ -128,7 +128,7 @@ class PasswordFormTests(LoggedInRequestTests):
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
         self.set_logged(email = self.user.mail_addresses.primary.email,
-                        extra_session_data = {'re-authn-ts': int(time.time())})
+                        extra_session_data = {'reauthn-for-chpass': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
@@ -153,7 +153,7 @@ class PasswordFormTests(LoggedInRequestTests):
         form['custom_password'].value = '0l8m vta8 j9lr'
         form['repeated_password'].value = form['custom_password'].value
         self.set_logged(email = self.user.mail_addresses.primary.email,
-                        extra_session_data = {'re-authn-ts': int(time.time())})
+                        extra_session_data = {'reauthn-for-chpass': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
@@ -185,7 +185,7 @@ class PasswordFormTests(LoggedInRequestTests):
             form['custom_password'].value = password
             form['repeated_password'].value = form['custom_password'].value
             self.set_logged(email = self.user.mail_addresses.primary.email,
-                            extra_session_data = {'re-authn-ts': int(time.time())})
+                            extra_session_data = {'reauthn-for-chpass': int(time.time())})
             from eduiddashboard.validators import CSRFTokenValidator
             with patch.object(CSRFTokenValidator, '__call__', clear=True):
                 CSRFTokenValidator.__call__.return_value = None
