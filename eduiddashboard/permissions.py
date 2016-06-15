@@ -89,12 +89,6 @@ class BaseFactory(RootFactory):
 
     def __init__(self, request):
         user = get_logged_in_user(request, legacy_user = False, raise_on_not_logged_in = False)
-        if user is None:
-            headers = forget(request)
-            url = request.route_path('saml2-login')
-            home = request.route_path('home')
-            url += '?next={0}'.format(home)
-            raise HTTPFound(location=url, headers=headers)
         self._logged_in_user = user
         self.request = request
         settings = self.request.registry.settings
