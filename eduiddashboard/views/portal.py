@@ -206,6 +206,14 @@ def token_login(context, request):
         return HTTPBadRequest()
 
 
+@view_config(route_name='logout')
+def logout(context, request):
+    settings = request.registry.settings
+    authn_url = settings.get('token_service_url')
+    logout_url = urlparse.urljoin(ts_url, 'logout')
+    return HTTPFound(location=logout_url)
+
+
 @view_config(route_name='set_language', request_method='GET')
 def set_language(context, request):
     import re
