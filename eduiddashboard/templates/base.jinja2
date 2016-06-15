@@ -66,7 +66,7 @@
               </ul>
               <div class="buttons nav navbar-nav navbar-right">
               {% if request.is_logged %}
-                <div class="button log-out"><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></div>
+                <div class="button log-out"><a href="{{ request.route_path('logout') }}">{{ _("Logout") }}</a></div>
               {% else %}
                 <div class="button orange">
                         <!-- Link leads to signup page -->

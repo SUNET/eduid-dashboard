@@ -14,7 +14,6 @@ from pyramid.settings import asbool
 
 from deform_bootstrap import Form
 
-from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
@@ -23,13 +22,10 @@ from eduiddashboard.utils import (verify_auth_token,
                                   sanitize_post_key)
 from eduiddashboard.loa import get_max_available_loa
 from eduiddashboard.i18n import TranslationString as _
-from eduiddashboard.saml2.views import logout_view
 from eduiddashboard.views.mobiles import has_confirmed_mobile
 from eduiddashboard.models import UserSearcher
 from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
-from eduiddashboard.saml2.utils import get_location
-from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
 from eduiddashboard.session import store_session_user, get_logged_in_user, get_session_user
 
 import logging

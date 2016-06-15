@@ -10,6 +10,9 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
+from pyramid.authentication import (AuthTktAuthenticationPolicy,
+                                    SessionAuthenticationPolicy)
+from pyramid.authorization import ACLAuthorizationPolicy
 
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
@@ -262,6 +265,7 @@ def includeme(config):
         config.include(admin_urls, route_prefix='/admin/{userid}/')
 
     config.add_route('token-login', '/tokenlogin/')
+    config.add_route('logout', '/logout')
     if settings['workmode'] == 'personal':
         config.add_route('verifications',
                          '/verificate/{model}/{code}/',

@@ -202,14 +202,6 @@ class PasswordFormTests(LoggedInRequestTests):
         self.patcher.stop()
 
 
-FAKE_SESSION_INFO = {
-    'authn_info': [('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', [])],
-    'ava': {'mail': ['johnsmith@example.com']},
-    'came_from': 'http://profile.eduid.example.com:6544/profile/account-terminated/',
-    'issuer': 'https://idp.example.com/simplesaml/saml2/idp/metadata.php',
-    'not_on_or_after': 1417031214}
-
-
 class TerminateAccountTests(LoggedInRequestTests):
 
     def test_reset_password_unterminates_account(self):
@@ -251,13 +243,10 @@ class TerminateAccountTests(LoggedInRequestTests):
             with patch('eduiddashboard.views.portal.send_termination_mail'):
                 from eduiddashboard.views.portal import send_termination_mail
                 send_termination_mail.return_value = None
-                with patch('eduiddashboard.views.portal.logout_view'):
-                    from eduiddashboard.views.portal import logout_view
-                    logout_view.return_value = None
-                    store_session_user(request, self.user)
-                    self.set_logged(email = self.user.mail_addresses.primary.email,
-                                    extra_session_data = {'reauthn-for-termination': int(time.time())})
-                    response = self.testapp.get('/profile/account-terminated/')
+                store_session_user(request, self.user)
+                self.set_logged(email = self.user.mail_addresses.primary.email,
+                                extra_session_data = {'reauthn-for-termination': int(time.time())})
+                response = self.testapp.get('/profile/account-terminated/')
 
         # Verify the user doesn't have ANY passwords and IS terminated at this point
         user = self.dashboard_db.get_user_by_mail(email)
