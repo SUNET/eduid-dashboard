@@ -239,7 +239,7 @@ class TerminateAccountTests(LoggedInRequestTests):
 
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
-        self.assertIn('idp.example.com', form_response.location)
+        self.assertIn('authn.example.com', form_response.location)
         with patch('eduiddashboard.vccs.get_vccs_client'):
             from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
@@ -255,11 +255,9 @@ class TerminateAccountTests(LoggedInRequestTests):
                     from eduiddashboard.views.portal import logout_view
                     logout_view.return_value = None
                     store_session_user(request, self.user)
-                    request.POST['RelayState'] = '/profile/account-terminated/'
-                    request.context.propagate_user_changes = lambda x: None
-                    from eduiddashboard.views.portal import account_termination_action
-                    user = self.userdb_new.get_user_by_mail(email)
-                    account_termination_action(request, FAKE_SESSION_INFO, user)
+                    self.set_logged(email = self.user.mail_addresses.primary.email,
+                                    extra_session_data = {'reauthn-for-termination': int(time.time())})
+                    response = self.testapp.get('/profile/account-terminated/')
 
         # Verify the user doesn't have ANY passwords and IS terminated at this point
         user = self.dashboard_db.get_user_by_mail(email)
