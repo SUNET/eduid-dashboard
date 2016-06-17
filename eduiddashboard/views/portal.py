@@ -1,5 +1,8 @@
 import deform
 import re
+from datetime import datetime
+import urlparse
+from urllib import urlencode
 
 from pyramid.i18n import get_locale_name
 from pyramid.httpexceptions import HTTPFound, HTTPBadRequest, HTTPNotFound
@@ -27,7 +30,7 @@ from eduiddashboard.emails import send_termination_mail
 from eduiddashboard.vccs import revoke_all_credentials
 from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
-from eduiddashboard.session import store_session_user, get_logged_in_user
+from eduiddashboard.session import store_session_user, get_logged_in_user, get_session_user
 
 import logging
 logger = logging.getLogger(__name__)
@@ -254,14 +257,6 @@ def set_language(context, request):
 @view_config(route_name='account-terminated',
              renderer='templates/account-terminated.jinja2',)
 def account_terminated(context, request):
-    '''
-    landing page after account termination
-    '''
-    return {}
-
-
-@acs_action('account-termination-action')
-def account_termination_action(request, session_info, user):
     """
     The account termination action,
     removes all credentials for the terminated account
@@ -273,8 +268,24 @@ def account_termination_action(request, session_info, user):
     :type user: eduid_userdb.dashboard.DashboardLegacyUser
     """
     settings = request.registry.settings
-    logged_user = get_logged_in_user(request, legacy_user = False)
 
+    authn_ts = request.session.get('reauthn-for-termination', None)
+    if authn_ts is None:
+        raise HTTPBadRequest(_('No authentication info'))
+    now = datetime.utcnow()
+    delta = now - datetime.fromtimestamp(authn_ts)
+    # XXX put the reauthn timeout in the settings
+    if int(delta.total_seconds()) > 600:
+        msg = _('Stale authentication info. Please try again.')
+        request.session.flash('error|' + msg)
+        raise HTTPFound(context.route_url('profile-editor'))
+
+    user = get_session_user(request)
+    logger.debug('Removing Authn ts for user {!r} before'
+            ' changing the password'.format(user))
+    del request.session['reauthn-for-termination']
+
+    logged_user = get_logged_in_user(request, legacy_user = False)
     if logged_user.user_id != user.user_id:
         raise HTTPUnauthorized("Wrong user")
 
@@ -292,11 +303,7 @@ def account_termination_action(request, session_info, user):
     # email the user
     send_termination_mail(request, logged_user)
 
-    logger.debug("Logging out after terminating user {!s}".format(user))
-    # logout
-    next_page = sanitize_post_key(request, 'RelayState', '/')
-    request.session['next_page'] = next_page
-    return logout_view(request)
+    return {}
 
 
 @view_config(route_name='terminate-account', request_method='POST',
@@ -315,15 +322,19 @@ def terminate_account(context, request):
     if csrf != request.session.get_csrf_token():
         return HTTPBadRequest()
 
-    selected_idp = request.session.get('selected_idp')
-    relay_state = context.route_url('account-terminated')
-    loa = context.get_loa()
-    info = get_authn_request(request.registry.settings, request.session,
-                             relay_state, selected_idp,
-                             required_loa=loa, force_authn=True)
-    schedule_action(request.session, 'account-termination-action')
+    ts_url = request.registry.settings.get('token_service_url')
+    terminate_url = urlparse.urljoin(ts_url, 'terminate')
+    next_url = request.route_url('account-terminated')
 
-    return HTTPFound(location=get_location(info))
+    params = {'next': next_url}
+
+    url_parts = list(urlparse.urlparse(terminate_url))
+    query = urlparse.parse_qs(url_parts[4])
+    query.update(params)
+
+    url_parts[4] = urlencode(query)
+    location = urlparse.urlunparse(url_parts)
+    return HTTPFound(location=location)
 
 
 @view_config(route_name='nins-verification-chooser',

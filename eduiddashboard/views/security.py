@@ -2,7 +2,8 @@
 
 from deform import Button
 import json
-
+import urlparse
+from urllib import urlencode
 from datetime import datetime, timedelta
 import time
 from bson import ObjectId
@@ -216,29 +217,19 @@ def start_password_change(context, request):
     if csrf != request.session.get_csrf_token():
         return HTTPBadRequest()
 
-    selected_idp = request.session.get('selected_idp')
-    relay_state = context.route_url('profile-editor')
-    loa = context.get_loa()
-    info = get_authn_request(request.registry.settings, request.session,
-                             relay_state, selected_idp,
-                             required_loa=loa, force_authn=True)
-    schedule_action(request.session, 'change-password-action')
+    ts_url = request.registry.settings.get('token_service_url')
+    chpass_url = urlparse.urljoin(ts_url, 'chpass')
+    next_url = request.route_url('password-change')
 
-    return HTTPFound(location=get_location(info))
+    params = {'next': next_url}
 
+    url_parts = list(urlparse.urlparse(chpass_url))
+    query = urlparse.parse_qs(url_parts[4])
+    query.update(params)
 
-@acs_action('change-password-action')
-def change_password_action(request, session_info, user):
-    logged_user = get_logged_in_user(request, legacy_user = False)
-
-    if logged_user.user_id != user.user_id:
-        raise HTTPUnauthorized("Wrong user")
-
-    # set timestamp in session
-    log.debug('Setting Authn ts for user {!r}'.format(user))
-    request.session['re-authn-ts'] = int(time.time())
-    # send to password change form
-    return HTTPFound(request.route_url('password-change'))
+    url_parts[4] = urlencode(query)
+    location = urlparse.urlunparse(url_parts)
+    return HTTPFound(location=location)
 
 
 @view_config(route_name='security',
@@ -316,11 +307,12 @@ class PasswordsView(BaseFormView):
         return self._password
 
     def save_success(self, passwordform):
-        authn_ts = self.request.session.get('re-authn-ts', None)
+        authn_ts = self.request.session.get('reauthn-for-chpass', None)
         if authn_ts is None:
             raise HTTPBadRequest(_('No authentication info'))
         now = datetime.utcnow()
         delta = now - datetime.fromtimestamp(authn_ts)
+        # XXX put the reauthn timeout in the settings
         if int(delta.total_seconds()) > 600:
             msg = _('Stale authentication info. Please try again.')
             self.request.session.flash('error|' + msg)
@@ -328,7 +320,7 @@ class PasswordsView(BaseFormView):
         user = get_session_user(self.request)
         log.debug('Removing Authn ts for user {!r} before'
                 ' changing the password'.format(user))
-        del self.request.session['re-authn-ts']
+        del self.request.session['reauthn-for-chpass']
         passwords_data = self.schema.serialize(passwordform)
 
         if passwords_data.get('use_custom_password') == 'true':

@@ -104,12 +104,12 @@ class PasswordFormTests(LoggedInRequestTests):
         form = response.forms['start-password-change-form']
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
-        self.assertIn('idp.example.com', form_response.location)
+        self.assertIn('authn.example.com', form_response.location)
         response_form = self.testapp.get('/profile/password-change/')
         form = response_form.forms[self.formname]
         form['old_password'].value = self.initial_password
         self.set_logged(email = self.user.mail_addresses.primary.email,
-                        extra_session_data = {'re-authn-ts': int(time.time())})
+                        extra_session_data = {'reauthn-for-chpass': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
 
@@ -128,7 +128,7 @@ class PasswordFormTests(LoggedInRequestTests):
         form = response_form.forms[self.formname]
         form['old_password'].value = 'nonexistingpassword'
         self.set_logged(email = self.user.mail_addresses.primary.email,
-                        extra_session_data = {'re-authn-ts': int(time.time())})
+                        extra_session_data = {'reauthn-for-chpass': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
@@ -153,7 +153,7 @@ class PasswordFormTests(LoggedInRequestTests):
         form['custom_password'].value = '0l8m vta8 j9lr'
         form['repeated_password'].value = form['custom_password'].value
         self.set_logged(email = self.user.mail_addresses.primary.email,
-                        extra_session_data = {'re-authn-ts': int(time.time())})
+                        extra_session_data = {'reauthn-for-chpass': int(time.time())})
         from eduiddashboard.validators import CSRFTokenValidator
         with patch.object(CSRFTokenValidator, '__call__', clear=True):
             CSRFTokenValidator.__call__.return_value = None
@@ -185,7 +185,7 @@ class PasswordFormTests(LoggedInRequestTests):
             form['custom_password'].value = password
             form['repeated_password'].value = form['custom_password'].value
             self.set_logged(email = self.user.mail_addresses.primary.email,
-                            extra_session_data = {'re-authn-ts': int(time.time())})
+                            extra_session_data = {'reauthn-for-chpass': int(time.time())})
             from eduiddashboard.validators import CSRFTokenValidator
             with patch.object(CSRFTokenValidator, '__call__', clear=True):
                 CSRFTokenValidator.__call__.return_value = None
@@ -239,7 +239,7 @@ class TerminateAccountTests(LoggedInRequestTests):
 
         form_response = form.submit('submit')
         self.assertEqual(form_response.status, '302 Found')
-        self.assertIn('idp.example.com', form_response.location)
+        self.assertIn('authn.example.com', form_response.location)
         with patch('eduiddashboard.vccs.get_vccs_client'):
             from eduiddashboard.vccs import get_vccs_client
             get_vccs_client.return_value = FakeVCCSClient(fake_response={
@@ -255,11 +255,9 @@ class TerminateAccountTests(LoggedInRequestTests):
                     from eduiddashboard.views.portal import logout_view
                     logout_view.return_value = None
                     store_session_user(request, self.user)
-                    request.POST['RelayState'] = '/profile/account-terminated/'
-                    request.context.propagate_user_changes = lambda x: None
-                    from eduiddashboard.views.portal import account_termination_action
-                    user = self.userdb_new.get_user_by_mail(email)
-                    account_termination_action(request, FAKE_SESSION_INFO, user)
+                    self.set_logged(email = self.user.mail_addresses.primary.email,
+                                    extra_session_data = {'reauthn-for-termination': int(time.time())})
+                    response = self.testapp.get('/profile/account-terminated/')
 
         # Verify the user doesn't have ANY passwords and IS terminated at this point
         user = self.dashboard_db.get_user_by_mail(email)
