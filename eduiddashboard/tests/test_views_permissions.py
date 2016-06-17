@@ -134,4 +134,4 @@ class PermissionsFormTestsPersonalMode(LoggedInRequestTests):
         self.testapp.get('/permissions/', status=404)
 
     def test_notlogged_get(self):
-        self.testapp.get('/permissions/', status=404)
+        self.testapp.get('/permissions/', status=302)

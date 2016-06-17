@@ -83,6 +83,7 @@ SETTINGS = {
     'nin_service_url': 'http://minameddelanden.se/',
     'mobile_service_name': 'TeleAdress',
     'letter_service_url': 'http://letter-proofing.example.com/',
+    'token_service_url': 'http://authn.example.com/saml2/login/',
     'available_languages': '''
             en = English
             sv = Svenska
@@ -90,13 +91,14 @@ SETTINGS = {
     'default_country_code': '+46',
     'vccs_url': 'http://localhost:8550/',
     'password_reset_timeout': '120',
-    'dashboard_hostname': 'dashboard.example.com',
-    'dashboard_baseurl': 'http://dashboard.example.com',
+    'dashboard_hostname': 'localhost',
+    'dashboard_baseurl': 'http://localhost/',
     'student_link': 'http://eduid.se/privacy.html',
     'technicians_link': 'http://eduid.se/privacy.html',
     'staff_link': 'http://eduid.se/privacy.html',
     'faq_link': 'http://eduid.se/privacy.html',
     'privacy_link': 'http://eduid.se/privacy.html',
+    'lang_cookie_domain': 'localhost',
     }
 
 
@@ -293,6 +295,8 @@ class LoggedInRequestTests(MongoTestCase):
         dummy.session = {
             'eduPersonAssurance': loa(3),
             'eduPersonIdentityProofing': loa(3),
+            'eduPersonPrincipalName': 'hubba-bubba',
+            'user_eppn': 'hubba-bubba',
         }
         store_session_user(dummy, user_obj)
         # XXX ought to set self.user = user_obj
