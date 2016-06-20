@@ -50,7 +50,7 @@ class PermissionsAlternativePemissionsInAdminMode(LoggedInRequestTests):
         self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
-                         status=401)
+                         status=403)
 
 
 class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInRequestTests):
@@ -102,7 +102,7 @@ class PermissionsAlternativePemissionsInHelpdeskMode(LoggedInRequestTests):
         self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
-                         status=401)
+                         status=403)
 
 
 class PermissionsAlternativePemissionsInPersonalMode(LoggedInRequestTests):

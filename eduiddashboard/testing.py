@@ -44,11 +44,6 @@ SETTINGS = {
     'auth_tk_secret': '123456',
     'auth_shared_secret': '123_456',
     'site.name': 'eduiID Testing',
-    'saml2.settings_module': path.join(path.dirname(__file__),
-                                       'saml2/tests/data/saml2_settings.py'),
-    'saml2.login_redirect_url': '/',
-    'saml2.logout_redirect_url': '/',
-    'saml2.user_main_attribute': 'mail',
     # Required only if not dont want mongodb
     # 'groups_callback': dummy_groups_callback,
     #'session.type': 'memory',
@@ -63,7 +58,6 @@ SETTINGS = {
     'session.cookie_secure': 'false',
     'testing': 'true',
     'jinja2.directories': [
-        'eduiddashboard:saml2/templates',
         'eduiddashboard:/templates'
     ],
     'jinja2.undefined': 'strict',
