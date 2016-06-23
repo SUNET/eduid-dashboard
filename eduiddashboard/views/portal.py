@@ -210,7 +210,7 @@ def token_login(context, request):
 def logout(context, request):
     settings = request.registry.settings
     authn_url = settings.get('token_service_url')
-    logout_url = urlparse.urljoin(ts_url, 'logout')
+    logout_url = urlparse.urljoin(authn_url, 'logout')
     return HTTPFound(location=logout_url)
 
 
