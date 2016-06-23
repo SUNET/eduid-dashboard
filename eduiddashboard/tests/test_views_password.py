@@ -142,7 +142,8 @@ class PasswordFormTests(LoggedInRequestTests):
                 response = form.submit('save')
                 self.assertEqual(response.status, '200 OK')
                 self.assertIn('Current password is incorrect', response.body)
-                self.assertIsNotNone(getattr(response, 'form', None))
+                # each form has 2 representations in response.forms
+                self.assertEquals(len(response.forms), 4)
 
     def test_password_form_entropy(self):
         self.set_logged()
