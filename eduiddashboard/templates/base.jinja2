@@ -66,7 +66,19 @@
               </ul>
               <div class="buttons nav navbar-nav navbar-right">
               {% if request.is_logged %}
-                <div class="button log-out"><a href="{{ request.route_path('saml2-logout') }}">{{ _("Logout") }}</a></div>
+                <div class="button log-out">
+
+                  <form method="POST" action="{{request.registry.settings['token_service_url']}}logout" id="logout-form">
+                    <button id="logout-button"
+                            class="button"
+                            type="submit"
+                            name="submit">
+                              {{ _('Logout') }}
+                    </button>
+                    <input type="hidden" name="csrf" value="{{ request.session.get_csrf_token() }}">
+                  </form>
+
+                </div>
               {% else %}
                 <div class="button orange">
                         <!-- Link leads to signup page -->

@@ -17,7 +17,6 @@ from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
 from eduid_userdb.exceptions import UserDoesNotExist
-from eduid_common.authn.eduid_saml2 import get_authn_request
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    NINResetPassword, MobileResetPassword,
@@ -25,8 +24,6 @@ from eduiddashboard.models import (Passwords, EmailResetPassword,
 from eduiddashboard.vccs import add_credentials
 from eduiddashboard.views import BaseFormView
 from eduiddashboard.emails import send_reset_password_mail
-from eduiddashboard.saml2.acs_actions import acs_action, schedule_action
-from eduiddashboard.saml2.utils import get_location
 from eduiddashboard.session import get_session_user, get_logged_in_user
 from eduiddashboard.utils import (generate_password,
                                   get_unique_hash,
@@ -382,7 +379,7 @@ def reset_password_sent(context, request):
         request.session.invalidate()
         return {
             'type': type,
-            'login_url': request.route_url('saml2-login'),
+            'login_url': request.route_url('home'),
         }
 
     return HTTPFound(location=request.route_url('reset-password'))
@@ -481,7 +478,7 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         return HTTPFound(location=self.request.route_url('reset-password-sent'))
 
     def cancel_success(self, passwordform):
-        return HTTPFound(location=self.request.route_url('saml2-login'))
+        return HTTPFound(location=self.request.route_url('home'))
     cancel_failure = cancel_success
 
 
@@ -524,7 +521,7 @@ class ResetPasswordNINView(BaseResetPasswordView):
         return HTTPFound(location=self.request.route_url('reset-password-sent'))
 
     def cancel_success(self, passwordform):
-        return HTTPFound(location=self.request.route_url('saml2-login'))
+        return HTTPFound(location=self.request.route_url('home'))
     cancel_failure = cancel_success
 
 
@@ -575,7 +572,7 @@ class ResetPasswordMobileView(BaseResetPasswordView):
             return HTTPFound(location=self.request.route_url('reset-password-sent'))
 
     def cancel_success(self, passwordform):
-        return HTTPFound(location=self.request.route_url('saml2-login'))
+        return HTTPFound(location=self.request.route_url('home'))
     cancel_failure = cancel_success
 
 
@@ -639,7 +636,7 @@ class ResetPasswordMobileView2(BaseResetPasswordView):
         return HTTPFound(self.request.route_path('reset-password-expired'))
 
     def cancel_success(self, passwordform):
-        return HTTPFound(location=self.request.route_url('saml2-login'))
+        return HTTPFound(location=self.request.route_url('home'))
 
     cancel_failure = cancel_success
 
@@ -774,5 +771,5 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         }
 
     def cancel_success(self, passwordform):
-        return HTTPFound(location=self.request.route_url('saml2-login'))
+        return HTTPFound(location=self.request.route_url('home'))
     cancel_failure = cancel_success

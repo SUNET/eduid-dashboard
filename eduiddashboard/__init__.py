@@ -10,6 +10,9 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.settings import asbool
 from pyramid.i18n import get_locale_name
+from pyramid.authentication import (AuthTktAuthenticationPolicy,
+                                    SessionAuthenticationPolicy)
+from pyramid.authorization import ACLAuthorizationPolicy
 
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
@@ -65,6 +68,29 @@ def groups_callback(userid, request):
         return request.context.get_groups(userid, request)
     else:
         return []
+
+def configure_auth(config, settings):
+
+    extra_authn_policy = {}
+
+    if 'groups_callback' in settings:
+        extra_authn_policy['callback'] = settings['groups_callback']
+
+    if not settings.get('testing'):
+        authn_policy = SessionAuthenticationPolicy(prefix='session',
+                                                   **extra_authn_policy)
+    else:
+        authn_policy = AuthTktAuthenticationPolicy(
+            settings.get('auth_tk_secret', '1234'),
+            hashalg='sha512',
+            wild_domain=False,
+            **extra_authn_policy)
+
+    authz_policy = ACLAuthorizationPolicy()
+
+    config.set_authentication_policy(authn_policy)
+    config.set_authorization_policy(authz_policy)
+    return config
 
 
 def jinja2_settings(settings):
@@ -239,6 +265,7 @@ def includeme(config):
         config.include(admin_urls, route_prefix='/admin/{userid}/')
 
     config.add_route('token-login', '/tokenlogin/')
+    config.add_route('logout', '/logout')
     if settings['workmode'] == 'personal':
         config.add_route('verifications',
                          '/verificate/{model}/{code}/',
@@ -495,7 +522,7 @@ def main(global_config, **settings):
     config.include('deform_bootstrap')
     config.include('pyramid_deform')
 
-    config.include('eduiddashboard.saml2')
+    config = configure_auth(config, settings)
 
     if settings['developer_mode'] or ('testing' in settings and asbool(settings['testing'])):
         config.include('pyramid_mailer.testing')

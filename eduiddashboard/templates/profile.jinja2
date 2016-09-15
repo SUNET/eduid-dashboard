@@ -208,7 +208,12 @@
 <script src="{{'eduiddashboard:static/js/libs/deform_bootstrap.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/dashboard-forms-helper-functions.js'|static_url}}"></script>
-<script src="{{'eduiddashboard:static/js/dashboard-tabbed-form.js'|static_url}}"></script>
+<!--script src="{{'eduiddashboard:static/js/dashboard-tabbed-form.js'|static_url}}"></script-->
+{% if request.registry.settings.get('developer_mode') %}
+<script src="{{'eduiddashboard:static/build/openid_connect-bundle.dev.js'|static_url}}"></script>
+{% else %}
+<script src="{{'eduiddashboard:static/build/openid-connect.js'|static_url}}"></script>
+{% endif %}
 <script src="{{'eduiddashboard:static/js/dashboard-proofing.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/dashboard-tablelist-form.js'|static_url}}"></script>
 

@@ -53,7 +53,7 @@ admin = urn:mace:eduid.se:role:admin
         self.set_logged(email='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
-                         status=401)
+                         status=403)
 
     def test_logged_addpermissions(self):
         self.set_logged(email='johnsmith@example.com')
@@ -88,7 +88,7 @@ admin = urn:mace:eduid.se:role:admin
         self.set_logged(email ='johnsmith@example.org')
 
         self.testapp.get('/users/johnsmith@example.com/permissions/',
-                         status=401)
+                         status=403)
 
     def test_logged_add_dirty_permissions(self):
         self.set_logged(email='johnsmith@example.com')
