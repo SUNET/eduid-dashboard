@@ -36,8 +36,7 @@ def authn_tween_factory(handler, registry):
             if reset_password_url in request.url:
                 return handler(request)
 
-        ts_url = settings.get('token_service_url')
-        login_url = urlparse.urljoin(ts_url, 'login')
+        login_url = '{!s}/{!s}'.format(settings['token_service_url'], 'login')
         next_url = request.url
 
         params = {'next': next_url}
