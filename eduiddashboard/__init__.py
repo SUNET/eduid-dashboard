@@ -501,6 +501,8 @@ def main(global_config, **settings):
 
     settings['stathat_username'] = cp.read_setting_from_env(settings, 'stathat_username')
 
+    settings['js_bundle'] = cp.read_setting_from_env(settings, 'js_bundle', '')
+
     jinja2_settings(settings)
 
     config = Configurator(settings=settings,

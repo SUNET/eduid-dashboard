@@ -202,22 +202,22 @@
 
 <script src="{{'eduiddashboard:static/js/libs/jquery.maskedinput.min.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/libs/jquery.form-3.09.js'|static_url}}"></script>
-
 <script src="{{'eduiddashboard:static/js/libs/deform.js'|static_url}}"></script>
-
 <script src="{{'eduiddashboard:static/js/libs/deform_bootstrap.js'|static_url}}"></script>
+<script src="{{'eduiddashboard:static/js/libs/zxcvbn.js'|static_url}}"></script>
 
 <script src="{{'eduiddashboard:static/js/dashboard-forms-helper-functions.js'|static_url}}"></script>
-<!--script src="{{'eduiddashboard:static/js/dashboard-tabbed-form.js'|static_url}}"></script-->
-{% if request.registry.settings.get('developer_mode') %}
-<script src="{{'eduiddashboard:static/build/openid_connect-bundle.dev.js'|static_url}}"></script>
-{% else %}
-<script src="{{'eduiddashboard:static/build/openid_connect.js'|static_url}}"></script>
-{% endif %}
 <script src="{{'eduiddashboard:static/js/dashboard-proofing.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/dashboard-tablelist-form.js'|static_url}}"></script>
 
-<script src="{{'eduiddashboard:static/js/libs/zxcvbn.js'|static_url}}"></script>
+{% with bundle = request.registry.settings.get('js_bundle') %}
+  {% if bundle %}
+    {% set js_bundle = 'eduiddashboard:static/build/' + bundle + '.js' %}
+    <script src="{{js_bundle|static_url}}"></script>
+  {% else %}
+    <script src="{{'eduiddashboard:static/js/dashboard-tabbed-form.js'|static_url}}"></script>
+  {% endif %}
+{% endwith %}
 
 <script id='communication-error-template' language='text/template'>
   <div class='alert communication-error'>
