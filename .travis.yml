@@ -12,6 +12,7 @@ services:
   - redis-server
 # command to install dependencies
 install:
+  - pip install -U setuptools
   - python setup.py develop
   - pip install nosexcover WebTest==2.0.18
 # command to run tests
