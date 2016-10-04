@@ -13,6 +13,6 @@ echo "#############################################################"
 echo "$0: Using PyPi URL ${PYPI}"
 echo "#############################################################"
 
-/opt/eduid/bin/pip install --pre -i ${PYPI} eduid-dashboard
+/opt/eduid/bin/pip install --pre -i ${PYPI} /src/eduid-dashboard
 
 /opt/eduid/bin/pip freeze
