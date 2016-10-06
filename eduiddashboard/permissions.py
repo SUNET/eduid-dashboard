@@ -286,12 +286,13 @@ class BaseFactory(RootFactory):
         bundle = self.request.session.get('js_bundle', '')
         if not bundle:
             user = self.get_user()
+            email = user.mail_addresses.primary.email
+
             settings = self.request.registry.settings
             bundle = settings.get('js_bundle_default')
-
             config_people = settings.get('js_bundle_people', None)
             config_ab = settings.get('js_bundle_abtesting', None)
-            email = user.mail_addresses.primary.email
+
             if config_people and email in config_people.keys():
                 bundle = config_people[email]
 
