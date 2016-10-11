@@ -14,6 +14,7 @@ from pyramid.settings import asbool
 
 from deform_bootstrap import Form
 
+from eduid_common.api.utils import urlappend
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
@@ -210,7 +211,7 @@ def token_login(context, request):
 def logout(context, request):
     settings = request.registry.settings
     authn_url = settings.get('token_service_url')
-    logout_url = urlparse.urljoin(authn_url, 'logout')
+    logout_url = urlappend(authn_url, 'logout')
     return HTTPFound(location=logout_url)
 
 
@@ -327,7 +328,7 @@ def terminate_account(context, request):
         return HTTPBadRequest()
 
     ts_url = request.registry.settings.get('token_service_url')
-    terminate_url = urlparse.urljoin(ts_url, 'terminate')
+    terminate_url = urlappend(ts_url, 'terminate')
     next_url = request.route_url('account-terminated')
 
     params = {'next': next_url}

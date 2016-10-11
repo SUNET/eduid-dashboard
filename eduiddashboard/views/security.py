@@ -2,10 +2,9 @@
 
 from deform import Button
 import json
-import urlparse
 from urllib import urlencode
+import urlparse
 from datetime import datetime, timedelta
-import time
 from bson import ObjectId
 import pytz
 
@@ -17,6 +16,7 @@ from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
 from eduid_userdb.exceptions import UserDoesNotExist
+from eduid_common.api.utils import urlappend
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
                                    NINResetPassword, MobileResetPassword,
@@ -215,7 +215,7 @@ def start_password_change(context, request):
         return HTTPBadRequest()
 
     ts_url = request.registry.settings.get('token_service_url')
-    chpass_url = urlparse.urljoin(ts_url, 'chpass')
+    chpass_url = urlappend(ts_url, 'chpass')
     next_url = request.route_url('password-change')
 
     params = {'next': next_url}
