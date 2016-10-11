@@ -68,7 +68,7 @@
               {% if request.is_logged %}
                 <div class="button log-out">
 
-                  <form method="POST" action="{{request.registry.settings['token_service_url']}}logout" id="logout-form">
+                  <form method="POST" action="{{request.registry.settings['token_service_url_logout']}}" id="logout-form">
                     <button id="logout-button"
                             class="button"
                             type="submit"

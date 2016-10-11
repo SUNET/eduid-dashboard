@@ -5,6 +5,8 @@ from urllib import urlencode
 from pyramid.security import remember
 from pyramid.httpexceptions import HTTPFound
 
+from eduid_common.api.utils import urlappend
+
 log = logging.getLogger(__name__)
 
 
@@ -36,7 +38,7 @@ def authn_tween_factory(handler, registry):
             if reset_password_url in request.url:
                 return handler(request)
 
-        login_url = '{!s}/{!s}'.format(settings['token_service_url'], 'login')
+        login_url = urlappend(settings['token_service_url'], 'login')
         next_url = request.url
 
         params = {'next': next_url}
