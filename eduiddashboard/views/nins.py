@@ -1,7 +1,6 @@
 # NINS form
 
 import deform
-import urlparse
 import requests
 from datetime import datetime
 from pyramid.view import view_config
@@ -10,6 +9,7 @@ from pyramid.i18n import get_localizer
 
 from eduid_userdb.exceptions import UserOutOfSync
 from eduid_userdb.nin import Nin
+from eduid_common.api.utils import urlappend
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import NIN, normalize_nin
 from eduiddashboard.views.mobiles import has_confirmed_mobile
@@ -144,7 +144,7 @@ def get_verified_nins(user):
 def letter_status(request, user, nin):
     settings = request.registry.settings
     letter_url = settings.get('letter_service_url')
-    state_url = urlparse.urljoin(letter_url, 'get-state')
+    state_url = urlappend(letter_url, 'get-state')
     data = {'eppn': user.eppn}
     response = requests.post(state_url, data=data)
 
@@ -183,7 +183,7 @@ def send_letter(request, user, nin):
 
     settings = request.registry.settings
     letter_url = settings.get('letter_service_url')
-    send_letter_url = urlparse.urljoin(letter_url, 'send-letter')
+    send_letter_url = urlappend(letter_url, 'send-letter')
 
     data = {'eppn': user.eppn, 'nin': nin}
     response = requests.post(send_letter_url, data=data)
@@ -393,7 +393,7 @@ class NINsActionsView(BaseActionsView):
 
         settings = self.request.registry.settings
         letter_url = settings.get('letter_service_url')
-        verify_letter_url = urlparse.urljoin(letter_url, 'verify-code')
+        verify_letter_url = urlappend(letter_url, 'verify-code')
 
         code = post_data['verification_code']
 
