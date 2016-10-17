@@ -297,13 +297,11 @@ class BaseFactory(RootFactory):
                 bundle = config_people[email]
 
             elif config_ab:
-                letter = ( ord(user.eppn[0]) - 97 ) *  4
-                percents = [(int(k), v) for k,v in config_ab.items()]
+                user_percent = ( ord(user.eppn[0]) - ord('a') ) *  4
                 accum = 0
-                for percent in percents:
-                    accum += percent[0]
-                    if letter < accum:
-                        bundle = percent[1]
+                for percent, bundle in config_ab.items():
+                    accum += int(percent)
+                    if user_percent < accum:
                         break
 
             self.request.session['js_bundle'] =  bundle
