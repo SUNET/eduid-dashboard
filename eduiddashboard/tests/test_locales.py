@@ -53,8 +53,8 @@ class LocaleChangeTests(LoggedInRequestTests):
         dashboard_baseurl = self.settings['dashboard_baseurl']
         referer = 'http://{hostname}/'.format(hostname=host)
         invalid_host = 'attacker.controlled.site'
-        import urlparse
-        url = urlparse.urljoin(referer, '/set_language/?lang=sv')
+        from eduid_common.api.utils import urlappend
+        url = urlappend(referer, '/set_language/?lang=sv')
         response = self.testapp.get(url, extra_environ={
                                         'HTTP_REFERER': referer,
                                         'HTTP_HOST': invalid_host

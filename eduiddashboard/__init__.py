@@ -17,6 +17,7 @@ from pyramid.authorization import ACLAuthorizationPolicy
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
 from eduid_common.config.parsers import IniConfigParser
+from eduid_common.api.utils import urlappend
 from eduiddashboard.i18n import locale_negotiator
 from eduiddashboard.permissions import (RootFactory, PersonFactory,
                                         SecurityFactory, ResetPasswordFactory,
@@ -266,6 +267,7 @@ def includeme(config):
 
     config.add_route('token-login', '/tokenlogin/')
     config.add_route('logout', '/logout')
+    settings['token_service_url_logout'] = urlappend(settings['token_service_url'], 'logout')
     if settings['workmode'] == 'personal':
         config.add_route('verifications',
                          '/verificate/{model}/{code}/',
