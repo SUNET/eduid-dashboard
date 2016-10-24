@@ -210,7 +210,7 @@
 <script src="{{'eduiddashboard:static/js/dashboard-proofing.js'|static_url}}"></script>
 <script src="{{'eduiddashboard:static/js/dashboard-tablelist-form.js'|static_url}}"></script>
 
-{% with bundle = request.registry.settings.get('js_bundle') %}
+{% with bundle = context.get_js_bundle_name() %}
   {% if bundle %}
     {% set js_bundle = 'eduiddashboard:static/build/' + bundle + '.js' %}
     <script src="{{js_bundle|static_url}}"></script>

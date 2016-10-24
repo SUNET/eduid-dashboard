@@ -503,7 +503,9 @@ def main(global_config, **settings):
 
     settings['stathat_username'] = cp.read_setting_from_env(settings, 'stathat_username')
 
-    settings['js_bundle'] = cp.read_setting_from_env(settings, 'js_bundle', '')
+    settings['js_bundle_default'] = cp.read_setting_from_env(settings, 'js_bundle_default')
+    settings['js_bundle_people'] = cp.read_mapping(settings, 'js_bundle_people', default={})
+    settings['js_bundle_abtesting'] = cp.read_mapping(settings, 'js_bundle_abtesting', default={})
 
     jinja2_settings(settings)
 

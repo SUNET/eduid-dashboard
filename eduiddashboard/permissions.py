@@ -270,6 +270,44 @@ class BaseFactory(RootFactory):
         else:
             return 'en'
 
+    def get_js_bundle_name(self):
+        """
+        Select the name of the js bundle with react components
+        that will be used during the session.
+        There is a default bundle,
+        and we can configure different bundles for specific users.
+        Also, we can set up A/B testing, configuring the percentages
+        of the requests that each of the bundles under test will
+        be selected.
+
+        :return: the bundle to be used in this session
+        :rtype: str
+        """
+        bundle = self.request.session.get('js_bundle', '')
+        if not bundle:
+            user = self.get_user()
+            email = user.mail_addresses.primary.email
+
+            settings = self.request.registry.settings
+            bundle = settings.get('js_bundle_default')
+            config_people = settings.get('js_bundle_people', None)
+            config_ab = settings.get('js_bundle_abtesting', None)
+
+            if config_people and email in config_people.keys():
+                bundle = config_people[email]
+
+            elif config_ab:
+                user_percent = ( ord(user.eppn[0]) - ord('a') ) *  4
+                accum = 0
+                for percent, bundle in config_ab.items():
+                    accum += int(percent)
+                    if user_percent < accum:
+                        break
+
+            self.request.session['js_bundle'] =  bundle
+
+        return bundle
+
 
 class ForbiddenFactory(RootFactory):
     __acl__ = [
