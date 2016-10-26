@@ -32,13 +32,6 @@ fi
 # version of something is actually running.
 /opt/eduid/bin/pip freeze
 
-if [ ! -s "${metadata}" ]; then
-    # Create file with local SP metadata
-    cd "${cfg_dir}" && \
-	/opt/eduid/bin/make_metadata.py "${pysaml2_settings}" | \
-	xmllint --format - > "${metadata}"
-fi
-
 echo "$0: pserving ${ini}"
 exec start-stop-daemon --start -c eduid:eduid --exec \
      /opt/eduid/bin/pserve -- "${ini}" \
