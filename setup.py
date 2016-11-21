@@ -38,7 +38,7 @@ requires = [
     'pyramid_debugtoolbar==1.0.4',
     'pyramid_deform==0.2',
     'pyramid_mailer==0.11',
-    'pyramid_tm==0.7',
+    'pyramid_tm==1.0.2',
     'colander==1.0b1',
     'deform==2.0a2',
     'deform_bootstrap==0.2.9',
