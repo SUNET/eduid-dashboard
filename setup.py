@@ -35,6 +35,7 @@ requires = [
     'pymongo>=2.8,<3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
+    'jinja2<2.9',  # Templates breaks with jinja2 2.9
     'pyramid_debugtoolbar==1.0.4',
     'pyramid_deform==0.2',
     'pyramid_mailer==0.11',
