@@ -394,7 +394,7 @@ def validate_nin_by_mobile(request, user, nin):
         log.info('User {!r} has no verified mobile phone number.'.format(user))
     elif status == 'no_match':
         log.info('User {!r} NIN is not associated with any verified mobile phone number.'.format(user))
-        msg = _('The given mobile number was not associated to the given national identity number')
+        msg = _('The national identity number is not associated with a mobile for private use, see hitta.se')
         request.stats.count('dashboard/validate_nin_by_mobile_no_match', 1)
     elif status == 'error_lookup' or status == 'error_navet':
         log.error('Validate NIN via mobile failed with status "{!s}" for user {!r}.'.format(status, user))
