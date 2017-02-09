@@ -463,11 +463,11 @@ class ResetPasswordEmailView(BaseResetPasswordView):
         try:
             user = self._search_user(email_or_username)
             log.debug("Reset password via email initiated for user {!r}".format(user))
-            self.request.stats.count('dashboard/pwreset_email_init', 1)
+            self.request.stats.count('pwreset_email_init')
         except UserDoesNotExist:
             log.debug("Tried to initiate reset password via email but user {!r} does not exist".format(
                 email_or_username))
-            self.request.stats.count('dashboard/pwreset_email_init_unknown_user', 1)
+            self.request.stats.count('pwreset_email_init_unknown_user')
             user = None
 
         if user is not None:
@@ -502,10 +502,10 @@ class ResetPasswordNINView(BaseResetPasswordView):
         try:
             user = self._search_user(email_or_username)
             log.debug("Reset password via mm initiated for user {!r}.".format(user))
-            self.request.stats.count('dashboard/pwreset_mm_init', 1)
+            self.request.stats.count('pwreset_mm_init')
         except UserDoesNotExist:
             log.debug("Tried to initiate reset password via mm but user {!r} does not exist".format(email_or_username))
-            self.request.stats.count('dashboard/pwreset_mm_init_unknown_user', 1)
+            self.request.stats.count('pwreset_mm_init_unknown_user')
             user = None
 
         if user is not None:
@@ -690,7 +690,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         password_reset = self.request.db.reset_passwords.find_one({'hash_code': hash_code})
 
         if password_reset is None:
-            self.request.stats.count('dashboard/pwreset_code_not_found', 1)
+            self.request.stats.count('pwreset_code_not_found')
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
         date = datetime.now(pytz.utc)
@@ -698,7 +698,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         reset_date = password_reset['created_at'] + timedelta(minutes=reset_timeout)
         if reset_date < date:
             self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
-            self.request.stats.count('dashboard/pwreset_code_expired', 1)
+            self.request.stats.count('pwreset_code_expired')
             return HTTPFound(self.request.route_path('reset-password-expired'))
 
         if password_reset['mechanism'] == 'mobile':
@@ -732,11 +732,11 @@ class ResetPasswordStep2View(BaseResetPasswordView):
         if form_data.get('use_custom_password') == 'true':
             log.debug("Password change for user {!r} (custom password).".format(user))
             new_password = form_data.get('custom_password')
-            self.request.stats.count('dashboard/pwreset_custom_password', 1)
+            self.request.stats.count('pwreset_custom_password')
         else:
             log.debug("Password change for user {!r} (suggested password).".format(user))
             new_password = self.get_suggested_password()
-            self.request.stats.count('dashboard/pwreset_generated_password', 1)
+            self.request.stats.count('pwreset_generated_password')
 
         # Make user AL1 if password was reset by e-mail only
         if password_reset['mechanism'] == 'email':
@@ -744,7 +744,7 @@ class ResetPasswordStep2View(BaseResetPasswordView):
             if nin_count:
                 retrieve_modified_ts(user, self.request.dashboard_userdb)
                 unverify_user_nins(self.request, user)
-                self.request.stats.count('dashboard/pwreset_downgraded_NINs', nin_count)
+                self.request.stats.count('pwreset_downgraded_NINs', nin_count)
             if len(user.phone_numbers.to_list()):
                 retrieve_modified_ts(user, self.request.dashboard_userdb)
                 # We need to unverify a users phone numbers to make sure that an attacker can not
@@ -758,11 +758,11 @@ class ResetPasswordStep2View(BaseResetPasswordView):
 
         if ok:
             self.request.db.reset_passwords.remove({'_id': password_reset['_id']})
-            self.request.stats.count('dashboard/pwreset_changed_password', 1)
+            self.request.stats.count('pwreset_changed_password')
             url = self.request.route_url('profile-editor')
             reset = True
         else:
-            self.request.stats.count('dashboard/pwreset_password_change_failed', 1)
+            self.request.stats.count('pwreset_password_change_failed')
             url = self.request.route_url('reset-password')
             reset = False
         return {

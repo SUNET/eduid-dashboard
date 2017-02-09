@@ -84,7 +84,7 @@ def send_verification_code(request, user, nin, reference=None, code=None):
     language = request.context.get_preferred_language()
 
     request.msgrelay.nin_validator(reference, nin, code, language, nin, message_type='mm')
-    request.stats.count('dashboard/nin_send_verification_code', 1)
+    request.stats.count('nin_send_verification_code')
 
 
 def get_tab(request):
@@ -321,7 +321,7 @@ class NINsActionsView(BaseActionsView):
             'verified': False,
         })
 
-        self.request.stats.count('dashboard/nin_remove', 1)
+        self.request.stats.count('nin_remove')
         message = _('National identity number has been removed')
         return {
             'result': 'success',
@@ -344,7 +344,7 @@ class NINsActionsView(BaseActionsView):
 
         send_verification_code(self.request, self.context.user, nin)
 
-        self.request.stats.count('dashboard/nin_code_resend', 1)
+        self.request.stats.count('nin_code_resend')
         message = self.verify_messages['new_code_sent']
         return {
             'result': 'success',
@@ -569,7 +569,7 @@ class NinsView(BaseFormView):
             }
         self.user = get_session_user(self.request)
         self.addition_with_code_validation(validated)
-        self.request.stats.count('dashboard/nin_add_external', 1)
+        self.request.stats.count('nin_add_external')
         return {
             'status': 'success'
         }
@@ -609,7 +609,7 @@ class NinsView(BaseFormView):
         self.request.session.flash(
                 get_localizer(self.request).translate(message),
                 queue='forms')
-        self.request.stats.count('dashboard/nin_add_other', 1)
+        self.request.stats.count('nin_add_other')
 
     def add_success(self, ninform):
         """ This method is bounded to the "add"-button by it's name """
@@ -641,7 +641,7 @@ class NinsView(BaseFormView):
             get_localizer(self.request).translate(message),
             queue='forms')
 
-        self.request.stats.count('dashboard/nin_add_mobile', 1)
+        self.request.stats.count('nin_add_mobile')
 
     def add_by_letter_success(self, ninform):
         """

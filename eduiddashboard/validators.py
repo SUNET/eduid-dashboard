@@ -366,7 +366,7 @@ def validate_nin_by_mobile(request, user, nin):
                 status = 'match'
                 log.info('Mobile number matched for user {!r}.'.format(user))
                 log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
-                request.stats.count('dashboard/validate_nin_by_mobile_exact_match', 1)
+                request.stats.count('validate_nin_by_mobile_exact_match')
                 break
             elif registered_to_nin is not None and age < 18:
                 # Check if registered nin is related to given nin
@@ -381,7 +381,7 @@ def validate_nin_by_mobile(request, user, nin):
                     log.debug('Mobile {!s} registered to NIN: {!s}.'.format(valid_mobile, registered_to_nin))
                     log.debug('Person with NIN {!s} have relation {!s} to user: {!r}.'.format(registered_to_nin,
                                                                                               relation, user))
-                    request.stats.count('dashboard/validate_nin_by_mobile_relative_match', 1)
+                    request.stats.count('validate_nin_by_mobile_relative_match')
                     break
     except request.lookuprelay.TaskFailed:
         status = 'error_lookup'
@@ -395,13 +395,13 @@ def validate_nin_by_mobile(request, user, nin):
     elif status == 'no_match':
         log.info('User {!r} NIN is not associated with any verified mobile phone number.'.format(user))
         msg = _('The national identity number is not associated with a mobile for private use, see hitta.se')
-        request.stats.count('dashboard/validate_nin_by_mobile_no_match', 1)
+        request.stats.count('validate_nin_by_mobile_no_match')
     elif status == 'error_lookup' or status == 'error_navet':
         log.error('Validate NIN via mobile failed with status "{!s}" for user {!r}.'.format(status, user))
         msg = _('Sorry, we are experiencing temporary technical '
                 'problem with ${service_name}, please try again '
                 'later.')
-        request.stats.count('dashboard/validate_nin_by_mobile_error', 1)
+        request.stats.count('validate_nin_by_mobile_error')
 
     if status == 'match' or status == 'match_by_navet':
         log.info('Validate NIN via mobile succeeded with status "{!s}" for user {!r}.'.format(status, user))

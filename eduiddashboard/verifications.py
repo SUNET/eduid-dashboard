@@ -159,8 +159,8 @@ def set_nin_verified(request, user, new_nin, reference=None):
     _add_nin_to_user(new_nin, user)
     _nin_verified_transaction_audit(request, reference)
     log.info('NIN verified for user {!r}.'.format(user))
-    request.stats.count('dashboard/verify_nin_stolen', steal_count)
-    request.stats.count('dashboard/verify_nin_completed', 1)
+    request.stats.count('verify_nin_stolen', steal_count)
+    request.stats.count('verify_nin_completed')
     return _('National identity number {obj} verified')
 
 
@@ -242,8 +242,8 @@ def set_phone_verified(request, user, new_number):
     # Add the verified mobile number to the requesting user
     _add_phone_to_user(new_number, user)
     log.info('Phone number verified for user {!r}.'.format(user))
-    request.stats.count('dashboard/verify_mobile_stolen', steal_count)
-    request.stats.count('dashboard/verify_mobile_completed', 1)
+    request.stats.count('verify_mobile_stolen', steal_count)
+    request.stats.count('verify_mobile_completed')
     return _('Phone {obj} verified')
 
 
@@ -314,8 +314,8 @@ def set_email_verified(request, user, new_mail):
     # Add the verified mail address to the requesting user
     _add_mail_to_user(new_mail, user)
     log.info('Mail address verified for user {!r}.'.format(user))
-    request.stats.count('dashboard/verify_mail_stolen', steal_count)
-    request.stats.count('dashboard/verify_mail_completed', 1)
+    request.stats.count('verify_mail_stolen', steal_count)
+    request.stats.count('verify_mail_completed')
     return _('Email {obj} verified')
 
 
@@ -421,7 +421,7 @@ def verify_code(request, model_name, code):
     else:
         msg = get_localizer(request).translate(msg)
         request.session.flash(msg.format(obj=obj_id), queue='forms')
-        request.stats.count('dashboard/verify_code_completed', 1)
+        request.stats.count('verify_code_completed')
     return obj_id
 
 
