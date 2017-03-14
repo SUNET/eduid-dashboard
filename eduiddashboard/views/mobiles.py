@@ -80,7 +80,7 @@ def send_verification_code(request, user, mobile_number, reference=None, code=No
 
     user_language = request.context.get_preferred_language()
     request.msgrelay.mobile_validator(reference, mobile_number, code, user_language)
-    request.stats.count('dashboard/mobile_number_send_verification_code', 1)
+    request.stats.count('mobile_number_send_verification_code')
 
 
 @view_config(route_name='mobiles-actions', permission='edit')
@@ -128,7 +128,7 @@ class MobilesActionsView(BaseActionsView):
         except UserOutOfSync:
             return self.sync_user()
 
-        self.request.stats.count('dashboard/mobile_number_removed', 1)
+        self.request.stats.count('mobile_number_removed')
         message = _('Mobile phone number was successfully removed')
         return {
             'result': 'success',
@@ -158,7 +158,7 @@ class MobilesActionsView(BaseActionsView):
         except UserOutOfSync:
             return self.sync_user()
 
-        self.request.stats.count('dashboard/mobile_number_set_primary', 1)
+        self.request.stats.count('mobile_number_set_primary')
         message = _('Mobile phone number was successfully made primary')
         return {
             'result': 'success',

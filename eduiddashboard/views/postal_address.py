@@ -133,7 +133,7 @@ class PostalAddressView(BaseFormView):
             self.request.session.flash(
                     get_localizer(self.request).translate(message),
                     queue='forms')
-            self.request.stats.count('dashboard/postal_address_saved', 1)
+            self.request.stats.count('postal_address_saved')
 
     def failure(self, e):
         context = super(PostalAddressView, self).failure(e)
