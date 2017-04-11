@@ -6,7 +6,7 @@
 set -e
 set -x
 
-PYPI="https://pypi.nordu.net/simple/"
+PYPI="https://pypi.sunet.se/simple/"
 ping -c 1 -q pypiserver.docker && PYPI="http://pypiserver.docker:8080/simple/"
 
 echo "#############################################################"
