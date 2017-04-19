@@ -29,9 +29,11 @@ requires = [
     'vccs_client >= 0.4.1',
     'eduid_lookup_mobile >= 0.0.4',
     'eduid_userdb >= 0.2.2',
-    'eduid-common[webapp] >= 0.2.2b2',
+    'eduid-common[nodeps] >= 0.3.0b2',
+    'Flask>=0.10.1,<0.12',  # Dependency for eduid-common
+    'redis >= 2.10.5',
+    'PyNaCl >= 1.0.1',
     'pysaml2 == 4.0.3rc1',
-
     'pymongo>=2.8,<3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
