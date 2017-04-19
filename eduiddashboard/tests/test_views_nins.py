@@ -174,7 +174,7 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(user.nins.count, 0)
 
         # Add a verified phone number to the user in the central userdb
-        user.phone_numbers.add(PhoneNumber({
+        user.phone_numbers.add(PhoneNumber(data={
             'number': '666666666',
             'primary': True,
             'verified': True
@@ -217,7 +217,7 @@ class NinsFormTests(LoggedInRequestTests):
         self.assertEqual(user.nins.count, 0)
 
         # Add a verified phone number to the user in the central userdb
-        user.phone_numbers.add(PhoneNumber({
+        user.phone_numbers.add(PhoneNumber(data={
             'number': '666666666',
             'primary': True,
             'verified': True
