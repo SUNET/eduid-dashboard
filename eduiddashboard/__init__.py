@@ -375,6 +375,7 @@ def main(global_config, **settings):
         # Avoid broken connections across firewall by disabling pool
         # http://docs.celeryproject.org/en/latest/configuration.html#broker-pool-limit
         'BROKER_POOL_LIMIT': 0,
+        'NEW_USER_DATE': settings.get('new_user_date', '2038-01-18'),  # Need to set NEW_USER_DATE for plugin init
     }
     settings['default_celery_conf'] = default_celery_conf
     settings['am_broker_url'] = cp.read_setting_from_env(settings, 'broker_url', 'amqp://')
