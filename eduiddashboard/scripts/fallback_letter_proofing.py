@@ -8,6 +8,7 @@ from datetime import datetime
 import json
 
 from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.dashboard import DashboardUser
 from eduiddashboard.verifications import set_nin_verified, save_as_verified
 from eduiddashboard.idproofinglog import LetterProofing
 from eduiddashboard.session import _get_user_by_eppn
@@ -45,7 +46,7 @@ def verify_code(env, user, verification_doc):
     set_nin_verified(env['request'], user, obj_id, reference)
 
     try:
-        user.save(env['request'])
+        env['request'].context.save_dashboard_user(user)
         print "Verified NIN saved for user {!r}.".format(user)
         verified = {
             'verified': True,
@@ -82,15 +83,15 @@ def letter_proof_user():
     eppn = args[0]
     data = args[1]
     rdata = json.loads(data)
-    user = _get_user_by_eppn(env['request'], eppn, legacy_user=True)
+    user = _get_user_by_eppn(env['request'], eppn, legacy_user=False)
 
-    if not user.get_nins() and rdata.get('verified', False):
+    if not user.nins.to_list() and rdata.get('verified', False):
         # Save data from successful verification call for later addition to user proofing collection
         rdata['created_ts'] = datetime.utcfromtimestamp(int(rdata['created_ts']))
         rdata['verified_ts'] = datetime.utcfromtimestamp(int(rdata['verified_ts']))
-        letter_proofings = user.get_letter_proofing_data()
-        letter_proofings.append(rdata)
-        user.set_letter_proofing_data(letter_proofings)
+        user = DashboardUser(data = user.to_dict())
+        user.add_letter_proofing_data(rdata)
+
         # Look up users official address at the time of verification per Kantara requirements
         print "Looking up address via Navet for user {!r}.".format(user)
         user_postal_address = env['request'].msgrelay.get_full_postal_address(rdata['number'])
@@ -106,7 +107,7 @@ def letter_proof_user():
                 # verified by the micro service
                 set_nin_verified(env['request'], user, rdata['number'])
                 try:
-                    user.save(env['request'])
+                    env['request'].context.save_dashboard_user(user)
                 except UserOutOfSync:
                     print 'Verified norEduPersonNIN NOT saved for user {!r}. User out of sync.'.format(user)
                     raise
@@ -117,4 +118,4 @@ def letter_proof_user():
             else:
                 print 'You have successfully verified the identity for user {!r}'.format(user)
     else:
-        print 'User {!r} already has verified NIN ({!s}).'.format(user, user.get_nins())
+        print 'User {!r} already has verified NIN ({!s}).'.format(user, user.nins)
