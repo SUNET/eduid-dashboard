@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import time
 from datetime import datetime
 from mock import patch
@@ -98,6 +100,22 @@ class PasswordFormTests(LoggedInRequestTests):
             })
             self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
 
+    def test_add_utf8_credentials(self):
+        vccs_url = self.settings['vccs_url']
+        self.assertTrue(check_password(vccs_url, self.initial_password, self.user))
+        new_password = 'new-passwordåäöыва9もとこ'
+        add_credentials(vccs_url, self.initial_password, new_password, self.user)
+        self.assertTrue(check_password(vccs_url, new_password, self.user))
+
+        with patch('eduiddashboard.vccs', clear=True):
+            vccs.get_vccs_client.return_value = FakeVCCSClient(fake_response={
+                'auth_response': {
+                    'version': 1,
+                    'authenticated': False,
+                },
+            })
+            self.assertFalse(check_password(vccs_url, self.initial_password, self.user))
+
     def test_valid_current_password(self):
         self.set_logged()
         response = self.testapp.get('/profile/security/')
@@ -182,6 +200,7 @@ class PasswordFormTests(LoggedInRequestTests):
             'eduid',
             'aaaaaaaaaaaaa',
             'onetwothreefour',
+            'йцуке',
         ]:
             form['custom_password'].value = password
             form['repeated_password'].value = form['custom_password'].value
