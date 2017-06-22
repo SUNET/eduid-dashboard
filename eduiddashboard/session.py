@@ -45,7 +45,7 @@ class SessionFactory(CommonSessionFactory):
                 base_session = self.manager.get_session(token=token)
                 existing_session = Session(request, base_session)
                 return existing_session
-            except KeyError:  # No session data found
+            except (KeyError, ValueError):  # No session data found
                 pass
         base_session = self.manager.get_session(data={})
         base_session['flash_messages'] = {'default': []}
