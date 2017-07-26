@@ -26,7 +26,7 @@
             {% for nin in not_verified_nins %}
                 <tr class='ninrow' data-identifier="{{ loop.index0 }}">
                     <td class='identifier'>{{ nin }}</td>
-                    <td class='non-identifier'>
+                     <td class='non-identifier'>
                         {% if enable_mm_verification %}
                             <input type='button' class='btn btn-link' value="{{_('Confirm using Mina Meddelanden')}}"
                                    data-index='{{ nin }} {{ loop.index0 }}' name='verify'>
@@ -73,9 +73,14 @@
   {% endif %}
     <!-- Hiding a form does not make in unusable. we should really have different forms for adding and validating NINs -->
     <div class='form-content {% if verified_nins or not_verified_nins %} hidden{% endif %}'>
-      {{ form|safe }}
+        {{ form|safe }}
     </div>
-    <div id="openid-connect-root" />
+    <!-- Only show the Freja eID component if there are nins to validate -->
+    {% if not verified_nins %}
+        <div class="text-xs-center">
+            <div id="openid-connect-root" />
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block askdialog_extra_info %}

@@ -480,7 +480,7 @@ class NinsView(BaseFormView):
 
     route = 'nins'
 
-    bootstrap_form_style = 'form-inline'
+    bootstrap_form_style = 'form'
 
     def __init__(self, *args, **kwargs):
         super(NinsView, self).__init__(*args, **kwargs)
@@ -489,13 +489,9 @@ class NinsView(BaseFormView):
         # from the button, must trigger the "add" validation part of a nin.
         self.buttons = ()
         if self.request.registry.settings.get('enable_mm_verification'):
+
             self.buttons += (deform.Button(name='add',
-                             title=_('Mina Meddelanden')),)
-        else:
-            # Add a disabled button to for information purposes when Mina Meddelanden is disabled
-            self.buttons += (deform.Button(name='NoMM',
-                                           title=_('Mina Meddelanden'),
-                                           css_class='btn btn-primary disabled'),)
+                                           title=_('Mina Meddelanden')),)
         self.buttons += (deform.Button(name='add_by_mobile',
                                        title=_('Phone subscription'),
                                        css_class='btn btn-primary'),)
