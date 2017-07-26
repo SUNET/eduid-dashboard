@@ -480,7 +480,7 @@ class NinsView(BaseFormView):
 
     route = 'nins'
 
-    bootstrap_form_style = 'form-inline'
+    bootstrap_form_style = 'form'
 
     def __init__(self, *args, **kwargs):
         super(NinsView, self).__init__(*args, **kwargs)

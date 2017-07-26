@@ -67,9 +67,14 @@
   {% endif %}
     <!-- Hiding a form does not make in unusable. we should really have different forms for adding and validating NINs -->
     <div class='form-content {% if verified_nins or not_verified_nins %} hidden{% endif %}'>
-      {{ form|safe }}
+        {{ form|safe }}
     </div>
-    <div id="openid-connect-root" />
+    <!-- Only show the Freja eID component if there are nins to validate -->
+    {% if not verified_nins %}
+        <div class="text-xs-center">
+            <div id="openid-connect-root" />
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block askdialog_extra_info %}
