@@ -488,6 +488,10 @@ class NinsView(BaseFormView):
         # All buttons for adding a nin, must have a name that starts with "add". This because the POST message, sent
         # from the button, must trigger the "add" validation part of a nin.
         self.buttons = ()
+        if self.request.registry.settings.get('enable_mm_verification'):
+
+            self.buttons += (deform.Button(name='add',
+                                           title=_('Mina Meddelanden')),)
         self.buttons += (deform.Button(name='add_by_mobile',
                                        title=_('Phone subscription'),
                                        css_class='btn btn-primary'),)
