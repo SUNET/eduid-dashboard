@@ -75,13 +75,16 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
+          <a class="navbar-brand" href="#">
+              {{ _("Menu") }}
+          </a>
         </div>
     
         <div class="collapse navbar-collapse" id="profile-menu-small">
           <ul class="nav nav-stacked nav-tabs navbar-nav">
               {% for tab in tabs %}
                 <li>
-                    <a href='#{{tab.id}}' class="main-nav-tabs">{{_(tab.label)}}</a>
+                    <a href='#{{tab.id}}' data-toggle="collapse" data-target="#profile-menu-small" class="main-nav-tabs btn btn-block">{{_(tab.label)}}</a>
                 </li>
               {% endfor %}
           </ul>
