@@ -8,7 +8,7 @@
 # Gijutsu <ascii@binary.to>, 2015-2017
 # Fredrik Thulin, 2013-2014
 # Gijutsu <ascii@binary.to>, 2015
-# Johan Lundberg <lundberg.johan@gmail.com>, 2016
+# Johan Lundberg <lundberg.johan@gmail.com>, 2016-2017
 # Johan Lundberg <lundberg.johan@gmail.com>, 2014-2015
 # Stefan Liström <steli@sunet.se>, 2013-2014
 # Stefan Wold <swold@sunet.se>, 2013-2014
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-01-10 15:45+0100\n"
-"PO-Revision-Date: 2017-01-10 14:53+0000\n"
-"Last-Translator: Gijutsu <ascii@binary.to>\n"
+"POT-Creation-Date: 2017-07-28 17:52+0200\n"
+"PO-Revision-Date: 2017-07-31 11:40+0000\n"
+"Last-Translator: Johan Lundberg <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -651,7 +651,7 @@ msgstr ""
 "<p>Lägg till ditt personnummer och påbörja verifieringsprocessen med en "
 "av knapparna nedan.</p>"
 
-#: eduiddashboard/templates/nins-form.jinja2:83
+#: eduiddashboard/templates/nins-form.jinja2:88
 #, python-format
 msgid ""
 "\n"
@@ -663,15 +663,15 @@ msgstr ""
 "Hämta bekräftelsekoden här: <a href=\"%(nin_service_url)s\" "
 "target=\"_blank\">%(nin_service_name)s</a>"
 
-#: eduiddashboard/templates/nins-form.jinja2:90
+#: eduiddashboard/templates/nins-form.jinja2:95
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr "Vänligen vänta medan personnumret bekräftas."
 
-#: eduiddashboard/templates/nins-form.jinja2:91
+#: eduiddashboard/templates/nins-form.jinja2:96
 msgid "Mina Meddelanden disabled"
 msgstr "Mina Meddelanden är inaktiverad"
 
-#: eduiddashboard/templates/nins-form.jinja2:91
+#: eduiddashboard/templates/nins-form.jinja2:96
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
@@ -681,7 +681,7 @@ msgstr ""
 "från användning av ”Mina Meddelanden” efter påtryckning från SWEDBANK. "
 "Mer information:"
 
-#: eduiddashboard/templates/nins-form.jinja2:91
+#: eduiddashboard/templates/nins-form.jinja2:96
 msgid "Vetenskapsrådet's press release"
 msgstr "Vetenskapsrådets pressrelease"
 
@@ -844,8 +844,8 @@ msgstr "Bekräfta borttagandet av eduID-kontot"
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:105
-#: eduiddashboard/templates/profile.jinja2:154
-#: eduiddashboard/templates/profile.jinja2:179
+#: eduiddashboard/templates/profile.jinja2:157
+#: eduiddashboard/templates/profile.jinja2:182
 #: eduiddashboard/views/security.py:456 eduiddashboard/views/security.py:495
 #: eduiddashboard/views/security.py:538 eduiddashboard/views/security.py:590
 #: eduiddashboard/views/security.py:655
@@ -939,12 +939,12 @@ msgid "Editing user %(eppn)s"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:53
-#: eduiddashboard/templates/profile.jinja2:108
+#: eduiddashboard/templates/profile.jinja2:111
 msgid "Completion"
 msgstr "Profilstatus"
 
 #: eduiddashboard/templates/profile.jinja2:61
-#: eduiddashboard/templates/profile.jinja2:113
+#: eduiddashboard/templates/profile.jinja2:116
 msgid "eduID identifier"
 msgstr "eduID-identifierare"
 
@@ -952,57 +952,61 @@ msgstr "eduID-identifierare"
 msgid "Toggle navigation"
 msgstr "Ändra gränssnitt"
 
-#: eduiddashboard/templates/profile.jinja2:128
+#: eduiddashboard/templates/profile.jinja2:79
+msgid "Menu"
+msgstr "Meny"
+
+#: eduiddashboard/templates/profile.jinja2:131
 msgid "Lost your confirmation code?"
 msgstr "Tappat bort din bekräftelsekod?"
 
-#: eduiddashboard/templates/profile.jinja2:128
+#: eduiddashboard/templates/profile.jinja2:131
 msgid "Resend confirmation code"
 msgstr "Skicka bekräftelsekoden igen"
 
-#: eduiddashboard/templates/profile.jinja2:133
+#: eduiddashboard/templates/profile.jinja2:136
 msgid "Finish"
 msgstr "Klar"
 
-#: eduiddashboard/templates/profile.jinja2:148
+#: eduiddashboard/templates/profile.jinja2:151
 msgid "Send code to your official postal address"
 msgstr "Skicka kod till din folkbokföringsadress"
 
-#: eduiddashboard/templates/profile.jinja2:155
+#: eduiddashboard/templates/profile.jinja2:158
 msgid "Send"
 msgstr "Skicka"
 
-#: eduiddashboard/templates/profile.jinja2:166
+#: eduiddashboard/templates/profile.jinja2:169
 msgid "Enter code received by letter"
 msgstr "Ange koden du fick i brevet"
 
-#: eduiddashboard/templates/profile.jinja2:170
+#: eduiddashboard/templates/profile.jinja2:173
 msgid ""
 "If you have received the letter, please enter the enclosed code below and"
 " click \"Ok\""
 msgstr "Om du har fått ett brev, skriv koden i rutan nedan och klicka på \"Ok\""
 
-#: eduiddashboard/templates/profile.jinja2:173
+#: eduiddashboard/templates/profile.jinja2:176
 msgid "required"
 msgstr "nödvändig"
 
-#: eduiddashboard/templates/profile.jinja2:180
+#: eduiddashboard/templates/profile.jinja2:183
 msgid "Ok"
 msgstr "Ok"
 
-#: eduiddashboard/templates/profile.jinja2:225
+#: eduiddashboard/templates/profile.jinja2:228
 msgid "Warning!"
 msgstr "Varning!"
 
-#: eduiddashboard/templates/profile.jinja2:225
+#: eduiddashboard/templates/profile.jinja2:228
 msgid "An error has occurred, please try again later."
 msgstr "Ett fel har uppstått. Vänligen försök igen senare."
 
-#: eduiddashboard/templates/profile.jinja2:232
+#: eduiddashboard/templates/profile.jinja2:235
 msgid "Error!"
 msgstr "Fel!"
 
-#: eduiddashboard/templates/profile.jinja2:232
+#: eduiddashboard/templates/profile.jinja2:235
 msgid "Permission denied"
 msgstr "Åtkomst nekad"
 
@@ -1389,7 +1393,7 @@ msgstr ""
 "Bekräftelsekoden har expirerat. Klicka på \"Skicka ny kod\" för att få en"
 " ny."
 
-#: eduiddashboard/views/__init__.py:131 eduiddashboard/views/nins.py:603
+#: eduiddashboard/views/__init__.py:131 eduiddashboard/views/nins.py:599
 #: eduiddashboard/views/verifications.py:29
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
@@ -1591,23 +1595,23 @@ msgstr "Vi har för närvarande tekniska problem, vänligen försök igen senare
 msgid "You have successfully verified your identity"
 msgstr "Din identitet är nu bekräftad"
 
-#: eduiddashboard/views/nins.py:493 eduiddashboard/views/nins.py:497
+#: eduiddashboard/views/nins.py:494
 msgid "Mina Meddelanden"
 msgstr "Mina Meddelanden"
 
-#: eduiddashboard/views/nins.py:500
+#: eduiddashboard/views/nins.py:496
 msgid "Phone subscription"
 msgstr "Telefonabonnemang"
 
-#: eduiddashboard/views/nins.py:503
+#: eduiddashboard/views/nins.py:499
 msgid "Physical letter"
 msgstr "Brev"
 
-#: eduiddashboard/views/nins.py:606
+#: eduiddashboard/views/nins.py:602
 msgid "Your national identity number has been confirmed"
 msgstr "Ditt personnummer är bekräftat"
 
-#: eduiddashboard/views/nins.py:617
+#: eduiddashboard/views/nins.py:613
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."

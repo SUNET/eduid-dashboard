@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-01-10 15:45+0100\n"
+"POT-Creation-Date: 2017-07-28 17:52+0200\n"
 "PO-Revision-Date: 2013-09-04 08:43+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -647,7 +647,7 @@ msgid ""
 "                one of the buttons below.</p>"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:83
+#: eduiddashboard/templates/nins-form.jinja2:88
 #, python-format
 msgid ""
 "\n"
@@ -656,22 +656,22 @@ msgid ""
 "    "
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:90
+#: eduiddashboard/templates/nins-form.jinja2:95
 msgid "We are verifying that the provided identity number is valid, please wait."
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:91
+#: eduiddashboard/templates/nins-form.jinja2:96
 msgid "Mina Meddelanden disabled"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:91
+#: eduiddashboard/templates/nins-form.jinja2:96
 msgid ""
 "For the time being Skatteverket has disabled Vetenskapsrådet/SUNET/eduID "
 "from using Mina Meddelanden due to pressure from SWEDBANK. For more "
 "information:"
 msgstr ""
 
-#: eduiddashboard/templates/nins-form.jinja2:91
+#: eduiddashboard/templates/nins-form.jinja2:96
 msgid "Vetenskapsrådet's press release"
 msgstr ""
 
@@ -812,8 +812,8 @@ msgstr ""
 
 #: eduiddashboard/templates/passwords-form.jinja2:67
 #: eduiddashboard/templates/passwords-form.jinja2:105
-#: eduiddashboard/templates/profile.jinja2:154
-#: eduiddashboard/templates/profile.jinja2:179
+#: eduiddashboard/templates/profile.jinja2:157
+#: eduiddashboard/templates/profile.jinja2:182
 #: eduiddashboard/views/security.py:456 eduiddashboard/views/security.py:495
 #: eduiddashboard/views/security.py:538 eduiddashboard/views/security.py:590
 #: eduiddashboard/views/security.py:655
@@ -897,17 +897,16 @@ msgstr "Editando el usuario %(email)s"
 
 #: eduiddashboard/templates/profile.jinja2:28
 #, fuzzy, python-format
-#| msgid "Editing user %(email)s"
 msgid "Editing user %(eppn)s"
 msgstr "Editando el usuario %(email)s"
 
 #: eduiddashboard/templates/profile.jinja2:53
-#: eduiddashboard/templates/profile.jinja2:108
+#: eduiddashboard/templates/profile.jinja2:111
 msgid "Completion"
 msgstr ""
 
 #: eduiddashboard/templates/profile.jinja2:61
-#: eduiddashboard/templates/profile.jinja2:113
+#: eduiddashboard/templates/profile.jinja2:116
 msgid "eduID identifier"
 msgstr ""
 
@@ -915,58 +914,62 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:128
+#: eduiddashboard/templates/profile.jinja2:79
+msgid "Menu"
+msgstr ""
+
+#: eduiddashboard/templates/profile.jinja2:131
 msgid "Lost your confirmation code?"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:128
+#: eduiddashboard/templates/profile.jinja2:131
 #, fuzzy
 msgid "Resend confirmation code"
 msgstr "Reenviar el email de verificación"
 
-#: eduiddashboard/templates/profile.jinja2:133
+#: eduiddashboard/templates/profile.jinja2:136
 msgid "Finish"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:148
+#: eduiddashboard/templates/profile.jinja2:151
 msgid "Send code to your official postal address"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:155
+#: eduiddashboard/templates/profile.jinja2:158
 msgid "Send"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:166
+#: eduiddashboard/templates/profile.jinja2:169
 msgid "Enter code received by letter"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:170
+#: eduiddashboard/templates/profile.jinja2:173
 msgid ""
 "If you have received the letter, please enter the enclosed code below and"
 " click \"Ok\""
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:173
+#: eduiddashboard/templates/profile.jinja2:176
 msgid "required"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:180
+#: eduiddashboard/templates/profile.jinja2:183
 msgid "Ok"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:225
+#: eduiddashboard/templates/profile.jinja2:228
 msgid "Warning!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:225
+#: eduiddashboard/templates/profile.jinja2:228
 msgid "An error has occurred, please try again later."
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:232
+#: eduiddashboard/templates/profile.jinja2:235
 msgid "Error!"
 msgstr ""
 
-#: eduiddashboard/templates/profile.jinja2:232
+#: eduiddashboard/templates/profile.jinja2:235
 msgid "Permission denied"
 msgstr ""
 
@@ -1249,7 +1252,7 @@ msgid ""
 "code\" to get a new one"
 msgstr ""
 
-#: eduiddashboard/views/__init__.py:131 eduiddashboard/views/nins.py:603
+#: eduiddashboard/views/__init__.py:131 eduiddashboard/views/nins.py:599
 #: eduiddashboard/views/verifications.py:29
 msgid "Your user profile is out of sync. Please reload the page and try again."
 msgstr ""
@@ -1442,24 +1445,24 @@ msgstr ""
 msgid "You have successfully verified your identity"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:493 eduiddashboard/views/nins.py:497
+#: eduiddashboard/views/nins.py:494
 msgid "Mina Meddelanden"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:500
+#: eduiddashboard/views/nins.py:496
 msgid "Phone subscription"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:503
+#: eduiddashboard/views/nins.py:499
 msgid "Physical letter"
 msgstr ""
 
-#: eduiddashboard/views/nins.py:606
+#: eduiddashboard/views/nins.py:602
 #, fuzzy
 msgid "Your national identity number has been confirmed"
 msgstr "números de identificación personal"
 
-#: eduiddashboard/views/nins.py:617
+#: eduiddashboard/views/nins.py:613
 msgid ""
 "A confirmation code has been sent to your government inbox. Please click "
 "on \"Pending confirmation\" link below to enter your confirmation code."
@@ -2128,10 +2131,4 @@ msgstr ""
 
 #~ msgid "Email {obj} verified"
 #~ msgstr "Tu email {email} fue verificado"
-
-#~ msgid ""
-#~ "The given mobile number was not "
-#~ "associated to the given national "
-#~ "identity number"
-#~ msgstr ""
 
