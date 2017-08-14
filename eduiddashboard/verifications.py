@@ -182,7 +182,7 @@ def _remove_nin_from_user(nin, user):
     return user
 
 
-def _add_nin_to_user(new_nin, user):
+def _add_nin_to_user(new_nin, user, created_ts=None):
     """
     Add a NIN to a user.
     Part of set_nin_verified() above.
@@ -192,6 +192,7 @@ def _add_nin_to_user(new_nin, user):
                       application = 'dashboard',
                       verified = True,
                       primary = primary,
+                      created_ts = created_ts,
                       )
     # Remove the NIN from the user if it is already there
     try:
