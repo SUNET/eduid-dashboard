@@ -1,3 +1,5 @@
+import datetime
+
 from unittest import TestCase
 from eduid_userdb import User
 from eduid_userdb.testing import MOCKED_USER_STANDARD
@@ -373,7 +375,8 @@ class TestRemoveninFromUser(TestCase):
     def test_verify_existing_number(self):
         """ Verify an existing number on the test user """
         this = self.ninuser
-        _add_nin_to_user('0000', this)
+        now = datetime.datetime.utcnow()
+        _add_nin_to_user('0000', this, created_ts = now)
         expected = [{'number': '1111',
                      'verified': True,
                      'primary': True,
@@ -385,6 +388,8 @@ class TestRemoveninFromUser(TestCase):
                     {'number': '0000',
                      'verified': True,
                      'primary': False,
+                     'created_by': 'dashboard',
+                     'created_ts': now,
                      },
                     ]
         self.assertEqual(this.nins.to_list_of_dicts(), expected)
