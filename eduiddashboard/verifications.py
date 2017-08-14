@@ -18,7 +18,7 @@ from eduid_userdb.nin import Nin
 from eduid_userdb.mail import MailAddress
 from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.element import DuplicateElementViolation
-from eduid_userdb.exceptions import UserOutOfSync
+from eduid_userdb.exceptions import UserOutOfSync, UserDBValueError
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.utils import get_unique_hash
 from eduiddashboard.utils import retrieve_modified_ts
@@ -193,10 +193,12 @@ def _add_nin_to_user(new_nin, user):
                       verified = True,
                       primary = primary,
                       )
+    # Remove the NIN from the user if it is already there
     try:
-        user.nins.add(new_nin_obj)
-    except DuplicateElementViolation:
-        user.nins.find(new_nin).is_verified = True
+        user.nins.remove(new_nin)
+    except UserDBValueError:
+        pass
+    user.nins.add(new_nin_obj)
 
 
 def _nin_verified_transaction_audit(request, reference):
