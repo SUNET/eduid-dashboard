@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: eduid-dashboard 0.5.1b10\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-07-28 17:52+0200\n"
+"POT-Creation-Date: 2017-08-14 15:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -263,8 +263,8 @@ msgstr ""
 
 #: eduiddashboard/validators.py:397
 msgid ""
-"The national identity number is not associated with a mobile for private use,"
-" see hitta.se"
+"A company subscription or protected phone number cannot be used with this "
+"service."
 msgstr ""
 
 #: eduiddashboard/validators.py:408
@@ -290,11 +290,11 @@ msgstr ""
 msgid "National identity number {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:247
+#: eduiddashboard/verifications.py:250
 msgid "Phone {obj} verified"
 msgstr ""
 
-#: eduiddashboard/verifications.py:319
+#: eduiddashboard/verifications.py:322
 msgid "Email {obj} verified"
 msgstr ""
 

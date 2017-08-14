@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-07-28 17:52+0200\n"
-"PO-Revision-Date: 2017-07-31 11:40+0000\n"
-"Last-Translator: Johan Lundberg <lundberg.johan@gmail.com>\n"
+"POT-Creation-Date: 2017-08-14 15:01+0200\n"
+"PO-Revision-Date: 2017-08-14 13:03+0000\n"
+"Last-Translator: Gijutsu <ascii@binary.to>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -292,11 +292,11 @@ msgstr "Du har inget bekräftat mobiltelefonnummer"
 
 #: eduiddashboard/validators.py:397
 msgid ""
-"The national identity number is not associated with a mobile for private "
-"use, see hitta.se"
+"A company subscription or protected phone number cannot be used with this"
+" service."
 msgstr ""
-"Personnumret är inte kopplat till en bekräftad mobil för privat bruk, se "
-"hitta.se"
+"Företagsabonnemang eller skyddat nummer kan inte användas för den här "
+"tjänsten."
 
 #: eduiddashboard/validators.py:408
 msgid "Validate NIN via mobile with succeeded"
@@ -324,11 +324,11 @@ msgstr ""
 msgid "National identity number {obj} verified"
 msgstr "Personnummer {obj} bekräftat"
 
-#: eduiddashboard/verifications.py:247
+#: eduiddashboard/verifications.py:250
 msgid "Phone {obj} verified"
 msgstr "Telefonnummer {obj} bekräftat"
 
-#: eduiddashboard/verifications.py:319
+#: eduiddashboard/verifications.py:322
 msgid "Email {obj} verified"
 msgstr "E-postadressen {obj} bekräftad"
 
