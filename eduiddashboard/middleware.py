@@ -39,7 +39,8 @@ def authn_tween_factory(handler, registry):
                 return handler(request)
 
         login_url = urlappend(settings['token_service_url'], 'login')
-        next_url = request.url
+        if next_url is None:
+            next_url = sanitize_post_key(request, 'next_url', '/')
 
         params = {'next': next_url}
 
