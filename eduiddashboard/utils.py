@@ -44,25 +44,31 @@ def verify_auth_token(shared_key, eppn, token, nonce, timestamp, generator=sha25
     :return: bool, True on valid authentication
     """
     logger.debug("Trying to authenticate user {!r} with auth token {!r}".format(eppn, token))
+
+    # XXX The timestamp check is already done in the check_authn middleware but I will not remove it here
+    # XXX for completeness of this function
     # check timestamp to make sure it is within -300..900 seconds from now
     now = int(time.time())
     ts = int(timestamp, 16)
     if (ts < now - 300) or (ts > now + 900):
         logger.debug("Auth token timestamp {!r} out of bounds ({!s} seconds from {!s})".format(
             timestamp, ts - now, now))
-        raise HTTPForbidden(_('Login token expired, please await confirmation e-mail to log in.'))
+        return False
+
     # verify there is a long enough nonce
     if len(nonce) < 16:
-        logger.debug("Auth token nonce {!r} too short".format(nonce))
-        raise HTTPForbidden(_('Login token invalid'))
+        logger.warning("Auth token nonce {!r} too short".format(nonce))
+        return False
 
+    # verify token format
     expected = generator("{0}|{1}|{2}|{3}".format(
         shared_key, eppn, nonce, timestamp)).hexdigest()
+    if len(expected) != len(token):
+        logger.warning("Auth token bad length")
+        return False
+
     # constant time comparision of the hash, courtesy of
     # http://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-library/
-    if len(expected) != len(token):
-        logger.debug("Auth token bad length")
-        raise HTTPForbidden(_('Login token invalid'))
     result = 0
     for x, y in zip(expected, token):
         result |= ord(x) ^ ord(y)
