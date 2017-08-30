@@ -203,8 +203,8 @@ def token_login(context, request):
     else:
         logger.info("Token authentication failed (eppn: {!r})".format(eppn))
         request.stats.count('token_login_fail')
-        # Show and error, the user can't be logged
-        return HTTPBadRequest()
+        # Redirect user to next_url and let middleware and authn sort out the login
+        return HTTPFound(location=next_url)
 
 
 @view_config(route_name='logout')
