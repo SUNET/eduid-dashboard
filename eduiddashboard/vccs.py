@@ -1,6 +1,6 @@
 from bson import ObjectId
 from eduid_userdb.dashboard import DashboardLegacyUser, DashboardUser
-from eduid_userdb.password import Password
+from eduid_userdb.credentials import Password
 
 import vccs_client
 
@@ -108,7 +108,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
 
     if old_factor:
         vccs.revoke_credentials(str(user.user_id), [old_factor])
-        user.passwords.remove(checked_password.credential_id)
+        user.passwords.remove(checked_password.key)
         log.debug("Revoked old credential {!s} (user {!s})".format(
             old_factor.credential_id, user))
 
@@ -119,7 +119,7 @@ def add_credentials(vccs_url, old_password, new_password, user):
             revoked.append(vccs_client.VCCSRevokeFactor(str(password.credential_id), 'reset password', reference='dashboard'))
             log.debug("Revoking old credential (password reset) {!s} (user {!r})".format(
                 password.credential_id, user))
-            user.passwords.remove(password.credential_id)
+            user.passwords.remove(password.key)
         if revoked:
             try:
                 vccs.revoke_credentials(str(user.user_id), revoked)

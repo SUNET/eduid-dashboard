@@ -15,7 +15,7 @@ from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
 from eduiddashboard.session import store_session_user
 
-from eduid_userdb.password import Password
+from eduid_userdb.credentials import Password
 from eduid_userdb.dashboard import DashboardUser
 
 from eduid_userdb.testing import MockedUserDB as MUDB
