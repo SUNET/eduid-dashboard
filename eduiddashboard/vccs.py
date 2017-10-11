@@ -1,6 +1,6 @@
 from bson import ObjectId
 from eduid_userdb.dashboard import DashboardLegacyUser, DashboardUser
-from eduid_userdb import Password
+from eduid_userdb.credentials import Password
 
 import vccs_client
 
