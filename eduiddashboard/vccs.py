@@ -41,7 +41,7 @@ def check_password(vccs_url, password, user, vccs=None):
     if isinstance(user, DashboardLegacyUser):
         user = DashboardUser(data=user._mongo_doc)
 
-    for cred in user.passwords.to_list():
+    for cred in user.credentials.to_list():
         if vccs is None:
             vccs = get_vccs_client(vccs_url)
         factor = vccs_client.VCCSPasswordFactor(
