@@ -21,7 +21,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.5.1b10'
+version = '0.5.1b11'
 
 requires = [
     'eduid_am >= 0.6.0',
@@ -30,6 +30,7 @@ requires = [
     'eduid_lookup_mobile >= 0.0.4',
     'eduid_userdb >= 0.2.6b1',
     'eduid-common[nodeps] >= 0.3.0b2',
+    'six >= 1.11.0',
     'Flask>=0.10.1,<0.12',  # Dependency for eduid-common
     'redis >= 2.10.5',
     'PyNaCl >= 1.0.1',

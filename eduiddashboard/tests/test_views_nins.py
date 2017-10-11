@@ -9,6 +9,7 @@ import pprint
 from eduid_userdb.nin import Nin
 from eduid_userdb.phone import PhoneNumber
 from eduid_userdb.dashboard import UserDBWrapper
+from eduid_userdb.dashboard import DashboardUser
 from eduid_userdb.dashboard import DashboardLegacyUser as OldUser
 from eduiddashboard.testing import LoggedInRequestTests
 from eduiddashboard.utils import retrieve_modified_ts
@@ -169,17 +170,18 @@ class NinsFormTests(LoggedInRequestTests):
         email = self.no_nin_user_email
         self.set_logged(email)
         user = self.userdb_new.get_user_by_mail(email)
-        retrieve_modified_ts(user, self.dashboard_db)
+        dashboard_user = DashboardUser(data=user.to_dict())
+        retrieve_modified_ts(dashboard_user, self.dashboard_db)
 
-        self.assertEqual(user.nins.count, 0)
+        self.assertEqual(dashboard_user.nins.count, 0)
 
         # Add a verified phone number to the user in the central userdb
-        user.phone_numbers.add(PhoneNumber(data={
+        dashboard_user.phone_numbers.add(PhoneNumber(data={
             'number': '666666666',
             'primary': True,
             'verified': True
             }))
-        self.dashboard_db.save(user)
+        self.dashboard_db.save(dashboard_user)
 
         # First we add a nin...
         nin = '200010100001'
@@ -214,18 +216,19 @@ class NinsFormTests(LoggedInRequestTests):
         email = self.no_nin_user_email
         self.set_logged(email)
         user = self.userdb_new.get_user_by_mail(email)
+        dashboard_user = DashboardUser(data=user.to_dict())
         self.assertEqual(user.nins.count, 0)
 
         # Add a verified phone number to the user in the central userdb
-        user.phone_numbers.add(PhoneNumber(data={
+        dashboard_user.phone_numbers.add(PhoneNumber(data={
             'number': '666666666',
             'primary': True,
             'verified': True
             }))
-        user.modified_ts = None
-        self.userdb_new.save(user)
-        retrieve_modified_ts(user, self.dashboard_db)
-        self.dashboard_db.save(user)
+        dashboard_user.modified_ts = None
+        self.userdb_new.save(dashboard_user)
+        retrieve_modified_ts(dashboard_user, self.dashboard_db)
+        self.dashboard_db.save(dashboard_user)
 
         # First we add a nin...
         new_nin = '200010100001'

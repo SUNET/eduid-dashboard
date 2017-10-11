@@ -299,7 +299,7 @@ def account_terminated(context, request):
     # revoke all user credentials
     revoke_all_credentials(settings.get('vccs_url'), user)
     for p in logged_user.passwords.to_list():
-        logged_user.passwords.remove(p.id)
+        logged_user.passwords.remove(p.key)
 
     # flag account as terminated
     logged_user.terminated = True

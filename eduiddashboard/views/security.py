@@ -143,9 +143,9 @@ def get_authn_info(request):
 
     authninfo = []
 
-    for credential in user.passwords.to_list_of_dicts():
-        auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential['id'])})
-        log.debug("get_authn_info {!s}: cred id: {!r} auth entry: {!r}".format(user, credential['id'], auth_entry))
+    for credential in user.credentials.to_list():
+        auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential.credential_id)})
+        log.debug("get_authn_info {!s}: cred id: {!r} auth entry: {!r}".format(user, credential.credential_id, auth_entry))
         if auth_entry:
             created_dt = convert_to_localtime(credential['created_ts'])
             success_dt = convert_to_localtime(auth_entry['success_ts'])

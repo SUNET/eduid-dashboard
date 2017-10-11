@@ -15,7 +15,8 @@ from eduiddashboard import vccs
 from eduiddashboard.vccs import (check_password, add_credentials, provision_credentials)
 from eduiddashboard.session import store_session_user
 
-from eduid_userdb import Password
+from eduid_userdb.credentials import Password
+from eduid_userdb.dashboard import DashboardUser
 
 from eduid_userdb.testing import MockedUserDB as MUDB
 
@@ -228,14 +229,15 @@ class TerminateAccountTests(LoggedInRequestTests):
         email = 'johnsmith@example.com'
         # Set up a bunch of faked passwords to make sure they are all revoked
         user = self.userdb_new.get_user_by_mail(email)
-        retrieve_modified_ts(user, self.dashboard_db)
+        dashboard_user = DashboardUser(data=user.to_dict())
+        retrieve_modified_ts(dashboard_user, self.dashboard_db)
         for i in range(7):
             pw = Password(credential_id=ObjectId(),
                           salt=str(i) * 64,
                           application='dashboard_unittest',
                           )
-            user.passwords.add(pw)
-        self.dashboard_db.save(user)
+            dashboard_user.passwords.add(pw)
+        self.dashboard_db.save(dashboard_user)
 
         logging.log(logging.DEBUG, "Fetching /profile/security\n\n" + ('-=-' * 30) + "\n\n")
 
