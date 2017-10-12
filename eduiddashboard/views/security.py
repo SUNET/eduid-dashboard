@@ -16,6 +16,7 @@ from pyramid_deform import FormView
 from pyramid.renderers import render_to_response
 
 from eduid_userdb.exceptions import UserDoesNotExist
+from eduid_userdb.credentials import Password
 from eduid_common.api.utils import urlappend
 from eduiddashboard.i18n import TranslationString as _
 from eduiddashboard.models import (Passwords, EmailResetPassword,
@@ -143,7 +144,7 @@ def get_authn_info(request):
 
     authninfo = []
 
-    for credential in user.credentials.to_list():
+    for credential in user.credentials.filter(Password).to_list():
         auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential.credential_id)})
         log.debug("get_authn_info {!s}: cred id: {!r} auth entry: {!r}".format(user, credential.credential_id, auth_entry))
         if auth_entry:
