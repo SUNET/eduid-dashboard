@@ -247,7 +247,7 @@ class TerminateAccountTests(LoggedInRequestTests):
 
         # Verify the user has eight passwords
         user = self.dashboard_db.get_user_by_mail(email)
-        self.assertEqual(len(user.passwords.to_list_of_dicts()), 8)
+        self.assertEqual(len(user.credentials.filter(Password).to_list_of_dicts()), 8)
 
         logging.log(logging.DEBUG, "Submitting termination request\n\n" + ('-=-' * 30) + "\n\n")
 
@@ -296,7 +296,7 @@ class TerminateAccountTests(LoggedInRequestTests):
 
         # Verify the user has a password and is NOT terminated again
         user = self.dashboard_db.get_user_by_mail(email)
-        self.assertEqual(len(user.passwords.to_list_of_dicts()), 1)
+        self.assertEqual(len(user.credentials.filter(Password).to_list_of_dicts()), 1)
         self.assertFalse(user.terminated)
 
 
@@ -436,7 +436,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
 
         # Verify the user has no nins and no verified phone numbers
         user = self.dashboard_db.get_user_by_mail(email)
-        self.assertEqual(len(user.passwords.to_list_of_dicts()), 1)
+        self.assertEqual(len(user.credentials.filter(Password).to_list_of_dicts()), 1)
         self.assertEqual(user.nins.count, 0)
         for mobile in user.phone_numbers.to_list_of_dicts():
             self.assertEqual(mobile['verified'], False)

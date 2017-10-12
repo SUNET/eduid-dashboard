@@ -15,6 +15,7 @@ from pyramid.settings import asbool
 from deform_bootstrap import Form
 
 from eduid_common.api.utils import urlappend
+from eduid_userdb.credentials import Password
 from eduiddashboard.utils import (verify_auth_token,
                                   calculate_filled_profile,
                                   get_pending_actions,
@@ -298,7 +299,7 @@ def account_terminated(context, request):
 
     # revoke all user credentials
     revoke_all_credentials(settings.get('vccs_url'), user)
-    for p in logged_user.passwords.to_list():
+    for p in logged_user.credentials.filter(Password).to_list():
         logged_user.passwords.remove(p.key)
 
     # flag account as terminated
