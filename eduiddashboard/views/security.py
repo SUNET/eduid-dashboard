@@ -148,7 +148,7 @@ def get_authn_info(request):
         auth_entry = request.authninfodb.authn_info.find_one({'_id': ObjectId(credential.credential_id)})
         log.debug("get_authn_info {!s}: cred id: {!r} auth entry: {!r}".format(user, credential.credential_id, auth_entry))
         if auth_entry:
-            created_dt = convert_to_localtime(credential['created_ts'])
+            created_dt = convert_to_localtime(credential.created_ts)
             success_dt = convert_to_localtime(auth_entry['success_ts'])
             data_type = _('Password')
             data = {'type': get_localizer(request).translate(data_type),
