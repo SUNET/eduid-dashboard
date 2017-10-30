@@ -10,7 +10,6 @@ set -x
 #  libssl-dev         # needed by pysaml2
 
 apt-get update
-apt-get -y dist-upgrade
 apt-get -y install \
     libxml2-dev \
     libxslt1-dev \
