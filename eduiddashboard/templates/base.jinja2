@@ -36,6 +36,7 @@
     {% endblock %}
   </head>
   <body>
+    <span class="hidden" id="eduid-lang-selected" data-lang="{{ request.locale }}"></span>
     <input type="hidden" id="jsconfig_url" name="jsconfig_url" value="{{ request.registry.settings['jsconfig_url'] }}">
     <div id='wrap container'>
       <header id="header" class="header">
