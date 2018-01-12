@@ -170,7 +170,7 @@ class MsgRelay(object):
                      link, nin))
         self._send_message.delay('mm', str(reference), content, nin, TEMPLATES_RELATION.get('nin-reset-password'), lang)
 
-    def get_postal_address(self, nin):
+    def get_postal_address(self, nin, timeout=4):
         """
             The expected address format is:
 
@@ -200,8 +200,8 @@ class MsgRelay(object):
 
         rtask = self._get_postal_address.apply_async(args=[nin])
         try:
-            rtask.wait()
-        except:
+            rtask.wait(timeout=timeout)
+        except Exception:
             raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
@@ -210,7 +210,7 @@ class MsgRelay(object):
         else:
             raise self.TaskFailed('Something went wrong')
 
-    def get_full_postal_address(self, nin):
+    def get_full_postal_address(self, nin, timeout=4):
         """
             The expected address format is:
 
@@ -232,8 +232,8 @@ class MsgRelay(object):
 
         rtask = self._get_postal_address.apply_async(args=[nin])
         try:
-            rtask.wait()
-        except:
+            rtask.wait(timeout=timeout)
+        except Exception:
             raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
@@ -242,7 +242,7 @@ class MsgRelay(object):
         else:
             raise self.TaskFailed('Something went wrong')
 
-    def get_relations_to(self, nin, relative_nin):
+    def get_relations_to(self, nin, relative_nin, timeout=4):
         """
         Get a list of the NAVET 'Relations' type codes between a NIN and a relatives NIN.
 
@@ -255,15 +255,17 @@ class MsgRelay(object):
 
         :param nin: Swedish National Identity Number
         :param relative_nin: Another Swedish National Identity Number
+        :param timeout: Max wait time for task to finish
         :type nin: str | unicode
         :type relative_nin: str | unicode
+        :type timeout: int
         :return: List of codes. Empty list if the NINs are not related.
         :rtype: [str | unicode]
         """
         rtask = self._get_relations_to.apply_async(args=[nin, relative_nin])
         try:
-            rtask.wait()
-        except:
+            rtask.wait(timeout=timeout)
+        except Exception:
             raise self.TaskFailed('Something went wrong')
 
         if rtask.successful():
