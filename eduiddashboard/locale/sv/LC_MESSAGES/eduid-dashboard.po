@@ -350,19 +350,19 @@ msgstr ""
 
 #: eduiddashboard/templates/base.jinja2:6
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: eduiddashboard/templates/base.jinja2:57
 msgid "Student"
-msgstr ""
+msgstr "Student"
 
 #: eduiddashboard/templates/base.jinja2:60
 msgid "Technicians"
-msgstr ""
+msgstr "Tekniker"
 
 #: eduiddashboard/templates/base.jinja2:63
 msgid "Staff"
-msgstr ""
+msgstr "Personal"
 
 #: eduiddashboard/templates/base.jinja2:66
 #: eduiddashboard/templates/emails-form.jinja2:7
@@ -374,15 +374,15 @@ msgstr "Vanliga frågor"
 
 #: eduiddashboard/templates/base.jinja2:78
 msgid "Logout"
-msgstr ""
+msgstr "Logga ut"
 
 #: eduiddashboard/templates/base.jinja2:87
 msgid "Sign up"
-msgstr ""
+msgstr "Skapa konto"
 
 #: eduiddashboard/templates/base.jinja2:91
 msgid "Sign in"
-msgstr ""
+msgstr "Logga in"
 
 #: eduiddashboard/templates/base.jinja2:118
 msgid "This Site depends on Javascript, so please enable it."
