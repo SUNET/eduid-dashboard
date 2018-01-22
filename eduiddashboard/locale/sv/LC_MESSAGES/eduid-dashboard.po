@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-14 15:01+0200\n"
+"POT-Creation-Date: 2018-01-22 10:29+0100\n"
 "PO-Revision-Date: 2017-08-14 13:03+0000\n"
 "Last-Translator: Gijutsu <ascii@binary.to>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
@@ -39,8 +39,8 @@ msgstr "{site_name} kontoborttagning"
 msgid "Reset your {site_name} password"
 msgstr "Återställning av ditt {site_name} lösenord"
 
-#: eduiddashboard/models.py:102 eduiddashboard/views/security.py:477
-#: eduiddashboard/views/security.py:571
+#: eduiddashboard/models.py:102 eduiddashboard/views/security.py:478
+#: eduiddashboard/views/security.py:572
 msgid "email"
 msgstr "e-post"
 
@@ -352,19 +352,19 @@ msgstr ""
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: eduiddashboard/templates/base.jinja2:56
+#: eduiddashboard/templates/base.jinja2:57
 msgid "Student"
 msgstr "Student"
 
-#: eduiddashboard/templates/base.jinja2:59
+#: eduiddashboard/templates/base.jinja2:60
 msgid "Technicians"
 msgstr "Tekniker"
 
-#: eduiddashboard/templates/base.jinja2:62
+#: eduiddashboard/templates/base.jinja2:63
 msgid "Staff"
 msgstr "Personal"
 
-#: eduiddashboard/templates/base.jinja2:65
+#: eduiddashboard/templates/base.jinja2:66
 #: eduiddashboard/templates/emails-form.jinja2:7
 #: eduiddashboard/templates/mobiles-form.jinja2:7
 #: eduiddashboard/templates/nins-form.jinja2:6
@@ -372,23 +372,31 @@ msgstr "Personal"
 msgid "FAQ"
 msgstr "Vanliga frågor"
 
-#: eduiddashboard/templates/base.jinja2:77
+#: eduiddashboard/templates/base.jinja2:78
 msgid "Logout"
 msgstr "Logga ut"
 
-#: eduiddashboard/templates/base.jinja2:86
+#: eduiddashboard/templates/base.jinja2:87
 msgid "Sign up"
 msgstr "Skapa konto"
 
-#: eduiddashboard/templates/base.jinja2:90
+#: eduiddashboard/templates/base.jinja2:91
 msgid "Sign in"
 msgstr "Logga in"
 
-#: eduiddashboard/templates/base.jinja2:117
+#: eduiddashboard/templates/base.jinja2:118
 msgid "This Site depends on Javascript, so please enable it."
 msgstr ""
-"Den här webbplatsen kräver Javascript för att fungera. Du behöver "
-"aktivera Javascript i webbläsaren."
+
+#: eduiddashboard/templates/base.jinja2:149
+msgid ""
+"There is a new experimental version of the app, which you can use "
+"clicking here"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:151
+msgid "Use new version of the app"
+msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
@@ -523,7 +531,7 @@ msgstr "Dashboard läge %(mode)s"
 msgid "Level %(level)s"
 msgstr "Nivå %(level)s"
 
-#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:105
+#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:106
 msgid "Search"
 msgstr "Sök"
 
@@ -801,8 +809,8 @@ msgstr "Användes senast"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:84
-#: eduiddashboard/views/security.py:255 eduiddashboard/views/security.py:589
-#: eduiddashboard/views/security.py:654
+#: eduiddashboard/views/security.py:256 eduiddashboard/views/security.py:590
+#: eduiddashboard/views/security.py:655
 msgid "Change password"
 msgstr "Byt lösenord"
 
@@ -846,9 +854,9 @@ msgstr "Bekräfta borttagandet av eduID-kontot"
 #: eduiddashboard/templates/passwords-form.jinja2:105
 #: eduiddashboard/templates/profile.jinja2:157
 #: eduiddashboard/templates/profile.jinja2:182
-#: eduiddashboard/views/security.py:456 eduiddashboard/views/security.py:495
-#: eduiddashboard/views/security.py:538 eduiddashboard/views/security.py:590
-#: eduiddashboard/views/security.py:655
+#: eduiddashboard/views/security.py:457 eduiddashboard/views/security.py:496
+#: eduiddashboard/views/security.py:539 eduiddashboard/views/security.py:591
+#: eduiddashboard/views/security.py:656
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1634,27 +1642,27 @@ msgstr "Ändringarna har sparats."
 msgid "Save"
 msgstr "Spara"
 
-#: eduiddashboard/views/portal.py:279 eduiddashboard/views/security.py:309
+#: eduiddashboard/views/portal.py:280 eduiddashboard/views/security.py:310
 msgid "No authentication info"
 msgstr "Ingen autentiseringsinformation"
 
-#: eduiddashboard/views/portal.py:284 eduiddashboard/views/security.py:314
+#: eduiddashboard/views/portal.py:285 eduiddashboard/views/security.py:315
 msgid "Stale authentication info. Please try again."
 msgstr "Autentiseringsinformationen är för gammal. Försök igen."
 
-#: eduiddashboard/views/security.py:132
+#: eduiddashboard/views/security.py:133
 msgid "Invalid request: only GET and POST accepted."
 msgstr "Ogiltig förfrågan: endast GET och POST tillåtna."
 
-#: eduiddashboard/views/security.py:152
+#: eduiddashboard/views/security.py:153
 msgid "Password"
 msgstr "Lösenord"
 
-#: eduiddashboard/views/security.py:347
+#: eduiddashboard/views/security.py:348
 msgid "Your password has been successfully updated"
 msgstr "Ditt lösenord har uppdaterats"
 
-#: eduiddashboard/views/security.py:349
+#: eduiddashboard/views/security.py:350
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
@@ -1662,7 +1670,7 @@ msgstr ""
 "Ett fel har uppståt vid ändring av ditt lösenord. Vänligen försök igen "
 "eller kontakta supporten om problemet kvarstår."
 
-#: eduiddashboard/views/security.py:389
+#: eduiddashboard/views/security.py:390
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
@@ -1671,16 +1679,16 @@ msgstr ""
 "Ange e-postadress, personnummer eller mobiltelefonnummer associerat med "
 "ditt eduID-konto så skickar vi en länk för att återställa ditt lösenord."
 
-#: eduiddashboard/views/security.py:455 eduiddashboard/views/security.py:494
-#: eduiddashboard/views/security.py:537
+#: eduiddashboard/views/security.py:456 eduiddashboard/views/security.py:495
+#: eduiddashboard/views/security.py:538
 msgid "Reset password"
 msgstr "Återställ lösenord"
 
-#: eduiddashboard/views/security.py:520
+#: eduiddashboard/views/security.py:521
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:540
+#: eduiddashboard/views/security.py:541
 msgid ""
 "Please enter a phone number associated with your eduID account, and we'll"
 " send you an sms with a code and an e-mail with a link to continue your "
@@ -1690,15 +1698,39 @@ msgstr ""
 " ett sms med en kod samt ett e-postmeddelande med en länk till sidan för "
 "att fortsätta återställningen av ditt lösenord."
 
-#: eduiddashboard/views/security.py:592
+#: eduiddashboard/views/security.py:593
 msgid "Please enter the code you received by SMS to continue"
 msgstr "Ange koden du fick via SMS för att fortsätta"
 
-#: eduiddashboard/views/security.py:657
+#: eduiddashboard/views/security.py:658
 msgid "Please choose a new password for your eduID account."
 msgstr "Välj ett nytt lösenord för ditt eduID-konto."
 
 #: eduiddashboard/views/verifications.py:25
 msgid "Can't locate the code in the active session"
 msgstr "Kan inte hitta koden i den aktiva sessionen"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+
+#~ msgid "Student"
+#~ msgstr "Student"
+
+#~ msgid "Technicians"
+#~ msgstr "Tekniker"
+
+#~ msgid "Staff"
+#~ msgstr "Personal"
+
+#~ msgid "Logout"
+#~ msgstr "Logga ut"
+
+#~ msgid "Sign up"
+#~ msgstr "Skapa konto"
+
+#~ msgid "Sign in"
+#~ msgstr "Logga in"
+
+#~ msgid "This Site depends on Javascript, so please enable it."
+#~ msgstr ""
 

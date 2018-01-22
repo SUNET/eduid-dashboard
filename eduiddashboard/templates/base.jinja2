@@ -143,6 +143,14 @@
                 {% endfor %}
               </span>
             </p>
+            <p id="go-to-new-dashboard"
+               data-toggle="tooltip"
+               data-placement="right"
+               title="{{ _("There is a new experimental version of the app, which you can use clicking here") }}">
+              <a>
+                  <span>{{ _("Use new version of the app") }}</span>
+              </a>
+            </p>
         </div>
     </div>
     {% block extra_jsdata %}
@@ -153,6 +161,8 @@
     <script src="{{'eduiddashboard:static/js/libs/bootstrap-3.2.0.min.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/dashboard-userstatus.js'|static_url}}"></script>
     <script src="{{'eduiddashboard:static/js/libs/pwstrength-bootstrap-1.1.1.min.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/libs/js.cookie.js'|static_url}}"></script>
+    <script src="{{'eduiddashboard:static/js/libs/popper.min.js'|static_url}}"></script>
     <!--[if IE]>
     <script type="text/javascript" src="{{'eduiddashboard:static/js/dashboard-base-ie.js'|static_url}}"></script>
     <![endif]-->
