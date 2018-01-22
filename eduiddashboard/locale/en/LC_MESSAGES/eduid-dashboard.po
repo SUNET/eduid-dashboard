@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-14 15:01+0200\n"
+"POT-Creation-Date: 2018-01-22 10:29+0100\n"
 "PO-Revision-Date: 2017-08-14 13:02+0000\n"
 "Last-Translator: Gijutsu <ascii@binary.to>\n"
 "Language-Team: English (United States) (http://www.transifex.com/sunet"
@@ -35,8 +35,8 @@ msgstr "{site_name} account termination"
 msgid "Reset your {site_name} password"
 msgstr "Reset your {site_name} password"
 
-#: eduiddashboard/models.py:102 eduiddashboard/views/security.py:477
-#: eduiddashboard/views/security.py:571
+#: eduiddashboard/models.py:102 eduiddashboard/views/security.py:478
+#: eduiddashboard/views/security.py:572
 msgid "email"
 msgstr "email"
 
@@ -343,21 +343,21 @@ msgstr ""
 
 #: eduiddashboard/templates/base.jinja2:6
 msgid "Dashboard"
-msgstr "Dashboard"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:56
+#: eduiddashboard/templates/base.jinja2:57
 msgid "Student"
-msgstr "Student"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:59
+#: eduiddashboard/templates/base.jinja2:60
 msgid "Technicians"
-msgstr "Technicians"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:62
+#: eduiddashboard/templates/base.jinja2:63
 msgid "Staff"
-msgstr "Staff"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:65
+#: eduiddashboard/templates/base.jinja2:66
 #: eduiddashboard/templates/emails-form.jinja2:7
 #: eduiddashboard/templates/mobiles-form.jinja2:7
 #: eduiddashboard/templates/nins-form.jinja2:6
@@ -365,21 +365,31 @@ msgstr "Staff"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: eduiddashboard/templates/base.jinja2:77
+#: eduiddashboard/templates/base.jinja2:78
 msgid "Logout"
-msgstr "Logout"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:86
+#: eduiddashboard/templates/base.jinja2:87
 msgid "Sign up"
-msgstr "Sign up"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:90
+#: eduiddashboard/templates/base.jinja2:91
 msgid "Sign in"
-msgstr "Sign in"
+msgstr ""
 
-#: eduiddashboard/templates/base.jinja2:117
+#: eduiddashboard/templates/base.jinja2:118
 msgid "This Site depends on Javascript, so please enable it."
-msgstr "This site requires JavaScript to be enabled."
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:149
+msgid ""
+"There is a new experimental version of the app, which you can use "
+"clicking here"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:151
+msgid "Use new version of the app"
+msgstr ""
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
@@ -516,7 +526,7 @@ msgstr "Dashboard %(mode)s mode"
 msgid "Level %(level)s"
 msgstr "Level %(level)s"
 
-#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:105
+#: eduiddashboard/templates/home.jinja2:18 eduiddashboard/views/portal.py:106
 msgid "Search"
 msgstr "Search"
 
@@ -794,8 +804,8 @@ msgstr "Last used"
 
 #: eduiddashboard/templates/passwords-form.jinja2:26
 #: eduiddashboard/templates/passwords-form.jinja2:84
-#: eduiddashboard/views/security.py:255 eduiddashboard/views/security.py:589
-#: eduiddashboard/views/security.py:654
+#: eduiddashboard/views/security.py:256 eduiddashboard/views/security.py:590
+#: eduiddashboard/views/security.py:655
 msgid "Change password"
 msgstr "Change password"
 
@@ -840,9 +850,9 @@ msgstr "Confirm deletion of eduID account"
 #: eduiddashboard/templates/passwords-form.jinja2:105
 #: eduiddashboard/templates/profile.jinja2:157
 #: eduiddashboard/templates/profile.jinja2:182
-#: eduiddashboard/views/security.py:456 eduiddashboard/views/security.py:495
-#: eduiddashboard/views/security.py:538 eduiddashboard/views/security.py:590
-#: eduiddashboard/views/security.py:655
+#: eduiddashboard/views/security.py:457 eduiddashboard/views/security.py:496
+#: eduiddashboard/views/security.py:539 eduiddashboard/views/security.py:591
+#: eduiddashboard/views/security.py:656
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -1622,27 +1632,27 @@ msgstr "Changes saved."
 msgid "Save"
 msgstr "Save"
 
-#: eduiddashboard/views/portal.py:279 eduiddashboard/views/security.py:309
+#: eduiddashboard/views/portal.py:280 eduiddashboard/views/security.py:310
 msgid "No authentication info"
 msgstr "No authentication info"
 
-#: eduiddashboard/views/portal.py:284 eduiddashboard/views/security.py:314
+#: eduiddashboard/views/portal.py:285 eduiddashboard/views/security.py:315
 msgid "Stale authentication info. Please try again."
 msgstr "Expired authentication info. Please try again."
 
-#: eduiddashboard/views/security.py:132
+#: eduiddashboard/views/security.py:133
 msgid "Invalid request: only GET and POST accepted."
 msgstr "Invalid request: only GET and POST accepted."
 
-#: eduiddashboard/views/security.py:152
+#: eduiddashboard/views/security.py:153
 msgid "Password"
 msgstr "Password"
 
-#: eduiddashboard/views/security.py:347
+#: eduiddashboard/views/security.py:348
 msgid "Your password has been successfully updated"
 msgstr "Your password has been successfully updated"
 
-#: eduiddashboard/views/security.py:349
+#: eduiddashboard/views/security.py:350
 msgid ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
@@ -1650,7 +1660,7 @@ msgstr ""
 "An error has occured while updating your password, please try again or "
 "contact support if the problem persists."
 
-#: eduiddashboard/views/security.py:389
+#: eduiddashboard/views/security.py:390
 msgid ""
 "Please enter e-mail address, national identity number or phone number "
 "associated with your eduID account, and we'll send you a link to reset "
@@ -1660,31 +1670,55 @@ msgstr ""
 "associated with your eduID account, and we'll send you a link to reset "
 "your password."
 
-#: eduiddashboard/views/security.py:455 eduiddashboard/views/security.py:494
-#: eduiddashboard/views/security.py:537
+#: eduiddashboard/views/security.py:456 eduiddashboard/views/security.py:495
+#: eduiddashboard/views/security.py:538
 msgid "Reset password"
 msgstr "Reset password"
 
-#: eduiddashboard/views/security.py:520
+#: eduiddashboard/views/security.py:521
 msgid "Myndighetspost"
 msgstr "Myndighetspost"
 
-#: eduiddashboard/views/security.py:540
+#: eduiddashboard/views/security.py:541
 msgid ""
 "Please enter a phone number associated with your eduID account, and we'll"
 " send you an sms with a code and an e-mail with a link to continue your "
 "password reset."
 msgstr ""
 
-#: eduiddashboard/views/security.py:592
+#: eduiddashboard/views/security.py:593
 msgid "Please enter the code you received by SMS to continue"
 msgstr ""
 
-#: eduiddashboard/views/security.py:657
+#: eduiddashboard/views/security.py:658
 msgid "Please choose a new password for your eduID account."
 msgstr "Please choose a new password for your eduID account."
 
 #: eduiddashboard/views/verifications.py:25
 msgid "Can't locate the code in the active session"
 msgstr "Unable to locate the code in the active session"
+
+#~ msgid "Dashboard"
+#~ msgstr "Dashboard"
+
+#~ msgid "Student"
+#~ msgstr "Student"
+
+#~ msgid "Technicians"
+#~ msgstr "Technicians"
+
+#~ msgid "Staff"
+#~ msgstr "Staff"
+
+#~ msgid "Logout"
+#~ msgstr "Logout"
+
+#~ msgid "Sign up"
+#~ msgstr "Sign up"
+
+#~ msgid "Sign in"
+#~ msgstr "Sign in"
+
+#~ msgid "This Site depends on Javascript, so please enable it."
+#~ msgstr "This site requires JavaScript to be enabled."
 

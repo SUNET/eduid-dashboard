@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: eduid-dashboard 0.5.1b11\n"
+"Project-Id-Version: eduid-dashboard 0.5.1b12\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-19 14:35+0100\n"
+"POT-Creation-Date: 2018-01-22 10:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -310,6 +310,56 @@ msgid ""
 "\n"
 msgstr ""
 
+#: eduiddashboard/templates/base.jinja2:6
+msgid "Dashboard"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:57
+msgid "Student"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:60
+msgid "Technicians"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:63
+msgid "Staff"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:66
+#: eduiddashboard/templates/emails-form.jinja2:7
+#: eduiddashboard/templates/mobiles-form.jinja2:7
+#: eduiddashboard/templates/nins-form.jinja2:6
+#: eduiddashboard/templates/personaldata-form.jinja2:7
+msgid "FAQ"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:78
+msgid "Logout"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:87
+msgid "Sign up"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:91
+msgid "Sign in"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:118
+msgid "This Site depends on Javascript, so please enable it."
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:149
+msgid ""
+"There is a new experimental version of the app, which you can use clicking "
+"here"
+msgstr ""
+
+#: eduiddashboard/templates/base.jinja2:151
+msgid "Use new version of the app"
+msgstr ""
+
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
 msgstr ""
@@ -372,13 +422,6 @@ msgstr ""
 #: eduiddashboard/templates/nins-form.jinja2:6
 #: eduiddashboard/templates/personaldata-form.jinja2:7
 msgid "For more information see the"
-msgstr ""
-
-#: eduiddashboard/templates/emails-form.jinja2:7
-#: eduiddashboard/templates/mobiles-form.jinja2:7
-#: eduiddashboard/templates/nins-form.jinja2:6
-#: eduiddashboard/templates/personaldata-form.jinja2:7
-msgid "FAQ"
 msgstr ""
 
 #: eduiddashboard/templates/emails-form.jinja2:23
