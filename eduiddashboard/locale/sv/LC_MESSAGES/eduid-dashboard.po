@@ -1,5 +1,5 @@
 # Swedish translations for eduid-dashboard.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the eduid-dashboard
 # project.
 #
@@ -8,7 +8,7 @@
 # Gijutsu <ascii@binary.to>, 2015-2017
 # Fredrik Thulin, 2013-2014
 # Gijutsu <ascii@binary.to>, 2015
-# Johan Lundberg <lundberg.johan@gmail.com>, 2016-2017
+# Johan Lundberg <lundberg.johan@gmail.com>, 2016-2018
 # Johan Lundberg <lundberg.johan@gmail.com>, 2014-2015
 # Stefan Liström <steli@sunet.se>, 2013-2014
 # Stefan Wold <swold@sunet.se>, 2013-2014
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-22 10:29+0100\n"
-"PO-Revision-Date: 2017-08-14 13:03+0000\n"
-"Last-Translator: Gijutsu <ascii@binary.to>\n"
+"POT-Creation-Date: 2018-01-22 14:02+0100\n"
+"PO-Revision-Date: 2018-01-22 13:12+0000\n"
+"Last-Translator: Johan Lundberg <lundberg.johan@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/sunet/eduid-"
 "dashboard/language/sv/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -387,16 +387,20 @@ msgstr "Logga in"
 #: eduiddashboard/templates/base.jinja2:118
 msgid "This Site depends on Javascript, so please enable it."
 msgstr ""
+"Den här webbplatsen kräver Javascript för att fungera. Du behöver "
+"aktivera Javascript i webbläsaren."
 
 #: eduiddashboard/templates/base.jinja2:149
 msgid ""
 "There is a new experimental version of the app, which you can use "
 "clicking here"
 msgstr ""
+"Klickar du här kommer du till den nya version av eduIDs Dashboard. Testa "
+"gärna, du kan alltid komma tillbaka till den gamla versionen."
 
 #: eduiddashboard/templates/base.jinja2:151
 msgid "Use new version of the app"
-msgstr ""
+msgstr "Testa den nya version"
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
@@ -1709,28 +1713,4 @@ msgstr "Välj ett nytt lösenord för ditt eduID-konto."
 #: eduiddashboard/views/verifications.py:25
 msgid "Can't locate the code in the active session"
 msgstr "Kan inte hitta koden i den aktiva sessionen"
-
-#~ msgid "Dashboard"
-#~ msgstr "Dashboard"
-
-#~ msgid "Student"
-#~ msgstr "Student"
-
-#~ msgid "Technicians"
-#~ msgstr "Tekniker"
-
-#~ msgid "Staff"
-#~ msgstr "Personal"
-
-#~ msgid "Logout"
-#~ msgstr "Logga ut"
-
-#~ msgid "Sign up"
-#~ msgstr "Skapa konto"
-
-#~ msgid "Sign in"
-#~ msgstr "Logga in"
-
-#~ msgid "This Site depends on Javascript, so please enable it."
-#~ msgstr ""
 

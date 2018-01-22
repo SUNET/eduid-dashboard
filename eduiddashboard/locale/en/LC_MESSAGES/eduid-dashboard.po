@@ -1,5 +1,5 @@
 # English translations for eduid-dashboard.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the eduid-dashboard
 # project.
 #
@@ -8,13 +8,14 @@
 # Gijutsu <ascii@binary.to>, 2015,2017
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2013
 # Gijutsu <ascii@binary.to>, 2015
+# Johan Lundberg <lundberg.johan@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version:  eduid-dashboard\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-22 10:29+0100\n"
-"PO-Revision-Date: 2017-08-14 13:02+0000\n"
-"Last-Translator: Gijutsu <ascii@binary.to>\n"
+"POT-Creation-Date: 2018-01-22 14:02+0100\n"
+"PO-Revision-Date: 2018-01-22 13:15+0000\n"
+"Last-Translator: Johan Lundberg <lundberg.johan@gmail.com>\n"
 "Language-Team: English (United States) (http://www.transifex.com/sunet"
 "/eduid-dashboard/language/en_US/)\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -343,19 +344,19 @@ msgstr ""
 
 #: eduiddashboard/templates/base.jinja2:6
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: eduiddashboard/templates/base.jinja2:57
 msgid "Student"
-msgstr ""
+msgstr "Student"
 
 #: eduiddashboard/templates/base.jinja2:60
 msgid "Technicians"
-msgstr ""
+msgstr "Technicians"
 
 #: eduiddashboard/templates/base.jinja2:63
 msgid "Staff"
-msgstr ""
+msgstr "Staff"
 
 #: eduiddashboard/templates/base.jinja2:66
 #: eduiddashboard/templates/emails-form.jinja2:7
@@ -367,29 +368,31 @@ msgstr "FAQ"
 
 #: eduiddashboard/templates/base.jinja2:78
 msgid "Logout"
-msgstr ""
+msgstr "Logout"
 
 #: eduiddashboard/templates/base.jinja2:87
 msgid "Sign up"
-msgstr ""
+msgstr "Sign up"
 
 #: eduiddashboard/templates/base.jinja2:91
 msgid "Sign in"
-msgstr ""
+msgstr "Sign in"
 
 #: eduiddashboard/templates/base.jinja2:118
 msgid "This Site depends on Javascript, so please enable it."
-msgstr ""
+msgstr "This site requires JavaScript to be enabled."
 
 #: eduiddashboard/templates/base.jinja2:149
 msgid ""
 "There is a new experimental version of the app, which you can use "
 "clicking here"
 msgstr ""
+"Click here to try out the new version of eduID's Dashboard. You can "
+"always get back here if something doesn't work right."
 
 #: eduiddashboard/templates/base.jinja2:151
 msgid "Use new version of the app"
-msgstr ""
+msgstr "Try the new version"
 
 #: eduiddashboard/templates/disabled-widgets.jinja2:6
 msgid "Level of assurance"
@@ -1697,28 +1700,4 @@ msgstr "Please choose a new password for your eduID account."
 #: eduiddashboard/views/verifications.py:25
 msgid "Can't locate the code in the active session"
 msgstr "Unable to locate the code in the active session"
-
-#~ msgid "Dashboard"
-#~ msgstr "Dashboard"
-
-#~ msgid "Student"
-#~ msgstr "Student"
-
-#~ msgid "Technicians"
-#~ msgstr "Technicians"
-
-#~ msgid "Staff"
-#~ msgstr "Staff"
-
-#~ msgid "Logout"
-#~ msgstr "Logout"
-
-#~ msgid "Sign up"
-#~ msgstr "Sign up"
-
-#~ msgid "Sign in"
-#~ msgstr "Sign in"
-
-#~ msgid "This Site depends on Javascript, so please enable it."
-#~ msgstr "This site requires JavaScript to be enabled."
 
