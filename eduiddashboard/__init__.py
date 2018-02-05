@@ -16,6 +16,8 @@ from pyramid.authorization import ACLAuthorizationPolicy
 
 from eduid_userdb import MongoDB, UserDB
 from eduid_userdb.dashboard import UserDBWrapper, DashboardUserDB
+from eduid_userdb.proofing import PhoneProofingStateDB
+from eduid_userdb.proofing import EmailProofingStateDB
 from eduid_common.config.parsers import IniConfigParser
 from eduid_common.api.utils import urlappend
 from eduiddashboard.i18n import locale_negotiator
@@ -235,6 +237,16 @@ def includeme(config):
     _dashboard_userdb = DashboardUserDB(config.registry.settings['mongo_uri'])
     config.registry.settings['dashboard_userdb'] = _dashboard_userdb
     config.add_request_method(lambda x: x.registry.settings['dashboard_userdb'], 'dashboard_userdb', reify=True)
+
+    _new_email_proofing_state_db = EmailProofingStateDB(config.registry.settings['mongo_uri'])
+    config.registry.settings['new_email_proofing_state_db'] = _new_email_proofing_state_db
+    config.add_request_method(lambda x: x.registry.settings['new_email_proofing_state_db'],
+            'new_email_proofing_state_db', reify=True)
+
+    _new_phone_proofing_state_db = PhoneProofingStateDB(config.registry.settings['mongo_uri'])
+    config.registry.settings['new_phone_proofing_state_db'] = _new_phone_proofing_state_db
+    config.add_request_method(lambda x: x.registry.settings['new_phone_proofing_state_db'],
+            'new_phone_proofing_state_db', reify=True)
 
     config.registry.settings['msgrelay'] = MsgRelay(config.registry.settings)
     config.add_request_method(lambda x: x.registry.settings['msgrelay'], 'msgrelay', reify=True)
