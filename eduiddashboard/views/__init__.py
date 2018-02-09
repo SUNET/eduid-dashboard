@@ -17,6 +17,8 @@ from eduiddashboard.utils import (get_short_hash,
                                   retrieve_modified_ts)
 from eduiddashboard.verifications import (get_verification_code,
                                           verify_code,
+                                          set_phone_verified,
+                                          set_email_verified,
                                           new_verification_code)
 from eduiddashboard import log
 from eduiddashboard.session import get_session_user, store_session_user
@@ -237,8 +239,38 @@ class BaseActionsView(object):
                         'result': 'success',
                         'message': self.verify_messages['success'],
                         }
-                else:
-                    log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
+
+            db, proofing_state = None, None
+            if self.data_attribute == 'mailAliases':
+                db = self.request.new_email_proofing_state_db
+                proofing_state = db.get_state_by_eppn_and_email(self.user.eppn,
+                        data_id, raise_on_missing=False)
+            elif self.data_attribute == 'phone':
+                db = self.request.new_phone_proofing_state_db
+                proofing_state = db.get_state_by_eppn_and_mobile(self.user.eppn,
+                        data_id, raise_on_missing=False)
+            if proofing_state:
+                if code_sent == proofing_state.verification.verification_code:
+                    if self.data_attribute == 'phone':
+                        msg = set_phone_verified(self.request, self.user, data_id)
+                    elif self.data_attribute == 'mailAliases':
+                        msg = set_email_verified(self.request, self.user, data_id)
+                    else:
+                        raise NotImplementedError('Unknown validation model_name: {!r}'.format(self.data_attribute))
+
+                    try:
+                        self.request.context.save_dashboard_user(self.user)
+                        log.info("Verified {!s} saved for user {!r}.".format(self.data_attribute, self.user))
+                    except UserOutOfSync:
+                        log.info("Verified {!s} NOT saved for user {!r}. User out of sync.".format(self.data_attribute, self.user))
+                        raise
+                    db.remove_state(proofing_state)
+                    log.debug('Removed proofing state: {!r} '.format(proofing_state))
+                    return {
+                        'result': 'success',
+                        'message': self.verify_messages['success'],
+                        }
+            log.debug("Incorrect code for user {!r}: {!r}".format(self.user, code_sent))
             return {
                 'result': 'error',
                 'message': self.verify_messages['error'],
