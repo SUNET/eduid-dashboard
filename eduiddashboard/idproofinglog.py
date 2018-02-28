@@ -157,7 +157,7 @@ class IDProofingLog(object):
         self.collection = MongoDB(self.mongodb_uri).get_collection('id_proofing_log', database_name='eduid_dashboard')
 
     def _insert(self, doc):
-        self.collection.insert(doc, safe=True)  # Make sure the write succeeded
+        self.collection.insert(doc, w='majority')  # Make sure the write succeeded
 
     def log_verification(self, id_proofing_data):
         """

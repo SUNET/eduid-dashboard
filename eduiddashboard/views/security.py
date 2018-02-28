@@ -89,7 +89,7 @@ def new_reset_password_code(request, user, mechanism='email', next_view='reset-p
     if mechanism == 'mobile':
         reset_doc['mobile_hash_code'] = get_short_hash()
 
-    reference = request.db.reset_passwords.insert(reset_doc, safe=True, manipulate=True)
+    reference = request.db.reset_passwords.insert(reset_doc, w='majority', manipulate=True)
     log.debug("New reset password code: {!s} via {!s} for user: {!r}.".format(hash_code, mechanism, user))
     reset_password_link = request.route_url(
         next_view,

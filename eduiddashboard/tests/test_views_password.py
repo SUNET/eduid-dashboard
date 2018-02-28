@@ -285,7 +285,7 @@ class TerminateAccountTests(LoggedInRequestTests):
             'hash_code': hash_code,
             'mechanism': 'email',
             'created_at': date
-        }, safe=True)
+        })
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
         self.assertIn('Please choose a new password for your eduID account', response.text)
         form = response.forms['resetpasswordstep2view-form']
@@ -425,7 +425,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'hash_code': hash_code,
             'mechanism': 'email',
             'created_at': date
-        }, safe=True)
+        })
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
         self.assertIn('Please choose a new password for your eduID account', response.text)
         form = response.forms['resetpasswordstep2view-form']
@@ -479,7 +479,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'hash_code': hash_code,
             'mechanism': 'email',
             'created_at': date
-        }, safe=True)
+        }, w='majority')
         response = self.testapp.get('/profile/reset-password/{0}/'.format(hash_code))
         self.assertIn('Please choose a new password for your eduID account', response.text)
 
@@ -491,7 +491,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'hash_code': hash_code,
             'mechanism': 'email',
             'verified': False,
-        }, safe=True)
+        })
         response = self.testapp.get('/profile/reset-password/{0}/'.format(wrong_code))
         self.assertEqual(response.status, '302 Found')
 
@@ -523,7 +523,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'mechanism': 'mobile',
             'verified': False,
             'created_at': datetime.now()
-        }, safe=True)
+        })
 
         response_form = self.testapp.get('/profile/reset-password/mobile/{0}/'.format(hash_code))
         form = response_form.forms['resetpasswordmobileview2-form']
@@ -547,7 +547,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'mechanism': 'mobile',
             'verified': False,
             'created_at': datetime.now()
-        }, safe=True)
+        })
 
         response_form = self.testapp.get('/profile/reset-password/mobile/{0}/'.format(hash_code))
         form = response_form.forms['resetpasswordmobileview2-form']
@@ -568,7 +568,7 @@ class ResetPasswordFormTests(LoggedInRequestTests):
             'mobile_hash_code': 'bogus_code',
             'mechanism': 'mobile',
             'verified': False,
-        }, safe=True)
+        })
         response = self.testapp.get('/profile/reset-password/mobile/{0}/'.format(wrong_code))
         self.assertEqual(response.status, '302 Found')
 
