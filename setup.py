@@ -21,7 +21,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-version = '0.5.1b13'
+version = '0.5.1b14'
 
 requires = [
     'eduid_am >= 0.6.0',
@@ -35,7 +35,6 @@ requires = [
     'redis >= 2.10.5',
     'PyNaCl >= 1.0.1',
     'pysaml2 == 4.0.3rc1',
-    'pymongo>=2.8,<3',
     'pyramid==1.4.1',
     'pyramid_jinja2==1.6',
     'jinja2<2.9',  # Templates breaks with jinja2 2.9
